@@ -8,7 +8,7 @@ import { useQuestionLimits } from '@/hooks/useDailyUsage';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { BookOpen, Trophy, Target, Flame, Play, Crown, Medal, Award, LogOut, Sparkles, Bot } from 'lucide-react';
+import { BookOpen, Trophy, Target, Flame, Play, Crown, Medal, Award, LogOut, Sparkles, Bot, HelpCircle } from 'lucide-react';
 import heroPattern from '@/assets/hero-pattern.png';
 import { PremiumBadge, UsageMeter, UpgradeCard } from '@/components/PremiumBadge';
 import { DailyLimitModal } from '@/components/DailyLimitModal';
@@ -221,6 +221,23 @@ export default function Index() {
             </CardContent>
           </Card>
         </div>
+
+        {/* FAQ Link */}
+        <Card 
+          variant="interactive" 
+          className="p-4 cursor-pointer"
+          onClick={() => navigate('/faq')}
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+              <HelpCircle className="w-5 h-5 text-primary" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-semibold text-sm">Perguntas Frequentes</h3>
+              <p className="text-xs text-muted-foreground">Tire suas dúvidas sobre o app</p>
+            </div>
+          </div>
+        </Card>
       </div>
 
       <DailyLimitModal open={showLimitModal} onOpenChange={setShowLimitModal} />
