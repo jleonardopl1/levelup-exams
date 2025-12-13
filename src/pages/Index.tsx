@@ -81,7 +81,7 @@ export default function Index() {
       </div>
 
       {/* Main Content */}
-      <div className="px-4 -mt-8 pb-8 space-y-6">
+      <div className="relative z-20 px-4 -mt-8 pb-8 space-y-6">
         {/* Start Quiz CTA */}
         <Card variant="elevated" className="overflow-hidden">
           <CardContent className="p-6">
