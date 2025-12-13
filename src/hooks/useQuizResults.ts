@@ -46,15 +46,33 @@ export function useQuizResults() {
 }
 
 export function useLeaderboard(limit: number = 10) {
+  return useLeaderboardFiltered('all', limit);
+}
+
+export function useLeaderboardFiltered(period: 'today' | 'week' | 'month' | 'all' = 'all', limit: number = 10) {
   return useQuery({
-    queryKey: ['leaderboard', limit],
+    queryKey: ['leaderboard', period, limit],
     queryFn: async () => {
-      // First get quiz results
-      const { data: results, error: resultsError } = await supabase
+      let query = supabase
         .from('quiz_results')
         .select('id, user_id, score, correct_answers, total_questions, created_at')
         .order('score', { ascending: false })
         .limit(limit);
+
+      // Apply date filter
+      const now = new Date();
+      if (period === 'today') {
+        const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+        query = query.gte('created_at', startOfDay);
+      } else if (period === 'week') {
+        const startOfWeek = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
+        query = query.gte('created_at', startOfWeek);
+      } else if (period === 'month') {
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+        query = query.gte('created_at', startOfMonth);
+      }
+
+      const { data: results, error: resultsError } = await query;
       
       if (resultsError) throw resultsError;
       if (!results || results.length === 0) return [];

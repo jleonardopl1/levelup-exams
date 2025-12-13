@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Quiz from "./pages/Quiz";
 import Result from "./pages/Result";
+import Ranking from "./pages/Ranking";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +25,7 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/quiz" element={<Quiz />} />
             <Route path="/result" element={<Result />} />
+            <Route path="/ranking" element={<Ranking />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
