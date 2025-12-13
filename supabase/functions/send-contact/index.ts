@@ -14,6 +14,16 @@ interface ContactRequest {
   message: string;
 }
 
+// HTML escape function to prevent XSS/injection in email templates
+const escapeHtml = (str: string): string => {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+};
+
 async function sendEmail(to: string[], subject: string, html: string) {
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -71,16 +81,21 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log(`Sending contact email from ${name} (${email})`);
 
+    // Escape user inputs to prevent HTML injection in emails
+    const safeName = escapeHtml(name);
+    const safeEmail = escapeHtml(email);
+    const safeMessage = escapeHtml(message).replace(/\n/g, '<br>');
+
     // Send notification to admin
     await sendEmail(
       ["contato@simuladosconcursos.com.br"], // Change to your admin email
-      `Nova mensagem de contato: ${name}`,
+      `Nova mensagem de contato: ${safeName}`,
       `
         <h2>Nova mensagem de contato</h2>
-        <p><strong>Nome:</strong> ${name}</p>
-        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Nome:</strong> ${safeName}</p>
+        <p><strong>Email:</strong> ${safeEmail}</p>
         <p><strong>Mensagem:</strong></p>
-        <p>${message.replace(/\n/g, '<br>')}</p>
+        <p>${safeMessage}</p>
       `
     );
 
@@ -91,10 +106,10 @@ const handler = async (req: Request): Promise<Response> => {
       [email],
       "Recebemos sua mensagem!",
       `
-        <h1>Olá, ${name}!</h1>
+        <h1>Olá, ${safeName}!</h1>
         <p>Recebemos sua mensagem e responderemos em breve.</p>
         <p><strong>Sua mensagem:</strong></p>
-        <p style="background: #f4f4f4; padding: 12px; border-radius: 8px;">${message.replace(/\n/g, '<br>')}</p>
+        <p style="background: #f4f4f4; padding: 12px; border-radius: 8px;">${safeMessage}</p>
         <p>Atenciosamente,<br>Equipe Simulados Concursos</p>
       `
     );
