@@ -1,9 +1,10 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useQuestions, Question } from '@/hooks/useQuestions';
 import { useSubmitQuiz } from '@/hooks/useQuizResults';
 import { useQuestionLimits, useIncrementUsage } from '@/hooks/useDailyUsage';
+import { useProcessQuizRewards } from '@/hooks/useQuizRewards';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -19,6 +20,7 @@ export default function Quiz() {
   const submitQuiz = useSubmitQuiz();
   const incrementUsage = useIncrementUsage();
   const { hasReachedLimit, questionsRemaining, isPremium } = useQuestionLimits();
+  const { processRewards } = useProcessQuizRewards();
   const navigate = useNavigate();
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -28,6 +30,8 @@ export default function Quiz() {
   const [timeLeft, setTimeLeft] = useState(600); // 10 minutes
   const [quizFinished, setQuizFinished] = useState(false);
   const [showLimitModal, setShowLimitModal] = useState(false);
+  const [currentStreak, setCurrentStreak] = useState(0);
+  const maxStreakRef = useRef(0);
 
   // Check limit when quiz starts
   useEffect(() => {
@@ -71,6 +75,16 @@ export default function Quiz() {
       selected: selectedAnswer, 
       correct: isCorrect 
     }]);
+    
+    // Track consecutive correct answers
+    if (isCorrect) {
+      const newStreak = currentStreak + 1;
+      setCurrentStreak(newStreak);
+      maxStreakRef.current = Math.max(maxStreakRef.current, newStreak);
+    } else {
+      setCurrentStreak(0);
+    }
+    
     setShowResult(true);
   };
 
@@ -92,24 +106,34 @@ export default function Quiz() {
       (showResult && selectedAnswer === currentQuestion?.correta ? 1 : 0);
     const total = questions?.length || 0;
     const score = Math.round((correctCount / total) * 100);
+    const timeSpent = 600 - timeLeft;
 
     // Increment usage for free users
     if (!isPremium) {
       await incrementUsage.mutateAsync(total);
     }
 
+    // Submit quiz result
     await submitQuiz.mutateAsync({
       score,
       correctAnswers: correctCount,
       totalQuestions: total,
-      timeSpentSeconds: 600 - timeLeft,
+      timeSpentSeconds: timeSpent,
       categoria: categoria || 'Todas',
     });
 
-    navigate('/result', { 
-      state: { score, correct: correctCount, total, timeSpent: 600 - timeLeft } 
+    // Process rewards and achievements
+    await processRewards({
+      correctAnswers: correctCount,
+      totalQuestions: total,
+      timeSpentSeconds: timeSpent,
+      consecutiveCorrect: maxStreakRef.current,
     });
-  }, [answers, currentQuestion, navigate, questions, quizFinished, selectedAnswer, showResult, submitQuiz, timeLeft, categoria, isPremium, incrementUsage]);
+
+    navigate('/result', { 
+      state: { score, correct: correctCount, total, timeSpent } 
+    });
+  }, [answers, currentQuestion, navigate, questions, quizFinished, selectedAnswer, showResult, submitQuiz, timeLeft, categoria, isPremium, incrementUsage, processRewards]);
 
   if (isLoading || !questions) {
     return (
