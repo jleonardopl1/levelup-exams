@@ -4,6 +4,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { calculateLevel } from './useRewards';
+import { useUpdateChallengeProgress } from './useDailyChallenges';
+import { useCheckAndCreateMilestones } from './useMilestones';
 
 interface QuizRewardResult {
   pointsEarned: number;
@@ -17,6 +19,8 @@ export function useProcessQuizRewards() {
   const queryClient = useQueryClient();
   const [showConfetti, setShowConfetti] = useState(false);
   const [showGlow, setShowGlow] = useState(false);
+  const updateChallengeProgress = useUpdateChallengeProgress();
+  const checkMilestones = useCheckAndCreateMilestones();
 
   const processRewards = useCallback(async ({
     correctAnswers,
@@ -225,6 +229,27 @@ export function useProcessQuizRewards() {
       queryClient.invalidateQueries({ queryKey: ['user-achievements'] });
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
       queryClient.invalidateQueries({ queryKey: ['notifications-unread-count'] });
+
+      // Update daily challenge progress
+      const isPerfect = accuracy === 1;
+      updateChallengeProgress.mutate({
+        correctAnswers,
+        totalQuestions,
+        accuracy: accuracy * 100,
+        timeSpentSeconds,
+        consecutiveCorrect,
+        isPerfect,
+      });
+
+      // Check for milestones
+      if (profile) {
+        checkMilestones.mutate({
+          totalPoints: newTotalPoints,
+          currentLevel: newLevel,
+          totalQuizzes: profile.total_quizzes + 1,
+          streakDays: profile.streak_days,
+        });
+      }
 
       // Show points earned notification
       if (totalPointsEarned > 0) {

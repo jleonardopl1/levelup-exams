@@ -13,6 +13,8 @@ import heroPattern from '@/assets/hero-pattern.png';
 import { PremiumBadge, UsageMeter, UpgradeCard } from '@/components/PremiumBadge';
 import { DailyLimitModal } from '@/components/DailyLimitModal';
 import { AppHeader } from '@/components/AppHeader';
+import { DailyChallengesCard } from '@/components/DailyChallengesCard';
+import { MilestoneModal } from '@/components/MilestoneModal';
 
 export default function Index() {
   const { user, loading: authLoading, signOut } = useAuth();
@@ -207,6 +209,10 @@ export default function Index() {
             <div className="w-1.5 h-1.5 rounded-full bg-primary/20" />
           </div>
         </div>
+
+        {/* Daily Challenges */}
+        <DailyChallengesCard />
+
         {/* Categories - Organic Grid */}
         <div>
           <h2 className="font-display font-bold text-lg mb-4 flex items-center gap-2">
@@ -376,6 +382,9 @@ export default function Index() {
       </div>
 
       <DailyLimitModal open={showLimitModal} onOpenChange={setShowLimitModal} />
+      
+      {/* Milestone Celebration Modal */}
+      <MilestoneModal />
     </div>
   );
 }
