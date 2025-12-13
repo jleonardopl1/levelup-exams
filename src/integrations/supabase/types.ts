@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      achievements: {
+        Row: {
+          code: string
+          created_at: string
+          description: string
+          icon: string
+          id: string
+          name: string
+          points_reward: number
+          requirement_type: string
+          requirement_value: number
+          tier: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          description: string
+          icon?: string
+          id?: string
+          name: string
+          points_reward?: number
+          requirement_type: string
+          requirement_value: number
+          tier?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          description?: string
+          icon?: string
+          id?: string
+          name?: string
+          points_reward?: number
+          requirement_type?: string
+          requirement_value?: number
+          tier?: string
+        }
+        Relationships: []
+      }
       ai_mentor_usage: {
         Row: {
           created_at: string
@@ -179,6 +218,148 @@ export type Database = {
         }
         Relationships: []
       }
+      referral_codes: {
+        Row: {
+          code: string
+          commission_percent: number
+          created_at: string
+          discount_percent: number
+          id: string
+          is_active: boolean
+          total_earnings: number
+          total_uses: number
+          user_id: string
+        }
+        Insert: {
+          code: string
+          commission_percent?: number
+          created_at?: string
+          discount_percent?: number
+          id?: string
+          is_active?: boolean
+          total_earnings?: number
+          total_uses?: number
+          user_id: string
+        }
+        Update: {
+          code?: string
+          commission_percent?: number
+          created_at?: string
+          discount_percent?: number
+          id?: string
+          is_active?: boolean
+          total_earnings?: number
+          total_uses?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      referral_uses: {
+        Row: {
+          commission_earned: number | null
+          created_at: string
+          id: string
+          referral_code_id: string
+          referred_user_id: string
+          subscription_amount: number | null
+        }
+        Insert: {
+          commission_earned?: number | null
+          created_at?: string
+          id?: string
+          referral_code_id: string
+          referred_user_id: string
+          subscription_amount?: number | null
+        }
+        Update: {
+          commission_earned?: number | null
+          created_at?: string
+          id?: string
+          referral_code_id?: string
+          referred_user_id?: string
+          subscription_amount?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referral_uses_referral_code_id_fkey"
+            columns: ["referral_code_id"]
+            isOneToOne: false
+            referencedRelation: "referral_codes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reward_catalog: {
+        Row: {
+          available_for_tier: string
+          code: string
+          created_at: string
+          description: string
+          id: string
+          is_active: boolean
+          max_redemptions: number | null
+          name: string
+          points_cost: number
+          reward_type: string
+          reward_value: Json
+        }
+        Insert: {
+          available_for_tier?: string
+          code: string
+          created_at?: string
+          description: string
+          id?: string
+          is_active?: boolean
+          max_redemptions?: number | null
+          name: string
+          points_cost: number
+          reward_type: string
+          reward_value: Json
+        }
+        Update: {
+          available_for_tier?: string
+          code?: string
+          created_at?: string
+          description?: string
+          id?: string
+          is_active?: boolean
+          max_redemptions?: number | null
+          name?: string
+          points_cost?: number
+          reward_type?: string
+          reward_value?: Json
+        }
+        Relationships: []
+      }
+      user_achievements: {
+        Row: {
+          achievement_id: string
+          id: string
+          unlocked_at: string
+          user_id: string
+        }
+        Insert: {
+          achievement_id: string
+          id?: string
+          unlocked_at?: string
+          user_id: string
+        }
+        Update: {
+          achievement_id?: string
+          id?: string
+          unlocked_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_achievements_achievement_id_fkey"
+            columns: ["achievement_id"]
+            isOneToOne: false
+            referencedRelation: "achievements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_answers: {
         Row: {
           created_at: string
@@ -223,6 +404,83 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_redemptions: {
+        Row: {
+          expires_at: string | null
+          id: string
+          points_spent: number
+          redeemed_at: string
+          reward_id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          expires_at?: string | null
+          id?: string
+          points_spent: number
+          redeemed_at?: string
+          reward_id: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          expires_at?: string | null
+          id?: string
+          points_spent?: number
+          redeemed_at?: string
+          reward_id?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_redemptions_reward_id_fkey"
+            columns: ["reward_id"]
+            isOneToOne: false
+            referencedRelation: "reward_catalog"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_rewards: {
+        Row: {
+          consecutive_correct: number
+          created_at: string
+          current_level: number
+          id: string
+          last_session_date: string | null
+          max_consecutive_correct: number
+          total_points: number
+          total_time_seconds: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          consecutive_correct?: number
+          created_at?: string
+          current_level?: number
+          id?: string
+          last_session_date?: string | null
+          max_consecutive_correct?: number
+          total_points?: number
+          total_time_seconds?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          consecutive_correct?: number
+          created_at?: string
+          current_level?: number
+          id?: string
+          last_session_date?: string | null
+          max_consecutive_correct?: number
+          total_points?: number
+          total_time_seconds?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
     }
     Views: {

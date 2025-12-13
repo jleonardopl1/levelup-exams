@@ -12,6 +12,7 @@ import { BookOpen, Trophy, Target, Flame, Play, Crown, Medal, Award, LogOut, Spa
 import heroPattern from '@/assets/hero-pattern.png';
 import { PremiumBadge, UsageMeter, UpgradeCard } from '@/components/PremiumBadge';
 import { DailyLimitModal } from '@/components/DailyLimitModal';
+import { AppHeader } from '@/components/AppHeader';
 
 export default function Index() {
   const { user, loading: authLoading, signOut } = useAuth();
@@ -60,6 +61,8 @@ export default function Index() {
 
   return (
     <div className="min-h-screen bg-background">
+      <AppHeader />
+      
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0">
@@ -68,32 +71,14 @@ export default function Index() {
         </div>
         
         <div className="relative z-10 px-4 pt-6 pb-20">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-3">
-              <div>
-                <p className="text-primary-foreground/80 text-sm">Olá,</p>
-                <h1 className="text-2xl font-display font-bold text-primary-foreground">
-                  {profile?.display_name || 'Estudante'}
-                </h1>
-              </div>
-              <PremiumBadge tier={tier} />
+          <div className="flex items-center gap-3 mb-6">
+            <div>
+              <p className="text-primary-foreground/80 text-sm">Olá,</p>
+              <h1 className="text-2xl font-display font-bold text-primary-foreground">
+                {profile?.display_name || 'Estudante'}
+              </h1>
             </div>
-            <div className="flex items-center gap-2">
-              {!isPremium && (
-                <Button 
-                  variant="glass" 
-                  size="sm" 
-                  onClick={() => navigate('/upgrade')}
-                  className="gap-1"
-                >
-                  <Sparkles className="w-4 h-4 text-amber-300" />
-                  <span className="hidden sm:inline">Upgrade</span>
-                </Button>
-              )}
-              <Button variant="glass" size="icon" onClick={signOut}>
-                <LogOut className="w-5 h-5" />
-              </Button>
-            </div>
+            <PremiumBadge tier={tier} />
           </div>
           
           {/* Stats Cards */}
