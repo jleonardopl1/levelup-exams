@@ -30,6 +30,7 @@ import {
 } from 'lucide-react';
 import { PremiumBadge } from '@/components/PremiumBadge';
 import { ShareModal } from '@/components/ShareModal';
+import { NotificationCenter } from '@/components/NotificationCenter';
 
 export function AppHeader() {
   const { user, signOut } = useAuth();
@@ -109,6 +110,9 @@ export function AppHeader() {
             >
               <LayoutDashboard className="w-5 h-5" />
             </Button>
+
+            {/* Notification Center */}
+            <NotificationCenter />
 
             {/* Share Button */}
             <Button

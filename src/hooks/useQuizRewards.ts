@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useQueryClient } from '@tanstack/react-query';
@@ -9,11 +9,14 @@ interface QuizRewardResult {
   pointsEarned: number;
   newLevel: number | null;
   achievementsUnlocked: string[];
+  shouldShowConfetti: boolean;
 }
 
 export function useProcessQuizRewards() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [showGlow, setShowGlow] = useState(false);
 
   const processRewards = useCallback(async ({
     correctAnswers,
@@ -26,12 +29,13 @@ export function useProcessQuizRewards() {
     timeSpentSeconds: number;
     consecutiveCorrect: number;
   }): Promise<QuizRewardResult> => {
-    if (!user) return { pointsEarned: 0, newLevel: null, achievementsUnlocked: [] };
+    if (!user) return { pointsEarned: 0, newLevel: null, achievementsUnlocked: [], shouldShowConfetti: false };
 
     const result: QuizRewardResult = {
       pointsEarned: 0,
       newLevel: null,
       achievementsUnlocked: [],
+      shouldShowConfetti: false,
     };
 
     try {
@@ -89,6 +93,20 @@ export function useProcessQuizRewards() {
       // Check for level up
       if (newLevel > oldLevel) {
         result.newLevel = newLevel;
+        result.shouldShowConfetti = true;
+        setShowConfetti(true);
+        setShowGlow(true);
+        
+        // Create persistent notification for level up
+        await supabase.from('notifications').insert([{
+          user_id: user.id,
+          type: 'level_up',
+          title: `Subiu para o Nível ${newLevel}!`,
+          message: 'Continue assim para desbloquear mais recompensas!',
+          icon: 'zap',
+          data: { level: newLevel, previous_level: oldLevel },
+        }]);
+        
         toast.success(`🎉 Subiu para o Nível ${newLevel}!`, {
           description: 'Continue assim para desbloquear mais recompensas!',
           duration: 5000,
@@ -163,6 +181,13 @@ export function useProcessQuizRewards() {
             if (!error) {
               result.achievementsUnlocked.push(achievement.name);
               
+              // Trigger celebration for rare achievements (gold/platinum)
+              if (achievement.tier === 'gold' || achievement.tier === 'platinum') {
+                result.shouldShowConfetti = true;
+                setShowConfetti(true);
+                setShowGlow(true);
+              }
+              
               // Add achievement points to total
               await supabase
                 .from('user_rewards')
@@ -170,6 +195,20 @@ export function useProcessQuizRewards() {
                   total_points: newTotalPoints + achievement.points_reward,
                 })
                 .eq('user_id', user.id);
+
+              // Create persistent notification for achievement
+              await supabase.from('notifications').insert([{
+                user_id: user.id,
+                type: 'achievement',
+                title: achievement.name,
+                message: `${achievement.description} (+${achievement.points_reward} pts)`,
+                icon: achievement.icon || 'trophy',
+                data: { 
+                  achievement_id: achievement.id, 
+                  tier: achievement.tier,
+                  points_reward: achievement.points_reward 
+                },
+              }]);
 
               // Show achievement notification
               toast.success(`🏆 ${achievement.name}`, {
@@ -184,6 +223,8 @@ export function useProcessQuizRewards() {
       // Invalidate queries to refresh data
       queryClient.invalidateQueries({ queryKey: ['user-rewards'] });
       queryClient.invalidateQueries({ queryKey: ['user-achievements'] });
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      queryClient.invalidateQueries({ queryKey: ['notifications-unread-count'] });
 
       // Show points earned notification
       if (totalPointsEarned > 0) {
@@ -202,7 +243,7 @@ export function useProcessQuizRewards() {
     }
   }, [user, queryClient]);
 
-  return { processRewards };
+  return { processRewards, showConfetti, setShowConfetti, showGlow, setShowGlow };
 }
 
 function getPointsBreakdown(base: number, accuracy: number, speed: number, perfect: number, streak: number): string {
