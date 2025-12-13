@@ -11,6 +11,7 @@ import { Progress } from '@/components/ui/progress';
 import { ArrowLeft, Clock, CheckCircle, XCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { DailyLimitModal } from '@/components/DailyLimitModal';
+import { Confetti, CelebrationGlow } from '@/components/Confetti';
 
 export default function Quiz() {
   const [searchParams] = useSearchParams();
@@ -20,7 +21,7 @@ export default function Quiz() {
   const submitQuiz = useSubmitQuiz();
   const incrementUsage = useIncrementUsage();
   const { hasReachedLimit, questionsRemaining, isPremium } = useQuestionLimits();
-  const { processRewards } = useProcessQuizRewards();
+  const { processRewards, showConfetti, setShowConfetti, showGlow, setShowGlow } = useProcessQuizRewards();
   const navigate = useNavigate();
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -238,6 +239,10 @@ export default function Quiz() {
       </Button>
 
       <DailyLimitModal open={showLimitModal} onOpenChange={setShowLimitModal} />
+      
+      {/* Celebration Effects */}
+      <Confetti isActive={showConfetti} onComplete={() => setShowConfetti(false)} />
+      <CelebrationGlow isActive={showGlow} />
     </div>
   );
 }
