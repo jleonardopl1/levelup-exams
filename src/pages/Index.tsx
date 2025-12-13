@@ -1,21 +1,42 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
 import { useCategories } from '@/hooks/useQuestions';
 import { useLeaderboard } from '@/hooks/useQuizResults';
+import { useQuestionLimits } from '@/hooks/useDailyUsage';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { BookOpen, Trophy, Target, Flame, Play, Crown, Medal, Award, LogOut } from 'lucide-react';
+import { BookOpen, Trophy, Target, Flame, Play, Crown, Medal, Award, LogOut, Sparkles } from 'lucide-react';
 import heroPattern from '@/assets/hero-pattern.png';
+import { PremiumBadge, UsageMeter, UpgradeCard } from '@/components/PremiumBadge';
+import { DailyLimitModal } from '@/components/DailyLimitModal';
 
 export default function Index() {
   const { user, loading: authLoading, signOut } = useAuth();
   const { data: profile } = useProfile();
   const { data: categories } = useCategories();
   const { data: leaderboard } = useLeaderboard(5);
+  const { isPremium, questionsRemaining, dailyLimit, hasReachedLimit, tier } = useQuestionLimits();
   const navigate = useNavigate();
+  const [showLimitModal, setShowLimitModal] = useState(false);
+
+  const handleStartQuiz = () => {
+    if (hasReachedLimit && !isPremium) {
+      setShowLimitModal(true);
+    } else {
+      navigate('/quiz');
+    }
+  };
+
+  const handleCategoryClick = (cat: string) => {
+    if (hasReachedLimit && !isPremium) {
+      setShowLimitModal(true);
+    } else {
+      navigate(`/quiz?categoria=${encodeURIComponent(cat)}`);
+    }
+  };
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -47,16 +68,32 @@ export default function Index() {
         </div>
         
         <div className="relative z-10 px-4 pt-6 pb-20">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <p className="text-primary-foreground/80 text-sm">Olá,</p>
-              <h1 className="text-2xl font-display font-bold text-primary-foreground">
-                {profile?.display_name || 'Estudante'}
-              </h1>
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div>
+                <p className="text-primary-foreground/80 text-sm">Olá,</p>
+                <h1 className="text-2xl font-display font-bold text-primary-foreground">
+                  {profile?.display_name || 'Estudante'}
+                </h1>
+              </div>
+              <PremiumBadge tier={tier} />
             </div>
-            <Button variant="glass" size="icon" onClick={signOut}>
-              <LogOut className="w-5 h-5" />
-            </Button>
+            <div className="flex items-center gap-2">
+              {!isPremium && (
+                <Button 
+                  variant="glass" 
+                  size="sm" 
+                  onClick={() => navigate('/upgrade')}
+                  className="gap-1"
+                >
+                  <Sparkles className="w-4 h-4 text-amber-300" />
+                  <span className="hidden sm:inline">Upgrade</span>
+                </Button>
+              )}
+              <Button variant="glass" size="icon" onClick={signOut}>
+                <LogOut className="w-5 h-5" />
+              </Button>
+            </div>
           </div>
           
           {/* Stats Cards */}
@@ -82,6 +119,15 @@ export default function Index() {
 
       {/* Main Content */}
       <div className="relative z-20 px-4 -mt-8 pb-8 space-y-6">
+        {/* Usage Meter for Free Users */}
+        {!isPremium && (
+          <Card variant="elevated">
+            <CardContent className="p-4">
+              <UsageMeter questionsRemaining={questionsRemaining} dailyLimit={dailyLimit} />
+            </CardContent>
+          </Card>
+        )}
+
         {/* Start Quiz CTA */}
         <Card variant="elevated" className="overflow-hidden">
           <CardContent className="p-6">
@@ -93,8 +139,8 @@ export default function Index() {
                 <h3 className="font-display font-bold text-lg">Iniciar Simulado</h3>
                 <p className="text-sm text-muted-foreground">10 questões aleatórias</p>
               </div>
-              <Button variant="gradient-accent" size="lg" asChild>
-                <Link to="/quiz">Começar</Link>
+              <Button variant="gradient-accent" size="lg" onClick={handleStartQuiz}>
+                Começar
               </Button>
             </div>
           </CardContent>
@@ -109,7 +155,7 @@ export default function Index() {
                 key={cat} 
                 variant="interactive"
                 className="p-4"
-                onClick={() => navigate(`/quiz?categoria=${encodeURIComponent(cat)}`)}
+                onClick={() => handleCategoryClick(cat)}
               >
                 <BookOpen className="w-6 h-6 text-primary mb-2" />
                 <p className="font-semibold text-sm">{cat}</p>
@@ -117,6 +163,11 @@ export default function Index() {
             ))}
           </div>
         </div>
+
+        {/* Upgrade Card for Free Users */}
+        {!isPremium && (
+          <UpgradeCard onUpgrade={() => navigate('/upgrade')} />
+        )}
 
         {/* Leaderboard Preview */}
         <div>
@@ -148,6 +199,8 @@ export default function Index() {
           </Card>
         </div>
       </div>
+
+      <DailyLimitModal open={showLimitModal} onOpenChange={setShowLimitModal} />
     </div>
   );
 }
