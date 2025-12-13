@@ -7,8 +7,10 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ArrowLeft, Send, Bot, User, Sparkles, Lock } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { useAIMentorLimits, useIncrementAIMentorUsage } from "@/hooks/useAIMentorUsage";
+import { useAIMentorLimits } from "@/hooks/useAIMentorUsage";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 
 type Message = {
   role: "user" | "assistant";
@@ -24,9 +26,9 @@ const Mentor = () => {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const queryClient = useQueryClient();
 
   const { questionsUsed, dailyLimit, questionsRemaining, hasReachedLimit, isPremium, isLoading: limitsLoading } = useAIMentorLimits();
-  const incrementUsage = useIncrementAIMentorUsage();
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -37,6 +39,7 @@ const Mentor = () => {
   const sendMessage = async () => {
     if (!input.trim() || isLoading) return;
 
+    // Client-side checks for UX only - server validates everything
     if (!isPremium) {
       toast.error("O Mentor IA é exclusivo para assinantes Plus!");
       navigate("/upgrade");
@@ -56,19 +59,49 @@ const Mentor = () => {
     let assistantContent = "";
 
     try {
-      await incrementUsage.mutateAsync();
+      // Get fresh JWT token for authentication
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData?.session?.access_token;
+
+      if (!accessToken) {
+        throw new Error("Sessão expirada. Faça login novamente.");
+      }
 
       const response = await fetch(CHAT_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify({ messages: [...messages, userMessage] }),
       });
 
-      if (!response.ok || !response.body) {
-        throw new Error("Falha ao conectar com o Mentor IA");
+      // Handle server-side errors
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.error || "Falha ao conectar com o Mentor IA";
+        
+        if (response.status === 401) {
+          toast.error("Sessão expirada. Faça login novamente.");
+          navigate("/auth");
+          return;
+        }
+        if (response.status === 403) {
+          toast.error(errorMessage);
+          navigate("/upgrade");
+          return;
+        }
+        if (response.status === 429) {
+          toast.error(errorMessage);
+          // Refresh usage data
+          queryClient.invalidateQueries({ queryKey: ["ai-mentor-usage"] });
+          return;
+        }
+        throw new Error(errorMessage);
+      }
+
+      if (!response.body) {
+        throw new Error("Resposta vazia do servidor");
       }
 
       const reader = response.body.getReader();
@@ -114,9 +147,11 @@ const Mentor = () => {
           }
         }
       }
+      // Refresh usage data after successful message
+      queryClient.invalidateQueries({ queryKey: ["ai-mentor-usage"] });
     } catch (error) {
       console.error("Mentor error:", error);
-      toast.error("Erro ao enviar mensagem. Tente novamente.");
+      toast.error(error instanceof Error ? error.message : "Erro ao enviar mensagem. Tente novamente.");
       setMessages((prev) => prev.slice(0, -1));
     } finally {
       setIsLoading(false);
