@@ -128,61 +128,146 @@ export default function Index() {
           </Card>
         )}
 
-        {/* Start Quiz CTA */}
-        <Card variant="elevated" className="overflow-hidden">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-2xl gradient-accent flex items-center justify-center shadow-glow-accent">
-                <Play className="w-7 h-7 text-accent-foreground" />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-display font-bold text-lg">Iniciar Simulado</h3>
-                <p className="text-sm text-muted-foreground">10 questões aleatórias</p>
-              </div>
-              <Button variant="gradient-accent" size="lg" onClick={handleStartQuiz}>
-                Começar
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Start Quiz CTA - Organic Style */}
+        <div 
+          className="relative cursor-pointer group"
+          onClick={handleStartQuiz}
+        >
+          {/* Organic background blobs */}
+          <div className="absolute inset-0 overflow-hidden">
+            <div className="absolute -top-6 -right-4 w-28 h-28 bg-gradient-to-br from-accent/25 to-success/15 rounded-[55%_45%_40%_60%/50%_35%_65%_50%] blur-xl" />
+            <div className="absolute -bottom-4 -left-2 w-20 h-20 bg-gradient-to-tr from-success/20 to-accent/10 rounded-[45%_55%_60%_40%/55%_50%_50%_45%] blur-lg" />
+          </div>
 
-        {/* AI Mentor Card - Premium Feature */}
-        <Card variant="elevated" className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg">
-                <Bot className="w-7 h-7 text-primary-foreground" />
+          <div className="relative flex items-center gap-5 p-5 bg-gradient-to-br from-card/95 via-card/90 to-card/80 backdrop-blur-sm rounded-[1.5rem_2rem_1.5rem_2rem] border border-border/50 shadow-lg group-hover:shadow-xl group-hover:scale-[1.02] transition-all duration-500">
+            
+            {/* Play icon with organic shape */}
+            <div className="relative flex-shrink-0">
+              <div className="absolute inset-0 bg-gradient-to-br from-accent to-success rounded-full blur-md opacity-50 group-hover:opacity-75 transition-opacity" />
+              <div className="relative w-16 h-16 bg-gradient-to-br from-accent via-success to-accent rounded-[50%_50%_45%_55%/45%_55%_50%_50%] flex items-center justify-center shadow-lg group-hover:rotate-6 transition-transform duration-500">
+                <span className="text-3xl">🎯</span>
               </div>
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <h3 className="font-display font-bold text-lg">Mentor IA</h3>
-                  <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium">Plus</span>
-                </div>
-                <p className="text-sm text-muted-foreground">Tire dúvidas com IA</p>
+              <div className="absolute -bottom-1 -right-1 w-7 h-7 bg-background rounded-full border-2 border-success shadow-md flex items-center justify-center">
+                <Play className="w-3.5 h-3.5 text-success" />
               </div>
-              <Button 
-                variant={isPremium ? "gradient-accent" : "outline"} 
-                size="lg" 
-                onClick={() => navigate('/mentor')}
-              >
-                {isPremium ? 'Acessar' : 'Ver mais'}
-              </Button>
             </div>
-          </CardContent>
-        </Card>
+
+            <div className="flex-1 min-w-0">
+              <p className="text-xs text-accent/70 font-medium mb-0.5">Pronto para estudar?</p>
+              <h3 className="font-display font-bold text-lg text-foreground group-hover:text-accent transition-colors duration-300">
+                Iniciar Simulado
+              </h3>
+              <p className="text-sm text-muted-foreground">10 questões aleatórias 🚀</p>
+            </div>
+
+            <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-accent/20 to-success/20 rounded-[45%_55%_50%_50%/50%_45%_55%_50%] flex items-center justify-center group-hover:bg-accent/30 group-hover:translate-x-1 transition-all duration-300">
+              <svg className="w-5 h-5 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </div>
+          </div>
+
+          <div className="absolute -bottom-2 right-8 flex gap-1.5">
+            <div className="w-1.5 h-1.5 rounded-full bg-accent/20" />
+            <div className="w-2 h-2 rounded-full bg-success/30" />
+            <div className="w-2 h-2 rounded-full bg-accent/40" />
+          </div>
+        </div>
+
+        {/* AI Mentor Card - Organic Style */}
+        <div 
+          className="relative cursor-pointer group"
+          onClick={() => navigate('/mentor')}
+        >
+          {/* Organic background blobs */}
+          <div className="absolute inset-0 overflow-hidden">
+            <div className="absolute -top-4 left-1/4 w-24 h-24 bg-gradient-to-br from-primary/25 to-accent/20 rounded-[60%_40%_50%_50%/45%_55%_45%_55%] blur-xl" />
+            <div className="absolute -bottom-6 -right-4 w-28 h-28 bg-gradient-to-tr from-accent/20 to-primary/15 rounded-[45%_55%_35%_65%/50%_40%_60%_50%] blur-lg" />
+          </div>
+
+          <div className="relative flex items-center gap-5 p-5 bg-gradient-to-br from-card/95 via-primary/5 to-accent/5 backdrop-blur-sm rounded-[2rem_1.5rem_2rem_1.5rem] border border-primary/20 shadow-lg group-hover:shadow-xl group-hover:scale-[1.02] transition-all duration-500">
+            
+            {/* Bot icon with organic shape */}
+            <div className="relative flex-shrink-0">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary to-accent rounded-full blur-md opacity-50 group-hover:opacity-75 transition-opacity" />
+              <div className="relative w-16 h-16 bg-gradient-to-br from-primary via-accent to-primary rounded-[48%_52%_55%_45%/52%_48%_52%_48%] flex items-center justify-center shadow-lg group-hover:rotate-6 transition-transform duration-500">
+                <span className="text-3xl">🤖</span>
+              </div>
+              <div className="absolute -top-2 -right-1 w-7 h-7 bg-background rounded-full border-2 border-primary shadow-md flex items-center justify-center group-hover:-translate-y-1 group-hover:rotate-12 transition-all duration-300">
+                <span className="text-xs bg-primary/10 text-primary px-1 rounded font-bold">+</span>
+              </div>
+            </div>
+
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-0.5">
+                <p className="text-xs text-primary/70 font-medium">Exclusivo Plus</p>
+                <span className="text-xs">✨</span>
+              </div>
+              <h3 className="font-display font-bold text-lg text-foreground group-hover:text-primary transition-colors duration-300">
+                Mentor IA
+              </h3>
+              <p className="text-sm text-muted-foreground">Tire dúvidas com inteligência artificial</p>
+            </div>
+
+            <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-primary/15 to-accent/15 rounded-[50%_50%_45%_55%/55%_45%_55%_45%] flex items-center justify-center group-hover:bg-primary/25 group-hover:translate-x-1 transition-all duration-300">
+              <svg className="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </div>
+          </div>
+
+          <div className="absolute -bottom-2 left-12 flex gap-1.5">
+            <div className="w-2 h-2 rounded-full bg-primary/40" />
+            <div className="w-2 h-2 rounded-full bg-accent/30" />
+            <div className="w-1.5 h-1.5 rounded-full bg-primary/20" />
+          </div>
+        </div>
+        {/* Categories - Organic Grid */}
         <div>
-          <h2 className="font-display font-bold text-lg mb-4">Categorias</h2>
-          <div className="grid grid-cols-2 gap-3">
-            {categories?.slice(0, 4).map((cat) => (
-              <Card 
+          <h2 className="font-display font-bold text-lg mb-4 flex items-center gap-2">
+            <span>📚</span> Categorias
+          </h2>
+          <div className="grid grid-cols-2 gap-4">
+            {categories?.slice(0, 4).map((cat, index) => (
+              <div 
                 key={cat} 
-                variant="interactive"
-                className="p-4"
+                className="relative cursor-pointer group"
                 onClick={() => handleCategoryClick(cat)}
               >
-                <BookOpen className="w-6 h-6 text-primary mb-2" />
-                <p className="font-semibold text-sm">{cat}</p>
-              </Card>
+                {/* Subtle organic blob */}
+                <div className="absolute inset-0 overflow-hidden">
+                  <div 
+                    className={`absolute w-16 h-16 blur-lg opacity-30 ${
+                      index === 0 ? '-top-2 -left-2 bg-primary/40 rounded-[60%_40%_50%_50%]' :
+                      index === 1 ? '-top-2 -right-2 bg-accent/40 rounded-[40%_60%_50%_50%]' :
+                      index === 2 ? '-bottom-2 -left-2 bg-success/40 rounded-[50%_50%_60%_40%]' :
+                      '-bottom-2 -right-2 bg-secondary/40 rounded-[50%_50%_40%_60%]'
+                    }`} 
+                  />
+                </div>
+
+                <div className={`relative p-4 bg-gradient-to-br from-card/95 to-card/85 backdrop-blur-sm border border-border/50 shadow-md group-hover:shadow-lg group-hover:scale-[1.03] transition-all duration-300 ${
+                  index === 0 ? 'rounded-[1.5rem_1rem_1.5rem_1rem]' :
+                  index === 1 ? 'rounded-[1rem_1.5rem_1rem_1.5rem]' :
+                  index === 2 ? 'rounded-[1rem_1.5rem_1rem_1.5rem]' :
+                  'rounded-[1.5rem_1rem_1.5rem_1rem]'
+                }`}>
+                  <div className={`w-10 h-10 mb-3 flex items-center justify-center rounded-[45%_55%_50%_50%/55%_45%_55%_45%] ${
+                    index === 0 ? 'bg-primary/15' :
+                    index === 1 ? 'bg-accent/15' :
+                    index === 2 ? 'bg-success/15' :
+                    'bg-secondary/15'
+                  }`}>
+                    <BookOpen className={`w-5 h-5 ${
+                      index === 0 ? 'text-primary' :
+                      index === 1 ? 'text-accent' :
+                      index === 2 ? 'text-success' :
+                      'text-secondary-foreground'
+                    }`} />
+                  </div>
+                  <p className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors">{cat}</p>
+                </div>
+              </div>
             ))}
           </div>
         </div>
@@ -192,22 +277,35 @@ export default function Index() {
           <UpgradeCard onUpgrade={() => navigate('/upgrade')} />
         )}
 
-        {/* Leaderboard Preview */}
+        {/* Leaderboard Preview - Organic Style */}
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-display font-bold text-lg">Ranking</h2>
-            <Link to="/ranking" className="text-sm text-primary font-medium">Ver todos</Link>
+            <h2 className="font-display font-bold text-lg flex items-center gap-2">
+              <span>🏆</span> Ranking
+            </h2>
+            <Link to="/ranking" className="text-sm text-primary font-medium hover:underline">Ver todos →</Link>
           </div>
-          <Card variant="elevated">
-            <CardContent className="p-4 space-y-3">
+          
+          <div className="relative">
+            {/* Background blobs */}
+            <div className="absolute inset-0 overflow-hidden">
+              <div className="absolute -top-4 right-1/3 w-20 h-20 bg-gradient-to-br from-accent/15 to-primary/10 rounded-[50%_50%_45%_55%] blur-xl" />
+              <div className="absolute -bottom-4 left-1/4 w-16 h-16 bg-gradient-to-tr from-primary/15 to-accent/10 rounded-[45%_55%_50%_50%] blur-lg" />
+            </div>
+
+            <div className="relative p-5 bg-gradient-to-br from-card/95 via-card/90 to-card/85 backdrop-blur-sm rounded-[1.5rem_2rem_1.5rem_2rem] border border-border/50 shadow-lg space-y-3">
               {leaderboard?.slice(0, 3).map((entry, index) => (
-                <div key={entry.id} className="flex items-center gap-3">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                    index === 0 ? 'gradient-accent' : index === 1 ? 'bg-muted' : 'bg-muted'
+                <div key={entry.id} className={`flex items-center gap-3 p-3 rounded-[1rem_1.5rem_1rem_1.5rem] transition-all duration-300 hover:bg-muted/30 ${
+                  index === 0 ? 'bg-gradient-to-r from-accent/10 to-transparent' : ''
+                }`}>
+                  <div className={`w-10 h-10 flex items-center justify-center shadow-md ${
+                    index === 0 ? 'bg-gradient-to-br from-accent to-amber-400 rounded-[45%_55%_50%_50%/55%_45%_55%_45%]' : 
+                    index === 1 ? 'bg-gradient-to-br from-slate-300 to-slate-400 rounded-[50%_50%_45%_55%]' : 
+                    'bg-gradient-to-br from-amber-600 to-amber-700 rounded-[55%_45%_50%_50%]'
                   }`}>
-                    {index === 0 ? <Crown className="w-4 h-4 text-accent-foreground" /> :
-                     index === 1 ? <Medal className="w-4 h-4 text-muted-foreground" /> :
-                     <Award className="w-4 h-4 text-muted-foreground" />}
+                    {index === 0 ? <span className="text-lg">👑</span> :
+                     index === 1 ? <span className="text-lg">🥈</span> :
+                     <span className="text-lg">🥉</span>}
                   </div>
                   <div className="flex-1">
                     <p className="font-medium text-sm">{entry.display_name}</p>
@@ -216,10 +314,16 @@ export default function Index() {
                 </div>
               ))}
               {(!leaderboard || leaderboard.length === 0) && (
-                <p className="text-center text-muted-foreground py-4">Nenhum resultado ainda</p>
+                <p className="text-center text-muted-foreground py-4">Nenhum resultado ainda 🌱</p>
               )}
-            </CardContent>
-          </Card>
+            </div>
+
+            <div className="absolute -bottom-2 right-10 flex gap-1.5">
+              <div className="w-2 h-2 rounded-full bg-accent/40" />
+              <div className="w-1.5 h-1.5 rounded-full bg-primary/30" />
+              <div className="w-2 h-2 rounded-full bg-accent/20" />
+            </div>
+          </div>
         </div>
 
         {/* FAQ - Organic Floating Element */}
