@@ -12,6 +12,8 @@ import Ranking from "./pages/Ranking";
 import Upgrade from "./pages/Upgrade";
 import Mentor from "./pages/Mentor";
 import FAQ from "./pages/FAQ";
+import Dashboard from "./pages/Dashboard";
+import Rewards from "./pages/Rewards";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,6 +34,8 @@ const App = () => (
             <Route path="/upgrade" element={<Upgrade />} />
             <Route path="/mentor" element={<Mentor />} />
             <Route path="/faq" element={<FAQ />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/rewards" element={<Rewards />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
