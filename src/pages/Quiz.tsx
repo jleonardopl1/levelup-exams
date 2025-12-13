@@ -3,11 +3,13 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useQuestions, Question } from '@/hooks/useQuestions';
 import { useSubmitQuiz } from '@/hooks/useQuizResults';
+import { useQuestionLimits, useIncrementUsage } from '@/hooks/useDailyUsage';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { ArrowLeft, Clock, CheckCircle, XCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { DailyLimitModal } from '@/components/DailyLimitModal';
 
 export default function Quiz() {
   const [searchParams] = useSearchParams();
@@ -15,6 +17,8 @@ export default function Quiz() {
   const { user, loading: authLoading } = useAuth();
   const { data: questions, isLoading } = useQuestions(10, categoria);
   const submitQuiz = useSubmitQuiz();
+  const incrementUsage = useIncrementUsage();
+  const { hasReachedLimit, questionsRemaining, isPremium } = useQuestionLimits();
   const navigate = useNavigate();
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -23,6 +27,14 @@ export default function Quiz() {
   const [answers, setAnswers] = useState<{ questionId: string; selected: number; correct: boolean }[]>([]);
   const [timeLeft, setTimeLeft] = useState(600); // 10 minutes
   const [quizFinished, setQuizFinished] = useState(false);
+  const [showLimitModal, setShowLimitModal] = useState(false);
+
+  // Check limit when quiz starts
+  useEffect(() => {
+    if (!authLoading && hasReachedLimit && !isPremium) {
+      setShowLimitModal(true);
+    }
+  }, [authLoading, hasReachedLimit, isPremium]);
 
   useEffect(() => {
     if (!authLoading && !user) navigate('/auth');
@@ -81,6 +93,11 @@ export default function Quiz() {
     const total = questions?.length || 0;
     const score = Math.round((correctCount / total) * 100);
 
+    // Increment usage for free users
+    if (!isPremium) {
+      await incrementUsage.mutateAsync(total);
+    }
+
     await submitQuiz.mutateAsync({
       score,
       correctAnswers: correctCount,
@@ -92,7 +109,7 @@ export default function Quiz() {
     navigate('/result', { 
       state: { score, correct: correctCount, total, timeSpent: 600 - timeLeft } 
     });
-  }, [answers, currentQuestion, navigate, questions, quizFinished, selectedAnswer, showResult, submitQuiz, timeLeft, categoria]);
+  }, [answers, currentQuestion, navigate, questions, quizFinished, selectedAnswer, showResult, submitQuiz, timeLeft, categoria, isPremium, incrementUsage]);
 
   if (isLoading || !questions) {
     return (
@@ -195,6 +212,8 @@ export default function Quiz() {
       >
         {showResult ? (currentIndex === questions.length - 1 ? 'Ver Resultado' : 'Próxima') : 'Confirmar'}
       </Button>
+
+      <DailyLimitModal open={showLimitModal} onOpenChange={setShowLimitModal} />
     </div>
   );
 }
