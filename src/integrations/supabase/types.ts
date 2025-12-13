@@ -80,6 +80,48 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_challenges: {
+        Row: {
+          challenge_type: string
+          code: string
+          created_at: string
+          description: string
+          difficulty: string
+          icon: string
+          id: string
+          is_active: boolean
+          points_reward: number
+          target_value: number
+          title: string
+        }
+        Insert: {
+          challenge_type: string
+          code: string
+          created_at?: string
+          description: string
+          difficulty?: string
+          icon?: string
+          id?: string
+          is_active?: boolean
+          points_reward?: number
+          target_value: number
+          title: string
+        }
+        Update: {
+          challenge_type?: string
+          code?: string
+          created_at?: string
+          description?: string
+          difficulty?: string
+          icon?: string
+          id?: string
+          is_active?: boolean
+          points_reward?: number
+          target_value?: number
+          title?: string
+        }
+        Relationships: []
+      }
       daily_question_usage: {
         Row: {
           created_at: string
@@ -320,6 +362,13 @@ export type Database = {
             foreignKeyName: "referral_uses_referral_code_id_fkey"
             columns: ["referral_code_id"]
             isOneToOne: false
+            referencedRelation: "referral_code_validation"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referral_uses_referral_code_id_fkey"
+            columns: ["referral_code_id"]
+            isOneToOne: false
             referencedRelation: "referral_codes"
             referencedColumns: ["id"]
           },
@@ -441,6 +490,80 @@ export type Database = {
           },
         ]
       }
+      user_daily_challenges: {
+        Row: {
+          challenge_date: string
+          challenge_id: string
+          completed_at: string | null
+          created_at: string
+          current_progress: number
+          id: string
+          is_completed: boolean
+          points_claimed: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          challenge_date?: string
+          challenge_id: string
+          completed_at?: string | null
+          created_at?: string
+          current_progress?: number
+          id?: string
+          is_completed?: boolean
+          points_claimed?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          challenge_date?: string
+          challenge_id?: string
+          completed_at?: string | null
+          created_at?: string
+          current_progress?: number
+          id?: string
+          is_completed?: boolean
+          points_claimed?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_daily_challenges_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "daily_challenges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_milestones: {
+        Row: {
+          achieved_at: string
+          id: string
+          milestone_type: string
+          milestone_value: number
+          notification_shown: boolean
+          user_id: string
+        }
+        Insert: {
+          achieved_at?: string
+          id?: string
+          milestone_type: string
+          milestone_value: number
+          notification_shown?: boolean
+          user_id: string
+        }
+        Update: {
+          achieved_at?: string
+          id?: string
+          milestone_type?: string
+          milestone_value?: number
+          notification_shown?: boolean
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_redemptions: {
         Row: {
           expires_at: string | null
@@ -520,7 +643,27 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      referral_code_validation: {
+        Row: {
+          code: string | null
+          discount_percent: number | null
+          id: string | null
+          is_active: boolean | null
+        }
+        Insert: {
+          code?: string | null
+          discount_percent?: number | null
+          id?: string | null
+          is_active?: boolean | null
+        }
+        Update: {
+          code?: string | null
+          discount_percent?: number | null
+          id?: string | null
+          is_active?: boolean | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       get_leaderboard: {
