@@ -1,10 +1,14 @@
-import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Crown, Check, Sparkles, Zap, BarChart3, FileText, Lock, Bot } from 'lucide-react';
+import { ArrowLeft, Crown, Check, Sparkles, Zap, BarChart3, FileText, Lock, Bot, Settings, Loader2 } from 'lucide-react';
 import { useQuestionLimits } from '@/hooks/useDailyUsage';
+import { useSubscription, useCreateCheckout, useCustomerPortal, PRICE_IDS } from '@/hooks/useSubscription';
 import { PremiumBadge } from '@/components/PremiumBadge';
 import { toast } from 'sonner';
+import { useAuth } from '@/contexts/AuthContext';
+import { useQueryClient } from '@tanstack/react-query';
 
 const features = {
   free: [
@@ -31,12 +35,45 @@ const features = {
 
 export default function Upgrade() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { user } = useAuth();
   const { tier, isPremium } = useQuestionLimits();
+  const { data: subscription, refetch: refetchSubscription } = useSubscription();
+  const createCheckout = useCreateCheckout();
+  const customerPortal = useCustomerPortal();
+  const queryClient = useQueryClient();
 
-  const handleSubscribe = () => {
-    // TODO: Integrate with Stripe
-    toast.info('Integração com pagamento em breve!');
+  // Handle success/cancel from Stripe
+  useEffect(() => {
+    const success = searchParams.get('success');
+    const canceled = searchParams.get('canceled');
+
+    if (success === 'true') {
+      toast.success('Assinatura realizada com sucesso! Bem-vindo ao Plus!');
+      refetchSubscription();
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
+      // Clean URL
+      window.history.replaceState({}, '', '/upgrade');
+    } else if (canceled === 'true') {
+      toast.info('Assinatura cancelada');
+      window.history.replaceState({}, '', '/upgrade');
+    }
+  }, [searchParams, refetchSubscription, queryClient]);
+
+  const handleSubscribe = (priceId: string) => {
+    if (!user) {
+      toast.error('Você precisa estar logado para assinar');
+      navigate('/auth');
+      return;
+    }
+    createCheckout.mutate(priceId);
   };
+
+  const handleManageSubscription = () => {
+    customerPortal.mutate();
+  };
+
+  const isLoading = createCheckout.isPending || customerPortal.isPending;
 
   return (
     <div className="min-h-screen bg-background">
@@ -134,16 +171,42 @@ export default function Upgrade() {
                 variant="hero" 
                 size="xl" 
                 className="w-full bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-600 hover:to-yellow-500"
-                onClick={handleSubscribe}
+                onClick={() => handleSubscribe(PRICE_IDS.monthly)}
+                disabled={isLoading}
               >
-                <Crown className="w-5 h-5 mr-2" />
+                {isLoading ? (
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                ) : (
+                  <Crown className="w-5 h-5 mr-2" />
+                )}
                 Assinar Plus
               </Button>
             )}
 
             {isPremium && (
-              <div className="text-center text-sm text-muted-foreground">
-                Você já é assinante Plus!
+              <div className="space-y-3">
+                <div className="text-center text-sm text-muted-foreground">
+                  Você já é assinante Plus!
+                  {subscription?.subscription_end && (
+                    <p className="mt-1">
+                      Renova em: {new Date(subscription.subscription_end).toLocaleDateString('pt-BR')}
+                    </p>
+                  )}
+                </div>
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  className="w-full"
+                  onClick={handleManageSubscription}
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  ) : (
+                    <Settings className="w-4 h-4 mr-2" />
+                  )}
+                  Gerenciar Assinatura
+                </Button>
               </div>
             )}
           </CardContent>
@@ -175,8 +238,12 @@ export default function Upgrade() {
                 variant="outline" 
                 size="lg" 
                 className="w-full"
-                onClick={handleSubscribe}
+                onClick={() => handleSubscribe(PRICE_IDS.annual)}
+                disabled={isLoading}
               >
+                {isLoading ? (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                ) : null}
                 Assinar Anual
               </Button>
             </CardContent>
