@@ -222,19 +222,48 @@ export default function Index() {
           </Card>
         </div>
 
-        {/* FAQ Link */}
+        {/* FAQ Link - Modern Card Design */}
         <Card 
           variant="interactive" 
-          className="p-4 cursor-pointer"
+          className="overflow-hidden cursor-pointer group"
           onClick={() => navigate('/faq')}
         >
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-              <HelpCircle className="w-5 h-5 text-primary" />
-            </div>
-            <div className="flex-1">
-              <h3 className="font-semibold text-sm">Perguntas Frequentes</h3>
-              <p className="text-xs text-muted-foreground">Tire suas dúvidas sobre o app</p>
+          <div className="relative p-6">
+            {/* Background decorative elements */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-accent/20 to-primary/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2 group-hover:scale-125 transition-transform duration-500" />
+            <div className="absolute bottom-0 left-0 w-20 h-20 bg-gradient-to-tr from-primary/15 to-accent/10 rounded-full blur-xl translate-y-1/2 -translate-x-1/2" />
+            
+            <div className="relative flex items-center gap-4">
+              {/* Icon with gradient background */}
+              <div className="relative">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-accent/90 to-primary/80 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                  <HelpCircle className="w-7 h-7 text-white" />
+                </div>
+                <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-background border-2 border-accent flex items-center justify-center">
+                  <span className="text-[10px] font-bold text-accent">?</span>
+                </div>
+              </div>
+              
+              <div className="flex-1">
+                <h3 className="font-display font-bold text-lg group-hover:text-primary transition-colors">
+                  Perguntas Frequentes
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Tire todas as suas dúvidas sobre o app
+                </p>
+              </div>
+              
+              {/* Arrow indicator */}
+              <div className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center group-hover:bg-primary/10 group-hover:translate-x-1 transition-all duration-300">
+                <svg 
+                  className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" 
+                  fill="none" 
+                  viewBox="0 0 24 24" 
+                  stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
             </div>
           </div>
         </Card>
