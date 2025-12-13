@@ -362,13 +362,6 @@ export type Database = {
             foreignKeyName: "referral_uses_referral_code_id_fkey"
             columns: ["referral_code_id"]
             isOneToOne: false
-            referencedRelation: "referral_code_validation"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "referral_uses_referral_code_id_fkey"
-            columns: ["referral_code_id"]
-            isOneToOne: false
             referencedRelation: "referral_codes"
             referencedColumns: ["id"]
           },
@@ -643,27 +636,7 @@ export type Database = {
       }
     }
     Views: {
-      referral_code_validation: {
-        Row: {
-          code: string | null
-          discount_percent: number | null
-          id: string | null
-          is_active: boolean | null
-        }
-        Insert: {
-          code?: string | null
-          discount_percent?: number | null
-          id?: string | null
-          is_active?: boolean | null
-        }
-        Update: {
-          code?: string | null
-          discount_percent?: number | null
-          id?: string | null
-          is_active?: boolean | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       get_leaderboard: {
@@ -676,6 +649,15 @@ export type Database = {
           score: number
           total_questions: number
           user_id: string
+        }[]
+      }
+      validate_referral_code: {
+        Args: { code_to_validate: string }
+        Returns: {
+          code: string
+          discount_percent: number
+          id: string
+          is_valid: boolean
         }[]
       }
     }
