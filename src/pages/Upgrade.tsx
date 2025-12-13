@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Crown, Check, Sparkles, Zap, BarChart3, FileText, Lock } from 'lucide-react';
+import { ArrowLeft, Crown, Check, Sparkles, Zap, BarChart3, FileText, Lock, Bot } from 'lucide-react';
 import { useQuestionLimits } from '@/hooks/useDailyUsage';
 import { PremiumBadge } from '@/components/PremiumBadge';
 import { toast } from 'sonner';
@@ -15,6 +15,7 @@ const features = {
     { icon: Lock, text: 'Explicações em PDF', included: false },
     { icon: Lock, text: 'Estatísticas avançadas', included: false },
     { icon: Lock, text: 'Questões premium', included: false },
+    { icon: Lock, text: 'Mentor IA (6 perguntas/dia)', included: false },
   ],
   plus: [
     { icon: Zap, text: 'Questões ilimitadas', included: true },
@@ -23,6 +24,7 @@ const features = {
     { icon: FileText, text: 'Explicações em PDF', included: true },
     { icon: BarChart3, text: 'Estatísticas avançadas', included: true },
     { icon: Sparkles, text: 'Questões premium exclusivas', included: true },
+    { icon: Bot, text: 'Mentor IA (6 perguntas/dia)', included: true },
     { icon: Crown, text: 'Acesso prioritário', included: true },
   ],
 };
