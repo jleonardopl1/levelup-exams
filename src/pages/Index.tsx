@@ -8,7 +8,7 @@ import { useQuestionLimits } from '@/hooks/useDailyUsage';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { BookOpen, Trophy, Target, Flame, Play, Crown, Medal, Award, LogOut, Sparkles } from 'lucide-react';
+import { BookOpen, Trophy, Target, Flame, Play, Crown, Medal, Award, LogOut, Sparkles, Bot } from 'lucide-react';
 import heroPattern from '@/assets/hero-pattern.png';
 import { PremiumBadge, UsageMeter, UpgradeCard } from '@/components/PremiumBadge';
 import { DailyLimitModal } from '@/components/DailyLimitModal';
@@ -146,7 +146,30 @@ export default function Index() {
           </CardContent>
         </Card>
 
-        {/* Categories */}
+        {/* AI Mentor Card - Premium Feature */}
+        <Card variant="elevated" className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg">
+                <Bot className="w-7 h-7 text-primary-foreground" />
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center gap-2">
+                  <h3 className="font-display font-bold text-lg">Mentor IA</h3>
+                  <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium">Plus</span>
+                </div>
+                <p className="text-sm text-muted-foreground">Tire dúvidas com IA</p>
+              </div>
+              <Button 
+                variant={isPremium ? "gradient-accent" : "outline"} 
+                size="lg" 
+                onClick={() => navigate('/mentor')}
+              >
+                {isPremium ? 'Acessar' : 'Ver mais'}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
         <div>
           <h2 className="font-display font-bold text-lg mb-4">Categorias</h2>
           <div className="grid grid-cols-2 gap-3">
