@@ -53,47 +53,23 @@ export function useLeaderboardFiltered(period: 'today' | 'week' | 'month' | 'all
   return useQuery({
     queryKey: ['leaderboard', period, limit],
     queryFn: async () => {
-      let query = supabase
-        .from('quiz_results')
-        .select('id, user_id, score, correct_answers, total_questions, created_at')
-        .order('score', { ascending: false })
-        .limit(limit);
+      // Use secure RPC function that exposes only necessary leaderboard data
+      const { data, error } = await supabase.rpc('get_leaderboard', {
+        period: period,
+        limit_count: limit
+      });
 
-      // Apply date filter
-      const now = new Date();
-      if (period === 'today') {
-        const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
-        query = query.gte('created_at', startOfDay);
-      } else if (period === 'week') {
-        const startOfWeek = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
-        query = query.gte('created_at', startOfWeek);
-      } else if (period === 'month') {
-        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-        query = query.gte('created_at', startOfMonth);
-      }
+      if (error) throw error;
+      if (!data || data.length === 0) return [];
 
-      const { data: results, error: resultsError } = await query;
-      
-      if (resultsError) throw resultsError;
-      if (!results || results.length === 0) return [];
-
-      // Get unique user IDs
-      const userIds = [...new Set(results.map(r => r.user_id))];
-      
-      // Fetch profiles for those users
-      const { data: profiles, error: profilesError } = await supabase
-        .from('profiles')
-        .select('user_id, display_name')
-        .in('user_id', userIds);
-      
-      if (profilesError) throw profilesError;
-
-      // Map profiles to results
-      const profileMap = new Map(profiles?.map(p => [p.user_id, p.display_name]) || []);
-      
-      return results.map(r => ({
-        ...r,
-        display_name: profileMap.get(r.user_id) || 'Anônimo',
+      return data.map((r: { id: string; user_id: string; score: number; correct_answers: number; total_questions: number; display_name: string | null; created_at: string }) => ({
+        id: r.id,
+        user_id: r.user_id,
+        score: r.score,
+        correct_answers: r.correct_answers,
+        total_questions: r.total_questions,
+        created_at: r.created_at,
+        display_name: r.display_name || 'Anônimo',
       })) as LeaderboardEntry[];
     },
   });
