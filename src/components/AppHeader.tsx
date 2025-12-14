@@ -27,7 +27,8 @@ import {
   Menu,
   X,
   TrendingUp,
-  ChevronRight
+  ChevronRight,
+  Award
 } from 'lucide-react';
 import { PremiumBadge } from '@/components/PremiumBadge';
 import { ShareModal } from '@/components/ShareModal';
@@ -53,7 +54,7 @@ export function AppHeader() {
     { path: '/', icon: Home, label: 'Início' },
     { path: '/quiz', icon: BookOpen, label: 'Quiz' },
     { path: '/ranking', icon: Trophy, label: 'Ranking' },
-    { path: '/rewards', icon: Gift, label: 'Recompensas' },
+    { path: '/achievements', icon: Award, label: 'Conquistas' },
     { path: '/mentor', icon: Bot, label: 'Mentor IA' },
   ];
 
