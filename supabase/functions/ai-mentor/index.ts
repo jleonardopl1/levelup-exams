@@ -7,17 +7,120 @@ const corsHeaders = {
 };
 
 const DAILY_LIMIT = 6;
+const RATE_LIMIT_WINDOW_MS = 60000; // 1 minute
+const RATE_LIMIT_MAX_REQUESTS = 10; // 10 requests per minute
+
+// Rate limiting helper
+async function checkRateLimit(
+  supabase: any,
+  identifier: string,
+  endpoint: string
+): Promise<{ allowed: boolean; remaining: number }> {
+  const windowStart = new Date(Date.now() - RATE_LIMIT_WINDOW_MS).toISOString();
+  
+  const { data: existing } = await supabase
+    .from("rate_limits")
+    .select("*")
+    .eq("identifier", identifier)
+    .eq("endpoint", endpoint)
+    .gte("window_start", windowStart)
+    .maybeSingle();
+
+  if (existing) {
+    if (existing.request_count >= RATE_LIMIT_MAX_REQUESTS) {
+      return { allowed: false, remaining: 0 };
+    }
+    
+    await supabase
+      .from("rate_limits")
+      .update({ 
+        request_count: existing.request_count + 1,
+        updated_at: new Date().toISOString()
+      })
+      .eq("id", existing.id);
+    
+    return { allowed: true, remaining: RATE_LIMIT_MAX_REQUESTS - existing.request_count - 1 };
+  }
+
+  await supabase
+    .from("rate_limits")
+    .upsert({
+      identifier,
+      endpoint,
+      request_count: 1,
+      window_start: new Date().toISOString()
+    }, { onConflict: "identifier,endpoint" });
+
+  return { allowed: true, remaining: RATE_LIMIT_MAX_REQUESTS - 1 };
+}
+
+// Audit logging helper
+async function logAuditEvent(
+  supabase: any,
+  eventType: string,
+  userId: string | null | undefined,
+  userEmail: string | null | undefined,
+  ipAddress: string | null,
+  userAgent: string | null,
+  success: boolean,
+  errorMessage: string | null = null,
+  metadata: Record<string, unknown> = {}
+) {
+  try {
+    await supabase.from("audit_logs").insert({
+      event_type: eventType,
+      user_id: userId,
+      user_email: userEmail,
+      ip_address: ipAddress,
+      user_agent: userAgent,
+      success,
+      error_message: errorMessage,
+      metadata
+    });
+  } catch (error) {
+    console.error("Failed to log audit event:", error);
+  }
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || 
+                   req.headers.get("x-real-ip") || 
+                   "unknown";
+  const userAgent = req.headers.get("user-agent") || "unknown";
+
+  const supabaseUrl = Deno.env.get("SUPABASE_URL");
+  const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  
+  if (!supabaseUrl || !supabaseServiceKey) {
+    return new Response(JSON.stringify({ error: "Server configuration error" }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
   try {
-    // Validate JWT token
+    // Check rate limit by IP first
+    const rateLimitResult = await checkRateLimit(supabase, clientIp, "ai-mentor");
+    if (!rateLimitResult.allowed) {
+      await logAuditEvent(
+        supabase, "RATE_LIMIT_EXCEEDED", null, null, clientIp, userAgent, false,
+        "Rate limit exceeded for ai-mentor endpoint"
+      );
+      return new Response(JSON.stringify({ error: "Muitas requisições. Aguarde um momento." }), {
+        status: 429,
+        headers: { ...corsHeaders, "Content-Type": "application/json", "Retry-After": "60" },
+      });
+    }
+
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
-      console.error("No authorization header provided");
+      await logAuditEvent(supabase, "AUTH_FAILED", null, null, clientIp, userAgent, false, "No authorization header");
       return new Response(JSON.stringify({ error: "Não autorizado" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -25,31 +128,16 @@ serve(async (req) => {
     }
 
     const token = authHeader.replace("Bearer ", "");
-    
-    // Create Supabase client
-    const supabaseUrl = Deno.env.get("SUPABASE_URL");
-    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-    
-    if (!supabaseUrl || !supabaseServiceKey) {
-      throw new Error("Supabase configuration missing");
-    }
-
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
-    // Verify user from JWT token
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
     
     if (authError || !user) {
-      console.error("Auth error:", authError?.message);
+      await logAuditEvent(supabase, "AUTH_FAILED", null, null, clientIp, userAgent, false, authError?.message || "Invalid token");
       return new Response(JSON.stringify({ error: "Token inválido ou expirado" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    console.log("Authenticated user:", user.id);
-
-    // Check subscription tier from profiles table
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
       .select("tier")
@@ -57,7 +145,7 @@ serve(async (req) => {
       .single();
 
     if (profileError) {
-      console.error("Profile fetch error:", profileError.message);
+      await logAuditEvent(supabase, "PROFILE_ERROR", user.id, user.email, clientIp, userAgent, false, profileError.message);
       return new Response(JSON.stringify({ error: "Erro ao verificar perfil" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -65,61 +153,50 @@ serve(async (req) => {
     }
 
     if (profile?.tier !== "plus") {
-      console.log("User tier:", profile?.tier, "- Access denied");
+      await logAuditEvent(supabase, "ACCESS_DENIED", user.id, user.email, clientIp, userAgent, false, "Non-plus user", { tier: profile?.tier });
       return new Response(JSON.stringify({ error: "O Mentor IA é exclusivo para assinantes Plus!" }), {
         status: 403,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // Check daily usage limits server-side
     const today = new Date().toISOString().split('T')[0];
-    const { data: usage, error: usageError } = await supabase
+    const { data: usage } = await supabase
       .from("ai_mentor_usage")
       .select("*")
       .eq("user_id", user.id)
       .eq("usage_date", today)
       .maybeSingle();
 
-    if (usageError) {
-      console.error("Usage fetch error:", usageError.message);
-    }
-
     if (usage && usage.questions_used >= DAILY_LIMIT) {
-      console.log("Daily limit reached for user:", user.id);
+      await logAuditEvent(supabase, "DAILY_LIMIT_REACHED", user.id, user.email, clientIp, userAgent, false, "Daily limit reached");
       return new Response(JSON.stringify({ error: "Limite diário de perguntas atingido. Tente novamente amanhã!" }), {
         status: 429,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // Increment usage counter
     if (usage) {
-      await supabase
-        .from("ai_mentor_usage")
-        .update({ questions_used: usage.questions_used + 1, updated_at: new Date().toISOString() })
-        .eq("id", usage.id);
+      await supabase.from("ai_mentor_usage").update({ questions_used: usage.questions_used + 1, updated_at: new Date().toISOString() }).eq("id", usage.id);
     } else {
-      await supabase
-        .from("ai_mentor_usage")
-        .insert({ user_id: user.id, usage_date: today, questions_used: 1 });
+      await supabase.from("ai_mentor_usage").insert({ user_id: user.id, usage_date: today, questions_used: 1 });
     }
 
     const { messages } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
+      return new Response(JSON.stringify({ error: "AI service not configured" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
-    console.log("AI Mentor request received with messages:", messages.length, "from user:", user.id);
+    await logAuditEvent(supabase, "AI_MENTOR_REQUEST", user.id, user.email, clientIp, userAgent, true, null, { messages_count: messages.length });
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
+      headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         messages: [
@@ -128,7 +205,7 @@ serve(async (req) => {
             content: `Você é o Mentor IA do LevelUp Exams, um especialista em educação focado em ajudar estudantes a se prepararem para vestibulares, ENEM e concursos públicos.
 
 Suas responsabilidades:
-- Esclarecer dúvidas sobre qualquer tema de estudo (matemática, português, história, geografia, física, química, biologia, etc.)
+- Esclarecer dúvidas sobre qualquer tema de estudo
 - Explicar conceitos de forma clara e didática
 - Fornecer dicas de estudo e memorização
 - Ajudar a resolver questões passo a passo
@@ -138,7 +215,6 @@ Diretrizes:
 - Seja didático e paciente
 - Use exemplos práticos quando possível
 - Estruture suas respostas de forma clara
-- Se a pergunta for muito ampla, peça mais detalhes
 - Responda sempre em português brasileiro
 
 Lembre-se: você é um mentor dedicado ao sucesso do estudante!`
@@ -150,36 +226,15 @@ Lembre-se: você é um mentor dedicado ao sucesso do estudante!`
     });
 
     if (!response.ok) {
-      if (response.status === 429) {
-        return new Response(JSON.stringify({ error: "Limite de requisições excedido, tente novamente mais tarde." }), {
-          status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      if (response.status === 402) {
-        return new Response(JSON.stringify({ error: "Créditos insuficientes. Por favor, adicione créditos à sua conta." }), {
-          status: 402,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      const errorText = await response.text();
-      console.error("AI gateway error:", response.status, errorText);
-      return new Response(JSON.stringify({ error: "Erro ao conectar com o Mentor IA" }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      const status = response.status;
+      if (status === 429) return new Response(JSON.stringify({ error: "Limite de requisições excedido" }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      if (status === 402) return new Response(JSON.stringify({ error: "Créditos insuficientes" }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return new Response(JSON.stringify({ error: "Erro ao conectar com o Mentor IA" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    console.log("AI Mentor streaming response started for user:", user.id);
-
-    return new Response(response.body, {
-      headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
-    });
+    return new Response(response.body, { headers: { ...corsHeaders, "Content-Type": "text/event-stream" } });
   } catch (error) {
     console.error("AI Mentor error:", error);
-    return new Response(JSON.stringify({ error: error instanceof Error ? error.message : "Erro desconhecido" }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return new Response(JSON.stringify({ error: "Erro interno do servidor" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   }
 });
