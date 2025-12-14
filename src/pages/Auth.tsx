@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -7,6 +7,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { toast } from 'sonner';
 import { BookOpen, Mail, Lock, User } from 'lucide-react';
 import heroPattern from '@/assets/hero-pattern.png';
+import ProfileCompletionModal from '@/components/ProfileCompletionModal';
+import { supabase } from '@/integrations/supabase/client';
 
 // Google icon component
 const GoogleIcon = () => (
@@ -36,8 +38,31 @@ export default function Auth() {
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signIn, signUp, signInWithGoogle } = useAuth();
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const { signIn, signUp, signInWithGoogle, user } = useAuth();
   const navigate = useNavigate();
+
+  // Check if user needs to complete profile after signup
+  useEffect(() => {
+    const checkProfileCompletion = async () => {
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('display_name, avatar_url')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        // If profile exists but has no avatar (new user via email signup)
+        if (profile && !profile.avatar_url) {
+          setShowProfileModal(true);
+        } else if (profile) {
+          navigate('/');
+        }
+      }
+    };
+
+    checkProfileCompletion();
+  }, [user, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,12 +73,11 @@ export default function Auth() {
         const { error } = await signIn(email, password);
         if (error) throw error;
         toast.success('Login realizado com sucesso!');
-        navigate('/');
       } else {
         const { error } = await signUp(email, password, displayName);
         if (error) throw error;
         toast.success('Conta criada com sucesso!');
-        navigate('/');
+        // Profile modal will be shown via useEffect when user state updates
       }
     } catch (error: any) {
       toast.error(error.message || 'Ocorreu um erro');
@@ -72,6 +96,11 @@ export default function Auth() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleProfileComplete = () => {
+    setShowProfileModal(false);
+    navigate('/');
   };
 
   return (
@@ -171,6 +200,11 @@ export default function Auth() {
           </div>
         </CardContent>
       </Card>
+
+      <ProfileCompletionModal
+        open={showProfileModal}
+        onComplete={handleProfileComplete}
+      />
     </div>
   );
 }
