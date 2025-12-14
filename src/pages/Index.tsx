@@ -15,6 +15,8 @@ import { DailyLimitModal } from '@/components/DailyLimitModal';
 import { AppHeader } from '@/components/AppHeader';
 import { DailyChallengesCard } from '@/components/DailyChallengesCard';
 import { MilestoneModal } from '@/components/MilestoneModal';
+import { RecentAchievementsCard } from '@/components/RecentAchievementsCard';
+import { StreakReminderBanner, StreakReminderToggle } from '@/components/StreakReminderToggle';
 
 export default function Index() {
   const { user, loading: authLoading, signOut } = useAuth();
@@ -206,6 +208,11 @@ export default function Index() {
               </p>
             </Card>
           </div>
+
+          {/* Streak Reminder Banner */}
+          <div className="mt-4">
+            <StreakReminderBanner />
+          </div>
         </div>
       </div>
 
@@ -219,6 +226,9 @@ export default function Index() {
             </CardContent>
           </Card>
         )}
+
+        {/* Recent Achievements */}
+        <RecentAchievementsCard />
 
         {/* Start Quiz CTA - Organic Style */}
         <div 

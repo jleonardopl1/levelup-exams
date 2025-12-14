@@ -33,6 +33,7 @@ import { PremiumBadge } from '@/components/PremiumBadge';
 import { ShareModal } from '@/components/ShareModal';
 import { NotificationCenter } from '@/components/NotificationCenter';
 import Logo from '@/components/Logo';
+import { StreakReminderToggle } from '@/components/StreakReminderToggle';
 
 export function AppHeader() {
   const { user, signOut } = useAuth();
@@ -121,6 +122,11 @@ export function AppHeader() {
                 <span className="hidden lg:inline">Upgrade</span>
               </Button>
             )}
+
+            {/* Streak Reminder Toggle */}
+            <div className="hidden sm:block">
+              <StreakReminderToggle />
+            </div>
 
             {/* Notification Center */}
             <NotificationCenter />
