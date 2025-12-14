@@ -25,7 +25,9 @@ import {
   Bot,
   HelpCircle,
   Menu,
-  X
+  X,
+  TrendingUp,
+  ChevronRight
 } from 'lucide-react';
 import { PremiumBadge } from '@/components/PremiumBadge';
 import { ShareModal } from '@/components/ShareModal';
@@ -59,54 +61,66 @@ export function AppHeader() {
   return (
     <>
       <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-16 items-center justify-between px-4">
+        <div className="container flex h-14 md:h-16 items-center justify-between px-3 md:px-4 gap-2">
           {/* Logo/Brand */}
-          <Link to="/" className="flex items-center">
-            <Logo size="md" showText={true} />
+          <Link to="/" className="flex items-center shrink-0">
+            <Logo size="sm" showText={true} />
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-1">
+          {/* Desktop Navigation - Centered */}
+          <nav className="hidden lg:flex items-center gap-0.5 flex-1 justify-center max-w-2xl">
             {navItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-300 ${
                   isActive(item.path)
-                    ? 'bg-primary/10 text-primary'
+                    ? 'bg-primary/10 text-primary shadow-sm'
                     : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                 }`}
               >
                 <item.icon className="w-4 h-4" />
-                {item.label}
+                <span className="hidden xl:inline">{item.label}</span>
               </Link>
             ))}
           </nav>
 
           {/* Right Side Actions */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 md:gap-2 shrink-0">
+            {/* Dashboard Button - More prominent */}
+            <Button
+              variant="default"
+              size="sm"
+              onClick={() => navigate('/dashboard')}
+              className="hidden sm:flex gap-1.5 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-md hover:shadow-lg transition-all group"
+            >
+              <TrendingUp className="w-4 h-4" />
+              <span className="font-medium">Meu Progresso</span>
+              <ChevronRight className="w-3 h-3 opacity-70 group-hover:translate-x-0.5 transition-transform" />
+            </Button>
+
+            {/* Mobile Dashboard Button */}
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => navigate('/dashboard')}
+              className="sm:hidden h-9 w-9 border-primary/30 text-primary hover:bg-primary/10"
+            >
+              <TrendingUp className="w-4 h-4" />
+            </Button>
+
             {/* Upgrade Button for Free Users */}
             {!isPremium && (
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => navigate('/upgrade')}
-                className="hidden sm:flex gap-1 border-accent/50 text-accent hover:bg-accent/10"
+                className="hidden md:flex gap-1.5 border-accent/50 text-accent hover:bg-accent/10 hover:border-accent"
               >
                 <Sparkles className="w-4 h-4" />
-                Upgrade
+                <span className="hidden lg:inline">Upgrade</span>
               </Button>
             )}
-
-            {/* Dashboard Button */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => navigate('/dashboard')}
-              className="relative"
-            >
-              <LayoutDashboard className="w-5 h-5" />
-            </Button>
 
             {/* Notification Center */}
             <NotificationCenter />
@@ -116,9 +130,9 @@ export function AppHeader() {
               variant="ghost"
               size="icon"
               onClick={() => setShareModalOpen(true)}
-              className="hidden sm:flex"
+              className="hidden md:flex h-9 w-9 text-muted-foreground hover:text-foreground"
             >
-              <Share2 className="w-5 h-5" />
+              <Share2 className="w-4 h-4" />
             </Button>
 
             {/* User Avatar Dropdown */}
@@ -186,7 +200,7 @@ export function AppHeader() {
             <Button
               variant="ghost"
               size="icon"
-              className="md:hidden"
+              className="lg:hidden h-9 w-9"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -196,14 +210,14 @@ export function AppHeader() {
 
         {/* Mobile Navigation */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-t border-border/40 bg-background/95 backdrop-blur animate-slide-up">
-            <nav className="container px-4 py-4 space-y-2">
+          <div className="lg:hidden border-t border-border/40 bg-background/95 backdrop-blur animate-fade-in">
+            <nav className="container px-4 py-3 space-y-1">
               {navItems.map((item) => (
                 <Link
                   key={item.path}
                   to={item.path}
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                  className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
                     isActive(item.path)
                       ? 'bg-primary/10 text-primary'
                       : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
@@ -213,10 +227,25 @@ export function AppHeader() {
                   {item.label}
                 </Link>
               ))}
-              <div className="pt-2 border-t border-border/40">
+              
+              {/* Mobile Dashboard Link */}
+              <Link
+                to="/dashboard"
+                onClick={() => setMobileMenuOpen(false)}
+                className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                  isActive('/dashboard')
+                    ? 'bg-primary/10 text-primary'
+                    : 'text-primary hover:bg-primary/10'
+                }`}
+              >
+                <TrendingUp className="w-5 h-5" />
+                Meu Progresso
+              </Link>
+
+              <div className="pt-2 border-t border-border/40 mt-2">
                 <Button
                   variant="ghost"
-                  className="w-full justify-start gap-3 px-4 py-3"
+                  className="w-full justify-start gap-3 px-4 py-2.5 text-muted-foreground hover:text-foreground"
                   onClick={() => {
                     setMobileMenuOpen(false);
                     setShareModalOpen(true);
@@ -225,6 +254,20 @@ export function AppHeader() {
                   <Share2 className="w-5 h-5" />
                   Compartilhar Evolução
                 </Button>
+                
+                {!isPremium && (
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start gap-3 px-4 py-2.5 text-accent"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      navigate('/upgrade');
+                    }}
+                  >
+                    <Sparkles className="w-5 h-5" />
+                    Fazer Upgrade
+                  </Button>
+                )}
               </div>
             </nav>
           </div>
