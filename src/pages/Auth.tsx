@@ -5,10 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { BookOpen, Mail, Lock, User } from 'lucide-react';
+import { Mail, Lock, User } from 'lucide-react';
 import heroPattern from '@/assets/hero-pattern.png';
 import ProfileCompletionModal from '@/components/ProfileCompletionModal';
 import { supabase } from '@/integrations/supabase/client';
+import Logo from '@/components/Logo';
 
 // Google icon component
 const GoogleIcon = () => (
@@ -112,14 +113,14 @@ export default function Auth() {
       
       <Card variant="elevated" className="w-full max-w-md z-10 animate-scale-in">
         <CardHeader className="text-center space-y-4">
-          <div className="mx-auto w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center shadow-glow">
-            <BookOpen className="w-8 h-8 text-primary-foreground" />
+          <div className="mx-auto">
+            <Logo size="xl" showText={false} />
           </div>
           <CardTitle className="text-2xl font-display">
             {isLogin ? 'Bem-vindo de volta!' : 'Criar conta'}
           </CardTitle>
           <CardDescription>
-            {isLogin ? 'Entre para continuar seus estudos' : 'Comece sua jornada de estudos'}
+            {isLogin ? 'Entre para continuar seus estudos na LevelUp Exams' : 'Comece sua jornada gamificada de estudos'}
           </CardDescription>
         </CardHeader>
         
