@@ -35,7 +35,7 @@ export function RecentAchievementsCard() {
             </p>
           </div>
           <Link 
-            to="/rewards" 
+            to="/achievements" 
             className="shrink-0 w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
           >
             <ChevronRight className="w-5 h-5 text-primary" />
@@ -58,7 +58,7 @@ export function RecentAchievementsCard() {
           <h3 className="font-display font-bold text-base">Conquistas Recentes</h3>
         </div>
         <Link 
-          to="/rewards" 
+          to="/achievements" 
           className="text-xs text-primary font-medium hover:underline flex items-center gap-1"
         >
           Ver todas
