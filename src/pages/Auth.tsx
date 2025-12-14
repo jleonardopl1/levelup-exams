@@ -10,6 +10,12 @@ import heroPattern from '@/assets/hero-pattern.png';
 import ProfileCompletionModal from '@/components/ProfileCompletionModal';
 import { supabase } from '@/integrations/supabase/client';
 import Logo from '@/components/Logo';
+import { z } from 'zod';
+
+// Validation schemas
+const emailSchema = z.string().trim().email({ message: "Email inválido" }).max(255);
+const passwordSchema = z.string().min(6, { message: "Senha deve ter pelo menos 6 caracteres" }).max(128);
+const displayNameSchema = z.string().trim().min(2, { message: "Nome deve ter pelo menos 2 caracteres" }).max(100).optional();
 
 // Google icon component
 const GoogleIcon = () => (
@@ -70,18 +76,52 @@ export default function Auth() {
     setLoading(true);
 
     try {
+      // Validate email
+      const emailResult = emailSchema.safeParse(email);
+      if (!emailResult.success) {
+        toast.error(emailResult.error.errors[0].message);
+        setLoading(false);
+        return;
+      }
+
+      // Validate password
+      const passwordResult = passwordSchema.safeParse(password);
+      if (!passwordResult.success) {
+        toast.error(passwordResult.error.errors[0].message);
+        setLoading(false);
+        return;
+      }
+
       if (isLogin) {
-        const { error } = await signIn(email, password);
+        const { error } = await signIn(emailResult.data, password);
         if (error) throw error;
         toast.success('Login realizado com sucesso!');
       } else {
-        const { error } = await signUp(email, password, displayName);
+        // Validate display name for signup
+        const nameResult = displayNameSchema.safeParse(displayName || undefined);
+        if (displayName && !nameResult.success) {
+          toast.error(nameResult.error.errors[0].message);
+          setLoading(false);
+          return;
+        }
+
+        const { error } = await signUp(emailResult.data, password, displayName?.trim() || undefined);
         if (error) throw error;
         toast.success('Conta criada com sucesso!');
         // Profile modal will be shown via useEffect when user state updates
       }
     } catch (error: any) {
-      toast.error(error.message || 'Ocorreu um erro');
+      // Handle specific Supabase auth errors with user-friendly messages
+      const errorMessage = error.message?.toLowerCase() || '';
+      if (errorMessage.includes('user already registered') || errorMessage.includes('already exists')) {
+        toast.error('Este email já está cadastrado. Tente fazer login.');
+      } else if (errorMessage.includes('invalid login credentials')) {
+        toast.error('Email ou senha incorretos.');
+      } else if (errorMessage.includes('email not confirmed')) {
+        toast.error('Por favor, confirme seu email antes de fazer login.');
+      } else {
+        toast.error(error.message || 'Ocorreu um erro. Tente novamente.');
+      }
     } finally {
       setLoading(false);
     }
