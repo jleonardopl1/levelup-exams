@@ -119,6 +119,36 @@ export type Database = {
         }
         Relationships: []
       }
+      career_categories: {
+        Row: {
+          created_at: string
+          description: string | null
+          display_order: number
+          icon: string
+          id: string
+          is_active: boolean
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          icon?: string
+          id?: string
+          is_active?: boolean
+          name: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          icon?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+        }
+        Relationships: []
+      }
       daily_challenges: {
         Row: {
           challenge_type: string
@@ -279,6 +309,7 @@ export type Database = {
           enunciado: string
           explicacao: string | null
           id: string
+          subject_id: string | null
         }
         Insert: {
           alternativas: string[]
@@ -289,6 +320,7 @@ export type Database = {
           enunciado: string
           explicacao?: string | null
           id?: string
+          subject_id?: string | null
         }
         Update: {
           alternativas?: string[]
@@ -299,8 +331,17 @@ export type Database = {
           enunciado?: string
           explicacao?: string | null
           id?: string
+          subject_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "questions_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       quiz_results: {
         Row: {
@@ -477,6 +518,47 @@ export type Database = {
           reward_value?: Json
         }
         Relationships: []
+      }
+      subjects: {
+        Row: {
+          career_category_id: string
+          created_at: string
+          description: string | null
+          display_order: number
+          icon: string
+          id: string
+          is_active: boolean
+          name: string
+        }
+        Insert: {
+          career_category_id: string
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          icon?: string
+          id?: string
+          is_active?: boolean
+          name: string
+        }
+        Update: {
+          career_category_id?: string
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          icon?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subjects_career_category_id_fkey"
+            columns: ["career_category_id"]
+            isOneToOne: false
+            referencedRelation: "career_categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_achievements: {
         Row: {

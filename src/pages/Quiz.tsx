@@ -16,8 +16,9 @@ import { Confetti, CelebrationGlow } from '@/components/Confetti';
 export default function Quiz() {
   const [searchParams] = useSearchParams();
   const categoria = searchParams.get('categoria') || undefined;
+  const subjectId = searchParams.get('subject') || undefined;
   const { user, loading: authLoading } = useAuth();
-  const { data: questions, isLoading } = useQuestions(10, categoria);
+  const { data: questions, isLoading } = useQuestions({ limit: 10, categoria, subjectId });
   const submitQuiz = useSubmitQuiz();
   const incrementUsage = useIncrementUsage();
   const { hasReachedLimit, questionsRemaining, isPremium } = useQuestionLimits();

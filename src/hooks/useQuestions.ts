@@ -10,18 +10,29 @@ export interface Question {
   dificuldade: string;
   explicacao: string | null;
   created_at: string;
+  subject_id: string | null;
 }
 
-export function useQuestions(limit: number = 10, categoria?: string) {
+interface UseQuestionsOptions {
+  limit?: number;
+  categoria?: string;
+  subjectId?: string;
+}
+
+export function useQuestions(options: UseQuestionsOptions = {}) {
+  const { limit = 10, categoria, subjectId } = options;
+  
   return useQuery({
-    queryKey: ['questions', limit, categoria],
+    queryKey: ['questions', limit, categoria, subjectId],
     queryFn: async () => {
       let query = supabase
         .from('questions')
         .select('*')
         .limit(limit);
       
-      if (categoria && categoria !== 'Todas') {
+      if (subjectId) {
+        query = query.eq('subject_id', subjectId);
+      } else if (categoria && categoria !== 'Todas') {
         query = query.eq('categoria', categoria);
       }
       

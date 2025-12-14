@@ -2,13 +2,10 @@ import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
-import { useCategories } from '@/hooks/useQuestions';
 import { useLeaderboard } from '@/hooks/useQuizResults';
 import { useQuestionLimits } from '@/hooks/useDailyUsage';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { BookOpen, Trophy, Target, Flame, Play, Crown, Medal, Award, LogOut, Sparkles, Bot, HelpCircle, TrendingUp, Zap, Star, ArrowUpRight } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { BookOpen, Trophy, Target, Flame, Play, TrendingUp, Zap, Star, ArrowUpRight } from 'lucide-react';
 import heroPattern from '@/assets/hero-pattern.png';
 import { PremiumBadge, UsageMeter, UpgradeCard } from '@/components/PremiumBadge';
 import { DailyLimitModal } from '@/components/DailyLimitModal';
@@ -16,12 +13,12 @@ import { AppHeader } from '@/components/AppHeader';
 import { DailyChallengesCard } from '@/components/DailyChallengesCard';
 import { MilestoneModal } from '@/components/MilestoneModal';
 import { RecentAchievementsCard } from '@/components/RecentAchievementsCard';
-import { StreakReminderBanner, StreakReminderToggle } from '@/components/StreakReminderToggle';
+import { StreakReminderBanner } from '@/components/StreakReminderToggle';
+import { CareerCategorySelector } from '@/components/CareerCategorySelector';
 
 export default function Index() {
-  const { user, loading: authLoading, signOut } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { data: profile } = useProfile();
-  const { data: categories } = useCategories();
   const { data: leaderboard } = useLeaderboard(5);
   const { isPremium, questionsRemaining, dailyLimit, hasReachedLimit, tier } = useQuestionLimits();
   const navigate = useNavigate();
@@ -32,14 +29,6 @@ export default function Index() {
       setShowLimitModal(true);
     } else {
       navigate('/quiz');
-    }
-  };
-
-  const handleCategoryClick = (cat: string) => {
-    if (hasReachedLimit && !isPremium) {
-      setShowLimitModal(true);
-    } else {
-      navigate(`/quiz?categoria=${encodeURIComponent(cat)}`);
     }
   };
 
@@ -328,55 +317,11 @@ export default function Index() {
         {/* Daily Challenges */}
         <DailyChallengesCard />
 
-        {/* Categories - Organic Grid */}
-        <div>
-          <h2 className="font-display font-bold text-lg mb-4 flex items-center gap-2">
-            <span>📚</span> Categorias
-          </h2>
-          <div className="grid grid-cols-2 gap-4">
-            {categories?.slice(0, 4).map((cat, index) => (
-              <div 
-                key={cat} 
-                className="relative cursor-pointer group"
-                onClick={() => handleCategoryClick(cat)}
-              >
-                {/* Subtle organic blob */}
-                <div className="absolute inset-0 overflow-hidden">
-                  <div 
-                    className={`absolute w-16 h-16 blur-lg opacity-30 ${
-                      index === 0 ? '-top-2 -left-2 bg-primary/40 rounded-[60%_40%_50%_50%]' :
-                      index === 1 ? '-top-2 -right-2 bg-accent/40 rounded-[40%_60%_50%_50%]' :
-                      index === 2 ? '-bottom-2 -left-2 bg-success/40 rounded-[50%_50%_60%_40%]' :
-                      '-bottom-2 -right-2 bg-secondary/40 rounded-[50%_50%_40%_60%]'
-                    }`} 
-                  />
-                </div>
-
-                <div className={`relative p-4 bg-gradient-to-br from-card/95 to-card/85 backdrop-blur-sm border border-border/50 shadow-md group-hover:shadow-lg group-hover:scale-[1.03] transition-all duration-300 ${
-                  index === 0 ? 'rounded-[1.5rem_1rem_1.5rem_1rem]' :
-                  index === 1 ? 'rounded-[1rem_1.5rem_1rem_1.5rem]' :
-                  index === 2 ? 'rounded-[1rem_1.5rem_1rem_1.5rem]' :
-                  'rounded-[1.5rem_1rem_1.5rem_1rem]'
-                }`}>
-                  <div className={`w-10 h-10 mb-3 flex items-center justify-center rounded-[45%_55%_50%_50%/55%_45%_55%_45%] ${
-                    index === 0 ? 'bg-primary/15' :
-                    index === 1 ? 'bg-accent/15' :
-                    index === 2 ? 'bg-success/15' :
-                    'bg-secondary/15'
-                  }`}>
-                    <BookOpen className={`w-5 h-5 ${
-                      index === 0 ? 'text-primary' :
-                      index === 1 ? 'text-accent' :
-                      index === 2 ? 'text-success' :
-                      'text-secondary-foreground'
-                    }`} />
-                  </div>
-                  <p className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors">{cat}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        {/* Career Categories Selector */}
+        <CareerCategorySelector 
+          hasReachedLimit={hasReachedLimit && !isPremium}
+          onLimitReached={() => setShowLimitModal(true)}
+        />
 
         {/* Upgrade Card for Free Users */}
         {!isPremium && (
