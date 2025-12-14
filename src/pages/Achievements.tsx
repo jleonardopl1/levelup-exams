@@ -2,9 +2,10 @@ import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
-import { useAchievements, useUserAchievements } from '@/hooks/useRewards';
+import { useAchievements, useUserAchievements, Achievement } from '@/hooks/useRewards';
 import { useUserRewards } from '@/hooks/useRewards';
 import { AppHeader } from '@/components/AppHeader';
+import { AchievementShareModal } from '@/components/AchievementShareModal';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
@@ -23,7 +24,10 @@ import {
   Gift,
   Sparkles,
   TrendingUp,
-  Award
+  Award,
+  Share2,
+  HelpCircle,
+  Eye
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -35,6 +39,7 @@ const tierConfig: Record<string, { label: string; color: string; bgColor: string
   gold: { label: 'Ouro', color: 'text-yellow-500', bgColor: 'from-yellow-500/20 to-amber-400/10', icon: '🥇' },
   platinum: { label: 'Platina', color: 'text-cyan-400', bgColor: 'from-cyan-400/20 to-blue-400/10', icon: '💠' },
   diamond: { label: 'Diamante', color: 'text-purple-400', bgColor: 'from-purple-500/20 to-pink-400/10', icon: '💎' },
+  secret: { label: 'Secreta', color: 'text-violet-500', bgColor: 'from-violet-500/20 to-purple-400/10', icon: '🔮' },
 };
 
 // Icon mapping
@@ -55,7 +60,19 @@ const iconMap: Record<string, string> = {
   award: '🏅',
   gift: '🎁',
   sparkles: '✨',
+  secret: '🔮',
 };
+
+// Secret achievement codes (these achievements are hidden until unlocked)
+const SECRET_ACHIEVEMENT_CODES = [
+  'perfect_quiz',      // Complete a quiz with 100% accuracy
+  'speed_demon',       // Complete a quiz in under 2 minutes
+  'night_owl',         // Complete a quiz between midnight and 5am
+  'early_bird',        // Complete a quiz between 5am and 7am
+  'streak_master',     // Reach a 30-day streak
+  'point_collector',   // Reach 10,000 points
+  'quiz_veteran',      // Complete 100 quizzes
+];
 
 export default function Achievements() {
   const { user, loading: authLoading } = useAuth();
@@ -65,6 +82,17 @@ export default function Achievements() {
   const { data: rewards } = useUserRewards();
   const navigate = useNavigate();
   const [selectedTier, setSelectedTier] = useState<string>('all');
+  const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [selectedAchievement, setSelectedAchievement] = useState<Achievement | null>(null);
+
+  // Check if an achievement is secret
+  const isSecretAchievement = (code: string) => SECRET_ACHIEVEMENT_CODES.includes(code);
+
+  // Handle share button click
+  const handleShare = (achievement: Achievement) => {
+    setSelectedAchievement(achievement);
+    setShareModalOpen(true);
+  };
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -124,10 +152,12 @@ export default function Achievements() {
     return { current, percent };
   };
 
-  // Filter achievements by tier
-  const filteredAchievements = achievements?.filter(a => 
-    selectedTier === 'all' || a.tier === selectedTier
-  ) || [];
+  // Filter achievements by tier (including secret filter)
+  const filteredAchievements = achievements?.filter(a => {
+    if (selectedTier === 'all') return true;
+    if (selectedTier === 'secret') return isSecretAchievement(a.code);
+    return a.tier === selectedTier;
+  }) || [];
 
   // Sort: unlocked first, then by tier
   const tierOrder = ['bronze', 'silver', 'gold', 'platinum', 'diamond'];
@@ -138,6 +168,12 @@ export default function Achievements() {
     if (!aUnlocked && bUnlocked) return 1;
     return tierOrder.indexOf(a.tier) - tierOrder.indexOf(b.tier);
   });
+
+  // Count secret achievements
+  const secretAchievementsCount = achievements?.filter(a => isSecretAchievement(a.code)).length || 0;
+  const unlockedSecretCount = achievements?.filter(a => 
+    isSecretAchievement(a.code) && unlockedIds.has(a.id)
+  ).length || 0;
 
   return (
     <div className="min-h-screen bg-background">
@@ -202,15 +238,41 @@ export default function Achievements() {
       <div className="px-4 py-6 max-w-4xl mx-auto">
         {/* Tier Tabs */}
         <Tabs value={selectedTier} onValueChange={setSelectedTier} className="mb-6">
-          <TabsList className="w-full grid grid-cols-6 h-auto p-1">
+          <TabsList className="w-full grid grid-cols-7 h-auto p-1">
             <TabsTrigger value="all" className="text-xs py-2">Todas</TabsTrigger>
             <TabsTrigger value="bronze" className="text-xs py-2">🥉</TabsTrigger>
             <TabsTrigger value="silver" className="text-xs py-2">🥈</TabsTrigger>
             <TabsTrigger value="gold" className="text-xs py-2">🥇</TabsTrigger>
             <TabsTrigger value="platinum" className="text-xs py-2">💠</TabsTrigger>
             <TabsTrigger value="diamond" className="text-xs py-2">💎</TabsTrigger>
+            <TabsTrigger value="secret" className="text-xs py-2 relative">
+              🔮
+              {secretAchievementsCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-violet-500 text-white text-[10px] rounded-full flex items-center justify-center">
+                  {unlockedSecretCount}
+                </span>
+              )}
+            </TabsTrigger>
           </TabsList>
         </Tabs>
+
+        {/* Secret achievements hint */}
+        {selectedTier === 'secret' && (
+          <Card className="mb-6 p-4 bg-gradient-to-br from-violet-500/10 to-purple-500/5 border-violet-500/30">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl bg-violet-500/20 flex items-center justify-center shrink-0">
+                <HelpCircle className="w-5 h-5 text-violet-400" />
+              </div>
+              <div>
+                <h4 className="font-semibold text-foreground mb-1">Conquistas Secretas</h4>
+                <p className="text-sm text-muted-foreground">
+                  Estas conquistas são reveladas apenas quando você as desbloqueia! 
+                  Continue explorando o app para descobrir todas elas.
+                </p>
+              </div>
+            </div>
+          </Card>
+        )}
 
         {/* Achievements Grid */}
         <div className="grid gap-4 md:grid-cols-2">
@@ -218,7 +280,13 @@ export default function Achievements() {
             const isUnlocked = unlockedIds.has(achievement.id);
             const userAchievement = userAchievements?.find(ua => ua.achievement_id === achievement.id);
             const progress = getProgress(achievement.requirement_type, achievement.requirement_value);
-            const tier = tierConfig[achievement.tier] || tierConfig.bronze;
+            const isSecret = isSecretAchievement(achievement.code);
+            const tier = isSecret && !isUnlocked 
+              ? tierConfig.secret 
+              : (tierConfig[achievement.tier] || tierConfig.bronze);
+
+            // For secret achievements that are not unlocked, hide details
+            const showDetails = !isSecret || isUnlocked;
 
             return (
               <Card 
@@ -226,13 +294,31 @@ export default function Achievements() {
                 className={`relative overflow-hidden transition-all duration-300 ${
                   isUnlocked 
                     ? 'bg-gradient-to-br ' + tier.bgColor + ' border-primary/30 shadow-md' 
-                    : 'bg-card/50 border-border/50 opacity-80 hover:opacity-100'
+                    : isSecret
+                      ? 'bg-gradient-to-br from-violet-900/20 to-purple-900/10 border-violet-500/20'
+                      : 'bg-card/50 border-border/50 opacity-80 hover:opacity-100'
                 }`}
               >
-                {/* Unlock indicator */}
+                {/* Unlock indicator or share button */}
                 {isUnlocked && (
-                  <div className="absolute top-3 right-3">
+                  <div className="absolute top-3 right-3 flex items-center gap-2">
+                    <button
+                      onClick={() => handleShare(achievement)}
+                      className="w-7 h-7 rounded-full bg-primary/20 hover:bg-primary/30 flex items-center justify-center transition-colors"
+                    >
+                      <Share2 className="w-3.5 h-3.5 text-primary" />
+                    </button>
                     <CheckCircle2 className="w-5 h-5 text-success" />
+                  </div>
+                )}
+
+                {/* Secret badge for locked secret achievements */}
+                {isSecret && !isUnlocked && (
+                  <div className="absolute top-3 right-3">
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-violet-500/30 text-violet-300 flex items-center gap-1">
+                      <Eye className="w-3 h-3" />
+                      Secreta
+                    </span>
                   </div>
                 )}
 
@@ -242,12 +328,18 @@ export default function Achievements() {
                     <div className={`relative w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 ${
                       isUnlocked 
                         ? 'bg-gradient-to-br from-primary to-accent shadow-lg' 
-                        : 'bg-muted/50'
+                        : isSecret
+                          ? 'bg-gradient-to-br from-violet-500/30 to-purple-500/20'
+                          : 'bg-muted/50'
                     }`}>
-                      <span className={`text-2xl ${!isUnlocked ? 'grayscale opacity-50' : ''}`}>
-                        {iconMap[achievement.icon] || '🏆'}
-                      </span>
-                      {!isUnlocked && (
+                      {showDetails ? (
+                        <span className={`text-2xl ${!isUnlocked ? 'grayscale opacity-50' : ''}`}>
+                          {iconMap[achievement.icon] || '🏆'}
+                        </span>
+                      ) : (
+                        <span className="text-2xl">🔮</span>
+                      )}
+                      {!isUnlocked && !isSecret && (
                         <div className="absolute inset-0 flex items-center justify-center bg-background/60 rounded-2xl">
                           <Lock className="w-5 h-5 text-muted-foreground" />
                         </div>
@@ -262,11 +354,14 @@ export default function Achievements() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <h3 className={`font-semibold ${isUnlocked ? 'text-foreground' : 'text-muted-foreground'}`}>
-                          {achievement.name}
+                          {showDetails ? achievement.name : '???'}
                         </h3>
                       </div>
                       <p className="text-sm text-muted-foreground mb-2 line-clamp-2">
-                        {achievement.description}
+                        {showDetails 
+                          ? achievement.description 
+                          : 'Continue usando o app para descobrir esta conquista secreta!'
+                        }
                       </p>
                       
                       {/* Points */}
@@ -274,7 +369,7 @@ export default function Achievements() {
                         <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
                           isUnlocked ? 'bg-success/20 text-success' : 'bg-muted text-muted-foreground'
                         }`}>
-                          +{achievement.points_reward} pts
+                          {showDetails ? `+${achievement.points_reward} pts` : '??? pts'}
                         </span>
                         <span className={`text-xs ${tier.color}`}>
                           {tier.label}
@@ -283,8 +378,8 @@ export default function Achievements() {
                     </div>
                   </div>
 
-                  {/* Progress bar (only for locked achievements) */}
-                  {!isUnlocked && (
+                  {/* Progress bar (only for locked non-secret achievements) */}
+                  {!isUnlocked && !isSecret && (
                     <div className="mt-4">
                       <div className="flex items-center justify-between text-xs mb-1.5">
                         <span className="text-muted-foreground">Progresso</span>
@@ -296,9 +391,25 @@ export default function Achievements() {
                     </div>
                   )}
 
-                  {/* Unlocked date */}
+                  {/* Mystery progress for secret achievements */}
+                  {!isUnlocked && isSecret && (
+                    <div className="mt-4">
+                      <div className="flex items-center justify-between text-xs mb-1.5">
+                        <span className="text-violet-400">Progresso oculto</span>
+                        <span className="font-medium text-violet-300">???</span>
+                      </div>
+                      <div className="h-2 rounded-full bg-violet-500/20 overflow-hidden">
+                        <div 
+                          className="h-full bg-gradient-to-r from-violet-500 to-purple-500 transition-all duration-500"
+                          style={{ width: `${progress.percent}%` }}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Unlocked date and share for unlocked achievements */}
                   {isUnlocked && userAchievement && (
-                    <div className="mt-3 pt-3 border-t border-border/30">
+                    <div className="mt-3 pt-3 border-t border-border/30 flex items-center justify-between">
                       <p className="text-xs text-muted-foreground flex items-center gap-1">
                         <Sparkles className="w-3 h-3" />
                         Desbloqueada {formatDistanceToNow(new Date(userAchievement.unlocked_at), { 
@@ -333,6 +444,13 @@ export default function Achievements() {
           </Button>
         </div>
       </div>
+
+      {/* Achievement Share Modal */}
+      <AchievementShareModal 
+        achievement={selectedAchievement}
+        open={shareModalOpen}
+        onOpenChange={setShareModalOpen}
+      />
     </div>
   );
 }

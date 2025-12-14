@@ -3,7 +3,8 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Confetti } from '@/components/Confetti';
 import { Achievement } from '@/hooks/useRewards';
-import { Trophy, Star, Sparkles, X } from 'lucide-react';
+import { AchievementShareModal } from '@/components/AchievementShareModal';
+import { Trophy, Star, Sparkles, X, Share2 } from 'lucide-react';
 
 interface AchievementCelebrationProps {
   achievement: Achievement | null;
@@ -29,6 +30,7 @@ const iconMap: Record<string, string> = {
   award: '🏅',
   gift: '🎁',
   sparkles: '✨',
+  secret: '🔮',
 };
 
 // Tier colors
@@ -51,6 +53,7 @@ const tierGlow: Record<string, string> = {
 export function AchievementCelebration({ achievement, open, onClose }: AchievementCelebrationProps) {
   const [showConfetti, setShowConfetti] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
@@ -107,6 +110,10 @@ export function AchievementCelebration({ achievement, open, onClose }: Achieveme
     } catch (error) {
       console.log('Audio not available');
     }
+  };
+
+  const handleShare = () => {
+    setShowShareModal(true);
   };
 
   if (!achievement) return null;
@@ -180,10 +187,11 @@ export function AchievementCelebration({ achievement, open, onClose }: Achieveme
               <div className="flex gap-3 justify-center">
                 <Button
                   variant="outline"
-                  onClick={onClose}
-                  className="flex-1"
+                  onClick={handleShare}
+                  className="flex-1 gap-2"
                 >
-                  Continuar
+                  <Share2 className="w-4 h-4" />
+                  Compartilhar
                 </Button>
                 <Button
                   variant="default"
@@ -208,6 +216,13 @@ export function AchievementCelebration({ achievement, open, onClose }: Achieveme
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Share Modal */}
+      <AchievementShareModal 
+        achievement={achievement}
+        open={showShareModal}
+        onOpenChange={setShowShareModal}
+      />
     </>
   );
 }
