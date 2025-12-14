@@ -17,7 +17,6 @@ import {
   Share2, 
   Trophy, 
   Gift, 
-  Settings, 
   LogOut,
   Crown,
   Sparkles,
@@ -31,6 +30,7 @@ import {
 import { PremiumBadge } from '@/components/PremiumBadge';
 import { ShareModal } from '@/components/ShareModal';
 import { NotificationCenter } from '@/components/NotificationCenter';
+import Logo from '@/components/Logo';
 
 export function AppHeader() {
   const { user, signOut } = useAuth();
@@ -61,11 +61,8 @@ export function AppHeader() {
       <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 items-center justify-between px-4">
           {/* Logo/Brand */}
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-[45%_55%_50%_50%/55%_45%_55%_45%] bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-md">
-              <span className="text-lg">🎯</span>
-            </div>
-            <span className="font-display font-bold text-lg hidden sm:block">StudyQuiz</span>
+          <Link to="/" className="flex items-center">
+            <Logo size="md" showText={true} />
           </Link>
 
           {/* Desktop Navigation */}
