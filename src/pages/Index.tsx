@@ -8,7 +8,7 @@ import { useQuestionLimits } from '@/hooks/useDailyUsage';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { BookOpen, Trophy, Target, Flame, Play, Crown, Medal, Award, LogOut, Sparkles, Bot, HelpCircle } from 'lucide-react';
+import { BookOpen, Trophy, Target, Flame, Play, Crown, Medal, Award, LogOut, Sparkles, Bot, HelpCircle, TrendingUp, Zap, Star, ArrowUpRight } from 'lucide-react';
 import heroPattern from '@/assets/hero-pattern.png';
 import { PremiumBadge, UsageMeter, UpgradeCard } from '@/components/PremiumBadge';
 import { DailyLimitModal } from '@/components/DailyLimitModal';
@@ -61,51 +61,156 @@ export default function Index() {
     ? Math.round((profile.total_correct / profile.total_questions) * 100) 
     : 0;
 
+  // Calculate user level and progress
+  const totalPoints = (profile?.total_correct || 0) * 10;
+  const currentLevel = Math.floor(totalPoints / 500) + 1;
+  const pointsInCurrentLevel = totalPoints % 500;
+  const levelProgress = (pointsInCurrentLevel / 500) * 100;
+
+  // Get time-based greeting
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return { text: 'Bom dia', emoji: '☀️' };
+    if (hour < 18) return { text: 'Boa tarde', emoji: '🌤️' };
+    return { text: 'Boa noite', emoji: '🌙' };
+  };
+  const greeting = getGreeting();
+
+  // Get motivational message based on stats
+  const getMotivationalMessage = () => {
+    if (!profile || profile.total_quizzes === 0) {
+      return { text: 'Pronto para começar sua jornada?', highlight: 'Faça seu primeiro simulado!' };
+    }
+    if (profile.streak_days >= 7) {
+      return { text: `${profile.streak_days} dias seguidos estudando!`, highlight: 'Você está no caminho certo! 🔥' };
+    }
+    if (accuracy >= 80) {
+      return { text: `${accuracy}% de precisão`, highlight: 'Excelente desempenho!' };
+    }
+    if (accuracy >= 50) {
+      return { text: 'Continue assim!', highlight: 'Cada questão conta.' };
+    }
+    return { text: 'A prática leva à perfeição!', highlight: 'Continue estudando.' };
+  };
+  const motivation = getMotivationalMessage();
+
   return (
     <div className="min-h-screen bg-background">
       <AppHeader />
       
-      {/* Hero Section */}
+      {/* Hero Section - Enhanced */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0">
           <img src={heroPattern} alt="" className="w-full h-full object-cover opacity-30" />
           <div className="absolute inset-0 gradient-hero opacity-90" />
         </div>
         
-        <div className="relative z-10 px-4 pt-6 pb-20">
-          <div className="flex items-center gap-3 mb-6">
-            <div>
-              <p className="text-primary-foreground/80 text-sm">Olá,</p>
-              <h1 className="text-2xl font-display font-bold text-primary-foreground">
+        <div className="relative z-10 px-4 pt-6 pb-24">
+          {/* Greeting & Profile Header */}
+          <div className="flex items-start justify-between gap-3 mb-5">
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-2xl">{greeting.emoji}</span>
+                <p className="text-primary-foreground/80 text-sm font-medium">{greeting.text}</p>
+              </div>
+              <h1 className="text-2xl md:text-3xl font-display font-bold text-primary-foreground">
                 {profile?.display_name || 'Estudante'}
               </h1>
             </div>
-            <PremiumBadge tier={tier} />
+            <div className="flex flex-col items-end gap-1">
+              <PremiumBadge tier={tier} />
+              <div className="flex items-center gap-1 text-primary-foreground/70 text-xs">
+                <Star className="w-3 h-3 fill-current" />
+                <span>Nível {currentLevel}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Motivational Card */}
+          <div className="mb-5 p-4 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+                <Zap className="w-5 h-5 text-primary-foreground" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-primary-foreground/90 text-sm font-medium">{motivation.text}</p>
+                <p className="text-primary-foreground font-semibold text-base">{motivation.highlight}</p>
+              </div>
+              <ArrowUpRight className="w-5 h-5 text-primary-foreground/50 shrink-0" />
+            </div>
+            
+            {/* Level Progress */}
+            {profile && profile.total_quizzes > 0 && (
+              <div className="mt-3 pt-3 border-t border-white/10">
+                <div className="flex items-center justify-between text-xs text-primary-foreground/70 mb-1.5">
+                  <span>Progresso para nível {currentLevel + 1}</span>
+                  <span>{pointsInCurrentLevel}/500 XP</span>
+                </div>
+                <div className="h-2 bg-white/20 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-gradient-to-r from-accent to-success rounded-full transition-all duration-500"
+                    style={{ width: `${levelProgress}%` }}
+                  />
+                </div>
+              </div>
+            )}
           </div>
           
-          {/* Stats Cards */}
+          {/* Stats Cards - Enhanced */}
           <div className="grid grid-cols-3 gap-3">
-            <Card variant="glass" className="text-center p-4">
-              <Target className="w-6 h-6 mx-auto mb-2 text-primary" />
-              <p className="text-2xl font-bold">{profile?.total_quizzes || 0}</p>
+            <Card variant="glass" className="text-center p-4 group hover:scale-105 transition-transform duration-300">
+              <div className="relative mx-auto w-10 h-10 mb-2 rounded-xl bg-primary/20 flex items-center justify-center">
+                <Target className="w-5 h-5 text-primary" />
+                <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-primary/30 flex items-center justify-center">
+                  <TrendingUp className="w-2.5 h-2.5 text-primary" />
+                </div>
+              </div>
+              <p className="text-2xl font-bold text-foreground">{profile?.total_quizzes || 0}</p>
               <p className="text-xs text-muted-foreground">Simulados</p>
+              {profile && profile.total_quizzes > 0 && (
+                <p className="text-[10px] text-primary/70 mt-1">
+                  +{profile.total_questions} questões
+                </p>
+              )}
             </Card>
-            <Card variant="glass" className="text-center p-4">
-              <Trophy className="w-6 h-6 mx-auto mb-2 text-accent" />
-              <p className="text-2xl font-bold">{accuracy}%</p>
+            
+            <Card variant="glass" className="text-center p-4 group hover:scale-105 transition-transform duration-300">
+              <div className="relative mx-auto w-10 h-10 mb-2 rounded-xl bg-accent/20 flex items-center justify-center">
+                <Trophy className="w-5 h-5 text-accent" />
+                {accuracy >= 70 && (
+                  <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-accent flex items-center justify-center">
+                    <span className="text-[8px]">⭐</span>
+                  </div>
+                )}
+              </div>
+              <p className="text-2xl font-bold text-foreground">{accuracy}%</p>
               <p className="text-xs text-muted-foreground">Precisão</p>
+              <p className="text-[10px] text-accent/70 mt-1">
+                {accuracy >= 80 ? 'Excelente!' : accuracy >= 60 ? 'Muito bom!' : accuracy > 0 ? 'Continue!' : 'Comece já!'}
+              </p>
             </Card>
-            <Card variant="glass" className="text-center p-4">
-              <Flame className="w-6 h-6 mx-auto mb-2 text-destructive" />
-              <p className="text-2xl font-bold">{profile?.streak_days || 0}</p>
-              <p className="text-xs text-muted-foreground">Sequência</p>
+            
+            <Card variant="glass" className="text-center p-4 group hover:scale-105 transition-transform duration-300">
+              <div className="relative mx-auto w-10 h-10 mb-2 rounded-xl bg-destructive/20 flex items-center justify-center">
+                <Flame className={`w-5 h-5 text-destructive ${profile?.streak_days && profile.streak_days > 0 ? 'animate-pulse' : ''}`} />
+                {profile?.streak_days && profile.streak_days >= 3 && (
+                  <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-destructive flex items-center justify-center">
+                    <span className="text-[8px]">🔥</span>
+                  </div>
+                )}
+              </div>
+              <p className="text-2xl font-bold text-foreground">{profile?.streak_days || 0}</p>
+              <p className="text-xs text-muted-foreground">Dias Seguidos</p>
+              <p className="text-[10px] text-destructive/70 mt-1">
+                {profile?.streak_days && profile.streak_days > 0 ? 'Não perca!' : 'Inicie sua sequência!'}
+              </p>
             </Card>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="relative z-20 px-4 -mt-8 pb-8 space-y-6">
+      <div className="relative z-20 px-4 -mt-10 pb-8 space-y-6">
         {/* Usage Meter for Free Users */}
         {!isPremium && (
           <Card variant="elevated">
