@@ -182,7 +182,65 @@ serve(async (req) => {
       await supabase.from("ai_mentor_usage").insert({ user_id: user.id, usage_date: today, questions_used: 1 });
     }
 
-    const { messages } = await req.json();
+    const body = await req.json();
+    
+    // Validate messages structure
+    if (!body.messages || !Array.isArray(body.messages)) {
+      await logAuditEvent(supabase, "VALIDATION_FAILED", user.id, user.email, clientIp, userAgent, false, "Invalid request format - messages not an array");
+      return new Response(JSON.stringify({ error: "Formato de requisição inválido" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const messages = body.messages;
+
+    // Limit message count (conversation history)
+    if (messages.length > 20) {
+      await logAuditEvent(supabase, "VALIDATION_FAILED", user.id, user.email, clientIp, userAgent, false, "Message count exceeded", { count: messages.length });
+      return new Response(JSON.stringify({ error: "Limite de mensagens excedido (máximo 20)" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Validate each message
+    for (const msg of messages) {
+      if (!msg.role || !msg.content) {
+        await logAuditEvent(supabase, "VALIDATION_FAILED", user.id, user.email, clientIp, userAgent, false, "Invalid message format");
+        return new Response(JSON.stringify({ error: "Formato de mensagem inválido" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      
+      if (typeof msg.content !== 'string') {
+        await logAuditEvent(supabase, "VALIDATION_FAILED", user.id, user.email, clientIp, userAgent, false, "Message content not a string");
+        return new Response(JSON.stringify({ error: "Conteúdo da mensagem deve ser texto" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      
+      // Limit message length (4000 chars)
+      if (msg.content.length > 4000) {
+        await logAuditEvent(supabase, "VALIDATION_FAILED", user.id, user.email, clientIp, userAgent, false, "Message too long", { length: msg.content.length });
+        return new Response(JSON.stringify({ error: "Mensagem muito longa (máximo 4000 caracteres)" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      
+      // Only allow user and assistant roles
+      if (msg.role !== 'user' && msg.role !== 'assistant') {
+        await logAuditEvent(supabase, "VALIDATION_FAILED", user.id, user.email, clientIp, userAgent, false, "Invalid message role", { role: msg.role });
+        return new Response(JSON.stringify({ error: "Função de mensagem inválida" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
