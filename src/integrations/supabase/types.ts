@@ -626,6 +626,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "user_answers_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions_public"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "user_answers_quiz_result_id_fkey"
             columns: ["quiz_result_id"]
             isOneToOne: false
@@ -787,7 +794,47 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      questions_public: {
+        Row: {
+          alternativas: string[] | null
+          categoria: string | null
+          created_at: string | null
+          dificuldade: string | null
+          enunciado: string | null
+          explicacao: string | null
+          id: string | null
+          subject_id: string | null
+        }
+        Insert: {
+          alternativas?: string[] | null
+          categoria?: string | null
+          created_at?: string | null
+          dificuldade?: string | null
+          enunciado?: string | null
+          explicacao?: string | null
+          id?: string | null
+          subject_id?: string | null
+        }
+        Update: {
+          alternativas?: string[] | null
+          categoria?: string | null
+          created_at?: string | null
+          dificuldade?: string | null
+          enunciado?: string | null
+          explicacao?: string | null
+          id?: string | null
+          subject_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "questions_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       cleanup_audit_logs: { Args: never; Returns: undefined }
@@ -803,6 +850,10 @@ export type Database = {
           total_questions: number
           user_id: string
         }[]
+      }
+      validate_answer: {
+        Args: { p_question_id: string; p_selected_index: number }
+        Returns: Json
       }
       validate_referral_code: {
         Args: { code_to_validate: string }
