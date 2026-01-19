@@ -1,14 +1,14 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { useQuestions, Question } from '@/hooks/useQuestions';
+import { useQuestions, useValidateAnswer, AnswerValidationResult } from '@/hooks/useQuestions';
 import { useSubmitQuiz } from '@/hooks/useQuizResults';
 import { useQuestionLimits, useIncrementUsage } from '@/hooks/useDailyUsage';
 import { useProcessQuizRewards } from '@/hooks/useQuizRewards';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { ArrowLeft, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { ArrowLeft, Clock, CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { DailyLimitModal } from '@/components/DailyLimitModal';
 import { Confetti, CelebrationGlow } from '@/components/Confetti';
@@ -19,15 +19,17 @@ export default function Quiz() {
   const subjectId = searchParams.get('subject') || undefined;
   const { user, loading: authLoading } = useAuth();
   const { data: questions, isLoading } = useQuestions({ limit: 10, categoria, subjectId });
+  const validateAnswer = useValidateAnswer();
   const submitQuiz = useSubmitQuiz();
   const incrementUsage = useIncrementUsage();
-  const { hasReachedLimit, questionsRemaining, isPremium } = useQuestionLimits();
+  const { hasReachedLimit, isPremium } = useQuestionLimits();
   const { processRewards, showConfetti, setShowConfetti, showGlow, setShowGlow } = useProcessQuizRewards();
   const navigate = useNavigate();
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
+  const [validationResult, setValidationResult] = useState<AnswerValidationResult | null>(null);
   const [answers, setAnswers] = useState<{ questionId: string; selected: number; correct: boolean }[]>([]);
   const [timeLeft, setTimeLeft] = useState(600); // 10 minutes
   const [quizFinished, setQuizFinished] = useState(false);
@@ -68,26 +70,38 @@ export default function Quiz() {
     setSelectedAnswer(index);
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (selectedAnswer === null || !currentQuestion) return;
     
-    const isCorrect = selectedAnswer === currentQuestion.correta;
-    setAnswers([...answers, { 
-      questionId: currentQuestion.id, 
-      selected: selectedAnswer, 
-      correct: isCorrect 
-    }]);
-    
-    // Track consecutive correct answers
-    if (isCorrect) {
-      const newStreak = currentStreak + 1;
-      setCurrentStreak(newStreak);
-      maxStreakRef.current = Math.max(maxStreakRef.current, newStreak);
-    } else {
-      setCurrentStreak(0);
+    // Validate answer server-side
+    try {
+      const result = await validateAnswer.mutateAsync({
+        questionId: currentQuestion.id,
+        selectedIndex: selectedAnswer,
+      });
+      
+      setValidationResult(result);
+      
+      const isCorrect = result.is_correct;
+      setAnswers([...answers, { 
+        questionId: currentQuestion.id, 
+        selected: selectedAnswer, 
+        correct: isCorrect 
+      }]);
+      
+      // Track consecutive correct answers
+      if (isCorrect) {
+        const newStreak = currentStreak + 1;
+        setCurrentStreak(newStreak);
+        maxStreakRef.current = Math.max(maxStreakRef.current, newStreak);
+      } else {
+        setCurrentStreak(0);
+      }
+      
+      setShowResult(true);
+    } catch (error) {
+      console.error('Failed to validate answer:', error);
     }
-    
-    setShowResult(true);
   };
 
   const handleNext = () => {
@@ -95,6 +109,7 @@ export default function Quiz() {
       setCurrentIndex(currentIndex + 1);
       setSelectedAnswer(null);
       setShowResult(false);
+      setValidationResult(null);
     } else {
       finishQuiz();
     }
@@ -105,7 +120,7 @@ export default function Quiz() {
     setQuizFinished(true);
     
     const correctCount = answers.filter(a => a.correct).length + 
-      (showResult && selectedAnswer === currentQuestion?.correta ? 1 : 0);
+      (showResult && validationResult?.is_correct ? 1 : 0);
     const total = questions?.length || 0;
     const score = Math.round((correctCount / total) * 100);
     const timeSpent = 600 - timeLeft;
@@ -135,7 +150,7 @@ export default function Quiz() {
     navigate('/result', { 
       state: { score, correct: correctCount, total, timeSpent } 
     });
-  }, [answers, currentQuestion, navigate, questions, quizFinished, selectedAnswer, showResult, submitQuiz, timeLeft, categoria, isPremium, incrementUsage, processRewards]);
+  }, [answers, navigate, questions, quizFinished, showResult, validationResult, submitQuiz, timeLeft, categoria, isPremium, incrementUsage, processRewards]);
 
   if (isLoading || !questions) {
     return (
@@ -184,14 +199,14 @@ export default function Quiz() {
       <div className="space-y-3 mb-6">
         {currentQuestion?.alternativas.map((alt, index) => {
           const isSelected = selectedAnswer === index;
-          const isCorrect = showResult && index === currentQuestion.correta;
-          const isWrong = showResult && isSelected && index !== currentQuestion.correta;
+          const isCorrect = showResult && validationResult && index === validationResult.correct_index;
+          const isWrong = showResult && isSelected && validationResult && index !== validationResult.correct_index;
 
           return (
             <button
               key={index}
               onClick={() => handleSelect(index)}
-              disabled={showResult}
+              disabled={showResult || validateAnswer.isPending}
               className={cn(
                 "w-full p-4 rounded-xl border-2 text-left transition-all duration-300",
                 "flex items-center gap-3",
@@ -219,11 +234,11 @@ export default function Quiz() {
       </div>
 
       {/* Explanation */}
-      {showResult && currentQuestion?.explicacao && (
+      {showResult && validationResult?.explicacao && (
         <Card variant="glass" className="mb-6 animate-slide-up">
           <CardContent className="p-4">
             <p className="text-sm font-medium text-primary mb-1">Explicação:</p>
-            <p className="text-sm text-muted-foreground">{currentQuestion.explicacao}</p>
+            <p className="text-sm text-muted-foreground">{validationResult.explicacao}</p>
           </CardContent>
         </Card>
       )}
@@ -234,9 +249,15 @@ export default function Quiz() {
         size="xl" 
         className="w-full"
         onClick={showResult ? handleNext : handleConfirm}
-        disabled={selectedAnswer === null && !showResult}
+        disabled={(selectedAnswer === null && !showResult) || validateAnswer.isPending}
       >
-        {showResult ? (currentIndex === questions.length - 1 ? 'Ver Resultado' : 'Próxima') : 'Confirmar'}
+        {validateAnswer.isPending ? (
+          <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Validando...</>
+        ) : showResult ? (
+          currentIndex === questions.length - 1 ? 'Ver Resultado' : 'Próxima'
+        ) : (
+          'Confirmar'
+        )}
       </Button>
 
       <DailyLimitModal open={showLimitModal} onOpenChange={setShowLimitModal} />
