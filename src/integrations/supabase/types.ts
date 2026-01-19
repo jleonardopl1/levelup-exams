@@ -844,6 +844,35 @@ export type Database = {
           },
         ]
       }
+      referral_uses_limited: {
+        Row: {
+          created_at: string | null
+          id: string | null
+          referral_code_id: string | null
+          referred_user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string | null
+          referral_code_id?: string | null
+          referred_user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string | null
+          referral_code_id?: string | null
+          referred_user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referral_uses_referral_code_id_fkey"
+            columns: ["referral_code_id"]
+            isOneToOne: false
+            referencedRelation: "referral_codes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       cleanup_audit_logs: { Args: never; Returns: undefined }
