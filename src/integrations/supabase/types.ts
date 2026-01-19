@@ -309,6 +309,7 @@ export type Database = {
           enunciado: string
           explicacao: string | null
           id: string
+          is_premium: boolean
           subject_id: string | null
         }
         Insert: {
@@ -320,6 +321,7 @@ export type Database = {
           enunciado: string
           explicacao?: string | null
           id?: string
+          is_premium?: boolean
           subject_id?: string | null
         }
         Update: {
@@ -331,6 +333,7 @@ export type Database = {
           enunciado?: string
           explicacao?: string | null
           id?: string
+          is_premium?: boolean
           subject_id?: string | null
         }
         Relationships: [
@@ -382,6 +385,7 @@ export type Database = {
           endpoint: string
           id: string
           identifier: string
+          ip_address: string | null
           request_count: number
           updated_at: string
           window_start: string
@@ -391,6 +395,7 @@ export type Database = {
           endpoint: string
           id?: string
           identifier: string
+          ip_address?: string | null
           request_count?: number
           updated_at?: string
           window_start?: string
@@ -400,6 +405,7 @@ export type Database = {
           endpoint?: string
           id?: string
           identifier?: string
+          ip_address?: string | null
           request_count?: number
           updated_at?: string
           window_start?: string
@@ -803,6 +809,7 @@ export type Database = {
           enunciado: string | null
           explicacao: string | null
           id: string | null
+          is_premium: boolean | null
           subject_id: string | null
         }
         Insert: {
@@ -813,6 +820,7 @@ export type Database = {
           enunciado?: string | null
           explicacao?: string | null
           id?: string | null
+          is_premium?: boolean | null
           subject_id?: string | null
         }
         Update: {
@@ -823,6 +831,7 @@ export type Database = {
           enunciado?: string | null
           explicacao?: string | null
           id?: string | null
+          is_premium?: boolean | null
           subject_id?: string | null
         }
         Relationships: [
@@ -851,6 +860,7 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_user_tier: { Args: { p_user_id: string }; Returns: string }
       validate_answer: {
         Args: { p_question_id: string; p_selected_index: number }
         Returns: Json

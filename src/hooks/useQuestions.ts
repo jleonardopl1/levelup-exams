@@ -11,6 +11,7 @@ export interface Question {
   explicacao: string | null;
   created_at: string;
   subject_id: string | null;
+  is_premium: boolean;
 }
 
 // Response from server-side answer validation
