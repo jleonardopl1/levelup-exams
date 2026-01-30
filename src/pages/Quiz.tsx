@@ -12,6 +12,7 @@ import { ArrowLeft, Clock, CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { DailyLimitModal } from '@/components/DailyLimitModal';
 import { Confetti, CelebrationGlow } from '@/components/Confetti';
+import { PremiumContentBadge } from '@/components/PremiumContentBadge';
 
 export default function Quiz() {
   const [searchParams] = useSearchParams();
@@ -190,7 +191,12 @@ export default function Quiz() {
       {/* Question */}
       <Card variant="elevated" className="mb-6">
         <CardContent className="p-6">
-          <p className="text-sm text-primary font-medium mb-2">{currentQuestion?.categoria}</p>
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-sm text-primary font-medium">{currentQuestion?.categoria}</p>
+            {currentQuestion?.is_premium && (
+              <PremiumContentBadge size="sm" />
+            )}
+          </div>
           <h2 className="text-lg font-semibold leading-relaxed">{currentQuestion?.enunciado}</h2>
         </CardContent>
       </Card>
