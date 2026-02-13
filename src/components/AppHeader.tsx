@@ -56,6 +56,8 @@ export function AppHeader() {
     { path: '/ranking', icon: Trophy, label: 'Ranking' },
     { path: '/achievements', icon: Award, label: 'Conquistas' },
     { path: '/mentor', icon: Bot, label: 'Mentor IA' },
+    { path: '/affiliate', icon: Share2, label: 'Afiliados' },
+    { path: '/admin', icon: Crown, label: 'Admin' },
   ];
 
   const isActive = (path: string) => location.pathname === path;
