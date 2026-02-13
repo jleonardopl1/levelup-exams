@@ -36,6 +36,7 @@ import { ShareModal } from '@/components/ShareModal';
 import { NotificationCenter } from '@/components/NotificationCenter';
 import Logo from '@/components/Logo';
 import { StreakReminderToggle } from '@/components/StreakReminderToggle';
+import { getSafeDisplayName } from '@/lib/displayName';
 
 export function AppHeader() {
   const { user, signOut } = useAuth();
@@ -151,9 +152,9 @@ export function AppHeader() {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-10 w-10 rounded-full p-0">
                   <Avatar className="h-10 w-10 border-2 border-primary/20">
-                    <AvatarImage src={profile?.avatar_url || undefined} alt={profile?.display_name || 'User'} />
+                    <AvatarImage src={profile?.avatar_url || undefined} alt={getSafeDisplayName(profile?.display_name)} />
                     <AvatarFallback className="bg-gradient-to-br from-primary/20 to-accent/20 font-semibold">
-                      {getInitials(profile?.display_name)}
+                      {getInitials(getSafeDisplayName(profile?.display_name))}
                     </AvatarFallback>
                   </Avatar>
                   {isPremium && (
@@ -170,7 +171,7 @@ export function AppHeader() {
                     <AvatarFallback>{getInitials(profile?.display_name)}</AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">{profile?.display_name || 'Usuário'}</p>
+                    <p className="text-sm font-medium truncate">{getSafeDisplayName(profile?.display_name, 'Usuário')}</p>
                     <div className="flex items-center gap-1">
                       <PremiumBadge tier={tier} />
                     </div>
