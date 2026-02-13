@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
 import { useQuestionLimits } from '@/hooks/useDailyUsage';
+import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -40,6 +41,7 @@ export function AppHeader() {
   const { user, signOut } = useAuth();
   const { data: profile } = useProfile();
   const { isPremium, tier } = useQuestionLimits();
+  const { isAdmin } = useIsAdmin();
   const navigate = useNavigate();
   const location = useLocation();
   const [shareModalOpen, setShareModalOpen] = useState(false);
@@ -57,7 +59,7 @@ export function AppHeader() {
     { path: '/achievements', icon: Award, label: 'Conquistas' },
     { path: '/mentor', icon: Bot, label: 'Mentor IA' },
     { path: '/affiliate', icon: Share2, label: 'Afiliados' },
-    { path: '/admin', icon: Crown, label: 'Admin' },
+    ...(isAdmin ? [{ path: '/admin', icon: Crown, label: 'Admin' }] : []),
   ];
 
   const isActive = (path: string) => location.pathname === path;
