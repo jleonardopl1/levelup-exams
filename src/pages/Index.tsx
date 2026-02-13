@@ -7,6 +7,7 @@ import { useQuestionLimits } from '@/hooks/useDailyUsage';
 import { Card, CardContent } from '@/components/ui/card';
 import { BookOpen, Trophy, Target, Flame, Play, TrendingUp, Zap, Star, ArrowUpRight } from 'lucide-react';
 import heroPattern from '@/assets/hero-pattern.png';
+import { getSafeDisplayName } from '@/lib/displayName';
 import { PremiumBadge, UsageMeter, UpgradeCard } from '@/components/PremiumBadge';
 import { DailyLimitModal } from '@/components/DailyLimitModal';
 import { AppHeader } from '@/components/AppHeader';
@@ -105,7 +106,7 @@ export default function Index() {
                 <p className="text-primary-foreground/80 text-sm font-medium">{greeting.text}</p>
               </div>
               <h1 className="text-2xl md:text-3xl font-display font-bold text-primary-foreground">
-                {profile?.display_name || 'Estudante'}
+                {getSafeDisplayName(profile?.display_name)}
               </h1>
             </div>
             <div className="flex flex-col items-end gap-1">
@@ -359,7 +360,7 @@ export default function Index() {
                      <span className="text-lg">🥉</span>}
                   </div>
                   <div className="flex-1">
-                    <p className="font-medium text-sm">{entry.display_name}</p>
+                    <p className="font-medium text-sm">{getSafeDisplayName(entry.display_name)}</p>
                   </div>
                   <p className="font-bold text-primary">{entry.score} pts</p>
                 </div>

@@ -5,6 +5,7 @@ import { useLeaderboardFiltered } from '@/hooks/useQuizResults';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ArrowLeft, Crown, Medal, Award, Trophy, Calendar } from 'lucide-react';
+import { getSafeDisplayName } from '@/lib/displayName';
 
 type PeriodFilter = 'today' | 'week' | 'month' | 'all';
 
@@ -89,7 +90,7 @@ export default function Ranking() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-semibold truncate">
-                      {entry.display_name}
+                      {getSafeDisplayName(entry.display_name)}
                       {entry.user_id === user?.id && (
                         <span className="ml-2 text-xs text-primary">(Você)</span>
                       )}
