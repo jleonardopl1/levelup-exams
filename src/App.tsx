@@ -15,6 +15,8 @@ import FAQ from "./pages/FAQ";
 import Dashboard from "./pages/Dashboard";
 import Rewards from "./pages/Rewards";
 import Achievements from "./pages/Achievements";
+import Admin from "./pages/Admin";
+import Affiliate from "./pages/Affiliate";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -38,6 +40,8 @@ const App = () => (
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/rewards" element={<Rewards />} />
             <Route path="/achievements" element={<Achievements />} />
+            <Route path="/admin" element={<Admin />} />
+            <Route path="/affiliate" element={<Affiliate />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
