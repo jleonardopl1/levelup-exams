@@ -13,6 +13,7 @@ import { cn } from '@/lib/utils';
 import { DailyLimitModal } from '@/components/DailyLimitModal';
 import { Confetti, CelebrationGlow } from '@/components/Confetti';
 import { PremiumContentBadge } from '@/components/PremiumContentBadge';
+import { PremiumUpsellModal } from '@/components/PremiumUpsellModal';
 
 export default function Quiz() {
   const [searchParams] = useSearchParams();
@@ -37,6 +38,7 @@ export default function Quiz() {
   const [showLimitModal, setShowLimitModal] = useState(false);
   const [currentStreak, setCurrentStreak] = useState(0);
   const maxStreakRef = useRef(0);
+  const [showUpsellModal, setShowUpsellModal] = useState(false);
 
   // Check limit when quiz starts
   useEffect(() => {
@@ -48,6 +50,14 @@ export default function Quiz() {
   useEffect(() => {
     if (!authLoading && !user) navigate('/auth');
   }, [user, authLoading, navigate]);
+
+  // Show upsell when free user encounters premium question
+  const currentQuestion = questions?.[currentIndex];
+  useEffect(() => {
+    if (currentQuestion?.is_premium && !isPremium) {
+      setShowUpsellModal(true);
+    }
+  }, [currentIndex, currentQuestion?.is_premium, isPremium]);
 
   useEffect(() => {
     if (quizFinished || !questions) return;
@@ -63,7 +73,6 @@ export default function Quiz() {
     return () => clearInterval(timer);
   }, [quizFinished, questions]);
 
-  const currentQuestion = questions?.[currentIndex];
   const progress = questions ? ((currentIndex + 1) / questions.length) * 100 : 0;
 
   const handleSelect = (index: number) => {
@@ -267,6 +276,7 @@ export default function Quiz() {
       </Button>
 
       <DailyLimitModal open={showLimitModal} onOpenChange={setShowLimitModal} />
+      <PremiumUpsellModal open={showUpsellModal} onOpenChange={setShowUpsellModal} triggerContext="question" />
       
       {/* Celebration Effects */}
       <Confetti isActive={showConfetti} onComplete={() => setShowConfetti(false)} />
