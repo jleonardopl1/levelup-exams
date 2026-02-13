@@ -44,7 +44,7 @@ export function AdminUserManagement() {
   const getUserBan = (userId: string) => bans?.find(b => b.user_id === userId && b.is_active);
 
   const handleAssignRole = () => {
-    assignRole.mutate({ userId: roleDialog.userId, role: selectedRole });
+    assignRole.mutate({ userId: roleDialog.userId, role: selectedRole, userName: roleDialog.name });
     setRoleDialog({ open: false, userId: '', name: '' });
   };
 
@@ -59,6 +59,8 @@ export function AdminUserManagement() {
       banType,
       reason: banReason,
       expiresAt,
+      userName: banDialog.name,
+      banDays,
     });
     setBanDialog({ open: false, userId: '', name: '' });
     setBanReason('');
@@ -108,7 +110,7 @@ export function AdminUserManagement() {
                             <Shield className="w-3 h-3" />
                             {r.role}
                             <button
-                              onClick={() => revokeRole.mutate({ userId: u.user_id, role: r.role })}
+                              onClick={() => revokeRole.mutate({ userId: u.user_id, role: r.role, userName: u.display_name || 'Usuário' })}
                               className="ml-0.5 hover:text-destructive"
                             >
                               <XCircle className="w-3 h-3" />
@@ -151,7 +153,7 @@ export function AdminUserManagement() {
                         variant="outline"
                         size="sm"
                         className="flex-1 gap-1 text-success"
-                        onClick={() => unbanUser.mutate(ban.id)}
+                        onClick={() => unbanUser.mutate({ banId: ban.id, userId: u.user_id, userName: u.display_name || 'Usuário' })}
                       >
                         Desbanir
                       </Button>

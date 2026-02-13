@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { AppHeader } from '@/components/AppHeader';
 import { AdminMetricsDashboard } from '@/components/admin/AdminMetricsDashboard';
 import { AdminUserManagement } from '@/components/admin/AdminUserManagement';
+import { AdminAuditLogs } from '@/components/admin/AdminAuditLogs';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,7 +16,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Shield, BookOpen, Users, Crown, Search, RefreshCw,
-  CheckCircle, XCircle, Loader2, BarChart3
+  CheckCircle, XCircle, Loader2, BarChart3, FileText
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -132,7 +133,7 @@ export default function Admin() {
         </div>
 
         <Tabs defaultValue="overview" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="overview" className="gap-1.5 text-xs sm:text-sm">
               <BarChart3 className="w-4 h-4" /> Visão Geral
             </TabsTrigger>
@@ -144,6 +145,9 @@ export default function Admin() {
             </TabsTrigger>
             <TabsTrigger value="referrals" className="gap-1.5 text-xs sm:text-sm">
               <Crown className="w-4 h-4" /> Afiliados
+            </TabsTrigger>
+            <TabsTrigger value="audit" className="gap-1.5 text-xs sm:text-sm">
+              <FileText className="w-4 h-4" /> Auditoria
             </TabsTrigger>
           </TabsList>
 
@@ -229,6 +233,11 @@ export default function Admin() {
                 ))
               )}
             </div>
+          </TabsContent>
+
+          {/* Audit Tab */}
+          <TabsContent value="audit">
+            <AdminAuditLogs />
           </TabsContent>
         </Tabs>
       </div>
