@@ -1,0 +1,27 @@
+{
+  "name": "LevelUp Exams - Plataforma Gamificada de Estudos para Concursos",
+  "short_name": "LevelUp Exams",
+  "description": "Prepare-se para concursos públicos com quizzes gamificados, ranking, conquistas e mentor IA.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0f1e",
+  "theme_color": "#3b82f6",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "games"],
+  "lang": "pt-BR",
+  "dir": "ltr"
+}
