@@ -1,11 +1,9 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { corsHeaders } from "../_shared/cors.ts";
+import { escapeHtml } from "../_shared/utils.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-};
+const ALLOWED_ACTIONS = ["user_banned", "user_unbanned", "role_assigned", "role_revoked"];
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -35,6 +33,14 @@ serve(async (req) => {
     const body = await req.json();
     const { action, targetUserId, targetName, details } = body;
 
+    // Validate action type
+    if (!action || !ALLOWED_ACTIONS.includes(action)) {
+      return new Response(JSON.stringify({ error: "Invalid action type" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
+    }
+
     // Get target user email
     const { data: targetUser } = await supabaseClient.auth.admin.getUserById(targetUserId);
     const targetEmail = targetUser?.user?.email;
@@ -55,6 +61,12 @@ serve(async (req) => {
     // Send email notification via Resend
     const resendKey = Deno.env.get("RESEND_API_KEY");
     if (resendKey && targetEmail) {
+      const safeName = escapeHtml(targetName || "");
+      const safeReason = details?.reason ? escapeHtml(details.reason) : "";
+      const safeRole = details?.role ? escapeHtml(details.role) : "";
+      const safeBanDays = details?.ban_days ? escapeHtml(String(details.ban_days)) : "alguns";
+      const safeBanType = details?.ban_type ? escapeHtml(details.ban_type) : "";
+
       let subject = "";
       let htmlBody = "";
 
@@ -63,9 +75,9 @@ serve(async (req) => {
           subject = "Sua conta foi suspensa - LevelUp Exams";
           htmlBody = `
             <h2>Sua conta foi suspensa</h2>
-            <p>Olá ${targetName},</p>
-            <p>Informamos que sua conta no LevelUp Exams foi <strong>${details.ban_type === 'permanent' ? 'banida permanentemente' : `suspensa temporariamente por ${details.ban_days || 'alguns'} dias`}</strong>.</p>
-            ${details.reason ? `<p><strong>Motivo:</strong> ${details.reason}</p>` : ''}
+            <p>Olá ${safeName},</p>
+            <p>Informamos que sua conta no LevelUp Exams foi <strong>${safeBanType === 'permanent' ? 'banida permanentemente' : `suspensa temporariamente por ${safeBanDays} dias`}</strong>.</p>
+            ${safeReason ? `<p><strong>Motivo:</strong> ${safeReason}</p>` : ''}
             <p>Se você acredita que houve um engano, entre em contato com o suporte.</p>
             <p>Atenciosamente,<br/>Equipe LevelUp Exams</p>
           `;
@@ -74,7 +86,7 @@ serve(async (req) => {
           subject = "Sua conta foi reativada - LevelUp Exams";
           htmlBody = `
             <h2>Sua conta foi reativada</h2>
-            <p>Olá ${targetName},</p>
+            <p>Olá ${safeName},</p>
             <p>Informamos que sua conta no LevelUp Exams foi <strong>reativada</strong>. Você já pode acessar a plataforma normalmente.</p>
             <p>Atenciosamente,<br/>Equipe LevelUp Exams</p>
           `;
@@ -83,8 +95,8 @@ serve(async (req) => {
           subject = "Nova permissão atribuída - LevelUp Exams";
           htmlBody = `
             <h2>Nova permissão atribuída</h2>
-            <p>Olá ${targetName},</p>
-            <p>Você recebeu a permissão de <strong>${details.role}</strong> no LevelUp Exams.</p>
+            <p>Olá ${safeName},</p>
+            <p>Você recebeu a permissão de <strong>${safeRole}</strong> no LevelUp Exams.</p>
             <p>Atenciosamente,<br/>Equipe LevelUp Exams</p>
           `;
           break;
@@ -92,8 +104,8 @@ serve(async (req) => {
           subject = "Permissão removida - LevelUp Exams";
           htmlBody = `
             <h2>Permissão removida</h2>
-            <p>Olá ${targetName},</p>
-            <p>A permissão de <strong>${details.role}</strong> foi removida da sua conta no LevelUp Exams.</p>
+            <p>Olá ${safeName},</p>
+            <p>A permissão de <strong>${safeRole}</strong> foi removida da sua conta no LevelUp Exams.</p>
             <p>Atenciosamente,<br/>Equipe LevelUp Exams</p>
           `;
           break;

@@ -39,8 +39,8 @@ export function useSubscription() {
       return data as SubscriptionStatus;
     },
     enabled: !!session,
-    refetchInterval: 60000, // Refresh every minute
-    staleTime: 30000,
+    refetchInterval: 300000, // Refresh every 5 minutes instead of every minute
+    staleTime: 240000, // Consider data fresh for 4 minutes
   });
 }
 

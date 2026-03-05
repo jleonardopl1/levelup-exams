@@ -16,9 +16,13 @@ export interface DailyUsage {
 export const FREE_DAILY_LIMIT = 30;
 export const PLUS_DAILY_LIMIT = Infinity;
 
+function getUTCDate(): string {
+  return new Date().toISOString().split('T')[0];
+}
+
 export function useDailyUsage() {
   const { user } = useAuth();
-  const today = new Date().toISOString().split('T')[0];
+  const today = getUTCDate();
 
   return useQuery({
     queryKey: ['daily-usage', user?.id, today],
@@ -59,43 +63,25 @@ export function useQuestionLimits() {
   };
 }
 
+// Uses atomic RPC function to prevent race conditions
 export function useIncrementUsage() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
-  const today = new Date().toISOString().split('T')[0];
 
   return useMutation({
     mutationFn: async (questionsCount: number) => {
       if (!user) throw new Error('Not authenticated');
       
-      // Try to upsert the usage record
-      const { data: existing } = await supabase
-        .from('daily_question_usage')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('usage_date', today)
-        .maybeSingle();
+      const today = getUTCDate();
+      
+      const { data, error } = await supabase.rpc('increment_daily_usage', {
+        p_user_id: user.id,
+        p_date: today,
+        p_count: questionsCount,
+      });
 
-      if (existing) {
-        // Update existing record
-        const { error } = await supabase
-          .from('daily_question_usage')
-          .update({ questions_used: existing.questions_used + questionsCount })
-          .eq('id', existing.id);
-        
-        if (error) throw error;
-      } else {
-        // Insert new record
-        const { error } = await supabase
-          .from('daily_question_usage')
-          .insert({
-            user_id: user.id,
-            usage_date: today,
-            questions_used: questionsCount,
-          });
-        
-        if (error) throw error;
-      }
+      if (error) throw error;
+      return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['daily-usage'] });

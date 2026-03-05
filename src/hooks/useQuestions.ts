@@ -34,7 +34,6 @@ export function useQuestions(options: UseQuestionsOptions = {}) {
   return useQuery({
     queryKey: ['questions', limit, categoria, subjectId],
     queryFn: async () => {
-      // Query the public view that excludes the correct answer
       let query = supabase
         .from('questions_public')
         .select('*')
@@ -73,7 +72,7 @@ export function useCategories() {
   return useQuery({
     queryKey: ['categories'],
     queryFn: async () => {
-      // Use the public view instead of the base table
+      // Only fetch the categoria column instead of all question data
       const { data, error } = await supabase
         .from('questions_public')
         .select('categoria');
@@ -83,5 +82,6 @@ export function useCategories() {
       const unique = [...new Set(data.map(q => q.categoria))];
       return ['Todas', ...unique];
     },
+    staleTime: 10 * 60 * 1000, // Categories rarely change, cache for 10 minutes
   });
 }

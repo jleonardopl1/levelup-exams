@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useProfile } from "./useProfile";
 
 const DAILY_AI_LIMIT = 6;
 
@@ -30,19 +31,7 @@ export const useAIMentorUsage = () => {
 
 export const useAIMentorLimits = () => {
   const { data: usage, isLoading } = useAIMentorUsage();
-  const { data: profile } = useQuery({
-    queryKey: ["profile"],
-    queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return null;
-      const { data } = await supabase
-        .from("profiles")
-        .select("tier")
-        .eq("user_id", user.id)
-        .single();
-      return data;
-    },
-  });
+  const { data: profile } = useProfile();
 
   const isPremium = profile?.tier === "plus";
   const questionsUsed = usage?.questions_used ?? 0;
@@ -70,7 +59,6 @@ export const useIncrementAIMentorUsage = () => {
 
       const today = new Date().toISOString().split("T")[0];
 
-      // Try to get existing record
       const { data: existing } = await supabase
         .from("ai_mentor_usage")
         .select("*")
@@ -79,7 +67,6 @@ export const useIncrementAIMentorUsage = () => {
         .maybeSingle();
 
       if (existing) {
-        // Update existing record
         const { error } = await supabase
           .from("ai_mentor_usage")
           .update({ questions_used: existing.questions_used + 1 })
@@ -87,7 +74,6 @@ export const useIncrementAIMentorUsage = () => {
 
         if (error) throw error;
       } else {
-        // Create new record
         const { error } = await supabase
           .from("ai_mentor_usage")
           .insert({
