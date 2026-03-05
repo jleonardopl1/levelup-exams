@@ -81,7 +81,6 @@ export function useUserRewards() {
     queryFn: async () => {
       if (!user) return null;
 
-      // Try to get existing rewards
       let { data, error } = await supabase
         .from('user_rewards')
         .select('*')
@@ -90,7 +89,6 @@ export function useUserRewards() {
 
       if (error) throw error;
 
-      // If no rewards exist, create them
       if (!data) {
         const { data: newData, error: insertError } = await supabase
           .from('user_rewards')
@@ -194,7 +192,6 @@ export function useUnlockAchievement() {
         .single();
 
       if (error) {
-        // Ignore duplicate key errors (already unlocked)
         if (error.code === '23505') return null;
         throw error;
       }
@@ -254,7 +251,7 @@ export function useUserRedemptions() {
   });
 }
 
-// Redeem a reward
+// Redeem a reward - uses atomic RPC to prevent race conditions
 export function useRedeemReward() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
@@ -263,40 +260,20 @@ export function useRedeemReward() {
     mutationFn: async ({ rewardId, pointsCost }: { rewardId: string; pointsCost: number }) => {
       if (!user) throw new Error('Not authenticated');
 
-      // First, check if user has enough points
-      const { data: rewards, error: rewardsError } = await supabase
-        .from('user_rewards')
-        .select('total_points')
-        .eq('user_id', user.id)
-        .single();
+      const { data, error } = await supabase.rpc('redeem_reward', {
+        p_user_id: user.id,
+        p_reward_id: rewardId,
+        p_points_cost: pointsCost,
+      });
 
-      if (rewardsError) throw rewardsError;
-      if (!rewards || rewards.total_points < pointsCost) {
-        throw new Error('Pontos insuficientes');
+      if (error) throw error;
+
+      const result = data as { success: boolean; error?: string; redemption_id?: string };
+      if (!result.success) {
+        throw new Error(result.error || 'Erro ao resgatar recompensa');
       }
 
-      // Create redemption
-      const { data: redemption, error: redemptionError } = await supabase
-        .from('user_redemptions')
-        .insert({
-          user_id: user.id,
-          reward_id: rewardId,
-          points_spent: pointsCost,
-        })
-        .select()
-        .single();
-
-      if (redemptionError) throw redemptionError;
-
-      // Deduct points
-      const { error: updateError } = await supabase
-        .from('user_rewards')
-        .update({ total_points: rewards.total_points - pointsCost })
-        .eq('user_id', user.id);
-
-      if (updateError) throw updateError;
-
-      return redemption;
+      return result;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user-rewards'] });
@@ -368,7 +345,6 @@ export function useCreateReferralCode() {
 
 // Calculate level from points
 export function calculateLevel(points: number): number {
-  // Level thresholds: 0, 100, 300, 600, 1000, 1500, 2100, 2800, 3600, 4500, 5500...
   let level = 1;
   let threshold = 0;
   let increment = 100;

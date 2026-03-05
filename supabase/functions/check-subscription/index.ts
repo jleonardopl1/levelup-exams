@@ -1,11 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+import { corsHeaders } from "../_shared/cors.ts";
 
 const logStep = (step: string, details?: any) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
@@ -46,7 +42,6 @@ serve(async (req) => {
     if (customers.data.length === 0) {
       logStep("No customer found, user is free tier");
       
-      // Update profile to free tier
       await supabaseClient
         .from("profiles")
         .update({ tier: "free" })
@@ -75,7 +70,6 @@ serve(async (req) => {
       subscriptionEnd = new Date(subscription.current_period_end * 1000).toISOString();
       logStep("Active subscription found", { subscriptionId: subscription.id, endDate: subscriptionEnd });
 
-      // Update profile to plus tier
       await supabaseClient
         .from("profiles")
         .update({ tier: "plus" })
@@ -83,7 +77,6 @@ serve(async (req) => {
     } else {
       logStep("No active subscription found");
       
-      // Update profile to free tier
       await supabaseClient
         .from("profiles")
         .update({ tier: "free" })

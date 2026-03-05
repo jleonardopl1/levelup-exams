@@ -1,86 +1,11 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { corsHeaders } from "../_shared/cors.ts";
+import { checkRateLimit, logAuditEvent } from "../_shared/utils.ts";
 
 const DAILY_LIMIT = 6;
-const RATE_LIMIT_WINDOW_MS = 60000; // 1 minute
-const RATE_LIMIT_MAX_REQUESTS = 10; // 10 requests per minute
-
-// Rate limiting helper
-async function checkRateLimit(
-  supabase: any,
-  identifier: string,
-  endpoint: string
-): Promise<{ allowed: boolean; remaining: number }> {
-  const windowStart = new Date(Date.now() - RATE_LIMIT_WINDOW_MS).toISOString();
-  
-  const { data: existing } = await supabase
-    .from("rate_limits")
-    .select("*")
-    .eq("identifier", identifier)
-    .eq("endpoint", endpoint)
-    .gte("window_start", windowStart)
-    .maybeSingle();
-
-  if (existing) {
-    if (existing.request_count >= RATE_LIMIT_MAX_REQUESTS) {
-      return { allowed: false, remaining: 0 };
-    }
-    
-    await supabase
-      .from("rate_limits")
-      .update({ 
-        request_count: existing.request_count + 1,
-        updated_at: new Date().toISOString()
-      })
-      .eq("id", existing.id);
-    
-    return { allowed: true, remaining: RATE_LIMIT_MAX_REQUESTS - existing.request_count - 1 };
-  }
-
-  await supabase
-    .from("rate_limits")
-    .upsert({
-      identifier,
-      endpoint,
-      request_count: 1,
-      window_start: new Date().toISOString()
-    }, { onConflict: "identifier,endpoint" });
-
-  return { allowed: true, remaining: RATE_LIMIT_MAX_REQUESTS - 1 };
-}
-
-// Audit logging helper
-async function logAuditEvent(
-  supabase: any,
-  eventType: string,
-  userId: string | null | undefined,
-  userEmail: string | null | undefined,
-  ipAddress: string | null,
-  userAgent: string | null,
-  success: boolean,
-  errorMessage: string | null = null,
-  metadata: Record<string, unknown> = {}
-) {
-  try {
-    await supabase.from("audit_logs").insert({
-      event_type: eventType,
-      user_id: userId,
-      user_email: userEmail,
-      ip_address: ipAddress,
-      user_agent: userAgent,
-      success,
-      error_message: errorMessage,
-      metadata
-    });
-  } catch (error) {
-    console.error("Failed to log audit event:", error);
-  }
-}
+const RATE_LIMIT_WINDOW_MS = 60000;
+const RATE_LIMIT_MAX_REQUESTS = 10;
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -105,8 +30,7 @@ serve(async (req) => {
   const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
   try {
-    // Check rate limit by IP first
-    const rateLimitResult = await checkRateLimit(supabase, clientIp, "ai-mentor");
+    const rateLimitResult = await checkRateLimit(supabase, clientIp, "ai-mentor", RATE_LIMIT_WINDOW_MS, RATE_LIMIT_MAX_REQUESTS);
     if (!rateLimitResult.allowed) {
       await logAuditEvent(
         supabase, "RATE_LIMIT_EXCEEDED", null, null, clientIp, userAgent, false,
@@ -184,7 +108,6 @@ serve(async (req) => {
 
     const body = await req.json();
     
-    // Validate messages structure
     if (!body.messages || !Array.isArray(body.messages)) {
       await logAuditEvent(supabase, "VALIDATION_FAILED", user.id, user.email, clientIp, userAgent, false, "Invalid request format - messages not an array");
       return new Response(JSON.stringify({ error: "Formato de requisição inválido" }), {
@@ -195,7 +118,6 @@ serve(async (req) => {
 
     const messages = body.messages;
 
-    // Limit message count (conversation history)
     if (messages.length > 20) {
       await logAuditEvent(supabase, "VALIDATION_FAILED", user.id, user.email, clientIp, userAgent, false, "Message count exceeded", { count: messages.length });
       return new Response(JSON.stringify({ error: "Limite de mensagens excedido (máximo 20)" }), {
@@ -204,7 +126,6 @@ serve(async (req) => {
       });
     }
 
-    // Validate each message
     for (const msg of messages) {
       if (!msg.role || !msg.content) {
         await logAuditEvent(supabase, "VALIDATION_FAILED", user.id, user.email, clientIp, userAgent, false, "Invalid message format");
@@ -222,7 +143,6 @@ serve(async (req) => {
         });
       }
       
-      // Limit message length (4000 chars)
       if (msg.content.length > 4000) {
         await logAuditEvent(supabase, "VALIDATION_FAILED", user.id, user.email, clientIp, userAgent, false, "Message too long", { length: msg.content.length });
         return new Response(JSON.stringify({ error: "Mensagem muito longa (máximo 4000 caracteres)" }), {
@@ -231,7 +151,6 @@ serve(async (req) => {
         });
       }
       
-      // Only allow user and assistant roles
       if (msg.role !== 'user' && msg.role !== 'assistant') {
         await logAuditEvent(supabase, "VALIDATION_FAILED", user.id, user.email, clientIp, userAgent, false, "Invalid message role", { role: msg.role });
         return new Response(JSON.stringify({ error: "Função de mensagem inválida" }), {

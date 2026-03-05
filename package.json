@@ -1,13 +1,16 @@
 {
-  "name": "vite_react_shadcn_ts",
+  "name": "levelup-exams",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "Plataforma gamificada de estudos para concursos publicos com quizzes, ranking, conquistas e mentor IA",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "typecheck": "tsc --noEmit",
     "preview": "vite preview"
   },
   "dependencies": {

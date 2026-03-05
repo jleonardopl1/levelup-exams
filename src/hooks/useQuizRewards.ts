@@ -101,7 +101,6 @@ export function useProcessQuizRewards() {
         setShowConfetti(true);
         setShowGlow(true);
         
-        // Create persistent notification for level up
         await supabase.from('notifications').insert([{
           user_id: user.id,
           type: 'level_up',
@@ -117,30 +116,35 @@ export function useProcessQuizRewards() {
         });
       }
 
-      // Get user's profile for total stats
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('total_quizzes, total_correct, total_questions, streak_days')
-        .eq('user_id', user.id)
-        .single();
+      // Get user's profile and achievements in parallel
+      const [profileResult, unlockedResult, allAchievementsResult] = await Promise.all([
+        supabase
+          .from('profiles')
+          .select('total_quizzes, total_correct, total_questions, streak_days')
+          .eq('user_id', user.id)
+          .single(),
+        supabase
+          .from('user_achievements')
+          .select('achievement_id')
+          .eq('user_id', user.id),
+        supabase
+          .from('achievements')
+          .select('*'),
+      ]);
 
-      // Get already unlocked achievements
-      const { data: unlockedAchievements } = await supabase
-        .from('user_achievements')
-        .select('achievement_id')
-        .eq('user_id', user.id);
+      const profile = profileResult.data;
+      const unlockedAchievements = unlockedResult.data;
+      const allAchievements = allAchievementsResult.data;
 
       const unlockedIds = new Set(unlockedAchievements?.map(a => a.achievement_id) || []);
-
-      // Get all achievements to check
-      const { data: allAchievements } = await supabase
-        .from('achievements')
-        .select('*');
 
       if (allAchievements && profile) {
         const totalQuizzesCompleted = profile.total_quizzes + 1;
         const totalCorrectOverall = profile.total_correct + correctAnswers;
         const streakDays = profile.streak_days;
+
+        // Accumulate achievement points to add in a single update
+        let accumulatedAchievementPoints = 0;
 
         for (const achievement of allAchievements) {
           if (unlockedIds.has(achievement.id)) continue;
@@ -184,23 +188,14 @@ export function useProcessQuizRewards() {
 
             if (!error) {
               result.achievementsUnlocked.push(achievement.name);
+              accumulatedAchievementPoints += achievement.points_reward;
               
-              // Trigger celebration for rare achievements (gold/platinum)
               if (achievement.tier === 'gold' || achievement.tier === 'platinum') {
                 result.shouldShowConfetti = true;
                 setShowConfetti(true);
                 setShowGlow(true);
               }
-              
-              // Add achievement points to total
-              await supabase
-                .from('user_rewards')
-                .update({
-                  total_points: newTotalPoints + achievement.points_reward,
-                })
-                .eq('user_id', user.id);
 
-              // Create persistent notification for achievement
               await supabase.from('notifications').insert([{
                 user_id: user.id,
                 type: 'achievement',
@@ -214,13 +209,20 @@ export function useProcessQuizRewards() {
                 },
               }]);
 
-              // Show achievement notification
               toast.success(`🏆 ${achievement.name}`, {
                 description: `${achievement.description} (+${achievement.points_reward} pts)`,
                 duration: 5000,
               });
             }
           }
+        }
+
+        // Single atomic update for all accumulated achievement points
+        if (accumulatedAchievementPoints > 0) {
+          await supabase.rpc('increment_user_points', {
+            p_user_id: user.id,
+            p_points: accumulatedAchievementPoints,
+          });
         }
       }
 
@@ -266,7 +268,7 @@ export function useProcessQuizRewards() {
       console.error('Error processing quiz rewards:', error);
       return result;
     }
-  }, [user, queryClient]);
+  }, [user, queryClient, updateChallengeProgress, checkMilestones]);
 
   return { processRewards, showConfetti, setShowConfetti, showGlow, setShowGlow };
 }

@@ -1,12 +1,11 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
-import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { corsHeaders } from "../_shared/cors.ts";
+import { checkRateLimit } from "../_shared/utils.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-};
+const RATE_LIMIT_WINDOW_MS = 60000;
+const RATE_LIMIT_MAX_REQUESTS = 10;
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -32,6 +31,16 @@ serve(async (req) => {
       _role: "admin",
     });
     if (!isAdmin) throw new Error("Forbidden: admin only");
+
+    // Rate limit admin requests
+    const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || req.headers.get("x-real-ip") || "unknown";
+    const rateLimitResult = await checkRateLimit(supabaseClient, clientIp, "admin-metrics", RATE_LIMIT_WINDOW_MS, RATE_LIMIT_MAX_REQUESTS);
+    if (!rateLimitResult.allowed) {
+      return new Response(JSON.stringify({ error: "Rate limit exceeded" }), {
+        status: 429,
+        headers: { ...corsHeaders, "Content-Type": "application/json", "Retry-After": "60" },
+      });
+    }
 
     // Fetch DB metrics
     const { count: totalUsers } = await supabaseClient
@@ -81,7 +90,6 @@ serve(async (req) => {
         const canceledSubs = await stripe.subscriptions.list({ status: "canceled", limit: 100 });
         stripeMetrics.canceledSubscriptions = canceledSubs.data.length;
 
-        // Total revenue from balance transactions (last 30 days)
         const thirtyDaysAgo = Math.floor(Date.now() / 1000) - 30 * 24 * 60 * 60;
         const charges = await stripe.charges.list({
           created: { gte: thirtyDaysAgo },

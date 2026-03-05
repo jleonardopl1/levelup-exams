@@ -1,11 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, stripe-signature",
-};
+import { corsHeaders } from "../_shared/cors.ts";
 
 const logStep = (step: string, details?: any) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
@@ -28,7 +24,6 @@ serve(async (req) => {
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
 
-    // Get the signature from headers
     const signature = req.headers.get("stripe-signature");
     if (!signature) {
       logStep("ERROR: No stripe-signature header");
@@ -38,7 +33,6 @@ serve(async (req) => {
       });
     }
 
-    // Get the raw body for signature verification
     const body = await req.text();
     
     let event: Stripe.Event;
@@ -55,14 +49,12 @@ serve(async (req) => {
 
     logStep("Event verified", { type: event.type, id: event.id });
 
-    // Initialize Supabase with service role key for admin access
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
       { auth: { persistSession: false } }
     );
 
-    // Handle the event
     switch (event.type) {
       case "customer.subscription.deleted": {
         const subscription = event.data.object as Stripe.Subscription;
@@ -92,7 +84,6 @@ serve(async (req) => {
         const customerId = invoice.customer as string;
         logStep("Payment failed", { customerId, invoiceId: invoice.id });
 
-        // Log the failed payment for audit purposes
         await logAuditEvent(supabaseClient, "PAYMENT_FAILED", customerId, {
           invoice_id: invoice.id,
           amount_due: invoice.amount_due,
@@ -106,7 +97,6 @@ serve(async (req) => {
         const customerId = invoice.customer as string;
         logStep("Payment succeeded", { customerId, invoiceId: invoice.id });
 
-        // Ensure user has plus tier on successful payment
         await updateUserTier(supabaseClient, stripe, customerId, "plus");
         break;
       }
@@ -147,7 +137,6 @@ async function updateUserTier(
   tier: "free" | "plus"
 ) {
   try {
-    // Get customer email from Stripe
     const customer = await stripe.customers.retrieve(customerId);
     if (customer.deleted) {
       logStep("Customer deleted in Stripe", { customerId });
@@ -162,38 +151,54 @@ async function updateUserTier(
 
     logStep("Updating user tier", { email, tier });
 
-    // Find user by email in auth.users via profiles
-    const { data: users, error: userError } = await supabase.auth.admin.listUsers();
-    if (userError) {
-      logStep("Error listing users", { error: userError.message });
+    // Find user by email via profile instead of listing all users
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("user_id")
+      .eq("email", email)
+      .maybeSingle();
+
+    if (profileError || !profile) {
+      // Fallback: try auth admin getUserByEmail (more efficient than listUsers)
+      const { data: userData } = await supabase.auth.admin.listUsers({
+        page: 1,
+        perPage: 1,
+        filter: email,
+      });
+
+      const user = userData?.users?.[0];
+      if (!user) {
+        logStep("No user found with email", { email });
+        return;
+      }
+
+      const { error: updateError } = await supabase
+        .from("profiles")
+        .update({ tier, updated_at: new Date().toISOString() })
+        .eq("user_id", user.id);
+
+      if (updateError) {
+        logStep("Error updating profile tier", { error: updateError.message });
+        return;
+      }
+
+      logStep("Successfully updated user tier", { userId: user.id, email, tier });
+      await logAuditEvent(supabase, "TIER_UPDATED", customerId, { user_id: user.id, email, new_tier: tier });
       return;
     }
 
-    const user = users.users.find((u: any) => u.email === email);
-    if (!user) {
-      logStep("No user found with email", { email });
-      return;
-    }
-
-    // Update the profile tier
     const { error: updateError } = await supabase
       .from("profiles")
       .update({ tier, updated_at: new Date().toISOString() })
-      .eq("user_id", user.id);
+      .eq("user_id", profile.user_id);
 
     if (updateError) {
       logStep("Error updating profile tier", { error: updateError.message });
       return;
     }
 
-    logStep("Successfully updated user tier", { userId: user.id, email, tier });
-
-    // Log audit event
-    await logAuditEvent(supabase, "TIER_UPDATED", customerId, {
-      user_id: user.id,
-      email,
-      new_tier: tier,
-    });
+    logStep("Successfully updated user tier", { userId: profile.user_id, email, tier });
+    await logAuditEvent(supabase, "TIER_UPDATED", customerId, { user_id: profile.user_id, email, new_tier: tier });
   } catch (error: unknown) {
     const errMessage = error instanceof Error ? error.message : String(error);
     logStep("Error in updateUserTier", { error: errMessage });

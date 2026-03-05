@@ -1,12 +1,9 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { corsHeaders } from "../_shared/cors.ts";
+import { escapeHtml, checkRateLimit, logAuditEvent } from "../_shared/utils.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
 
 const RATE_LIMIT_WINDOW_MS = 300000;
 const RATE_LIMIT_MAX_REQUESTS = 3;
@@ -15,32 +12,6 @@ interface ContactRequest {
   name: string;
   email: string;
   message: string;
-}
-
-const escapeHtml = (str: string): string => {
-  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
-};
-
-async function checkRateLimit(supabase: any, identifier: string, endpoint: string): Promise<{ allowed: boolean; remaining: number }> {
-  const windowStart = new Date(Date.now() - RATE_LIMIT_WINDOW_MS).toISOString();
-  const { data: existing } = await supabase.from("rate_limits").select("*").eq("identifier", identifier).eq("endpoint", endpoint).gte("window_start", windowStart).maybeSingle();
-
-  if (existing) {
-    if (existing.request_count >= RATE_LIMIT_MAX_REQUESTS) return { allowed: false, remaining: 0 };
-    await supabase.from("rate_limits").update({ request_count: existing.request_count + 1, updated_at: new Date().toISOString() }).eq("id", existing.id);
-    return { allowed: true, remaining: RATE_LIMIT_MAX_REQUESTS - existing.request_count - 1 };
-  }
-
-  await supabase.from("rate_limits").upsert({ identifier, endpoint, request_count: 1, window_start: new Date().toISOString() }, { onConflict: "identifier,endpoint" });
-  return { allowed: true, remaining: RATE_LIMIT_MAX_REQUESTS - 1 };
-}
-
-async function logAuditEvent(supabase: any, eventType: string, userId: string | null | undefined, userEmail: string | null | undefined, ipAddress: string | null, userAgent: string | null, success: boolean, errorMessage: string | null = null, metadata: Record<string, unknown> = {}) {
-  try {
-    await supabase.from("audit_logs").insert({ event_type: eventType, user_id: userId, user_email: userEmail, ip_address: ipAddress, user_agent: userAgent, success, error_message: errorMessage, metadata });
-  } catch (error) {
-    console.error("Failed to log audit event:", error);
-  }
 }
 
 async function sendEmail(to: string[], subject: string, html: string) {
@@ -62,7 +33,7 @@ serve(async (req) => {
   const supabase = createClient(Deno.env.get("SUPABASE_URL") ?? "", Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "", { auth: { persistSession: false } });
 
   try {
-    const rateLimitResult = await checkRateLimit(supabase, clientIp, "send-contact");
+    const rateLimitResult = await checkRateLimit(supabase, clientIp, "send-contact", RATE_LIMIT_WINDOW_MS, RATE_LIMIT_MAX_REQUESTS);
     if (!rateLimitResult.allowed) {
       await logAuditEvent(supabase, "RATE_LIMIT_EXCEEDED", null, null, clientIp, userAgent, false, "Rate limit exceeded");
       return new Response(JSON.stringify({ error: "Muitas mensagens enviadas. Aguarde alguns minutos." }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json", "Retry-After": "300" } });
