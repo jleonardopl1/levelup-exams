@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.2.0] - 2026-11-10
+
+### Features
+- Admin Master: conta do dono da plataforma com controle exclusivo de níveis de acesso (admin, moderador, usuário), protegida contra revogação
+- Painel admin reorganizado por nível de acesso (Master, Administrador, Moderador), com busca paginada, filtros (equipe, afiliados, Plus, banidos) e guia da hierarquia
+- Gestão de afiliados pelo master: adicionar (por e-mail ou a partir de um usuário), editar comissão/desconto, pausar, remover, registrar pagamentos e ligar/desligar a autoinscrição de Top Players
+- Novo dashboard do afiliado com KPIs: comissão do mês (vs. mês anterior), saldo a receber, conversões, receita, ticket médio, indicados ativos/retenção, visitas, taxa de conversão, ranking, gráfico mensal e funil
+- Link de indicação `/?ref=CODIGO` com contagem de visitas e aplicação automática do código no checkout
+- Atribuição real de vendas: o código de indicação é aplicado no checkout (cupom Stripe) e a comissão é registrada pelo webhook de forma idempotente
+
+### Security
+- Escrita direta do cliente em `user_roles`, `user_bans`, `referral_codes` (exceto autoinscrição) e `referral_uses` revogada; ações passam por RPCs com hierarquia validada no banco
+- Moderadores e administradores só moderam usuários comuns; somente o master modera a equipe
+- E-mails de usuários visíveis apenas para o master (LGPD)
+- `admin-notify` relê o estado no banco antes de bloquear contas ou enviar e-mails
+- Busca de auditoria sanitizada antes de montar o filtro do PostgREST
+
+
 ## [1.1.0] - 2026-11-10
 
 ### Features

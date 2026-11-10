@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { useIsAdmin } from '@/hooks/useIsAdmin';
+import { ACCESS_LEVEL_LABELS, useAccess } from '@/hooks/useAccess';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { AppHeader } from '@/components/AppHeader';
@@ -9,16 +9,17 @@ import { AdminMetricsDashboard } from '@/components/admin/AdminMetricsDashboard'
 import { AdminUserManagement } from '@/components/admin/AdminUserManagement';
 import { AdminAuditLogs } from '@/components/admin/AdminAuditLogs';
 import { AdminQuestionGeneration } from '@/components/admin/AdminQuestionGeneration';
+import { AdminAffiliates } from '@/components/admin/AdminAffiliates';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Shield, BookOpen, Users, Crown, Search, RefreshCw,
-  CheckCircle, XCircle, Loader2, BarChart3, FileText
+import {
+  Shield, BookOpen, Users, Crown, Search, RefreshCw, Loader2, BarChart3, FileText, Handshake,
 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
 function useAdminQuestions(search: string) {
@@ -38,24 +39,10 @@ function useAdminQuestions(search: string) {
   });
 }
 
-function useAdminReferralCodes() {
-  return useQuery({
-    queryKey: ['admin-referral-codes'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('referral_codes')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(50);
-      if (error) throw error;
-      return data;
-    },
-  });
-}
-
 export default function Admin() {
   const { user, loading: authLoading } = useAuth();
-  const { isAdmin, isLoading: adminLoading } = useIsAdmin();
+  const { access, isLoading: adminLoading } = useAccess();
+  const { isAdmin, isStaff, isMaster } = access;
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -63,7 +50,6 @@ export default function Admin() {
   const [debouncedSearch, setDebouncedSearch] = useState('');
 
   const { data: questions, isLoading: questionsLoading, refetch: refetchQuestions } = useAdminQuestions(debouncedSearch);
-  const { data: referralCodes, isLoading: codesLoading, refetch: refetchCodes } = useAdminReferralCodes();
 
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedSearch(questionSearch), 300);
@@ -83,15 +69,6 @@ export default function Admin() {
     onError: (e) => toast.error('Erro: ' + (e as Error).message),
   });
 
-  const toggleCodeActive = useMutation({
-    mutationFn: async ({ id, is_active }: { id: string; is_active: boolean }) => {
-      const { error } = await supabase.from('referral_codes').update({ is_active: !is_active }).eq('id', id);
-      if (error) throw error;
-    },
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['admin-referral-codes'] }); toast.success('Status atualizado!'); },
-    onError: (e) => toast.error('Erro: ' + (e as Error).message),
-  });
-
   if (authLoading || adminLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -102,7 +79,7 @@ export default function Admin() {
 
   if (!user) return null;
 
-  if (!isAdmin) {
+  if (!isStaff) {
     return (
       <div className="min-h-screen bg-background">
         <AppHeader />
@@ -123,39 +100,62 @@ export default function Admin() {
       <AppHeader />
       <div className="px-4 py-6 space-y-6 max-w-6xl mx-auto">
         {/* Header */}
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-            <Shield className="w-6 h-6 text-white" />
+        <div className="flex flex-wrap items-center gap-3">
+          <div className={cn(
+            'w-12 h-12 rounded-xl flex items-center justify-center',
+            isMaster ? 'bg-gradient-to-br from-amber-500 to-yellow-400' : 'bg-gradient-to-br from-primary to-accent',
+          )}>
+            {isMaster ? <Crown className="w-6 h-6 text-white" /> : <Shield className="w-6 h-6 text-white" />}
           </div>
-          <div>
-            <h1 className="text-2xl font-display font-bold">Painel Admin</h1>
-            <p className="text-sm text-muted-foreground">Métricas, usuários e conteúdo</p>
+          <div className="flex-1 min-w-0">
+            <h1 className="text-2xl font-display font-bold">{isMaster ? 'Painel Admin Master' : 'Painel Admin'}</h1>
+            <p className="text-sm text-muted-foreground">
+              {isMaster
+                ? 'Controle total: acessos, afiliados, conteúdo e métricas'
+                : isAdmin ? 'Métricas, moderação, conteúdo e auditoria' : 'Moderação de usuários e conteúdo'}
+            </p>
           </div>
+          <Badge
+            variant="outline"
+            className={cn('gap-1', isMaster && 'bg-gradient-to-r from-amber-500 to-yellow-400 text-white border-transparent')}
+          >
+            {isMaster ? <Crown className="w-3 h-3" /> : <Shield className="w-3 h-3" />}
+            {ACCESS_LEVEL_LABELS[access.accessLevel]}
+          </Badge>
         </div>
 
-        <Tabs defaultValue="overview" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="overview" className="gap-1.5 text-xs sm:text-sm">
-              <BarChart3 className="w-4 h-4" /> Visão Geral
-            </TabsTrigger>
-            <TabsTrigger value="users" className="gap-1.5 text-xs sm:text-sm">
-              <Users className="w-4 h-4" /> Usuários
-            </TabsTrigger>
-            <TabsTrigger value="questions" className="gap-1.5 text-xs sm:text-sm">
-              <BookOpen className="w-4 h-4" /> Questões
-            </TabsTrigger>
-            <TabsTrigger value="referrals" className="gap-1.5 text-xs sm:text-sm">
-              <Crown className="w-4 h-4" /> Afiliados
-            </TabsTrigger>
-            <TabsTrigger value="audit" className="gap-1.5 text-xs sm:text-sm">
-              <FileText className="w-4 h-4" /> Auditoria
-            </TabsTrigger>
-          </TabsList>
+        <Tabs defaultValue={isAdmin ? 'overview' : 'users'} className="space-y-4">
+          <div className="overflow-x-auto -mx-4 px-4">
+            <TabsList className="inline-flex w-max min-w-full justify-start sm:justify-center">
+              {isAdmin && (
+                <TabsTrigger value="overview" className="gap-1.5 text-xs sm:text-sm">
+                  <BarChart3 className="w-4 h-4" /> Visão Geral
+                </TabsTrigger>
+              )}
+              <TabsTrigger value="users" className="gap-1.5 text-xs sm:text-sm">
+                <Users className="w-4 h-4" /> {isMaster ? 'Usuários & Acessos' : 'Usuários'}
+              </TabsTrigger>
+              {isAdmin && (
+                <TabsTrigger value="affiliates" className="gap-1.5 text-xs sm:text-sm">
+                  <Handshake className="w-4 h-4" /> Afiliados
+                </TabsTrigger>
+              )}
+              <TabsTrigger value="questions" className="gap-1.5 text-xs sm:text-sm">
+                <BookOpen className="w-4 h-4" /> Questões
+              </TabsTrigger>
+              {isAdmin && (
+                <TabsTrigger value="audit" className="gap-1.5 text-xs sm:text-sm">
+                  <FileText className="w-4 h-4" /> Auditoria
+                </TabsTrigger>
+              )}
+            </TabsList>
+          </div>
 
-          {/* Overview Tab */}
-          <TabsContent value="overview">
-            <AdminMetricsDashboard />
-          </TabsContent>
+          {isAdmin && (
+            <TabsContent value="overview">
+              <AdminMetricsDashboard />
+            </TabsContent>
+          )}
 
           {/* Users Tab */}
           <TabsContent value="users">
@@ -164,7 +164,7 @@ export default function Admin() {
 
           {/* Questions Tab */}
           <TabsContent value="questions" className="space-y-4">
-            <AdminQuestionGeneration />
+            {isAdmin && <AdminQuestionGeneration />}
             <div className="flex gap-2">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -202,45 +202,17 @@ export default function Admin() {
             </div>
           </TabsContent>
 
-          {/* Referrals Tab */}
-          <TabsContent value="referrals" className="space-y-4">
-            <div className="flex justify-end">
-              <Button variant="outline" size="sm" onClick={() => refetchCodes()}>
-                <RefreshCw className="w-4 h-4 mr-2" /> Atualizar
-              </Button>
-            </div>
-            <div className="space-y-3">
-              {codesLoading ? (
-                <div className="flex justify-center py-8"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>
-              ) : referralCodes?.length === 0 ? (
-                <Card><CardContent className="p-6 text-center text-muted-foreground">Nenhum código encontrado</CardContent></Card>
-              ) : (
-                referralCodes?.map((code) => (
-                  <Card key={code.id}>
-                    <CardContent className="p-4">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2">
-                          <code className="px-2 py-1 bg-muted rounded text-sm font-mono font-bold">{code.code}</code>
-                          {code.is_active ? <CheckCircle className="w-4 h-4 text-success" /> : <XCircle className="w-4 h-4 text-destructive" />}
-                        </div>
-                        <Switch checked={code.is_active} onCheckedChange={() => toggleCodeActive.mutate({ id: code.id, is_active: code.is_active })} />
-                      </div>
-                      <div className="grid grid-cols-3 gap-2 text-center text-sm">
-                        <div><p className="font-bold">{code.total_uses}</p><p className="text-xs text-muted-foreground">Usos</p></div>
-                        <div><p className="font-bold">{code.discount_percent}%</p><p className="text-xs text-muted-foreground">Desconto</p></div>
-                        <div><p className="font-bold text-success">R$ {Number(code.total_earnings).toFixed(2)}</p><p className="text-xs text-muted-foreground">Ganhos</p></div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))
-              )}
-            </div>
-          </TabsContent>
+          {isAdmin && (
+            <TabsContent value="affiliates">
+              <AdminAffiliates />
+            </TabsContent>
+          )}
 
-          {/* Audit Tab */}
-          <TabsContent value="audit">
-            <AdminAuditLogs />
-          </TabsContent>
+          {isAdmin && (
+            <TabsContent value="audit">
+              <AdminAuditLogs />
+            </TabsContent>
+          )}
         </Tabs>
       </div>
     </div>

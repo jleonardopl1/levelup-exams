@@ -19,8 +19,8 @@ Plataforma gamificada de estudos para concursos publicos, vestibulares e ENEM.
 - Desafios diarios e recompensas
 - Mentor IA para duvidas de estudo (Plus)
 - Sistema de assinaturas (Free/Plus) via Stripe
-- Painel administrativo completo
-- Sistema de indicacoes (afiliados)
+- Painel administrativo com niveis de acesso (Admin Master, Administrador, Moderador)
+- Programa de afiliados gerenciado pelo Admin Master, com dashboard de KPIs (ver `docs/ADMIN_E_AFILIADOS.md`)
 - Trilhas de estudo por concurso com questoes novas toda semana (ver `docs/TRILHAS.md`)
 
 ## Setup Local
@@ -108,7 +108,7 @@ supabase/
 
 ### Seguranca
 - JWT authentication via Supabase Auth
-- Role-based access control para admin
+- Controle de acesso hierarquico (master > admin > moderador > usuario) aplicado no banco
 - Stripe webhook signature verification
 - Price ID whitelist para checkout
 - Rate limiting em todos os endpoints publicos

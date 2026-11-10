@@ -4,18 +4,30 @@ import { corsHeaders } from "../_shared/cors.ts";
 import {
   checkRateLimit,
   escapeHtml,
-  getClientIp,
+  getAccessLevel,
   jsonResponse,
   readJson,
-  requireAdmin,
+  requireStaff,
   stripControlChars,
   UUID_RE,
 } from "../_shared/utils.ts";
 
-const ALLOWED_ACTIONS = ["user_banned", "user_unbanned", "role_assigned", "role_revoked"] as const;
+/**
+ * Efeitos colaterais de acoes administrativas que JA foram aplicadas e auditadas
+ * pelas RPCs do banco (admin_ban_user, admin_unban_user, admin_set_access_level):
+ *   - aplica/retira o banimento no Supabase Auth (bloqueia login e refresh);
+ *   - envia o e-mail de aviso ao usuario afetado.
+ * Nada aqui confia no cliente: o estado real e relido do banco antes de agir.
+ */
+const ALLOWED_ACTIONS = ["user_banned", "user_unbanned", "access_level_changed"] as const;
 type Action = typeof ALLOWED_ACTIONS[number];
-const ALLOWED_ROLES = ["admin", "moderator", "user"];
 const MAIL_FROM = Deno.env.get("MAIL_FROM") || "LevelUp Exams <onboarding@resend.dev>";
+
+const LEVEL_LABELS: Record<string, string> = {
+  admin: "Administrador",
+  moderator: "Moderador",
+  user: "Usuário",
+};
 
 const clip = (v: unknown, max: number) => (typeof v === "string" ? stripControlChars(v).slice(0, max) : "");
 
@@ -30,11 +42,11 @@ serve(async (req) => {
       { auth: { persistSession: false } },
     );
 
-    const auth = await requireAdmin(supabase, req);
+    const auth = await requireStaff(supabase, req);
     if ("error" in auth) return auth.error;
-    const admin = auth.user;
+    const actor = auth.user;
 
-    const rl = await checkRateLimit(supabase, `user:${admin.id}`, "admin-notify", 60000, 30);
+    const rl = await checkRateLimit(supabase, `user:${actor.id}`, "admin-notify", 60000, 30);
     if (!rl.allowed) return jsonResponse({ error: "Rate limit exceeded" }, 429, { "Retry-After": "60" });
 
     const body = await readJson<Record<string, unknown>>(req, 8 * 1024);
@@ -44,90 +56,79 @@ serve(async (req) => {
     if (typeof targetUserId !== "string" || !UUID_RE.test(targetUserId)) {
       return jsonResponse({ error: "Invalid target" }, 400);
     }
-    if (targetUserId === admin.id && (action === "user_banned" || action === "role_revoked")) {
-      return jsonResponse({ error: "Ação não permitida sobre a própria conta" }, 400);
+
+    // Mesma hierarquia das RPCs: niveis de acesso so o master; moderacao respeita _can_moderate.
+    if (action === "access_level_changed") {
+      if (auth.level !== "master") return jsonResponse({ error: "Acesso negado" }, 403);
+    } else {
+      const { data: allowed } = await supabase.rpc("_can_moderate", { p_actor: actor.id, p_target: targetUserId });
+      if (allowed !== true) return jsonResponse({ error: "Acesso negado" }, 403);
     }
 
     const rawDetails = (body.details && typeof body.details === "object") ? body.details as Record<string, unknown> : {};
-    // Whitelist de campos (antes: spread arbitrario do objeto do cliente no log de auditoria).
-    const details = {
-      reason: clip(rawDetails.reason, 500),
-      role: ALLOWED_ROLES.includes(String(rawDetails.role)) ? String(rawDetails.role) : "",
-      ban_type: rawDetails.ban_type === "permanent" ? "permanent" : "temporary",
-      ban_days: /^\d{1,4}$/.test(String(rawDetails.ban_days ?? "")) ? String(rawDetails.ban_days) : "",
-    };
+    const reason = clip(rawDetails.reason, 500);
     const targetName = clip(body.targetName, 100);
 
     const { data: targetUser } = await supabase.auth.admin.getUserById(targetUserId);
     if (!targetUser?.user) return jsonResponse({ error: "Usuário não encontrado" }, 404);
     const targetEmail = targetUser.user.email;
 
-    // Banimento EFETIVO: antes o ban so era gravado em user_bans e nada o aplicava
-    // (o usuario banido continuava logando e usando a API).
+    let subject = "";
+    let htmlBody = "";
+    const safeName = escapeHtml(targetName || "");
+    const safeReason = escapeHtml(reason);
+
     if (action === "user_banned") {
-      const { data: activeBan } = await supabase.rpc("is_user_banned", { p_user_id: targetUserId });
-      if (activeBan !== true) return jsonResponse({ error: "Nenhum banimento ativo registrado" }, 409);
-      const days = details.ban_type === "permanent" ? 36500 : Math.max(1, Number(details.ban_days || "1"));
+      // Le o banimento real gravado pela RPC (tipo e expiracao nao vem do cliente).
+      const { data: ban } = await supabase
+        .from("user_bans")
+        .select("ban_type, expires_at")
+        .eq("user_id", targetUserId)
+        .eq("is_active", true)
+        .order("banned_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      const stillActive = ban && (!ban.expires_at || new Date(ban.expires_at).getTime() > Date.now());
+      if (!stillActive) return jsonResponse({ error: "Nenhum banimento ativo registrado" }, 409);
+
+      const permanent = ban.ban_type === "permanent";
+      const hours = permanent
+        ? 36500 * 24
+        : Math.max(1, Math.ceil((new Date(ban.expires_at as string).getTime() - Date.now()) / 3_600_000));
       // Com ban_duration o GoTrue recusa login e refresh; o access token atual expira
       // naturalmente e as Edge Functions ja recusam usuarios banidos (requireUser).
-      await supabase.auth.admin.updateUserById(targetUserId, { ban_duration: `${days * 24}h` });
+      await supabase.auth.admin.updateUserById(targetUserId, { ban_duration: `${hours}h` });
+
+      const days = Math.max(1, Math.round(hours / 24));
+      subject = "Sua conta foi suspensa - LevelUp Exams";
+      htmlBody = `<h2>Sua conta foi suspensa</h2><p>Olá ${safeName},</p><p>Informamos que sua conta no LevelUp Exams foi <strong>${permanent ? "banida permanentemente" : `suspensa temporariamente por ${days} dia(s)`}</strong>.</p>${safeReason ? `<p><strong>Motivo:</strong> ${safeReason}</p>` : ""}<p>Se você acredita que houve um engano, entre em contato com o suporte.</p><p>Atenciosamente,<br/>Equipe LevelUp Exams</p>`;
     } else if (action === "user_unbanned") {
       const { data: stillBanned } = await supabase.rpc("is_user_banned", { p_user_id: targetUserId });
-      if (stillBanned !== true) {
-        await supabase.auth.admin.updateUserById(targetUserId, { ban_duration: "none" });
-      }
+      if (stillBanned === true) return jsonResponse({ error: "O usuário ainda possui banimento ativo" }, 409);
+      await supabase.auth.admin.updateUserById(targetUserId, { ban_duration: "none" });
+      subject = "Sua conta foi reativada - LevelUp Exams";
+      htmlBody = `<h2>Sua conta foi reativada</h2><p>Olá ${safeName},</p><p>Informamos que sua conta no LevelUp Exams foi <strong>reativada</strong>. Você já pode acessar a plataforma normalmente.</p><p>Atenciosamente,<br/>Equipe LevelUp Exams</p>`;
+    } else if (action === "access_level_changed") {
+      // O nivel informado no e-mail e o nivel atual do banco, nunca o enviado pelo cliente.
+      const level = await getAccessLevel(supabase, targetUserId);
+      const label = escapeHtml(LEVEL_LABELS[level] ?? "Usuário");
+      subject = "Seu nível de acesso foi atualizado - LevelUp Exams";
+      htmlBody = level === "user"
+        ? `<h2>Nível de acesso atualizado</h2><p>Olá ${safeName},</p><p>As permissões administrativas da sua conta no LevelUp Exams foram <strong>removidas</strong>. Você continua com acesso normal à plataforma.</p><p>Atenciosamente,<br/>Equipe LevelUp Exams</p>`
+        : `<h2>Nível de acesso atualizado</h2><p>Olá ${safeName},</p><p>Sua conta no LevelUp Exams agora tem o nível de acesso <strong>${label}</strong>.</p><p>Atenciosamente,<br/>Equipe LevelUp Exams</p>`;
     }
 
-    await supabase.from("audit_logs").insert({
-      user_id: admin.id,
-      user_email: admin.email,
-      event_type: action,
-      ip_address: getClientIp(req),
-      success: true,
-      metadata: { target_user_id: targetUserId, target_name: targetName, ...details },
-    });
-
     const resendKey = Deno.env.get("RESEND_API_KEY");
-    if (resendKey && targetEmail) {
-      const safeName = escapeHtml(targetName || "");
-      const safeReason = escapeHtml(details.reason);
-      const safeRole = escapeHtml(details.role);
-      const safeBanDays = details.ban_days ? escapeHtml(details.ban_days) : "alguns";
-
-      let subject = "";
-      let htmlBody = "";
-      switch (action) {
-        case "user_banned":
-          subject = "Sua conta foi suspensa - LevelUp Exams";
-          htmlBody = `<h2>Sua conta foi suspensa</h2><p>Olá ${safeName},</p><p>Informamos que sua conta no LevelUp Exams foi <strong>${details.ban_type === "permanent" ? "banida permanentemente" : `suspensa temporariamente por ${safeBanDays} dias`}</strong>.</p>${safeReason ? `<p><strong>Motivo:</strong> ${safeReason}</p>` : ""}<p>Se você acredita que houve um engano, entre em contato com o suporte.</p><p>Atenciosamente,<br/>Equipe LevelUp Exams</p>`;
-          break;
-        case "user_unbanned":
-          subject = "Sua conta foi reativada - LevelUp Exams";
-          htmlBody = `<h2>Sua conta foi reativada</h2><p>Olá ${safeName},</p><p>Informamos que sua conta no LevelUp Exams foi <strong>reativada</strong>. Você já pode acessar a plataforma normalmente.</p><p>Atenciosamente,<br/>Equipe LevelUp Exams</p>`;
-          break;
-        case "role_assigned":
-          if (!safeRole) break;
-          subject = "Nova permissão atribuída - LevelUp Exams";
-          htmlBody = `<h2>Nova permissão atribuída</h2><p>Olá ${safeName},</p><p>Você recebeu a permissão de <strong>${safeRole}</strong> no LevelUp Exams.</p><p>Atenciosamente,<br/>Equipe LevelUp Exams</p>`;
-          break;
-        case "role_revoked":
-          if (!safeRole) break;
-          subject = "Permissão removida - LevelUp Exams";
-          htmlBody = `<h2>Permissão removida</h2><p>Olá ${safeName},</p><p>A permissão de <strong>${safeRole}</strong> foi removida da sua conta no LevelUp Exams.</p><p>Atenciosamente,<br/>Equipe LevelUp Exams</p>`;
-          break;
-      }
-
-      if (subject && htmlBody) {
-        try {
-          await fetch("https://api.resend.com/emails", {
-            method: "POST",
-            headers: { "Content-Type": "application/json", Authorization: `Bearer ${resendKey}` },
-            body: JSON.stringify({ from: MAIL_FROM, to: [targetEmail], subject, html: htmlBody }),
-            signal: AbortSignal.timeout(15000),
-          });
-        } catch {
-          console.error("Email send error");
-        }
+    if (resendKey && targetEmail && subject && htmlBody) {
+      try {
+        await fetch("https://api.resend.com/emails", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${resendKey}` },
+          body: JSON.stringify({ from: MAIL_FROM, to: [targetEmail], subject, html: htmlBody }),
+          signal: AbortSignal.timeout(15000),
+        });
+      } catch {
+        console.error("Email send error");
       }
     }
 

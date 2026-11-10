@@ -12,6 +12,7 @@ const log = (step: string, details?: Record<string, unknown>) =>
 
 const RELEVANT_EVENTS = new Set([
   "checkout.session.completed",
+  "checkout.session.async_payment_succeeded", // PIX/boleto confirmados depois do checkout
   "customer.subscription.created",
   "customer.subscription.updated",
   "customer.subscription.deleted",
@@ -81,6 +82,10 @@ serve(async (req) => {
       await audit(supabase, "PAYMENT_FAILED", null, { stripe_customer_id: customerId, invoice_id: obj.id });
     }
 
+    if (event.type === "checkout.session.completed" || event.type === "checkout.session.async_payment_succeeded") {
+      await recordReferralConversion(supabase, event.data.object as Stripe.Checkout.Session);
+    }
+
     // Nao confia no tipo/ordem do evento: recalcula o direito a partir do estado atual no Stripe.
     await syncCustomerTier(supabase, stripe, customerId);
     return json({ received: true });
@@ -106,6 +111,30 @@ async function resolveUserId(supabase: SupabaseClient, customer: Stripe.Customer
     if (typeof data === "string") return data;
   }
   return null;
+}
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/**
+ * Atribui a venda ao afiliado. Os IDs vem do metadata gravado pelo create-checkout
+ * (servidor) e chegam aqui por um evento com assinatura verificada. A RPC e
+ * idempotente (sessao e indicado unicos), entao re-entregas nao duplicam comissao.
+ */
+async function recordReferralConversion(supabase: SupabaseClient, session: Stripe.Checkout.Session) {
+  const referralCodeId = session.metadata?.referral_code_id;
+  const userId = session.metadata?.supabase_user_id ?? session.client_reference_id;
+  if (!referralCodeId || !userId || !UUID_RE.test(referralCodeId) || !UUID_RE.test(userId)) return;
+  if (session.payment_status !== "paid" && session.payment_status !== "no_payment_required") return;
+
+  const amount = (session.amount_total ?? 0) / 100; // valor efetivamente pago (ja com desconto)
+  const { data, error } = await supabase.rpc("record_referral_conversion", {
+    p_referral_code_id: referralCodeId,
+    p_referred_user_id: userId,
+    p_amount: amount,
+    p_checkout_session_id: session.id,
+  });
+  if (error) throw new Error("referral conversion failed");
+  log("Referral conversion", { referralCodeId, result: data });
 }
 
 async function syncCustomerTier(supabase: SupabaseClient, stripe: Stripe, customerId: string) {

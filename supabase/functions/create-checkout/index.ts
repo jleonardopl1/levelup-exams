@@ -16,6 +16,61 @@ const ALLOWED_PRICE_IDS = (Deno.env.get("STRIPE_ALLOWED_PRICE_IDS") ??
   "price_1SdkO4FQ1QkvCgEAJsa9KbIE,price_1SdkMfFQ1QkvCgEAnMRl3MXq").split(",").map((s) => s.trim()).filter(Boolean);
 const RATE_LIMIT_WINDOW_MS = 60000;
 const RATE_LIMIT_MAX_REQUESTS = 5;
+const REFERRAL_CODE_RE = /^[A-Z0-9]{4,20}$/;
+
+// deno-lint-ignore no-explicit-any
+type SupabaseClient = any; // eslint-disable-line @typescript-eslint/no-explicit-any
+
+/**
+ * Valida o codigo de indicacao no servidor. Regras:
+ *  - codigo ativo e nao removido;
+ *  - nao e o codigo do proprio comprador;
+ *  - o comprador ainda nao usou nenhum codigo (1 indicacao por usuario).
+ */
+async function resolveReferral(
+  supabase: SupabaseClient,
+  rawCode: unknown,
+  userId: string,
+): Promise<{ id: string; discount: number } | { error: string } | null> {
+  if (rawCode === undefined || rawCode === null || rawCode === "") return null;
+  if (typeof rawCode !== "string") return { error: "Código de indicação inválido" };
+  const code = rawCode.trim().toUpperCase();
+  if (!REFERRAL_CODE_RE.test(code)) return { error: "Código de indicação inválido" };
+
+  const { data: ref } = await supabase
+    .from("referral_codes")
+    .select("id, user_id, discount_percent, is_active, revoked_at")
+    .eq("code", code)
+    .maybeSingle();
+  if (!ref || !ref.is_active || ref.revoked_at) return { error: "Código de indicação inválido ou inativo" };
+  if (ref.user_id === userId) return { error: "Você não pode usar o seu próprio código de indicação" };
+
+  const { count } = await supabase
+    .from("referral_uses")
+    .select("id", { count: "exact", head: true })
+    .eq("referred_user_id", userId);
+  if ((count ?? 0) > 0) return { error: "Você já utilizou um código de indicação" };
+
+  return { id: ref.id as string, discount: Number(ref.discount_percent) || 0 };
+}
+
+/** Cupom reutilizavel por percentual (primeira cobranca), criado sob demanda. */
+async function ensureReferralCoupon(stripe: NonNullable<ReturnType<typeof getStripe>>, percent: number): Promise<string> {
+  const id = `LEVELUP_REF_${percent}`;
+  try {
+    const existing = await stripe.coupons.retrieve(id);
+    if (existing && !(existing as unknown as { deleted?: boolean }).deleted && existing.valid) return id;
+  } catch {
+    // inexistente: cria abaixo
+  }
+  try {
+    await stripe.coupons.create({ id, percent_off: percent, duration: "once", name: `Indicação ${percent}%` });
+  } catch (e) {
+    // Corrida com outra requisicao criando o mesmo cupom: segue com o id.
+    if ((e as { code?: string })?.code !== "resource_already_exists") throw e;
+  }
+  return id;
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
@@ -43,11 +98,17 @@ serve(async (req) => {
       return jsonResponse({ error: "Confirme seu e-mail antes de assinar." }, 403);
     }
 
-    const body = await readJson<{ priceId?: unknown }>(req, 4 * 1024);
+    const body = await readJson<{ priceId?: unknown; referralCode?: unknown }>(req, 4 * 1024);
     const priceId = body?.priceId;
     if (typeof priceId !== "string" || !ALLOWED_PRICE_IDS.includes(priceId)) {
       await logAuditEvent(supabase, "CHECKOUT_INVALID_PRICE", user.id, null, clientIp, userAgent, false, "Invalid price ID");
       return jsonResponse({ error: "Plano inválido" }, 400);
+    }
+
+    const referral = await resolveReferral(supabase, body?.referralCode, user.id);
+    if (referral && "error" in referral) {
+      await logAuditEvent(supabase, "CHECKOUT_INVALID_REFERRAL", user.id, null, clientIp, userAgent, false, referral.error);
+      return jsonResponse({ error: `${referral.error}. Remova o código para continuar.`, code: "referral_invalid" }, 400);
     }
 
     let customer = await findCustomerForUser(stripe, user);
@@ -65,18 +126,26 @@ serve(async (req) => {
     // Redirect fixo (SITE_URL). O header Origin e controlado pelo cliente e permitiria
     // redirecionar a vitima, apos o pagamento, para um dominio de phishing.
     const siteUrl = getSiteUrl();
+    const discounts = referral && referral.discount > 0
+      ? [{ coupon: await ensureReferralCoupon(stripe, referral.discount) }]
+      : undefined;
+    const referralMeta: Record<string, string> = referral ? { referral_code_id: referral.id } : {};
     const session = await stripe.checkout.sessions.create({
       customer: customer.id,
       client_reference_id: user.id,
       line_items: [{ price: priceId, quantity: 1 }],
       mode: "subscription",
-      subscription_data: { metadata: { supabase_user_id: user.id } },
-      metadata: { supabase_user_id: user.id },
+      subscription_data: { metadata: { supabase_user_id: user.id, ...referralMeta } },
+      metadata: { supabase_user_id: user.id, ...referralMeta },
+      ...(discounts ? { discounts } : { allow_promotion_codes: false }),
       success_url: `${siteUrl}/upgrade?success=true`,
       cancel_url: `${siteUrl}/upgrade?canceled=true`,
-    }, { idempotencyKey: `checkout:${user.id}:${priceId}:${Math.floor(Date.now() / 60000)}` });
+    }, { idempotencyKey: `checkout:${user.id}:${priceId}:${referral?.id ?? "none"}:${Math.floor(Date.now() / 60000)}` });
 
-    await logAuditEvent(supabase, "CHECKOUT_CREATED", user.id, null, clientIp, userAgent, true, null, { price_id: priceId });
+    await logAuditEvent(supabase, "CHECKOUT_CREATED", user.id, null, clientIp, userAgent, true, null, {
+      price_id: priceId,
+      ...(referral ? { referral_code_id: referral.id } : {}),
+    });
     return jsonResponse({ url: session.url });
   } catch {
     console.error("Checkout error");

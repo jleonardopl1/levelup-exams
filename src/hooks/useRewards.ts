@@ -297,7 +297,8 @@ export function useReferralCode() {
 
       const { data, error } = await supabase
         .from('referral_codes')
-        .select('*')
+        // Colunas explícitas: notas internas do admin não são legíveis pelo cliente.
+        .select('id, user_id, code, discount_percent, commission_percent, is_active, total_uses, total_earnings, created_at')
         .eq('user_id', user.id)
         .maybeSingle();
 
@@ -323,7 +324,7 @@ export function useCreateReferralCode() {
           user_id: user.id,
           code: code.toUpperCase(),
         })
-        .select()
+        .select('id, user_id, code, discount_percent, commission_percent, is_active, total_uses, total_earnings, created_at')
         .single();
 
       if (error) throw error;
@@ -331,11 +332,15 @@ export function useCreateReferralCode() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['referral-code'] });
+      queryClient.invalidateQueries({ queryKey: ['my-access'] });
+      queryClient.invalidateQueries({ queryKey: ['affiliate-dashboard'] });
       toast.success('🌟 Código de indicação criado!');
     },
     onError: (error: Error) => {
       if (error.message.includes('duplicate')) {
         toast.error('Este código já está em uso');
+      } else if (error.message.includes('row-level security')) {
+        toast.error('Não foi possível criar o código: requisitos não atendidos ou inscrições pausadas pela equipe.');
       } else {
         toast.error('Erro ao criar código');
       }
