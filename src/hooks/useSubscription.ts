@@ -67,9 +67,7 @@ export function useCreateCheckout() {
       return data;
     },
     onSuccess: (data) => {
-      if (data?.url) {
-        window.open(data.url, '_blank');
-      }
+      openStripeUrl(data?.url);
     },
     onError: (error: Error) => {
       toast.error(error.message || 'Erro ao criar sessão de pagamento');
@@ -98,12 +96,27 @@ export function useCustomerPortal() {
       return data;
     },
     onSuccess: (data) => {
-      if (data?.url) {
-        window.open(data.url, '_blank');
-      }
+      openStripeUrl(data?.url);
     },
     onError: (error: Error) => {
       toast.error(error.message || 'Erro ao abrir portal');
     },
   });
+}
+
+/** Abre apenas URLs do Stripe, sem expor window.opener (reverse tabnabbing). */
+function openStripeUrl(url: unknown) {
+  if (typeof url !== 'string') return;
+  try {
+    const parsed = new URL(url);
+    const allowed = parsed.protocol === 'https:' &&
+      (parsed.hostname === 'checkout.stripe.com' || parsed.hostname === 'billing.stripe.com');
+    if (!allowed) {
+      toast.error('Link de pagamento inválido');
+      return;
+    }
+    window.open(parsed.toString(), '_blank', 'noopener,noreferrer');
+  } catch {
+    toast.error('Link de pagamento inválido');
+  }
 }

@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
 import { useLeaderboardFiltered } from '@/hooks/useQuizResults';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -17,7 +16,6 @@ const periodLabels: Record<PeriodFilter, string> = {
 };
 
 export default function Ranking() {
-  const { user } = useAuth();
   const navigate = useNavigate();
   const [period, setPeriod] = useState<PeriodFilter>('all');
   const { data: leaderboard, isLoading } = useLeaderboardFiltered(period, 50);
@@ -81,7 +79,7 @@ export default function Ranking() {
             <Card
               key={entry.id}
               variant={index < 3 ? 'elevated' : 'default'}
-              className={`overflow-hidden ${entry.user_id === user?.id ? 'ring-2 ring-primary' : ''}`}
+              className={`overflow-hidden ${entry.is_current_user ? 'ring-2 ring-primary' : ''}`}
             >
               <CardContent className="p-4">
                 <div className="flex items-center gap-4">
@@ -91,7 +89,7 @@ export default function Ranking() {
                   <div className="flex-1 min-w-0">
                     <p className="font-semibold truncate">
                       {getSafeDisplayName(entry.display_name)}
-                      {entry.user_id === user?.id && (
+                      {entry.is_current_user && (
                         <span className="ml-2 text-xs text-primary">(Você)</span>
                       )}
                     </p>

@@ -938,12 +938,20 @@ export type Database = {
           created_at: string
           display_name: string
           id: string
+          is_current_user: boolean
           score: number
           total_questions: number
-          user_id: string
         }[]
       }
       get_user_tier: { Args: { p_user_id: string }; Returns: string }
+      increment_daily_usage: {
+        Args: { p_count?: number; p_date: string; p_user_id: string }
+        Returns: number
+      }
+      redeem_reward: {
+        Args: { p_points_cost: number; p_reward_id: string; p_user_id: string }
+        Returns: Json
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "./useProfile";
@@ -49,44 +49,5 @@ export const useAIMentorLimits = () => {
   };
 };
 
-export const useIncrementAIMentorUsage = () => {
-  const { user } = useAuth();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async () => {
-      if (!user) throw new Error("User not authenticated");
-
-      const today = new Date().toISOString().split("T")[0];
-
-      const { data: existing } = await supabase
-        .from("ai_mentor_usage")
-        .select("*")
-        .eq("user_id", user.id)
-        .eq("usage_date", today)
-        .maybeSingle();
-
-      if (existing) {
-        const { error } = await supabase
-          .from("ai_mentor_usage")
-          .update({ questions_used: existing.questions_used + 1 })
-          .eq("id", existing.id);
-
-        if (error) throw error;
-      } else {
-        const { error } = await supabase
-          .from("ai_mentor_usage")
-          .insert({
-            user_id: user.id,
-            usage_date: today,
-            questions_used: 1,
-          });
-
-        if (error) throw error;
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["ai-mentor-usage"] });
-    },
-  });
-};
+// O consumo da cota do Mentor IA e feito exclusivamente pela Edge Function
+// ai-mentor (RPC consume_ai_mentor_quota). O cliente nao escreve nessa tabela.

@@ -15,7 +15,8 @@ export interface QuizResult {
 
 export interface LeaderboardEntry {
   id: string;
-  user_id: string;
+  /** Calculado no servidor; o ranking nao expoe UUIDs de outros usuarios. */
+  is_current_user: boolean;
   score: number;
   correct_answers: number;
   total_questions: number;
@@ -62,9 +63,9 @@ export function useLeaderboardFiltered(period: 'today' | 'week' | 'month' | 'all
       if (error) throw error;
       if (!data || data.length === 0) return [];
 
-      return data.map((r: { id: string; user_id: string; score: number; correct_answers: number; total_questions: number; display_name: string | null; created_at: string }) => ({
+      return data.map((r: { id: string; is_current_user: boolean; score: number; correct_answers: number; total_questions: number; display_name: string | null; created_at: string }) => ({
         id: r.id,
-        user_id: r.user_id,
+        is_current_user: !!r.is_current_user,
         score: r.score,
         correct_answers: r.correct_answers,
         total_questions: r.total_questions,
