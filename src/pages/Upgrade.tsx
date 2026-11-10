@@ -1,8 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Crown, Check, Sparkles, Zap, BarChart3, FileText, Lock, Bot, Settings, Loader2 } from 'lucide-react';
+import { ArrowLeft, Crown, Check, Sparkles, Zap, BarChart3, FileText, Lock, Bot, Settings, Loader2, Ticket, X } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { supabase } from '@/integrations/supabase/client';
+import { clearStoredReferralCode, getStoredReferralCode, REFERRAL_CODE_RE, storeReferralCode } from '@/hooks/useAffiliates';
 import { useQuestionLimits } from '@/hooks/useDailyUsage';
 import { useSubscription, useCreateCheckout, useCustomerPortal, PRICE_IDS } from '@/hooks/useSubscription';
 import { PremiumBadge } from '@/components/PremiumBadge';
@@ -42,6 +45,45 @@ export default function Upgrade() {
   const createCheckout = useCreateCheckout();
   const customerPortal = useCustomerPortal();
   const queryClient = useQueryClient();
+  const [referralInput, setReferralInput] = useState(() => getStoredReferralCode() ?? '');
+  const [referral, setReferral] = useState<{ code: string; discount: number } | null>(null);
+  const [referralError, setReferralError] = useState<string | null>(null);
+  const [checkingReferral, setCheckingReferral] = useState(false);
+
+  const applyReferral = async (raw: string, silent = false) => {
+    const code = raw.trim().toUpperCase();
+    setReferralError(null);
+    if (!REFERRAL_CODE_RE.test(code)) {
+      setReferral(null);
+      if (!silent) setReferralError('Código inválido: use de 4 a 20 letras ou números.');
+      return;
+    }
+    setCheckingReferral(true);
+    const { data, error } = await supabase.rpc('validate_referral_code', { code_to_validate: code });
+    setCheckingReferral(false);
+    const match = !error && data?.[0];
+    if (match) {
+      setReferral({ code: match.code, discount: match.discount_percent });
+      storeReferralCode(match.code);
+    } else {
+      setReferral(null);
+      if (!silent) setReferralError('Código não encontrado ou inativo.');
+    }
+  };
+
+  // Código vindo de um link de afiliado (?ref=): valida automaticamente.
+  useEffect(() => {
+    const stored = getStoredReferralCode();
+    if (user && stored && !isPremium) void applyReferral(stored, true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, isPremium]);
+
+  const removeReferral = () => {
+    setReferral(null);
+    setReferralInput('');
+    setReferralError(null);
+    clearStoredReferralCode();
+  };
 
   // Handle success/cancel from Stripe
   useEffect(() => {
@@ -49,6 +91,7 @@ export default function Upgrade() {
     const canceled = searchParams.get('canceled');
 
     if (success === 'true') {
+      clearStoredReferralCode();
       toast.success('Assinatura realizada com sucesso! Bem-vindo ao Plus!');
       refetchSubscription();
       queryClient.invalidateQueries({ queryKey: ['profile'] });
@@ -66,7 +109,7 @@ export default function Upgrade() {
       navigate('/auth');
       return;
     }
-    createCheckout.mutate(priceId);
+    createCheckout.mutate({ priceId, referralCode: referral?.code });
   };
 
   const handleManageSubscription = () => {
@@ -103,6 +146,45 @@ export default function Upgrade() {
 
       {/* Plans */}
       <div className="px-4 -mt-6 pb-8 space-y-4">
+        {/* Referral / affiliate code */}
+        {!isPremium && user && (
+          <Card variant="default">
+            <CardContent className="p-4 space-y-2">
+              <label htmlFor="referral-code" className="text-sm font-medium flex items-center gap-2">
+                <Ticket className="w-4 h-4 text-primary" /> Código de indicação
+              </label>
+              {referral ? (
+                <div className="flex items-center justify-between gap-2 rounded-lg border border-success/30 bg-success/10 px-3 py-2">
+                  <span className="text-sm">
+                    <span className="font-mono font-bold">{referral.code}</span> aplicado
+                    {referral.discount > 0 && <> — <strong>{referral.discount}% de desconto</strong> na primeira cobrança</>}
+                  </span>
+                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={removeReferral} aria-label="Remover código">
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <Input
+                    id="referral-code"
+                    placeholder="Ex.: JOAO10"
+                    value={referralInput}
+                    maxLength={20}
+                    autoComplete="off"
+                    className="font-mono uppercase"
+                    onChange={(e) => { setReferralInput(e.target.value.toUpperCase()); setReferralError(null); }}
+                    onKeyDown={(e) => { if (e.key === 'Enter') void applyReferral(referralInput); }}
+                  />
+                  <Button variant="outline" onClick={() => applyReferral(referralInput)} disabled={!referralInput || checkingReferral}>
+                    {checkingReferral ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Aplicar'}
+                  </Button>
+                </div>
+              )}
+              {referralError && <p className="text-xs text-destructive">{referralError}</p>}
+            </CardContent>
+          </Card>
+        )}
+
         {/* Free Plan */}
         <Card variant={tier === 'free' ? 'elevated' : 'default'} className="relative">
           {tier === 'free' && (

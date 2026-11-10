@@ -105,6 +105,27 @@ export async function requireAdmin(
   return result;
 }
 
+export type AccessLevel = "master" | "admin" | "moderator" | "user";
+
+/** Nivel efetivo de acesso (master > admin > moderator > user). Fail-closed: "user". */
+export async function getAccessLevel(supabase: SupabaseClient, userId: string): Promise<AccessLevel> {
+  const { data, error } = await supabase.rpc("_access_level", { p_user_id: userId });
+  if (error || typeof data !== "string") return "user";
+  return (["master", "admin", "moderator"].includes(data) ? data : "user") as AccessLevel;
+}
+
+/** Exige admin, moderador ou master. Retorna tambem o nivel do chamador. */
+export async function requireStaff(
+  supabase: SupabaseClient,
+  req: Request,
+): Promise<{ user: AuthedUser; level: AccessLevel } | { error: Response }> {
+  const result = await requireUser(supabase, req);
+  if ("error" in result) return result;
+  const level = await getAccessLevel(supabase, result.user.id);
+  if (level === "user") return { error: jsonResponse({ error: "Acesso negado" }, 403) };
+  return { user: result.user, level };
+}
+
 /**
  * Rate limit atomico (RPC check_rate_limit). Fail-closed: se o banco falhar,
  * a requisicao e negada.

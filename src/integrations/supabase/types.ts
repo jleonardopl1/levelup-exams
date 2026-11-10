@@ -53,6 +53,42 @@ export type Database = {
         }
         Relationships: []
       }
+      affiliate_payouts: {
+        Row: {
+          amount: number
+          created_at: string
+          created_by: string
+          id: string
+          method: string
+          notes: string | null
+          paid_at: string
+          reference: string | null
+          referral_code_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          created_by: string
+          id?: string
+          method?: string
+          notes?: string | null
+          paid_at?: string
+          reference?: string | null
+          referral_code_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          created_by?: string
+          id?: string
+          method?: string
+          notes?: string | null
+          paid_at?: string
+          reference?: string | null
+          referral_code_id?: string
+        }
+        Relationships: []
+      }
       ai_mentor_usage: {
         Row: {
           created_at: string
@@ -473,22 +509,34 @@ export type Database = {
           code: string
           commission_percent: number
           created_at: string
+          created_by: string | null
           discount_percent: number
           id: string
           is_active: boolean
+          notes: string | null
+          revoked_at: string | null
+          revoked_reason: string | null
+          source: string
           total_earnings: number
           total_uses: number
+          updated_at: string
           user_id: string
         }
         Insert: {
           code: string
           commission_percent?: number
           created_at?: string
+          created_by?: string | null
           discount_percent?: number
           id?: string
           is_active?: boolean
+          notes?: string | null
+          revoked_at?: string | null
+          revoked_reason?: string | null
+          source?: string
           total_earnings?: number
           total_uses?: number
+          updated_at?: string
           user_id: string
         }
         Update: {
@@ -511,6 +559,7 @@ export type Database = {
           id: string
           referral_code_id: string
           referred_user_id: string
+          stripe_checkout_session_id: string | null
           subscription_amount: number | null
         }
         Insert: {
@@ -1203,6 +1252,92 @@ export type Database = {
       }
     }
     Functions: {
+      admin_add_affiliate: {
+        Args: {
+          p_code?: string
+          p_commission_percent?: number
+          p_discount_percent?: number
+          p_email?: string
+          p_notes?: string
+          p_user_id?: string
+        }
+        Returns: Json
+      }
+      admin_affiliate_overview: { Args: never; Returns: Json }
+      admin_ban_user: {
+        Args: {
+          p_ban_type: string
+          p_days?: number
+          p_reason?: string
+          p_user_id: string
+        }
+        Returns: Json
+      }
+      admin_get_settings: { Args: never; Returns: Json }
+      admin_list_users: {
+        Args: {
+          p_filter?: string
+          p_limit?: number
+          p_offset?: number
+          p_search?: string
+        }
+        Returns: {
+          access_level: string
+          affiliate_code: string | null
+          affiliate_status: string | null
+          ban_expires_at: string | null
+          ban_reason: string | null
+          ban_type: string | null
+          can_moderate: boolean
+          created_at: string
+          display_name: string | null
+          email: string | null
+          is_banned: boolean
+          last_sign_in_at: string | null
+          streak_days: number
+          tier: string
+          total_correct: number
+          total_count: number
+          total_questions: number
+          total_quizzes: number
+          user_id: string
+        }[]
+      }
+      admin_register_payout: {
+        Args: {
+          p_amount: number
+          p_method?: string
+          p_notes?: string
+          p_paid_at?: string
+          p_reference?: string
+          p_referral_code_id: string
+        }
+        Returns: Json
+      }
+      admin_remove_affiliate: {
+        Args: { p_reason?: string; p_referral_code_id: string }
+        Returns: Json
+      }
+      admin_set_access_level: {
+        Args: { p_level: string; p_reason?: string; p_user_id: string }
+        Returns: Json
+      }
+      admin_unban_user: { Args: { p_user_id: string }; Returns: Json }
+      admin_update_affiliate: {
+        Args: {
+          p_commission_percent?: number
+          p_discount_percent?: number
+          p_is_active?: boolean
+          p_notes?: string
+          p_referral_code_id: string
+        }
+        Returns: Json
+      }
+      admin_update_setting: {
+        Args: { p_key: string; p_value: Json }
+        Returns: Json
+      }
+      affiliate_self_enrollment_enabled: { Args: never; Returns: boolean }
       check_rate_limit: {
         Args: {
           p_endpoint: string
@@ -1218,6 +1353,10 @@ export type Database = {
         Args: { p_limit: number; p_user_id: string }
         Returns: boolean
       }
+      get_affiliate_dashboard: {
+        Args: { p_months?: number; p_referral_code_id?: string }
+        Returns: Json
+      }
       get_leaderboard: {
         Args: { limit_count?: number; period?: string }
         Returns: {
@@ -1230,6 +1369,7 @@ export type Database = {
           total_questions: number
         }[]
       }
+      get_my_access: { Args: never; Returns: Json }
       get_practice_questions: {
         Args: {
           p_limit?: number
@@ -1279,10 +1419,20 @@ export type Database = {
       }
       is_user_banned: { Args: { p_user_id: string }; Returns: boolean }
       level_for_points: { Args: { p_points: number }; Returns: number }
+      record_referral_conversion: {
+        Args: {
+          p_amount: number
+          p_checkout_session_id: string
+          p_referral_code_id: string
+          p_referred_user_id: string
+        }
+        Returns: Json
+      }
       redeem_reward: {
         Args: { p_points_cost: number; p_reward_id: string; p_user_id: string }
         Returns: Json
       }
+      track_referral_visit: { Args: { p_code: string }; Returns: undefined }
       validate_answer: {
         Args: { p_question_id: string; p_selected_index: number }
         Returns: Json

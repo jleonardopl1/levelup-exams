@@ -1,14 +1,23 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Search, RefreshCw, Loader2, Shield, Ban, UserPlus, AlertTriangle } from 'lucide-react';
+import {
+  Search, RefreshCw, Loader2, Shield, Ban, UserPlus, AlertTriangle, UserCog, Handshake, Wallet, Settings, DollarSign,
+} from 'lucide-react';
 import { useAdminAuditLogs } from '@/hooks/useAdminAuditLogs';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 const eventIcons: Record<string, typeof Shield> = {
+  access_level_changed: UserCog,
+  affiliate_added: Handshake,
+  affiliate_updated: Handshake,
+  affiliate_removed: Handshake,
+  affiliate_payout: Wallet,
+  affiliate_conversion: DollarSign,
+  setting_updated: Settings,
   role_assigned: UserPlus,
   role_revoked: Shield,
   user_banned: Ban,
@@ -16,6 +25,13 @@ const eventIcons: Record<string, typeof Shield> = {
 };
 
 const eventLabels: Record<string, string> = {
+  access_level_changed: 'Nível de Acesso Alterado',
+  affiliate_added: 'Afiliado Adicionado',
+  affiliate_updated: 'Afiliado Atualizado',
+  affiliate_removed: 'Afiliado Removido',
+  affiliate_payout: 'Pagamento de Comissão',
+  affiliate_conversion: 'Venda de Afiliado',
+  setting_updated: 'Configuração Alterada',
   role_assigned: 'Role Atribuída',
   role_revoked: 'Role Revogada',
   user_banned: 'Usuário Banido',
@@ -23,17 +39,49 @@ const eventLabels: Record<string, string> = {
 };
 
 const eventColors: Record<string, string> = {
+  access_level_changed: 'bg-blue-500/10 text-blue-600 border-blue-500/20',
+  affiliate_added: 'bg-green-500/10 text-green-600 border-green-500/20',
+  affiliate_updated: 'bg-blue-500/10 text-blue-600 border-blue-500/20',
+  affiliate_removed: 'bg-amber-500/10 text-amber-600 border-amber-500/20',
+  affiliate_payout: 'bg-green-500/10 text-green-600 border-green-500/20',
+  affiliate_conversion: 'bg-green-500/10 text-green-600 border-green-500/20',
+  setting_updated: 'bg-blue-500/10 text-blue-600 border-blue-500/20',
   role_assigned: 'bg-blue-500/10 text-blue-600 border-blue-500/20',
   role_revoked: 'bg-amber-500/10 text-amber-600 border-amber-500/20',
   user_banned: 'bg-destructive/10 text-destructive border-destructive/20',
   user_unbanned: 'bg-green-500/10 text-green-600 border-green-500/20',
 };
 
+const LEVEL_LABELS: Record<string, string> = { master: 'Master', admin: 'Admin', moderator: 'Moderador', user: 'Usuário' };
+
+/** Resumo legível do metadata de um evento de auditoria. */
+function describeMeta(meta: Record<string, unknown>): string {
+  const parts: string[] = [];
+  const str = (k: string) => (meta[k] === null || meta[k] === undefined || meta[k] === '' ? null : String(meta[k]));
+  if (str('target_name')) parts.push(`Alvo: ${str('target_name')}`);
+  if (str('from') && str('to') && !str('key')) parts.push(`${LEVEL_LABELS[str('from')!] ?? str('from')} → ${LEVEL_LABELS[str('to')!] ?? str('to')}`);
+  if (str('key')) parts.push(`${str('key')}: ${str('from') ?? '—'} → ${str('to')}`);
+  if (str('code')) parts.push(`Código: ${str('code')}`);
+  if (str('role')) parts.push(`Role: ${str('role')}`);
+  if (str('ban_type')) parts.push(`Tipo: ${str('ban_type') === 'permanent' ? 'permanente' : `temporário${str('ban_days') ? ` (${str('ban_days')} dias)` : ''}`}`);
+  if (str('commission_percent')) parts.push(`Comissão: ${str('commission_percent')}%`);
+  if (str('discount_percent')) parts.push(`Desconto: ${str('discount_percent')}%`);
+  if (str('amount')) parts.push(`Valor: R$ ${Number(meta.amount).toFixed(2).replace('.', ',')}`);
+  if (str('commission')) parts.push(`Comissão gerada: R$ ${Number(meta.commission).toFixed(2).replace('.', ',')}`);
+  if (str('reason')) parts.push(`Motivo: ${str('reason')}`);
+  return parts.join(' · ');
+}
+
 export function AdminAuditLogs() {
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
 
   const { data: logs, isLoading, refetch } = useAdminAuditLogs(debouncedSearch);
+
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(search), 300);
+    return () => clearTimeout(t);
+  }, [search]);
 
   return (
     <div className="space-y-4">
@@ -43,10 +91,7 @@ export function AdminAuditLogs() {
           <Input
             placeholder="Buscar logs..."
             value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-              setTimeout(() => setDebouncedSearch(e.target.value), 300);
-            }}
+            onChange={(e) => setSearch(e.target.value)}
             className="pl-9"
           />
         </div>
@@ -69,7 +114,7 @@ export function AdminAuditLogs() {
         <div className="space-y-3">
           {logs.map((log) => {
             const Icon = eventIcons[log.event_type] || Shield;
-            const meta = log.metadata as Record<string, string> | null;
+            const meta = log.metadata as Record<string, unknown> | null;
             return (
               <Card key={log.id}>
                 <CardContent className="p-4">
@@ -89,15 +134,10 @@ export function AdminAuditLogs() {
                         )}
                       </div>
                       <p className="text-sm text-muted-foreground">
-                        Admin: <span className="font-medium text-foreground">{log.user_email || 'Desconhecido'}</span>
+                        Autor: <span className="font-medium text-foreground">{log.user_email || (log.event_type === 'affiliate_conversion' ? 'Sistema (Stripe)' : 'Sistema')}</span>
                       </p>
-                      {meta?.target_name && (
-                        <p className="text-sm text-muted-foreground">
-                          Alvo: <span className="font-medium text-foreground">{meta.target_name}</span>
-                          {meta.role && <> — Role: <span className="font-semibold">{meta.role}</span></>}
-                          {meta.ban_type && <> — Tipo: <span className="font-semibold">{meta.ban_type}</span></>}
-                          {meta.reason && <> — Motivo: {meta.reason}</>}
-                        </p>
+                      {meta && describeMeta(meta) && (
+                        <p className="text-sm text-muted-foreground break-words">{describeMeta(meta)}</p>
                       )}
                       <p className="text-xs text-muted-foreground mt-1">
                         {format(new Date(log.created_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}

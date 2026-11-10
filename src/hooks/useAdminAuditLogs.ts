@@ -11,8 +11,10 @@ export function useAdminAuditLogs(search: string) {
         .order('created_at', { ascending: false })
         .limit(100);
 
-      if (search) {
-        query = query.or(`event_type.ilike.%${search}%,user_email.ilike.%${search}%`);
+      // Remove caracteres com significado na sintaxe de filtros do PostgREST (, . ( ) * %).
+      const term = search.replace(/[^\p{L}\p{N}@_\- ]/gu, '').trim().slice(0, 80);
+      if (term) {
+        query = query.or(`event_type.ilike.*${term}*,user_email.ilike.*${term}*`);
       }
 
       const { data, error } = await query;

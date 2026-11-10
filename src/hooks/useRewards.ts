@@ -331,11 +331,15 @@ export function useCreateReferralCode() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['referral-code'] });
+      queryClient.invalidateQueries({ queryKey: ['my-access'] });
+      queryClient.invalidateQueries({ queryKey: ['affiliate-dashboard'] });
       toast.success('🌟 Código de indicação criado!');
     },
     onError: (error: Error) => {
       if (error.message.includes('duplicate')) {
         toast.error('Este código já está em uso');
+      } else if (error.message.includes('row-level security')) {
+        toast.error('Não foi possível criar o código: requisitos não atendidos ou inscrições pausadas pela equipe.');
       } else {
         toast.error('Erro ao criar código');
       }

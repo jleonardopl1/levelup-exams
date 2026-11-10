@@ -1,16 +1,19 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { useHasReferralCode } from '@/hooks/useReferralAnalytics';
+import { useAccess } from '@/hooks/useAccess';
+import { useAffiliateSelfEnrollment } from '@/hooks/useAffiliates';
 import { AppHeader } from '@/components/AppHeader';
-import { ReferralAnalyticsDashboard } from '@/components/ReferralAnalyticsDashboard';
+import { AffiliateDashboard } from '@/components/affiliate/AffiliateDashboard';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Users, Gift, TrendingUp, Star } from 'lucide-react';
 
 export default function Affiliate() {
   const { user, loading: authLoading } = useAuth();
-  const { data: hasCode, isLoading } = useHasReferralCode();
+  const { access, isLoading } = useAccess();
+  const { data: selfEnrollment = true } = useAffiliateSelfEnrollment();
+  const hasCode = access.isAffiliate;
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -33,21 +36,23 @@ export default function Affiliate() {
     <div className="min-h-screen bg-background">
       <AppHeader />
       
-      <div className="px-4 py-6 space-y-6">
+      <div className="px-4 py-6 space-y-6 max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center space-y-2">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-amber-500/20 to-yellow-400/20 border border-amber-500/30">
             <Users className="w-4 h-4 text-amber-500" />
             <span className="text-sm font-medium text-amber-600">Programa de Afiliados</span>
           </div>
-          <h1 className="text-2xl font-display font-bold">Ganhe com Indicações</h1>
+          <h1 className="text-2xl font-display font-bold">{hasCode ? 'Seu Painel de Afiliado' : 'Ganhe com Indicações'}</h1>
           <p className="text-muted-foreground text-sm max-w-md mx-auto">
-            Compartilhe seu código com amigos e ganhe comissões em cada assinatura Plus
+            {hasCode
+              ? 'Acompanhe visitas, conversões, comissões e pagamentos em tempo real'
+              : 'Compartilhe seu código com amigos e ganhe comissões em cada assinatura Plus'}
           </p>
         </div>
 
         {hasCode ? (
-          <ReferralAnalyticsDashboard />
+          <AffiliateDashboard />
         ) : (
           <div className="space-y-6">
             {/* How it works */}
@@ -64,9 +69,11 @@ export default function Affiliate() {
                       <span className="text-sm font-bold text-primary">1</span>
                     </div>
                     <div>
-                      <p className="font-medium">Torne-se Top Player</p>
+                      <p className="font-medium">{selfEnrollment ? 'Torne-se Top Player' : 'Seja convidado'}</p>
                       <p className="text-sm text-muted-foreground">
-                        Alcance o ranking dos melhores jogadores para desbloquear seu código de afiliado
+                        {selfEnrollment
+                          ? 'Alcance o ranking dos melhores jogadores para desbloquear seu código de afiliado, ou receba um convite da equipe'
+                          : 'No momento, novos afiliados são adicionados pela equipe LevelUp. Fale com o suporte para participar'}
                       </p>
                     </div>
                   </div>
@@ -78,7 +85,7 @@ export default function Affiliate() {
                     <div>
                       <p className="font-medium">Compartilhe seu Código</p>
                       <p className="text-sm text-muted-foreground">
-                        Seus amigos ganham 10% de desconto na assinatura Plus
+                        Seus amigos ganham desconto na primeira cobrança da assinatura Plus
                       </p>
                     </div>
                   </div>
@@ -90,7 +97,7 @@ export default function Affiliate() {
                     <div>
                       <p className="font-medium">Ganhe Comissões</p>
                       <p className="text-sm text-muted-foreground">
-                        Receba 3% de comissão em cada assinatura feita com seu código
+                        Receba comissão sobre cada assinatura feita com seu código ou link
                       </p>
                     </div>
                   </div>

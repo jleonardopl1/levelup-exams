@@ -43,7 +43,7 @@ export function AppHeader() {
   const { user, signOut } = useAuth();
   const { data: profile } = useProfile();
   const { isPremium, tier } = useQuestionLimits();
-  const { isAdmin } = useIsAdmin();
+  const { isStaff } = useIsAdmin();
   const navigate = useNavigate();
   const location = useLocation();
   const [shareModalOpen, setShareModalOpen] = useState(false);
@@ -62,7 +62,7 @@ export function AppHeader() {
     { path: '/achievements', icon: Award, label: 'Conquistas' },
     { path: '/mentor', icon: Bot, label: 'Mentor IA' },
     { path: '/affiliate', icon: Share2, label: 'Afiliados' },
-    ...(isAdmin ? [{ path: '/admin', icon: Crown, label: 'Admin' }] : []),
+    ...(isStaff ? [{ path: '/admin', icon: Crown, label: 'Admin' }] : []),
   ];
 
   const isActive = (path: string) => location.pathname === path;

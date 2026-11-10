@@ -49,13 +49,13 @@ export function useCreateCheckout() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (priceId: string) => {
+    mutationFn: async ({ priceId, referralCode }: { priceId: string; referralCode?: string }) => {
       if (!session) {
         throw new Error('Você precisa estar logado');
       }
 
       const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: { priceId },
+        body: referralCode ? { priceId, referralCode } : { priceId },
         headers: {
           Authorization: `Bearer ${session.access_token}`,
         },
