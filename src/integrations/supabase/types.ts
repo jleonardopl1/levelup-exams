@@ -87,7 +87,15 @@ export type Database = {
           reference?: string | null
           referral_code_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "affiliate_payouts_referral_code_id_fkey"
+            columns: ["referral_code_id"]
+            isOneToOne: false
+            referencedRelation: "referral_codes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       ai_mentor_usage: {
         Row: {
@@ -287,6 +295,27 @@ export type Database = {
           title?: string
           type?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      platform_settings: {
+        Row: {
+          key: string
+          updated_at: string
+          updated_by: string | null
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          updated_by?: string | null
+          value: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
         }
         Relationships: []
       }
@@ -543,14 +572,46 @@ export type Database = {
           code?: string
           commission_percent?: number
           created_at?: string
+          created_by?: string | null
           discount_percent?: number
           id?: string
           is_active?: boolean
+          notes?: string | null
+          revoked_at?: string | null
+          revoked_reason?: string | null
+          source?: string
           total_earnings?: number
           total_uses?: number
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
+      }
+      referral_link_visits: {
+        Row: {
+          referral_code_id: string
+          visit_date: string
+          visits: number
+        }
+        Insert: {
+          referral_code_id: string
+          visit_date: string
+          visits?: number
+        }
+        Update: {
+          referral_code_id?: string
+          visit_date?: string
+          visits?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referral_link_visits_referral_code_id_fkey"
+            columns: ["referral_code_id"]
+            isOneToOne: false
+            referencedRelation: "referral_codes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       referral_uses: {
         Row: {
@@ -558,7 +619,7 @@ export type Database = {
           created_at: string
           id: string
           referral_code_id: string
-          referred_user_id: string
+          referred_user_id: string | null
           stripe_checkout_session_id: string | null
           subscription_amount: number | null
         }
@@ -567,7 +628,8 @@ export type Database = {
           created_at?: string
           id?: string
           referral_code_id: string
-          referred_user_id: string
+          referred_user_id?: string | null
+          stripe_checkout_session_id?: string | null
           subscription_amount?: number | null
         }
         Update: {
@@ -575,7 +637,8 @@ export type Database = {
           created_at?: string
           id?: string
           referral_code_id?: string
-          referred_user_id?: string
+          referred_user_id?: string | null
+          stripe_checkout_session_id?: string | null
           subscription_amount?: number | null
         }
         Relationships: [
@@ -1221,37 +1284,32 @@ export type Database = {
           },
         ]
       }
-      referral_uses_limited: {
-        Row: {
-          created_at: string | null
-          id: string | null
-          referral_code_id: string | null
-          referred_user_id: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          id?: string | null
-          referral_code_id?: string | null
-          referred_user_id?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          id?: string | null
-          referral_code_id?: string | null
-          referred_user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "referral_uses_referral_code_id_fkey"
-            columns: ["referral_code_id"]
-            isOneToOne: false
-            referencedRelation: "referral_codes"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
     }
     Functions: {
+      _access_level: { Args: { p_user_id: string }; Returns: string }
+      _audit: {
+        Args: { p_event: string; p_metadata: Json }
+        Returns: undefined
+      }
+      _avatar_from_meta: { Args: { p_meta: Json }; Returns: string }
+      _ban_outranks: {
+        Args: { p_actor: string; p_target: string }
+        Returns: boolean
+      }
+      _can_moderate: {
+        Args: { p_actor: string; p_target: string }
+        Returns: boolean
+      }
+      _display_name_from_meta: { Args: { p_meta: Json }; Returns: string }
+      _has_role: {
+        Args: {
+          p_role: Database["public"]["Enums"]["app_role"]
+          p_user_id: string
+        }
+        Returns: boolean
+      }
+      _is_master: { Args: { p_user_id: string }; Returns: boolean }
+      _level_rank: { Args: { p_level: string }; Returns: number }
       admin_add_affiliate: {
         Args: {
           p_code?: string
@@ -1277,16 +1335,16 @@ export type Database = {
       admin_list_audit_logs: {
         Args: { p_limit?: number; p_search?: string }
         Returns: {
-          actor_email: string | null
-          actor_name: string | null
+          actor_email: string
+          actor_name: string
           created_at: string
-          error_message: string | null
+          error_message: string
           event_type: string
           id: string
-          ip_address: string | null
+          ip_address: string
           metadata: Json
           success: boolean
-          target_name: string | null
+          target_name: string
         }[]
       }
       admin_list_users: {
@@ -1298,17 +1356,17 @@ export type Database = {
         }
         Returns: {
           access_level: string
-          affiliate_code: string | null
-          affiliate_status: string | null
-          ban_expires_at: string | null
-          ban_reason: string | null
-          ban_type: string | null
+          affiliate_code: string
+          affiliate_status: string
+          ban_expires_at: string
+          ban_reason: string
+          ban_type: string
           can_moderate: boolean
           created_at: string
-          display_name: string | null
-          email: string | null
+          display_name: string
+          email: string
           is_banned: boolean
-          last_sign_in_at: string | null
+          last_sign_in_at: string
           streak_days: number
           tier: string
           total_correct: number
@@ -1435,6 +1493,7 @@ export type Database = {
       }
       is_user_banned: { Args: { p_user_id: string }; Returns: boolean }
       level_for_points: { Args: { p_points: number }; Returns: number }
+      master_admin_email: { Args: never; Returns: string }
       record_referral_conversion: {
         Args: {
           p_amount: number
