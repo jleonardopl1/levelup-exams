@@ -20,7 +20,8 @@
  *   - administrador autenticado (botao no painel Admin).
  *
  * Variaveis: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, LOVABLE_API_KEY,
- *            QUESTION_CRON_SECRET, opcionais QUESTION_MODEL, QUESTION_REVIEW_MODEL,
+ *            opcionais QUESTION_CRON_SECRET (sem ela, o segredo e lido do Vault pela
+ *            RPC get_question_cron_secret), QUESTION_MODEL, QUESTION_REVIEW_MODEL,
  *            QUESTIONS_PER_SUBJECT_DAY.
  */
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
@@ -350,13 +351,20 @@ serve(async (req) => {
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   const apiKey = Deno.env.get("LOVABLE_API_KEY");
-  const cronSecret = Deno.env.get("QUESTION_CRON_SECRET") ?? "";
+  let cronSecret = Deno.env.get("QUESTION_CRON_SECRET") ?? "";
   if (!supabaseUrl || !serviceKey || !apiKey) return jsonResponse({ error: "Serviço indisponível" }, 503);
 
   const supabase = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } });
 
   // Autorizacao: cron (segredo compartilhado) ou administrador.
   const providedSecret = req.headers.get("x-cron-secret") ?? "";
+  // Sem a variavel QUESTION_CRON_SECRET, o segredo e lido do Vault (o mesmo que o
+  // pg_cron envia), por uma RPC exclusiva do service_role. Assim o segredo nasce e
+  // fica dentro do banco, sem precisar ser copiado para o painel de Secrets.
+  if (!cronSecret && providedSecret) {
+    const { data: vaultSecret } = await supabase.rpc("get_question_cron_secret");
+    cronSecret = typeof vaultSecret === "string" ? vaultSecret : "";
+  }
   const isCron = cronSecret.length >= 32 && providedSecret.length > 0 && timingSafeEqual(providedSecret, cronSecret);
   if (!isCron) {
     const auth = await requireAdmin(supabase, req);

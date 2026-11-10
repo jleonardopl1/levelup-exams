@@ -61,16 +61,15 @@ O agendamento (`pg_cron` + `pg_net`) roda a cada 10 minutos entre 01h e 04h50 (h
 
 ## Implantação (nesta ordem)
 
-1. **Migrations**: `supabase db push` (aplica `20261110130000_study_tracks.sql`, a trilha e o agendamento).
+1. **Migrations**: `supabase db push` (aplica `20261110130000_study_tracks.sql`, a trilha, o agendamento e o segredo do agendador no Vault).
 2. **Segredos das Edge Functions** (Dashboard → Edge Functions → Secrets):
-   - `QUESTION_CRON_SECRET`: valor aleatório com pelo menos 32 caracteres (ex.: `openssl rand -hex 32`);
    - `LOVABLE_API_KEY`: já usado pelo Mentor IA;
-   - opcionais: `QUESTION_MODEL` (padrão `google/gemini-2.5-pro`), `QUESTION_REVIEW_MODEL`, `QUESTIONS_PER_SUBJECT_DAY` (padrão 3).
-3. **Publicar a função**: `supabase functions deploy generate-track-questions`.
-4. **Vault** (SQL Editor, uma vez), para o agendador saber o endereço e o segredo:
+   - opcionais: `QUESTION_MODEL` (padrão `google/gemini-2.5-pro`), `QUESTION_REVIEW_MODEL`, `QUESTIONS_PER_SUBJECT_DAY` (padrão 3);
+   - `QUESTION_CRON_SECRET` **não é mais necessário**: a migration `20261110140000_question_cron_secret_vault.sql` gera o segredo dentro do Vault e a função o lê de lá (RPC `get_question_cron_secret`, só `service_role`). Se a variável existir, ela tem prioridade e precisa ser igual ao segredo `question_cron_secret` do Vault.
+3. **Publicar a função**: `supabase functions deploy generate-track-questions` (no Lovable Cloud, a publicação das funções é automática).
+4. **Vault** (SQL Editor, uma vez por projeto), para o agendador saber o endereço do projeto:
    ```sql
    select vault.create_secret('https://<project-ref>.supabase.co', 'project_url');
-   select vault.create_secret('<o mesmo valor de QUESTION_CRON_SECRET>', 'question_cron_secret');
    ```
    Se `pg_cron`/`pg_net` não estiverem habilitados no projeto, habilite-os em Database → Extensions e reaplique `20261110130200_schedule_question_generation.sql`.
 5. **Publicar o frontend**.
