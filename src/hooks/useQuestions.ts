@@ -53,7 +53,7 @@ export function useQuestions(options: UseQuestionsOptions = {}) {
         // Selecao no servidor: ineditas primeiro, depois erros; 'review' traz so os erros.
         const { data, error } = await supabase.rpc('get_practice_questions', {
           p_subject_id: subjectId,
-          p_nivel: nivel ?? null,
+          p_nivel: nivel ?? undefined,
           p_limit: limit,
           p_mode: mode,
         });

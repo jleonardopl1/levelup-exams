@@ -75,7 +75,7 @@ export default function Rewards() {
   const navigate = useNavigate();
 
   const [redeemDialogOpen, setRedeemDialogOpen] = useState(false);
-  const [selectedReward, setSelectedReward] = useState<typeof catalog extends (infer T)[] | null | undefined ? T : never | null>(null);
+  const [selectedReward, setSelectedReward] = useState<typeof catalog extends (infer T)[] | null | undefined ? T | null : never>(null);
   const [referralCodeInput, setReferralCodeInput] = useState('');
   const [copied, setCopied] = useState(false);
 
