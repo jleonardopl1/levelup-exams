@@ -9,7 +9,8 @@
  * - Embaralha as alternativas de forma deterministica (hash do enunciado) para
  *   equilibrar o gabarito, exceto quando as alternativas se referem umas as outras
  *   (itens I/II/III, "todas as anteriores"...) ou a questao tem "fixa": true.
- * - Calcula content_hash (dedup): a migration e idempotente (ON CONFLICT).
+ * - Calcula content_hash (dedup): a migration e idempotente (ON CONFLICT) e, ao ser
+ *   reaplicada, atualiza gabarito/explicacao/nivel corrigidos das questoes autorais.
  *
  * Formato compacto de cada questao:
  *   { "t": "topico", "d": "Fácil|Médio|Difícil", "n": "medio|superior" (opcional),
@@ -154,7 +155,10 @@ for (const { meta, questions } of subjects) {
     lines.push(`INSERT INTO public.questions (enunciado, alternativas, correta, categoria, dificuldade, explicacao, subject_id, is_premium, topico, origem, nivel, content_hash)
 SELECT ${sql(q.q)}, ${sqlArr(q.alternativas)}, ${q.correta}, ${sql(meta.name)}, ${sql(q.d)}, ${sql(q.e)}, s.id, false, ${sql(q.t)}, ${sql(q.o || "autoral")}, ${sql(q.n || null)}, ${sql(q.hash)}
 FROM public.subjects s WHERE s.slug = ${sql(meta.slug)}
-ON CONFLICT (content_hash) DO NOTHING;`);
+ON CONFLICT (content_hash) DO UPDATE SET
+  alternativas = EXCLUDED.alternativas, correta = EXCLUDED.correta, categoria = EXCLUDED.categoria,
+  dificuldade = EXCLUDED.dificuldade, explicacao = EXCLUDED.explicacao, topico = EXCLUDED.topico, nivel = EXCLUDED.nivel
+WHERE questions.origem = 'autoral';`);
   }
   lines.push("");
 }

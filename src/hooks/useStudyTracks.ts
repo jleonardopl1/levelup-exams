@@ -125,6 +125,9 @@ export function useTrackProgress(moduleId: string | undefined) {
   return useQuery({
     queryKey: ['track-progress', moduleId, user?.id],
     enabled: !!moduleId && !!user,
+    // As respostas sao gravadas no servidor durante o quiz: sempre recarregar ao voltar a trilha.
+    staleTime: 0,
+    refetchOnMount: 'always',
     queryFn: async () => {
       const { data, error } = await supabase.rpc('get_track_progress', { p_module_id: moduleId! });
       if (error) throw error;

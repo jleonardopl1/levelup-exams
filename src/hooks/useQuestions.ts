@@ -41,9 +41,13 @@ export function useQuestions(options: UseQuestionsOptions = {}) {
   
   return useQuery({
     queryKey: ['questions', limit, categoria, subjectId, nivel, mode],
-    // Cada quiz sorteia um novo conjunto; nao reaproveitar cache entre tentativas.
-    staleTime: 0,
+    // O conjunto de um quiz em andamento e um snapshot: nunca refazer a busca em
+    // segundo plano (foco/reconexao), pois o RPC sorteia e reordena as questoes.
+    // gcTime 0 descarta o cache ao sair, entao a proxima tentativa busca um novo conjunto.
+    staleTime: Infinity,
     gcTime: 0,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
     queryFn: async () => {
       if (subjectId) {
         // Selecao no servidor: ineditas primeiro, depois erros; 'review' traz so os erros.
