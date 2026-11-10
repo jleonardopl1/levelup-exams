@@ -297,7 +297,8 @@ export function useReferralCode() {
 
       const { data, error } = await supabase
         .from('referral_codes')
-        .select('*')
+        // Colunas explícitas: notas internas do admin não são legíveis pelo cliente.
+        .select('id, user_id, code, discount_percent, commission_percent, is_active, total_uses, total_earnings, created_at')
         .eq('user_id', user.id)
         .maybeSingle();
 
@@ -323,7 +324,7 @@ export function useCreateReferralCode() {
           user_id: user.id,
           code: code.toUpperCase(),
         })
-        .select()
+        .select('id, user_id, code, discount_percent, commission_percent, is_active, total_uses, total_earnings, created_at')
         .single();
 
       if (error) throw error;

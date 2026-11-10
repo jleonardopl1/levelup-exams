@@ -61,7 +61,13 @@ export function useCreateCheckout() {
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        // FunctionsHttpError: a mensagem real vem no corpo da resposta (ex.: código inválido).
+        const body = await (error as { context?: Response }).context?.json?.().catch(() => null);
+        const err = new Error(body?.error || error.message) as Error & { code?: string };
+        err.code = body?.code;
+        throw err;
+      }
       if (data?.error) throw new Error(data.error);
 
       return data;

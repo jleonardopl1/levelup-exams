@@ -48,6 +48,7 @@ AS $$
 $$;
 
 -- Uso interno: papel de QUALQUER usuario (has_role so responde sobre o proprio chamador).
+-- Membro da equipe banido perde os poderes na hora (sem esperar o token expirar).
 CREATE OR REPLACE FUNCTION public._has_role(p_user_id uuid, p_role public.app_role)
 RETURNS boolean
 LANGUAGE sql
@@ -55,8 +56,19 @@ STABLE
 SECURITY DEFINER
 SET search_path = public
 AS $$
-  SELECT EXISTS (SELECT 1 FROM public.user_roles WHERE user_id = p_user_id AND role = p_role)
-      OR (p_role = 'admin' AND public._is_master(p_user_id))
+  SELECT NOT public.is_user_banned(p_user_id)
+     AND (EXISTS (SELECT 1 FROM public.user_roles WHERE user_id = p_user_id AND role = p_role)
+          OR (p_role = 'admin' AND public._is_master(p_user_id)))
+$$;
+
+-- Peso de cada nivel (para comparar quem emitiu um banimento com quem tenta altera-lo).
+CREATE OR REPLACE FUNCTION public._level_rank(p_level text)
+RETURNS integer
+LANGUAGE sql
+IMMUTABLE
+SET search_path = public
+AS $$
+  SELECT CASE p_level WHEN 'master' THEN 3 WHEN 'admin' THEN 2 WHEN 'moderator' THEN 1 ELSE 0 END
 $$;
 
 -- Nivel efetivo: master > admin > moderator > user.
@@ -96,6 +108,7 @@ $$;
 
 REVOKE ALL ON FUNCTION public._is_master(uuid) FROM PUBLIC, anon, authenticated;
 REVOKE ALL ON FUNCTION public._has_role(uuid, public.app_role) FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public._level_rank(text) FROM PUBLIC, anon, authenticated;
 REVOKE ALL ON FUNCTION public._access_level(uuid) FROM PUBLIC, anon, authenticated;
 REVOKE ALL ON FUNCTION public._audit(text, jsonb) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public._is_master(uuid) TO service_role;
@@ -211,7 +224,8 @@ GRANT EXECUTE ON FUNCTION public.admin_set_access_level(uuid, text, text) TO aut
 -- 3. Moderacao (banimento) com hierarquia
 --    * staff (admin/moderador) bane apenas usuarios comuns;
 --    * somente o master bane/desbane membros da equipe;
---    * ninguem bane a si mesmo nem o master.
+--    * ninguem bane a si mesmo nem o master;
+--    * um banimento so e alterado/retirado por quem tem nivel >= ao de quem o emitiu.
 -- -----------------------------------------------------------------------------
 DROP POLICY IF EXISTS "Admins can manage bans" ON public.user_bans;
 DROP POLICY IF EXISTS "Staff can view bans" ON public.user_bans;
@@ -240,6 +254,24 @@ $$;
 REVOKE ALL ON FUNCTION public._can_moderate(uuid, uuid) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public._can_moderate(uuid, uuid) TO service_role;
 
+-- O banimento ativo do alvo (se houver) foi emitido por alguem de nivel maior que o do ator?
+CREATE OR REPLACE FUNCTION public._ban_outranks(p_actor uuid, p_target uuid)
+RETURNS boolean
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM public.user_bans b
+    WHERE b.user_id = p_target AND b.is_active
+      AND (b.expires_at IS NULL OR b.expires_at > now())
+      AND public._level_rank(public._access_level(b.banned_by)) > public._level_rank(public._access_level(p_actor))
+  )
+$$;
+REVOKE ALL ON FUNCTION public._ban_outranks(uuid, uuid) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public._ban_outranks(uuid, uuid) TO service_role;
+
 CREATE OR REPLACE FUNCTION public.admin_ban_user(
   p_user_id uuid, p_ban_type text, p_days integer DEFAULT NULL, p_reason text DEFAULT NULL)
 RETURNS jsonb
@@ -252,11 +284,17 @@ DECLARE
   v_expires timestamptz;
   v_ban_id uuid;
 BEGIN
+  IF public._access_level(v_uid) NOT IN ('master', 'admin', 'moderator') THEN
+    RAISE EXCEPTION 'Acesso negado' USING ERRCODE = '42501';
+  END IF;
   IF NOT EXISTS (SELECT 1 FROM auth.users WHERE id = p_user_id) THEN
     RAISE EXCEPTION 'Usuário não encontrado' USING ERRCODE = 'P0002';
   END IF;
   IF NOT public._can_moderate(v_uid, p_user_id) THEN
     RAISE EXCEPTION 'Você não tem permissão para banir este usuário' USING ERRCODE = '42501';
+  END IF;
+  IF public._ban_outranks(v_uid, p_user_id) THEN
+    RAISE EXCEPTION 'Este banimento foi aplicado por um nível superior e só ele pode alterá-lo' USING ERRCODE = '42501';
   END IF;
   IF p_ban_type NOT IN ('temporary', 'permanent') THEN
     RAISE EXCEPTION 'Tipo de banimento inválido' USING ERRCODE = '22023';
@@ -297,6 +335,9 @@ BEGIN
   IF NOT public._can_moderate(v_uid, p_user_id) THEN
     RAISE EXCEPTION 'Você não tem permissão para desbanir este usuário' USING ERRCODE = '42501';
   END IF;
+  IF public._ban_outranks(v_uid, p_user_id) THEN
+    RAISE EXCEPTION 'Este banimento foi aplicado por um nível superior e só ele pode retirá-lo' USING ERRCODE = '42501';
+  END IF;
   UPDATE public.user_bans SET is_active = false WHERE user_id = p_user_id AND is_active;
   GET DIAGNOSTICS v_count = ROW_COUNT;
   IF v_count > 0 THEN
@@ -310,6 +351,10 @@ REVOKE ALL ON FUNCTION public.admin_ban_user(uuid, text, integer, text) FROM PUB
 REVOKE ALL ON FUNCTION public.admin_unban_user(uuid) FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION public.admin_ban_user(uuid, text, integer, text) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.admin_unban_user(uuid) TO authenticated;
+
+-- Admins nao editam perfis alheios (antes podiam alterar nome/estatisticas de qualquer
+-- conta, inclusive do master, e manipular o ranking). O painel nao usa essa escrita.
+DROP POLICY IF EXISTS "Admins can update all profiles" ON public.profiles;
 
 -- Moderadores: leitura de perfis e moderacao de questoes (premium on/off).
 DROP POLICY IF EXISTS "Moderators can view all profiles" ON public.profiles;
@@ -346,8 +391,8 @@ ALTER TABLE public.platform_settings ENABLE ROW LEVEL SECURITY;
 REVOKE ALL ON public.platform_settings FROM anon, authenticated;
 
 INSERT INTO public.platform_settings (key, value) VALUES
-  ('affiliate_self_enrollment', 'true'::jsonb),          -- Top Players criam o proprio codigo
-  ('affiliate_default_commission_percent', '3'::jsonb),
+  ('affiliate_self_enrollment', 'true'::jsonb),            -- Top Players criam o proprio codigo
+  ('affiliate_default_commission_percent', '3'::jsonb),    -- padrao do painel e da autoinscricao
   ('affiliate_default_discount_percent', '10'::jsonb)
 ON CONFLICT (key) DO NOTHING;
 
@@ -442,9 +487,63 @@ ALTER TABLE public.referral_codes
 
 -- Admin (nao master) passa a ser somente leitura sobre afiliados.
 DROP POLICY IF EXISTS "Admins can update referral codes" ON public.referral_codes;
-REVOKE INSERT, UPDATE, DELETE ON public.referral_codes FROM anon, authenticated;
-GRANT INSERT ON public.referral_codes TO authenticated;  -- autoinscricao (policy abaixo)
-GRANT SELECT ON public.referral_codes TO authenticated;
+REVOKE ALL ON public.referral_codes FROM anon, authenticated;
+-- Colunas internas do master (notes, revoked_reason, created_by) nao sao legiveis pelo cliente;
+-- o painel as obtem pela RPC admin_affiliate_overview.
+GRANT SELECT (id, user_id, code, discount_percent, commission_percent, is_active, total_uses,
+              total_earnings, created_at, updated_at, revoked_at, source)
+  ON public.referral_codes TO authenticated;
+GRANT INSERT (user_id, code) ON public.referral_codes TO authenticated;  -- autoinscricao (policy abaixo)
+
+-- Condicoes padrao do programa (nao sensiveis; usadas pela autoinscricao e pelo painel).
+CREATE OR REPLACE FUNCTION public.affiliate_default_terms()
+RETURNS jsonb
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT jsonb_build_object(
+    'commission_percent', COALESCE((SELECT (value)::numeric FROM public.platform_settings
+                                    WHERE key = 'affiliate_default_commission_percent'), 3),
+    'discount_percent', COALESCE((SELECT (value)::numeric::integer FROM public.platform_settings
+                                  WHERE key = 'affiliate_default_discount_percent'), 10))
+$$;
+REVOKE ALL ON FUNCTION public.affiliate_default_terms() FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.affiliate_default_terms() TO authenticated;
+
+-- Autoinscricao: condicoes sempre definidas pelo servidor (padroes configurados pelo master).
+-- SECURITY INVOKER de proposito: current_user identifica a escrita vinda do cliente.
+CREATE OR REPLACE FUNCTION public.apply_self_enrollment_terms()
+RETURNS trigger
+LANGUAGE plpgsql
+SET search_path = public
+AS $$
+DECLARE
+  v_terms jsonb;
+BEGIN
+  IF current_user IN ('authenticated', 'anon') THEN
+    v_terms := public.affiliate_default_terms();
+    NEW.commission_percent := round((v_terms->>'commission_percent')::numeric, 2);
+    NEW.discount_percent := (v_terms->>'discount_percent')::integer;
+    NEW.code := upper(btrim(NEW.code));
+    NEW.is_active := true;
+    NEW.total_uses := 0;
+    NEW.total_earnings := 0;
+    NEW.source := 'self_service';
+    NEW.created_by := NULL;
+    NEW.notes := NULL;
+    NEW.revoked_at := NULL;
+    NEW.revoked_reason := NULL;
+  END IF;
+  RETURN NEW;
+END;
+$$;
+REVOKE ALL ON FUNCTION public.apply_self_enrollment_terms() FROM PUBLIC, anon, authenticated;
+DROP TRIGGER IF EXISTS apply_self_enrollment_terms ON public.referral_codes;
+CREATE TRIGGER apply_self_enrollment_terms
+  BEFORE INSERT ON public.referral_codes
+  FOR EACH ROW EXECUTE FUNCTION public.apply_self_enrollment_terms();
 
 -- Autoinscricao de Top Players: mesma regra anterior + chave liga/desliga do master.
 DROP POLICY IF EXISTS "Top players can create their referral code" ON public.referral_codes;
@@ -454,16 +553,7 @@ CREATE POLICY "Top players can create their referral code"
     auth.uid() = user_id
     AND (SELECT public.affiliate_self_enrollment_enabled())
     AND code ~ '^[A-Z0-9]{4,20}$'
-    AND discount_percent = 10
-    AND commission_percent = 3.00
-    AND total_uses = 0
-    AND total_earnings = 0
-    AND is_active = true
-    AND source = 'self_service'
-    AND created_by IS NULL
-    AND notes IS NULL
-    AND revoked_at IS NULL
-    AND revoked_reason IS NULL
+    AND source = 'self_service'   -- demais condicoes forcadas pelo trigger apply_self_enrollment_terms
     AND (
       (
         (SELECT public.get_user_tier(auth.uid())) = 'plus'
@@ -481,7 +571,7 @@ CREATE POLICY "Top players can create their referral code"
 -- Pagamentos de comissao (registrados pelo master).
 CREATE TABLE IF NOT EXISTS public.affiliate_payouts (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  referral_code_id uuid NOT NULL REFERENCES public.referral_codes(id) ON DELETE RESTRICT,
+  referral_code_id uuid NOT NULL REFERENCES public.referral_codes(id) ON DELETE CASCADE,
   amount numeric(10,2) NOT NULL CHECK (amount > 0),
   paid_at timestamptz NOT NULL DEFAULT now(),
   method text NOT NULL DEFAULT 'pix' CHECK (method IN ('pix', 'transferencia', 'outro')),
@@ -492,15 +582,8 @@ CREATE TABLE IF NOT EXISTS public.affiliate_payouts (
 );
 CREATE INDEX IF NOT EXISTS idx_affiliate_payouts_code ON public.affiliate_payouts(referral_code_id, paid_at DESC);
 ALTER TABLE public.affiliate_payouts ENABLE ROW LEVEL SECURITY;
+-- Sem acesso direto do cliente: leitura pelas RPCs de dashboard (sem notas internas).
 REVOKE ALL ON public.affiliate_payouts FROM anon, authenticated;
-GRANT SELECT ON public.affiliate_payouts TO authenticated;
-
-CREATE POLICY "Affiliates view their payouts"
-  ON public.affiliate_payouts FOR SELECT TO authenticated
-  USING (referral_code_id IN (SELECT id FROM public.referral_codes WHERE user_id = auth.uid()));
-CREATE POLICY "Admins view all payouts"
-  ON public.affiliate_payouts FOR SELECT TO authenticated
-  USING ((SELECT public.has_role(auth.uid(), 'admin')));
 
 -- Visitas ao link de indicacao (contador diario agregado, sem dados pessoais).
 CREATE TABLE IF NOT EXISTS public.referral_link_visits (
@@ -519,12 +602,26 @@ CREATE UNIQUE INDEX IF NOT EXISTS referral_uses_checkout_session_uniq
   ON public.referral_uses(stripe_checkout_session_id) WHERE stripe_checkout_session_id IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_referral_uses_code_created ON public.referral_uses(referral_code_id, created_at DESC);
 
--- Admins podem ler as conversoes (painel). Escrita: somente service_role/RPC.
-DROP POLICY IF EXISTS "Admins can view all referral uses" ON public.referral_uses;
-CREATE POLICY "Admins can view all referral uses"
-  ON public.referral_uses FOR SELECT TO authenticated
-  USING ((SELECT public.has_role(auth.uid(), 'admin')));
-REVOKE INSERT, UPDATE, DELETE ON public.referral_uses FROM anon, authenticated;
+-- Sem acesso direto do cliente: o afiliado ve agregados pela RPC e nunca o id do indicado.
+DROP POLICY IF EXISTS "Referral code owners can view their referral uses" ON public.referral_uses;
+DROP VIEW IF EXISTS public.referral_uses_limited;  -- nao usada pelo app
+REVOKE ALL ON public.referral_uses FROM anon, authenticated;
+
+-- Direito de exclusao (LGPD): com conversoes reais registradas, as FKs antigas (NO ACTION)
+-- impediam excluir a conta do indicado ou do afiliado. O indicado excluido vira anonimo
+-- (a venda continua contabilizada); a exclusao do afiliado remove seu historico, que
+-- permanece resumido em audit_logs.
+ALTER TABLE public.referral_uses ALTER COLUMN referred_user_id DROP NOT NULL;
+ALTER TABLE public.referral_uses DROP CONSTRAINT IF EXISTS referral_uses_referred_user_id_fkey;
+ALTER TABLE public.referral_uses ADD CONSTRAINT referral_uses_referred_user_id_fkey
+  FOREIGN KEY (referred_user_id) REFERENCES auth.users(id) ON DELETE SET NULL;
+ALTER TABLE public.referral_uses DROP CONSTRAINT IF EXISTS referral_uses_referral_code_id_fkey;
+ALTER TABLE public.referral_uses ADD CONSTRAINT referral_uses_referral_code_id_fkey
+  FOREIGN KEY (referral_code_id) REFERENCES public.referral_codes(id) ON DELETE CASCADE;
+
+-- Defesa em profundidade: TRUNCATE nunca e necessario para clientes.
+REVOKE TRUNCATE ON public.user_roles, public.user_bans, public.referral_codes,
+  public.referral_uses, public.profiles, public.audit_logs FROM anon, authenticated;
 
 -- Acesso do proprio chamador (usado pelo frontend para montar menus e abas).
 CREATE OR REPLACE FUNCTION public.get_my_access()
@@ -820,6 +917,9 @@ AS $$
   WHERE rc.code = upper(btrim(code_to_validate))
     AND rc.is_active = true
     AND rc.revoked_at IS NULL
+    -- mesmas regras do checkout: nao vale o proprio codigo, e cada comprador usa um so
+    AND rc.user_id <> auth.uid()
+    AND NOT EXISTS (SELECT 1 FROM public.referral_uses ru WHERE ru.referred_user_id = auth.uid())
   LIMIT 1;
 $$;
 REVOKE ALL ON FUNCTION public.validate_referral_code(text) FROM PUBLIC, anon;
@@ -881,8 +981,11 @@ BEGIN
     RETURN jsonb_build_object('recorded', false, 'reason', 'self_referral');
   END IF;
 
-  -- Comissao calculada com o percentual vigente no momento da venda.
-  v_commission := round(v_amount * v_code.commission_percent / 100, 2);
+  -- Comissao calculada com o percentual vigente no momento da venda. Uma sessao de
+  -- checkout aberta antes de o codigo ser pausado/removido ainda conclui a venda (o
+  -- comprador ja viu o desconto), mas nao gera comissao: a remocao vale na hora.
+  v_commission := CASE WHEN v_code.is_active AND v_code.revoked_at IS NULL
+                       THEN round(v_amount * v_code.commission_percent / 100, 2) ELSE 0 END;
 
   INSERT INTO public.referral_uses
     (referral_code_id, referred_user_id, subscription_amount, commission_earned, stripe_checkout_session_id)
@@ -1246,3 +1349,65 @@ GRANT EXECUTE ON FUNCTION public.admin_list_users(text, text, integer, integer) 
 -- Indices de apoio
 CREATE INDEX IF NOT EXISTS idx_user_bans_user_active ON public.user_bans(user_id) WHERE is_active;
 CREATE INDEX IF NOT EXISTS idx_user_roles_user ON public.user_roles(user_id);
+
+-- -----------------------------------------------------------------------------
+-- 9. Auditoria para o painel. Admins nao leem a tabela diretamente: e-mails e IPs
+--    da equipe aparecem somente para o master (LGPD); o alvo e resolvido por nome.
+-- -----------------------------------------------------------------------------
+DROP POLICY IF EXISTS "Admins can view audit logs" ON public.audit_logs;
+REVOKE ALL ON public.audit_logs FROM anon, authenticated;
+
+CREATE OR REPLACE FUNCTION public.admin_list_audit_logs(p_search text DEFAULT NULL, p_limit integer DEFAULT 100)
+RETURNS TABLE (
+  id uuid,
+  event_type text,
+  created_at timestamptz,
+  success boolean,
+  error_message text,
+  metadata jsonb,
+  actor_name text,
+  actor_email text,
+  ip_address text,
+  target_name text)
+LANGUAGE plpgsql
+STABLE
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_is_master boolean;
+  v_pattern text;
+BEGIN
+  IF public._access_level(auth.uid()) NOT IN ('master', 'admin') THEN
+    RAISE EXCEPTION 'Acesso negado' USING ERRCODE = '42501';
+  END IF;
+  v_is_master := public._is_master(auth.uid());
+  IF p_search IS NOT NULL AND btrim(p_search) <> '' THEN
+    v_pattern := '%' || replace(replace(replace(left(btrim(p_search), 80), '\', '\\'), '%', '\%'), '_', '\_') || '%';
+  END IF;
+
+  RETURN QUERY
+  SELECT a.id, a.event_type, a.created_at, a.success, a.error_message, a.metadata,
+         CASE WHEN pa.display_name IS NULL OR position('@' in pa.display_name) > 0
+              THEN NULL ELSE pa.display_name END,
+         CASE WHEN v_is_master THEN a.user_email ELSE NULL END,
+         CASE WHEN v_is_master THEN a.ip_address ELSE NULL END,
+         COALESCE(NULLIF(a.metadata->>'target_name', ''),
+                  CASE WHEN pt.display_name IS NULL OR position('@' in pt.display_name) > 0
+                       THEN NULL ELSE pt.display_name END)
+  FROM public.audit_logs a
+  LEFT JOIN public.profiles pa ON pa.user_id = a.user_id
+  LEFT JOIN public.profiles pt
+         ON pt.user_id = CASE WHEN (a.metadata->>'target_user_id') ~* '^[0-9a-f-]{36}$'
+                              THEN (a.metadata->>'target_user_id')::uuid END
+  WHERE v_pattern IS NULL
+     OR a.event_type ILIKE v_pattern
+     OR pa.display_name ILIKE v_pattern
+     OR pt.display_name ILIKE v_pattern
+     OR (v_is_master AND a.user_email ILIKE v_pattern)
+  ORDER BY a.created_at DESC
+  LIMIT LEAST(GREATEST(COALESCE(p_limit, 100), 1), 200);
+END;
+$$;
+REVOKE ALL ON FUNCTION public.admin_list_audit_logs(text, integer) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.admin_list_audit_logs(text, integer) TO authenticated;

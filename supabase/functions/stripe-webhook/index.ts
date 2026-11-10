@@ -12,6 +12,7 @@ const log = (step: string, details?: Record<string, unknown>) =>
 
 const RELEVANT_EVENTS = new Set([
   "checkout.session.completed",
+  "checkout.session.async_payment_succeeded", // PIX/boleto confirmados depois do checkout
   "customer.subscription.created",
   "customer.subscription.updated",
   "customer.subscription.deleted",
@@ -81,7 +82,7 @@ serve(async (req) => {
       await audit(supabase, "PAYMENT_FAILED", null, { stripe_customer_id: customerId, invoice_id: obj.id });
     }
 
-    if (event.type === "checkout.session.completed") {
+    if (event.type === "checkout.session.completed" || event.type === "checkout.session.async_payment_succeeded") {
       await recordReferralConversion(supabase, event.data.object as Stripe.Checkout.Session);
     }
 

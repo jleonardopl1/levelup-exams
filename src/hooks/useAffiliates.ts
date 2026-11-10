@@ -160,8 +160,9 @@ export function useAffiliateDashboard(referralCodeId?: string, months = 6) {
 }
 
 export function useAffiliateOverview(enabled = true) {
+  const { user } = useAuth();
   return useQuery({
-    queryKey: ['admin-affiliate-overview'],
+    queryKey: ['admin-affiliate-overview', user?.id],
     queryFn: async (): Promise<AffiliateOverview> => {
       const { data, error } = await supabase.rpc('admin_affiliate_overview');
       if (error) throw new Error(rpcErrorMessage(error));
@@ -187,7 +188,24 @@ export function useAffiliateOverview(enabled = true) {
         })),
       };
     },
+    enabled: enabled && !!user,
+  });
+}
+
+/** Condições padrão do programa (definidas pelo master), usadas como valor inicial no painel. */
+export function useAffiliateDefaultTerms(enabled = true) {
+  return useQuery({
+    queryKey: ['affiliate-default-terms'],
+    queryFn: async () => {
+      const { data } = await supabase.rpc('affiliate_default_terms');
+      const d = (data ?? {}) as { commission_percent?: unknown; discount_percent?: unknown };
+      return {
+        commission: d.commission_percent === undefined ? 3 : num(d.commission_percent),
+        discount: d.discount_percent === undefined ? 10 : num(d.discount_percent),
+      };
+    },
     enabled,
+    staleTime: 60 * 1000,
   });
 }
 
@@ -203,6 +221,7 @@ function useAffiliateMutation<TVars>(
       queryClient.invalidateQueries({ queryKey: ['affiliate-dashboard'] });
       queryClient.invalidateQueries({ queryKey: ['admin-users'] });
       queryClient.invalidateQueries({ queryKey: ['admin-audit-logs'] });
+      queryClient.invalidateQueries({ queryKey: ['affiliate-default-terms'] });
       toast.success(typeof successMessage === 'function' ? successMessage(result) : successMessage);
     },
     onError: (e: Error) => toast.error(e.message),

@@ -108,7 +108,7 @@ serve(async (req) => {
     const referral = await resolveReferral(supabase, body?.referralCode, user.id);
     if (referral && "error" in referral) {
       await logAuditEvent(supabase, "CHECKOUT_INVALID_REFERRAL", user.id, null, clientIp, userAgent, false, referral.error);
-      return jsonResponse({ error: referral.error }, 400);
+      return jsonResponse({ error: `${referral.error}. Remova o código para continuar.`, code: "referral_invalid" }, 400);
     }
 
     let customer = await findCustomerForUser(stripe, user);

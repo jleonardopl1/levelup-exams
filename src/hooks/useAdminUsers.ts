@@ -1,6 +1,7 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useAuth } from '@/contexts/AuthContext';
 import type { AccessLevel } from '@/hooks/useAccess';
 
 export type UserFilter = 'all' | 'staff' | 'affiliates' | 'banned' | 'plus';
@@ -52,8 +53,10 @@ async function notifyAdminAction(action: string, targetUserId: string, targetNam
 }
 
 export function useAdminUsers(search: string, filter: UserFilter, page: number) {
+  const { user } = useAuth();
   return useQuery({
-    queryKey: ['admin-users', search, filter, page],
+    queryKey: ['admin-users', user?.id, search, filter, page],
+    enabled: !!user,
     queryFn: async () => {
       const { data, error } = await supabase.rpc('admin_list_users', {
         p_search: search || undefined,

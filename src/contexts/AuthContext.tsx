@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -21,6 +22,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
+  const lastUserId = useRef<string | null | undefined>(undefined);
+
+  // Nunca reaproveitar respostas em cache de outra conta (ex.: dados restritos ao
+  // admin master vistos por outro usuário no mesmo navegador após trocar de login).
+  useEffect(() => {
+    const current = user?.id ?? null;
+    if (lastUserId.current !== undefined && lastUserId.current !== current) {
+      queryClient.clear();
+    }
+    lastUserId.current = current;
+  }, [user?.id, queryClient]);
 
   useEffect(() => {
     // Set up auth state listener FIRST

@@ -9,11 +9,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Loader2 } from 'lucide-react';
 import {
-  formatBRL, REFERRAL_CODE_RE, useAddAffiliate, useRegisterPayout, useRemoveAffiliate, useUpdateAffiliate,
+  formatBRL, REFERRAL_CODE_RE, useAddAffiliate, useAffiliateDefaultTerms, useRegisterPayout, useRemoveAffiliate, useUpdateAffiliate,
   type AffiliateRow,
 } from '@/hooks/useAffiliates';
 
-const parseNum = (v: string) => Number(v.replace(',', '.'));
+/** Campo vazio vira NaN (inválido) em vez de 0, para não salvar 0% sem querer. */
+const parseNum = (v: string) => (v.trim() === '' ? NaN : Number(v.replace(',', '.')));
 
 /** Sugestão de código a partir do nome (ex.: "Maria Souza" -> "MARIA10"). */
 function suggestCode(name?: string | null) {
@@ -37,6 +38,7 @@ export function AddAffiliateDialog({
   prefill?: AddAffiliatePrefill;
 }) {
   const add = useAddAffiliate();
+  const { data: defaults } = useAffiliateDefaultTerms(open);
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
   const [commission, setCommission] = useState('3');
@@ -47,10 +49,10 @@ export function AddAffiliateDialog({
     if (!open) return;
     setEmail(prefill?.email ?? '');
     setCode(suggestCode(prefill?.name));
-    setCommission('3');
-    setDiscount('10');
+    setCommission(String(defaults?.commission ?? 3).replace('.', ','));
+    setDiscount(String(defaults?.discount ?? 10));
     setNotes('');
-  }, [open, prefill]);
+  }, [open, prefill, defaults]);
 
   const commissionN = parseNum(commission);
   const discountN = parseNum(discount);

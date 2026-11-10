@@ -1274,6 +1274,21 @@ export type Database = {
         Returns: Json
       }
       admin_get_settings: { Args: never; Returns: Json }
+      admin_list_audit_logs: {
+        Args: { p_limit?: number; p_search?: string }
+        Returns: {
+          actor_email: string | null
+          actor_name: string | null
+          created_at: string
+          error_message: string | null
+          event_type: string
+          id: string
+          ip_address: string | null
+          metadata: Json
+          success: boolean
+          target_name: string | null
+        }[]
+      }
       admin_list_users: {
         Args: {
           p_filter?: string
@@ -1337,6 +1352,7 @@ export type Database = {
         Args: { p_key: string; p_value: Json }
         Returns: Json
       }
+      affiliate_default_terms: { Args: never; Returns: Json }
       affiliate_self_enrollment_enabled: { Args: never; Returns: boolean }
       check_rate_limit: {
         Args: {

@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import {
   Search, RefreshCw, Loader2, Shield, Ban, UserPlus, AlertTriangle, UserCog, Handshake, Wallet, Settings, DollarSign,
 } from 'lucide-react';
-import { useAdminAuditLogs } from '@/hooks/useAdminAuditLogs';
+import { useAdminAuditLogs, type AuditLogRow } from '@/hooks/useAdminAuditLogs';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -58,7 +58,6 @@ const LEVEL_LABELS: Record<string, string> = { master: 'Master', admin: 'Admin',
 function describeMeta(meta: Record<string, unknown>): string {
   const parts: string[] = [];
   const str = (k: string) => (meta[k] === null || meta[k] === undefined || meta[k] === '' ? null : String(meta[k]));
-  if (str('target_name')) parts.push(`Alvo: ${str('target_name')}`);
   if (str('from') && str('to') && !str('key')) parts.push(`${LEVEL_LABELS[str('from')!] ?? str('from')} → ${LEVEL_LABELS[str('to')!] ?? str('to')}`);
   if (str('key')) parts.push(`${str('key')}: ${str('from') ?? '—'} → ${str('to')}`);
   if (str('code')) parts.push(`Código: ${str('code')}`);
@@ -70,6 +69,13 @@ function describeMeta(meta: Record<string, unknown>): string {
   if (str('commission')) parts.push(`Comissão gerada: R$ ${Number(meta.commission).toFixed(2).replace('.', ',')}`);
   if (str('reason')) parts.push(`Motivo: ${str('reason')}`);
   return parts.join(' · ');
+}
+
+/** Usuário afetado: nome resolvido no servidor ou, se a conta não tiver nome/existir mais, o id curto. */
+function targetLabel(log: AuditLogRow): string | null {
+  if (log.target_name) return log.target_name;
+  const id = log.metadata?.target_user_id;
+  return typeof id === 'string' && id ? `usuário ${id.slice(0, 8)}…` : null;
 }
 
 export function AdminAuditLogs() {
@@ -114,7 +120,7 @@ export function AdminAuditLogs() {
         <div className="space-y-3">
           {logs.map((log) => {
             const Icon = eventIcons[log.event_type] || Shield;
-            const meta = log.metadata as Record<string, unknown> | null;
+            const meta = log.metadata;
             return (
               <Card key={log.id}>
                 <CardContent className="p-4">
@@ -134,8 +140,18 @@ export function AdminAuditLogs() {
                         )}
                       </div>
                       <p className="text-sm text-muted-foreground">
-                        Autor: <span className="font-medium text-foreground">{log.user_email || (log.event_type === 'affiliate_conversion' ? 'Sistema (Stripe)' : 'Sistema')}</span>
+                        Autor:{' '}
+                        <span className="font-medium text-foreground">
+                          {log.actor_email || log.actor_name
+                            || (log.event_type === 'affiliate_conversion' ? 'Sistema (Stripe)' : 'Sistema')}
+                        </span>
+                        {log.ip_address && <span className="text-xs"> · IP {log.ip_address}</span>}
                       </p>
+                      {targetLabel(log) && (
+                        <p className="text-sm text-muted-foreground">
+                          Alvo: <span className="font-medium text-foreground">{targetLabel(log)}</span>
+                        </p>
+                      )}
                       {meta && describeMeta(meta) && (
                         <p className="text-sm text-muted-foreground break-words">{describeMeta(meta)}</p>
                       )}

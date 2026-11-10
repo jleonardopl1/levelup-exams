@@ -109,14 +109,24 @@ export default function Upgrade() {
       navigate('/auth');
       return;
     }
-    createCheckout.mutate({ priceId, referralCode: referral?.code });
+    createCheckout.mutate(
+      { priceId, referralCode: referral?.code },
+      {
+        onError: (error) => {
+          // Código recusado no servidor (ex.: já usado antes): remove para não travar a compra.
+          if ((error as Error & { code?: string }).code === 'referral_invalid') removeReferral();
+        },
+      },
+    );
   };
 
   const handleManageSubscription = () => {
     customerPortal.mutate();
   };
 
-  const isLoading = createCheckout.isPending || customerPortal.isPending;
+  // Bloqueia a assinatura enquanto o código de indicação é validado: um checkout criado
+  // antes disso sairia sem desconto e sem atribuição ao afiliado.
+  const isLoading = createCheckout.isPending || customerPortal.isPending || checkingReferral;
 
   return (
     <div className="min-h-screen bg-background">
