@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.1.0] - 2026-11-10
+
+### Features
+- Trilhas de estudo por concurso, começando pela Câmara Municipal de Cuiabá-MT 2026 (Selecon): módulos de nível médio e superior, seletor de cargo, quadro de pesos do edital, projeção de nota, foco do dia e conteúdo programático por matéria
+- Banco inicial de 1.091 questões autorais (19 matérias, no mínimo 50 por matéria e por nível)
+- Seleção inteligente de questões (inéditas primeiro, depois erros), modo "Revisar erros" e "Novas da semana"
+- Geração automática diária de questões novas (3 por matéria por dia) com passe revisor e agendamento via pg_cron
+- Painel admin para acompanhar e disparar a geração
+
+
 ## [1.0.0] - 2026-03-05
 
 ### Features

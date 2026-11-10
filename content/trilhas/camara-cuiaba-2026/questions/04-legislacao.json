@@ -1,0 +1,1279 @@
+{
+"slug": "cmc26-legislacao",
+"questions": [
+{
+"t": "Lei Orgânica - Município",
+"d": "Fácil",
+"q": "Segundo a Lei Orgânica do Município de Cuiabá, o Município é pessoa jurídica de direito público interno dotada de autonomia:",
+"a": [
+"política, administrativa, financeira e legislativa",
+"apenas administrativa e financeira",
+"política e judiciária",
+"legislativa e judiciária, apenas"
+],
+"c": 0,
+"e": "Art. 1º da LOM: autonomia política, administrativa, financeira e legislativa. O Município não tem Poder Judiciário."
+},
+{
+"t": "Lei Orgânica - Poderes",
+"d": "Fácil",
+"q": "De acordo com a Lei Orgânica de Cuiabá, são Poderes do Município, independentes e harmônicos entre si:",
+"a": [
+"o Legislativo e o Executivo",
+"o Legislativo, o Executivo e o Judiciário",
+"o Executivo e o Tribunal de Contas",
+"a Câmara, a Prefeitura e a Procuradoria"
+],
+"c": 0,
+"e": "Art. 2º da LOM. Municípios não possuem Poder Judiciário próprio."
+},
+{
+"t": "Lei Orgânica - Símbolos",
+"d": "Fácil",
+"q": "São símbolos do Município de Cuiabá, segundo a Lei Orgânica:",
+"a": [
+"o Brasão, o Hino e a Bandeira",
+"a Bandeira e o Selo",
+"o Hino e o Selo Municipal",
+"o Brasão e as Armas Nacionais"
+],
+"c": 0,
+"e": "Art. 3º da LOM: Brasão, Hino e Bandeira, representativos da cultura, história e tradição do povo cuiabano."
+},
+{
+"t": "Lei Orgânica - Câmara",
+"d": "Médio",
+"q": "Conforme a Lei Orgânica, o número de vereadores de Cuiabá será alterado, proporcionalmente à população, por lei complementar de iniciativa exclusiva:",
+"a": [
+"da Mesa Diretora da Câmara Municipal",
+"do Prefeito Municipal",
+"da Justiça Eleitoral",
+"de um terço dos vereadores"
+],
+"c": 0,
+"e": "Art. 6º, § 3º, da LOM: lei complementar de iniciativa exclusiva da Mesa Diretora, com ajustes até um ano antes das eleições."
+},
+{
+"t": "Lei Orgânica - Vereadores",
+"d": "Fácil",
+"q": "Entre as condições de elegibilidade para o mandato de Vereador previstas na Lei Orgânica, inclui-se a idade mínima de:",
+"a": [
+"18 anos",
+"21 anos",
+"16 anos",
+"25 anos"
+],
+"c": 0,
+"e": "Art. 7º, VI, da LOM, em consonância com a Constituição Federal (art. 14, § 3º, VI, d)."
+},
+{
+"t": "Lei Orgânica - Sessão legislativa",
+"d": "Médio",
+"q": "Segundo a redação atual da Lei Orgânica de Cuiabá, a Câmara Municipal reúne-se anualmente, na sede do Município:",
+"a": [
+"de 2 de fevereiro a 17 de julho e de 1º de agosto a 22 de dezembro",
+"de 15 de fevereiro a 30 de junho e de 1º de agosto a 15 de dezembro",
+"de 1º de fevereiro a 31 de dezembro, sem recesso",
+"de 2 de fevereiro a 30 de junho e de 1º de agosto a 20 de dezembro"
+],
+"c": 0,
+"e": "Art. 8º, caput, da LOM (redação vigente). As reuniões são transferidas para o primeiro dia útil quando caírem em sábados, domingos e feriados."
+},
+{
+"t": "Lei Orgânica - Convocação extraordinária",
+"d": "Médio",
+"q": "De acordo com a Lei Orgânica, a convocação extraordinária da Câmara Municipal, em caso de urgência ou interesse público relevante, poderá ser feita:",
+"a": [
+"pelo Prefeito, pelo Presidente da Câmara ou a requerimento da maioria dos membros da Casa",
+"exclusivamente pelo Presidente da Câmara",
+"apenas por dois terços dos vereadores",
+"pelo Tribunal de Contas do Estado"
+],
+"c": 0,
+"e": "Art. 8º, § 3º, da LOM. Na sessão extraordinária, a Câmara só delibera sobre a matéria da convocação, vedado o pagamento de parcela indenizatória (§ 4º)."
+},
+{
+"t": "Lei Orgânica - Sessões",
+"d": "Médio",
+"q": "Pela Lei Orgânica, as sessões da Câmara são públicas, salvo deliberação em contrário de:",
+"a": [
+"dois terços dos Vereadores, nos casos especificados no Regimento Interno",
+"maioria simples dos presentes",
+"Presidente da Câmara, por ato isolado",
+"um terço dos Vereadores"
+],
+"c": 0,
+"e": "Art. 8º, § 5º, da LOM."
+},
+{
+"t": "Lei Orgânica - Deliberações",
+"d": "Médio",
+"q": "Salvo disposição em contrário, as deliberações da Câmara Municipal de Cuiabá são tomadas:",
+"a": [
+"por maioria de votos, presente a maioria absoluta de seus membros",
+"por maioria absoluta dos membros",
+"por dois terços dos presentes",
+"por unanimidade"
+],
+"c": 0,
+"e": "Art. 9º da LOM e art. 175 do Regimento Interno: maioria simples, com quórum de presença de maioria absoluta."
+},
+{
+"t": "Lei Orgânica - Mesa Diretora",
+"d": "Fácil",
+"q": "Segundo a Lei Orgânica e o Regimento Interno, a Mesa Diretora da Câmara de Cuiabá é composta por:",
+"a": [
+"Presidente, 1º e 2º Vice-Presidentes e 1º e 2º Secretários",
+"Presidente, Vice-Presidente e Secretário",
+"Presidente, Tesoureiro e dois Secretários",
+"Presidente e líderes partidários"
+],
+"c": 0,
+"e": "Art. 15 da LOM e art. 21 do Regimento: cinco cargos."
+},
+{
+"t": "Lei Orgânica - Pedido de informação",
+"d": "Médio",
+"q": "A Mesa da Câmara pode encaminhar pedidos escritos de informação a Secretários Municipais. Segundo a Lei Orgânica, importa crime de responsabilidade a recusa ou o não atendimento no prazo de:",
+"a": [
+"30 dias, bem como a prestação de informações falsas",
+"15 dias úteis",
+"60 dias",
+"10 dias, apenas se houver dolo"
+],
+"c": 0,
+"e": "Art. 15, VI, da LOM."
+},
+{
+"t": "Lei Orgânica - Vereadores",
+"d": "Médio",
+"q": "Conforme a Lei Orgânica, os Vereadores gozam de inviolabilidade por suas opiniões, palavras e votos:",
+"a": [
+"no exercício do mandato e na circunscrição do Município",
+"em qualquer lugar do território nacional",
+"apenas dentro do plenário",
+"somente durante as sessões ordinárias"
+],
+"c": 0,
+"e": "Art. 18 da LOM, reproduzindo o art. 29, VIII, da Constituição Federal."
+},
+{
+"t": "Lei Orgânica - Subsídio",
+"d": "Médio",
+"q": "Segundo a Lei Orgânica, o subsídio dos Vereadores é fixado pela Câmara Municipal:",
+"a": [
+"em cada legislatura para a subsequente",
+"anualmente, para o próprio exercício",
+"pelo Prefeito, mediante decreto",
+"a cada sessão legislativa, por resolução da Mesa"
+],
+"c": 0,
+"e": "Art. 18-A da LOM, observado o art. 29, VI, da Constituição Federal (regra da anterioridade da legislatura)."
+},
+{
+"t": "Lei Orgânica - Perda do mandato",
+"d": "Médio",
+"q": "Perderá o mandato o Vereador que deixar de comparecer, em cada sessão legislativa anual, sem doença comprovada, licença ou missão autorizada, a:",
+"a": [
+"um terço das sessões ordinárias",
+"metade das sessões ordinárias",
+"um quarto das sessões ordinárias",
+"dez sessões consecutivas"
+],
+"c": 0,
+"e": "Art. 20, IV, da LOM ('terça parte das sessões ordinárias'). Nesse caso, a perda é declarada pela Mesa (art. 20, § 3º)."
+},
+{
+"t": "Lei Orgânica - Perda do mandato",
+"d": "Difícil",
+"q": "Nos casos de perda do mandato do Vereador por quebra de decoro parlamentar, a perda será declarada:",
+"a": [
+"pela Câmara, por voto nominal de dois terços, mediante provocação da Mesa ou de partido político, assegurada ampla defesa",
+"pela Mesa da Câmara, de ofício",
+"pela Justiça Eleitoral, exclusivamente",
+"pelo Prefeito, por decreto"
+],
+"c": 0,
+"e": "Art. 20, § 2º, da LOM: incisos I, II, III e VIII — deliberação do Plenário por 2/3, em votação nominal."
+},
+{
+"t": "Lei Orgânica - Licença do Vereador",
+"d": "Médio",
+"q": "A licença do Vereador para tratar, sem remuneração, de interesse particular, segundo a Lei Orgânica, não pode ser inferior a ___ nem ultrapassar ___ por sessão legislativa.",
+"a": [
+"30 dias; 120 dias",
+"15 dias; 90 dias",
+"30 dias; 180 dias",
+"60 dias; 120 dias"
+],
+"c": 0,
+"e": "Art. 21, II, da LOM. O Vereador não pode reassumir antes do término da licença."
+},
+{
+"t": "Lei Orgânica - Suplente",
+"d": "Médio",
+"q": "Segundo a Lei Orgânica, o suplente de Vereador é convocado em caso de vaga ou de licença do titular por prazo superior a ___, devendo tomar posse em ___ contados da convocação.",
+"a": [
+"30 dias; 10 dias",
+"15 dias; 30 dias",
+"60 dias; 5 dias",
+"120 dias; 15 dias"
+],
+"c": 0,
+"e": "Art. 22 e § 1º da LOM, salvo justo motivo aceito pela Câmara."
+},
+{
+"t": "Lei Orgânica - Processo legislativo",
+"d": "Fácil",
+"q": "O processo legislativo municipal de Cuiabá compreende a elaboração de:",
+"a": [
+"emendas à Lei Orgânica, leis complementares, leis ordinárias, resoluções e decretos legislativos",
+"leis ordinárias, medidas provisórias e decretos",
+"emendas constitucionais, leis delegadas e resoluções",
+"leis complementares e portarias"
+],
+"c": 0,
+"e": "Art. 23 da LOM. Não há medida provisória nem lei delegada na LOM de Cuiabá."
+},
+{
+"t": "Lei Orgânica - Emenda",
+"d": "Médio",
+"q": "A Lei Orgânica de Cuiabá poderá ser emendada mediante proposta:",
+"a": [
+"de um terço, no mínimo, dos membros da Câmara, do Prefeito ou de iniciativa popular",
+"exclusivamente do Prefeito",
+"da maioria absoluta da Câmara, apenas",
+"de qualquer vereador isoladamente"
+],
+"c": 0,
+"e": "Art. 24 da LOM: proposta de 1/3 dos vereadores, do Prefeito ou de iniciativa popular."
+},
+{
+"t": "Lei Orgânica - Emenda",
+"d": "Médio",
+"q": "A proposta de emenda à Lei Orgânica de Cuiabá será votada em:",
+"a": [
+"dois turnos, com interstício mínimo de 10 dias, e aprovada por dois terços dos membros",
+"turno único, por maioria absoluta",
+"dois turnos, com interstício de 5 dias, por três quintos",
+"três turnos, por maioria simples"
+],
+"c": 0,
+"e": "Art. 24, § 1º, da LOM. A emenda é promulgada pela Mesa da Câmara (§ 2º)."
+},
+{
+"t": "Lei Orgânica - Emenda",
+"d": "Médio",
+"q": "Segundo a Lei Orgânica, ela NÃO poderá ser emendada na vigência de:",
+"a": [
+"estado de sítio ou de intervenção no Município",
+"recesso parlamentar",
+"ano eleitoral",
+"período de votação do orçamento"
+],
+"c": 0,
+"e": "Art. 24, § 3º, da LOM."
+},
+{
+"t": "Lei Orgânica - Iniciativa popular",
+"d": "Médio",
+"q": "A iniciativa popular de leis em Cuiabá, conforme a Lei Orgânica, é exercida por moção articulada subscrita por, no mínimo:",
+"a": [
+"5% do eleitorado do Município",
+"1% do eleitorado do Município",
+"10% do eleitorado do Município",
+"3% da população"
+],
+"c": 0,
+"e": "Art. 25 da LOM (a CF exige ao menos 5% do eleitorado — art. 29, XIII)."
+},
+{
+"t": "Lei Orgânica - Lei complementar",
+"d": "Médio",
+"q": "As leis complementares, segundo a Lei Orgânica de Cuiabá, somente serão aprovadas se obtiverem:",
+"a": [
+"maioria absoluta dos votos dos membros da Câmara",
+"maioria simples dos presentes",
+"dois terços dos membros",
+"três quintos dos membros"
+],
+"c": 0,
+"e": "Art. 26 da LOM. Exemplos: Código Tributário, Código de Obras, Plano Diretor, Regime Jurídico Único dos Servidores."
+},
+{
+"t": "Lei Orgânica - Iniciativa privativa",
+"d": "Médio",
+"q": "São de iniciativa exclusiva do Prefeito as leis que disponham sobre:",
+"a": [
+"regime jurídico dos servidores do Executivo, criação de secretarias e matéria orçamentária",
+"denominação de ruas e logradouros",
+"concessão de títulos honoríficos",
+"criação de cargos nos serviços da Câmara"
+],
+"c": 0,
+"e": "Art. 27 da LOM. A criação de cargos da Câmara é de iniciativa da Mesa (art. 15, II)."
+},
+{
+"t": "Lei Orgânica - Urgência",
+"d": "Médio",
+"q": "O Prefeito pode solicitar urgência para projetos de sua iniciativa, que deverão ser apreciados no prazo de:",
+"a": [
+"45 dias, sob pena de sobrestamento das demais deliberações, exceto veto e leis orçamentárias",
+"30 dias, sob pena de aprovação tácita",
+"15 dias úteis",
+"90 dias, sem qualquer consequência"
+],
+"c": 0,
+"e": "Art. 28 e § 1º da LOM. O prazo não corre no recesso nem se aplica a codificações e leis complementares (§ 2º)."
+},
+{
+"t": "Lei Orgânica - Sanção e veto",
+"d": "Médio",
+"q": "Recebido o projeto de lei aprovado pela Câmara, o Prefeito tem, para sancioná-lo ou vetá-lo, o prazo de:",
+"a": [
+"15 dias úteis, importando o silêncio em sanção tácita",
+"30 dias corridos, importando o silêncio em veto",
+"10 dias úteis, importando o silêncio em veto",
+"48 horas"
+],
+"c": 0,
+"e": "Art. 29 e §§ 1º e 2º da LOM. O veto deve ser comunicado ao Presidente da Câmara em 48 horas."
+},
+{
+"t": "Lei Orgânica - Veto",
+"d": "Médio",
+"q": "Sobre o veto, conforme a Lei Orgânica de Cuiabá, é correto afirmar:",
+"a": [
+"o veto parcial somente abrangerá texto integral de artigo, parágrafo, inciso ou alínea",
+"o veto pode recair sobre palavras isoladas",
+"o veto não precisa ser fundamentado",
+"o veto é apreciado em dois turnos"
+],
+"c": 0,
+"e": "Art. 29, § 3º, da LOM. O veto é apreciado em 15 dias, em uma única discussão e votação (§ 4º)."
+},
+{
+"t": "Lei Orgânica - Espécies normativas",
+"d": "Médio",
+"q": "De acordo com a Lei Orgânica, matérias de interesse interno da Câmara são disciplinadas por:",
+"a": [
+"projeto de resolução",
+"projeto de decreto legislativo",
+"projeto de lei ordinária",
+"decreto do Prefeito"
+],
+"c": 0,
+"e": "Art. 30 da LOM: resolução para interesse interno; decreto legislativo para os demais casos de competência privativa."
+},
+{
+"t": "Lei Orgânica - Sucessão",
+"d": "Médio",
+"q": "Em caso de impedimento do Prefeito e do Vice-Prefeito, assume a administração municipal o:",
+"a": [
+"Presidente da Câmara",
+"Procurador-Geral do Município, em primeiro lugar",
+"Secretário de Governo",
+"Vereador mais votado"
+],
+"c": 0,
+"e": "Art. 36 da LOM. Não podendo o Presidente, assume o 1º Vice-Presidente; impedidos ambos, o Procurador-Geral do Município (art. 36-A)."
+},
+{
+"t": "Lei Orgânica - Vacância",
+"d": "Difícil",
+"q": "Vagos os cargos de Prefeito e Vice-Prefeito no último ano do mandato, segundo a Lei Orgânica:",
+"a": [
+"assumirá o Presidente da Câmara, que completará o período",
+"haverá eleição direta em 90 dias",
+"haverá eleição indireta pela Câmara em 30 dias",
+"assumirá o Procurador-Geral do Município"
+],
+"c": 0,
+"e": "Art. 37 da LOM: nos três primeiros anos, nova eleição 90 dias após a vacância; no último ano, o Presidente da Câmara completa o período."
+},
+{
+"t": "Lei Orgânica - Prefeito",
+"d": "Médio",
+"q": "Sem licença da Câmara, o Prefeito e o Vice-Prefeito em exercício não poderão ausentar-se do País nem do Município por mais de:",
+"a": [
+"15 dias, sob pena de perda do cargo",
+"30 dias",
+"10 dias úteis",
+"45 dias"
+],
+"c": 0,
+"e": "Art. 39 da LOM: sem licença da Câmara, a ausência do País ou do Município por mais de 15 dias sujeita o Prefeito e o Vice à perda do cargo."
+},
+{
+"t": "Lei Orgânica - Certidões",
+"d": "Médio",
+"q": "Segundo a Lei Orgânica, os Poderes Executivo e Legislativo são obrigados a fornecer certidões de atos, contratos e decisões a qualquer interessado no prazo máximo de:",
+"a": [
+"15 dias",
+"30 dias",
+"5 dias úteis",
+"60 dias"
+],
+"c": 0,
+"e": "Art. 64 da LOM, sob pena de responsabilidade da autoridade."
+},
+{
+"t": "Regimento Interno - Sede",
+"d": "Fácil",
+"q": "Segundo o Regimento Interno, a sede da Câmara Municipal de Cuiabá situa-se:",
+"a": [
+"na Rua Barão de Melgaço, Praça Paschoal Moreira Cabral",
+"no Centro Político Administrativo (CPA)",
+"na Avenida Getúlio Vargas",
+"no Palácio Alencastro"
+],
+"c": 0,
+"e": "Art. 1º do Regimento Interno; o horário de funcionamento é de segunda a sexta, das 7h30 às 13h30."
+},
+{
+"t": "Regimento Interno - Funções",
+"d": "Médio",
+"q": "A função da Câmara exercida por meio de indicações, sugerindo medidas de interesse público ao Executivo, é a função:",
+"a": [
+"de assessoramento",
+"fiscalizadora",
+"integrativa",
+"julgadora"
+],
+"c": 0,
+"e": "Art. 2º, § 7º, do Regimento. A integrativa é a cooperação das associações representativas na elaboração das leis (§ 6º)."
+},
+{
+"t": "Regimento Interno - Funções",
+"d": "Médio",
+"q": "Quando a Câmara julga o Prefeito por infração político-administrativa ou aprecia suas contas, exerce a função:",
+"a": [
+"julgadora",
+"administrativa",
+"institucional",
+"de assessoramento"
+],
+"c": 0,
+"e": "Art. 2º, § 4º, do Regimento Interno."
+},
+{
+"t": "Regimento Interno - Posse",
+"d": "Médio",
+"q": "Na sessão solene preparatória de 1º de janeiro do primeiro ano da legislatura, assume a direção dos trabalhos:",
+"a": [
+"o Vereador mais votado dentre os presentes",
+"o Vereador mais idoso, obrigatoriamente",
+"o Presidente da legislatura anterior",
+"o Prefeito eleito"
+],
+"c": 0,
+"e": "Art. 5º do Regimento: o mais votado; na falta deste, o mais idoso (que pode declinar)."
+},
+{
+"t": "Regimento Interno - Sessões solenes",
+"d": "Fácil",
+"q": "Segundo o Regimento Interno, entre as hipóteses de sessão solene inclui-se, obrigatoriamente, a comemoração:",
+"a": [
+"do aniversário de Cuiabá",
+"do Dia do Servidor Público",
+"da Independência do Brasil",
+"do aniversário da Câmara"
+],
+"c": 0,
+"e": "Art. 20, III, do Regimento. As sessões solenes podem ser realizadas fora da sede da Câmara (parágrafo único)."
+},
+{
+"t": "Regimento Interno - Mesa",
+"d": "Médio",
+"q": "Sobre a eleição da Mesa Diretora para o primeiro biênio, prevista no Regimento Interno, é correto afirmar:",
+"a": [
+"realiza-se pelo sistema de chapas, em votação nominal",
+"é feita por voto secreto individual para cada cargo",
+"é decidida pelo Colégio de Líderes",
+"ocorre na primeira sessão ordinária de fevereiro"
+],
+"c": 0,
+"e": "Art. 22 e § 1º do Regimento. Persistindo empate no 2º escrutínio, vence a chapa com o candidato a Presidente mais idoso (§ 3º)."
+},
+{
+"t": "Regimento Interno - Mesa",
+"d": "Médio",
+"q": "Na renovação da Mesa Diretora, conforme o Regimento Interno:",
+"a": [
+"é vedada a recondução para o mesmo cargo, salvo a exceção regimental, e o suplente não pode integrar a Mesa",
+"é permitida a recondução ilimitada",
+"o suplente pode ser eleito Presidente",
+"a eleição é feita pelo Prefeito"
+],
+"c": 0,
+"e": "Art. 23, §§ 2º a 4º. Não se considera recondução a eleição para o mesmo cargo em legislaturas diferentes."
+},
+{
+"t": "Regimento Interno - Comissões",
+"d": "Fácil",
+"q": "Segundo o Regimento Interno, as comissões que permanecem por toda a legislatura são as:",
+"a": [
+"permanentes",
+"temporárias",
+"especiais",
+"de representação"
+],
+"c": 0,
+"e": "Art. 42, I. As temporárias se extinguem quando cumprida sua finalidade (inciso II)."
+},
+{
+"t": "Regimento Interno - Comissões",
+"d": "Médio",
+"q": "De acordo com o Regimento Interno, as Comissões Permanentes são compostas por:",
+"a": [
+"3 membros titulares e 3 suplentes",
+"5 membros titulares e 2 suplentes",
+"7 membros, sem suplentes",
+"todos os vereadores do mesmo partido"
+],
+"c": 0,
+"e": "Art. 48, § 1º. A presidência e a composição são decididas pelo Colégio de Líderes."
+},
+{
+"t": "Regimento Interno - Comissões",
+"d": "Médio",
+"q": "É Comissão Permanente da Câmara Municipal de Cuiabá, segundo o Regimento Interno:",
+"a": [
+"Comissão de Constituição, Justiça e Redação",
+"Comissão de Orçamento Participativo Federal",
+"Comissão Mista de Planos e Orçamentos",
+"Comissão de Relações Exteriores"
+],
+"c": 0,
+"e": "Art. 43, I, do Regimento, que lista, entre outras, Fiscalização e Acompanhamento da Execução Orçamentária, Ética e Decoro Parlamentar e Educação."
+},
+{
+"t": "Regimento Interno - CPI",
+"d": "Médio",
+"q": "A Comissão Parlamentar de Inquérito, segundo o Regimento Interno, é criada:",
+"a": [
+"mediante requerimento de, no mínimo, um terço dos membros da Câmara, com fato determinado e prazo certo, independentemente de deliberação do Plenário",
+"por decisão da maioria absoluta do Plenário",
+"por ato do Prefeito",
+"a pedido de qualquer cidadão"
+],
+"c": 0,
+"e": "Art. 59 do Regimento (simetria com o art. 58, § 3º, da CF). Tem poderes de investigação próprios das autoridades judiciais."
+},
+{
+"t": "Regimento Interno - CPI",
+"d": "Difícil",
+"q": "Sobre a composição da CPI prevista no Regimento Interno de Cuiabá, é correto afirmar:",
+"a": [
+"tem 3 titulares e 3 suplentes, assegurada a presidência ao primeiro signatário do requerimento",
+"tem 5 membros sorteados entre todos os vereadores",
+"é presidida obrigatoriamente pelo Presidente da Câmara",
+"é composta apenas por vereadores da base do governo"
+],
+"c": 0,
+"e": "Art. 59, § 4º, do Regimento."
+},
+{
+"t": "Regimento Interno - Comissões temporárias",
+"d": "Médio",
+"q": "As Comissões Processantes destinadas a apurar infrações político-administrativas do Prefeito são compostas, segundo o Regimento, por:",
+"a": [
+"3 membros sorteados entre os Vereadores desimpedidos",
+"5 membros indicados pelos líderes",
+"todos os membros da Mesa",
+"3 membros eleitos pelo Plenário por maioria absoluta"
+],
+"c": 0,
+"e": "Art. 58 do Regimento. São impedidos o subscritor da representação e o denunciado."
+},
+{
+"t": "Regimento Interno - Sessões",
+"d": "Fácil",
+"q": "As sessões ordinárias da Câmara Municipal de Cuiabá, segundo o Regimento Interno, realizam-se:",
+"a": [
+"às terças e quintas-feiras, às 9 horas, com duração de 3 horas",
+"de segunda a sexta-feira, às 14 horas",
+"às quartas-feiras, às 19 horas",
+"diariamente, às 8 horas"
+],
+"c": 0,
+"e": "Art. 113, II, do Regimento, independentemente de convocação."
+},
+{
+"t": "Regimento Interno - Sessões",
+"d": "Médio",
+"q": "As fases da sessão ordinária, na ordem prevista no Regimento Interno, são:",
+"a": [
+"pequeno expediente, grande expediente, ordem do dia e palavra livre",
+"ordem do dia, expediente, explicações pessoais e tribuna livre",
+"abertura, leitura da ata, votação e encerramento",
+"grande expediente, pequeno expediente, ordem do dia e palavra livre"
+],
+"c": 0,
+"e": "Art. 120 do Regimento."
+},
+{
+"t": "Regimento Interno - Tribuna Livre",
+"d": "Médio",
+"q": "Sobre a Tribuna Livre, prevista no Regimento Interno, é correto afirmar:",
+"a": [
+"permite que qualquer cidadão use a palavra em sessão ordinária, com inscrição prévia de 48 horas",
+"é restrita aos vereadores da oposição",
+"dispensa inscrição prévia",
+"ocorre apenas em sessões solenes"
+],
+"c": 0,
+"e": "Art. 119: inicia-se às 10h, nas terças e quintas, com 20 minutos divididos entre dois oradores (10 minutos cada)."
+},
+{
+"t": "Regimento Interno - Sessão híbrida",
+"d": "Difícil",
+"q": "Segundo o Regimento Interno, a sessão extraordinária híbrida (presencial e virtual):",
+"a": [
+"só pode ocorrer durante o recesso parlamentar, por decisão do Presidente da Câmara",
+"pode substituir qualquer sessão ordinária",
+"depende de requerimento de dois terços dos vereadores",
+"é proibida em qualquer hipótese"
+],
+"c": 0,
+"e": "Art. 120-B e § 3º do Regimento."
+},
+{
+"t": "Regimento Interno - Audiência pública",
+"d": "Médio",
+"q": "Conforme o Regimento Interno, a Audiência Pública da Câmara poderá ser requisitada por:",
+"a": [
+"qualquer Vereador, mediante requerimento aprovado por maioria de votos em sessão plenária",
+"somente a Mesa Diretora",
+"apenas o Prefeito",
+"qualquer cidadão, independentemente de aprovação"
+],
+"c": 0,
+"e": "Art. 133 do Regimento. A audiência pública da Câmara não se confunde com a de Comissão Permanente."
+},
+{
+"t": "Regimento Interno - Proposições",
+"d": "Médio",
+"q": "Para efeitos regimentais, considera-se autor da proposição:",
+"a": [
+"o seu primeiro signatário",
+"todos os signatários, solidariamente",
+"o Presidente da Câmara",
+"o relator da comissão"
+],
+"c": 0,
+"e": "Art. 144 do Regimento. A retirada de assinatura só é lícita antes da inserção na Ordem do Dia (§ 1º)."
+},
+{
+"t": "Regimento Interno - Urgência",
+"d": "Difícil",
+"q": "Segundo o Regimento Interno, o regime de urgência especial:",
+"a": [
+"dispensa todas as exigências regimentais, exceto quórum e pareceres obrigatórios, e pode ser proposto por 2/3 dos membros",
+"dispensa inclusive o quórum de votação",
+"impede apenas pedidos de vista",
+"é concedido automaticamente a projetos do Executivo"
+],
+"c": 0,
+"e": "Arts. 151, § 1º, e 152 do Regimento. A urgência simples impede adiamento e exclui pedidos de vista."
+},
+{
+"t": "Regimento Interno - Quórum",
+"d": "Médio",
+"q": "Pelo Regimento Interno, depende do voto favorável da maioria absoluta da Câmara:",
+"a": [
+"a rejeição de veto",
+"a denominação de vias e logradouros públicos",
+"a concessão de títulos honoríficos",
+"a alienação de bens imóveis"
+],
+"c": 0,
+"e": "Art. 176, IV. Denominação de logradouros, títulos honoríficos e alienação de imóveis exigem 2/3 (art. 177)."
+},
+{
+"t": "Regimento Interno - Quórum",
+"d": "Médio",
+"q": "Segundo o Regimento Interno, exige o voto favorável de dois terços dos membros da Câmara:",
+"a": [
+"a concessão de títulos honoríficos e honrarias",
+"a aprovação de lei complementar",
+"a convocação de Secretário para prestar esclarecimentos",
+"a criação de Comissão Especial"
+],
+"c": 0,
+"e": "Art. 177, IV. As demais alternativas exigem maioria absoluta (art. 176)."
+},
+{
+"t": "Regimento Interno - Quórum",
+"d": "Fácil",
+"q": "O Regimento Interno define maioria absoluta como:",
+"a": [
+"o primeiro número inteiro acima da metade do total dos membros da Câmara",
+"metade dos presentes mais um",
+"dois terços dos membros",
+"a maioria dos presentes à sessão"
+],
+"c": 0,
+"e": "Art. 176, parágrafo único."
+},
+{
+"t": "Regimento Interno - Votação",
+"d": "Médio",
+"q": "Os processos de votação previstos no Regimento Interno são:",
+"a": [
+"simbólico, nominal e eletrônico, sendo o simbólico a regra geral",
+"secreto, aberto e por aclamação",
+"nominal e por cédula apenas",
+"eletrônico, sempre obrigatório"
+],
+"c": 0,
+"e": "Arts. 182 e 183. A votação será nominal nos casos de quórum de maioria absoluta ou dois terços (art. 184)."
+},
+{
+"t": "Regimento Interno - Votação",
+"d": "Médio",
+"q": "Do resultado de uma votação simbólica, qualquer Vereador pode requerer verificação por votação nominal. Segundo o Regimento:",
+"a": [
+"o Presidente não pode indeferir o pedido, e não se admite segunda verificação",
+"o pedido depende de aprovação do Plenário",
+"podem ser feitas quantas verificações forem requeridas",
+"a verificação só cabe em matérias de 2/3"
+],
+"c": 0,
+"e": "Art. 183, §§ 1º e 2º, do Regimento."
+},
+{
+"t": "LC 93/2003 - Disposições gerais",
+"d": "Fácil",
+"q": "Segundo o Estatuto dos Servidores de Cuiabá (LC nº 93/2003), o Dia do Servidor Público é feriado municipal comemorado em:",
+"a": [
+"28 de outubro",
+"8 de abril",
+"1º de maio",
+"15 de novembro"
+],
+"c": 0,
+"e": "Art. 3º da LC 93/2003."
+},
+{
+"t": "LC 93/2003 - Prazos",
+"d": "Médio",
+"q": "Os prazos previstos na LC nº 93/2003 são contados:",
+"a": [
+"em dias corridos, excluindo o dia do começo e incluindo o do vencimento",
+"em dias úteis, incluindo o dia do começo",
+"em dias úteis, excluindo sábados apenas",
+"em horas, a partir da publicação"
+],
+"c": 0,
+"e": "Art. 4º da LC 93/2003; vencido em dia sem expediente, prorroga-se para o primeiro dia útil."
+},
+{
+"t": "LC 93/2003 - Provimento",
+"d": "Médio",
+"q": "São formas de provimento previstas no Estatuto dos Servidores de Cuiabá:",
+"a": [
+"nomeação, promoção, readaptação, reversão, aproveitamento, reintegração e recondução",
+"nomeação, transferência, ascensão e acesso",
+"nomeação, redistribuição e remoção",
+"posse, exercício e estágio probatório"
+],
+"c": 0,
+"e": "Art. 14 da LC 93/2003. Remoção e redistribuição não são formas de provimento."
+},
+{
+"t": "LC 93/2003 - Requisitos",
+"d": "Fácil",
+"q": "NÃO é requisito básico para investidura em cargo público, segundo o art. 13 da LC nº 93/2003:",
+"a": [
+"filiação a partido político",
+"gozo dos direitos políticos",
+"aptidão física e mental",
+"idoneidade moral"
+],
+"c": 0,
+"e": "O art. 13 exige nacionalidade (brasileiros e estrangeiros na forma da lei), direitos políticos, quitação militar/eleitoral/com o fisco municipal, escolaridade, maioridade civil, aptidão física e mental e idoneidade moral."
+},
+{
+"t": "LC 93/2003 - Posse",
+"d": "Médio",
+"q": "No âmbito da Câmara Municipal, segundo a LC nº 93/2003, a competência para dar posse aos ocupantes de cargos efetivos e de confiança é do:",
+"a": [
+"Presidente da Câmara",
+"Prefeito Municipal",
+"Secretário de Gestão de Pessoas",
+"1º Secretário da Mesa"
+],
+"c": 0,
+"e": "Art. 23, II, da LC 93/2003."
+},
+{
+"t": "LC 93/2003 - Posse",
+"d": "Médio",
+"q": "Segundo a LC nº 93/2003, a posse ocorrerá no prazo de:",
+"a": [
+"30 dias contados da publicação do ato de provimento, prorrogável uma vez por igual período",
+"15 dias da nomeação, improrrogável",
+"5 dias da publicação, prorrogável por mais 5",
+"60 dias, prorrogável indefinidamente"
+],
+"c": 0,
+"e": "Art. 24, § 2º. Não ocorrendo a posse no prazo, o ato de provimento será tornado sem efeito (§ 6º)."
+},
+{
+"t": "LC 93/2003 - Posse",
+"d": "Médio",
+"q": "Sobre a posse, nos termos da LC nº 93/2003, é correto afirmar:",
+"a": [
+"pode dar-se mediante procuração específica com firma reconhecida",
+"dispensa inspeção médica oficial",
+"não exige declaração de bens",
+"ocorre também nos casos de promoção"
+],
+"c": 0,
+"e": "Art. 24, §§ 1º, 4º e 5º, e art. 25: só há posse nos cargos providos por nomeação; exige declaração de bens e prévia inspeção médica."
+},
+{
+"t": "LC 93/2003 - Exercício",
+"d": "Médio",
+"q": "O servidor empossado deve entrar em exercício, conforme a LC nº 93/2003, no prazo de:",
+"a": [
+"5 dias contados da posse, prorrogável por igual período, sob pena de exoneração",
+"15 dias da posse",
+"30 dias da nomeação",
+"10 dias úteis, improrrogável"
+],
+"c": 0,
+"e": "Art. 26, §§ 1º e 2º, da LC 93/2003."
+},
+{
+"t": "LC 93/2003 - Jornada",
+"d": "Médio",
+"q": "A LC nº 93/2003 estabelece como duração máxima da jornada dos servidores:",
+"a": [
+"40 horas semanais e 8 horas diárias",
+"44 horas semanais e 8 horas diárias",
+"30 horas semanais e 6 horas diárias",
+"36 horas semanais e 12 horas diárias"
+],
+"c": 0,
+"e": "Art. 27 da LC 93/2003. Na Câmara, a carga oficial é de 30 horas semanais (art. 36 da LC 235/2011)."
+},
+{
+"t": "LC 93/2003 - Estágio probatório",
+"d": "Fácil",
+"q": "O servidor nomeado para cargo efetivo fica sujeito a estágio probatório pelo período de:",
+"a": [
+"3 anos",
+"2 anos",
+"4 anos",
+"1 ano"
+],
+"c": 0,
+"e": "Art. 28 da LC 93/2003, em harmonia com o art. 41 da CF."
+},
+{
+"t": "LC 93/2003 - Estágio probatório",
+"d": "Médio",
+"q": "A comissão especial de avaliação de desempenho, para fins de estabilidade, deve ser composta, segundo a LC nº 93/2003, por no mínimo:",
+"a": [
+"3 servidores estáveis",
+"2 servidores efetivos",
+"5 servidores comissionados",
+"3 vereadores"
+],
+"c": 0,
+"e": "Art. 29 da LC 93/2003. O servidor não aprovado no estágio probatório será exonerado (§ 3º)."
+},
+{
+"t": "LC 93/2003 - Reversão",
+"d": "Difícil",
+"q": "Segundo a LC nº 93/2003, NÃO poderá reverter o aposentado que tenha:",
+"a": [
+"70 anos de idade ou mais",
+"mais de 5 anos de aposentadoria por invalidez",
+"aposentadoria voluntária",
+"sido estável na atividade"
+],
+"c": 0,
+"e": "Art. 33, § 4º. Na reversão no interesse da Administração, exige-se que a aposentadoria tenha sido voluntária e ocorrido nos 5 anos anteriores à solicitação."
+},
+{
+"t": "LC 93/2003 - Recondução",
+"d": "Médio",
+"q": "O retorno do servidor estável ao cargo anteriormente ocupado, por inabilitação em estágio probatório ou reintegração do anterior ocupante, é denominado:",
+"a": [
+"recondução",
+"reversão",
+"reintegração",
+"aproveitamento"
+],
+"c": 0,
+"e": "Art. 35 da LC 93/2003."
+},
+{
+"t": "LC 93/2003 - Vacância",
+"d": "Médio",
+"q": "Segundo a LC nº 93/2003, NÃO é hipótese de vacância de cargo público:",
+"a": [
+"remoção",
+"exoneração",
+"readaptação",
+"posse em outro cargo inacumulável"
+],
+"c": 0,
+"e": "Art. 40: exoneração, demissão, readaptação, aposentadoria, posse em outro cargo inacumulável e falecimento. Remoção é deslocamento, não gera vacância."
+},
+{
+"t": "LC 93/2003 - Férias",
+"d": "Médio",
+"q": "Pela LC nº 93/2003, as férias do servidor podem ser acumuladas, por necessidade do serviço, até o máximo de:",
+"a": [
+"2 períodos",
+"3 períodos",
+"1 período",
+"4 períodos"
+],
+"c": 0,
+"e": "Art. 69 da LC 93/2003. O adicional de 1/3 é pago independentemente de solicitação (§ 1º)."
+},
+{
+"t": "LC 235/2011 - Férias",
+"d": "Difícil",
+"q": "Para os servidores efetivos do Poder Legislativo de Cuiabá, a LC nº 235/2011 permite que as férias sejam fracionadas em:",
+"a": [
+"até três períodos, nunca inferiores a 10 dias",
+"até dois períodos, nunca inferiores a 15 dias",
+"até quatro períodos de 5 dias",
+"período único obrigatório"
+],
+"c": 0,
+"e": "Art. 16-A da LC 235/2011, regra específica para a Câmara (o Estatuto geral prevê até 2 períodos)."
+},
+{
+"t": "LC 93/2003 - Adicionais",
+"d": "Médio",
+"q": "Segundo a LC nº 93/2003, o serviço extraordinário é remunerado com acréscimo de ___ e o serviço noturno é o prestado entre ___.",
+"a": [
+"50%; 22h e 5h",
+"100%; 20h e 6h",
+"30%; 22h e 6h",
+"25%; 23h e 5h"
+],
+"c": 0,
+"e": "Arts. 71 e 72 da LC 93/2003."
+},
+{
+"t": "LC 93/2003 - Direito de petição",
+"d": "Difícil",
+"q": "O direito de petição, segundo a LC nº 93/2003, prescreve em 5 anos quanto aos atos de demissão e cassação de aposentadoria e em ___ nos demais casos, salvo outro prazo legal.",
+"a": [
+"120 dias",
+"30 dias",
+"1 ano",
+"2 anos"
+],
+"c": 0,
+"e": "Art. 87, I e II, da LC 93/2003. O prazo para recurso ou reconsideração é de 30 dias (art. 85)."
+},
+{
+"t": "LC 93/2003 - Licenças",
+"d": "Médio",
+"q": "A licença para tratar de interesses particulares, nos termos da LC nº 93/2003, pode ser concedida ao ocupante de cargo efetivo, a critério da Administração, pelo prazo de até:",
+"a": [
+"2 anos consecutivos, sem remuneração",
+"3 anos, com remuneração",
+"1 ano, com metade da remuneração",
+"5 anos, sem remuneração"
+],
+"c": 0,
+"e": "Art. 101 da LC 93/2003; pode ser interrompida a pedido ou no interesse do serviço."
+},
+{
+"t": "LC 93/2003 - Licenças",
+"d": "Médio",
+"q": "Após cada quinquênio de efetivo exercício, o servidor pode afastar-se, com remuneração, para curso de capacitação profissional, por:",
+"a": [
+"3 meses",
+"6 meses",
+"1 mês",
+"2 anos"
+],
+"c": 0,
+"e": "Art. 100 da LC 93/2003. Não havendo o afastamento, o período pode ser concedido como licença-prêmio para gozo (§ 2º)."
+},
+{
+"t": "LC 93/2003 - Licenças",
+"d": "Fácil",
+"q": "A licença à servidora gestante, pela LC nº 93/2003, é de:",
+"a": [
+"180 dias consecutivos, sem prejuízo da remuneração",
+"120 dias consecutivos",
+"90 dias",
+"150 dias"
+],
+"c": 0,
+"e": "Art. 105 da LC 93/2003. A licença-paternidade é de 10 dias consecutivos (art. 107)."
+},
+{
+"t": "LC 93/2003 - Ausências",
+"d": "Médio",
+"q": "Sem qualquer prejuízo, o servidor pode ausentar-se do serviço, em razão de casamento, por:",
+"a": [
+"8 dias consecutivos",
+"5 dias úteis",
+"3 dias",
+"10 dias"
+],
+"c": 0,
+"e": "Art. 118, V, a, da LC 93/2003. Também há 1 dia para doação de sangue e 1 dia para alistamento eleitoral."
+},
+{
+"t": "LC 93/2003 - Penalidades",
+"d": "Médio",
+"q": "São penalidades disciplinares previstas na LC nº 93/2003:",
+"a": [
+"advertência, suspensão, destituição de cargo em comissão, destituição de função comissionada, demissão e cassação de aposentadoria ou disponibilidade",
+"advertência, multa, prisão administrativa e demissão",
+"repreensão, suspensão e exoneração",
+"advertência e exoneração a bem do serviço público"
+],
+"c": 0,
+"e": "Art. 139 da LC 93/2003. Exoneração não é penalidade."
+},
+{
+"t": "LC 93/2003 - Penalidades",
+"d": "Médio",
+"q": "As penalidades de advertência e de suspensão têm seus registros cancelados, se não houver nova infração, após, respectivamente:",
+"a": [
+"3 e 5 anos de efetivo exercício",
+"1 e 3 anos",
+"2 e 4 anos",
+"5 e 10 anos"
+],
+"c": 0,
+"e": "Art. 143 da LC 93/2003. O cancelamento não tem efeitos retroativos."
+},
+{
+"t": "LC 93/2003 - Abandono e inassiduidade",
+"d": "Médio",
+"q": "Configura abandono de cargo a ausência intencional ao serviço por mais de ___ dias consecutivos; e inassiduidade habitual a falta injustificada por ___ dias, interpoladamente, em 12 meses.",
+"a": [
+"30; 60",
+"15; 30",
+"60; 90",
+"30; 45"
+],
+"c": 0,
+"e": "Arts. 149 e 150 da LC 93/2003; ambos levam à demissão (art. 147, II e III)."
+},
+{
+"t": "LC 93/2003 - Prescrição",
+"d": "Difícil",
+"q": "A ação disciplinar, segundo a LC nº 93/2003, prescreve em:",
+"a": [
+"5 anos para demissão e cassação; 2 anos para suspensão; 6 meses para advertência",
+"5 anos para todas as penalidades",
+"3 anos para demissão; 1 ano para suspensão; 180 dias para advertência",
+"10 anos para demissão; 5 anos para as demais"
+],
+"c": 0,
+"e": "Art. 156 da LC 93/2003. O prazo corre da data em que o fato se tornou conhecido; a abertura de sindicância ou PAD interrompe a prescrição."
+},
+{
+"t": "LC 93/2003 - PAD",
+"d": "Médio",
+"q": "Segundo a LC nº 93/2003, é obrigatória a instauração de processo administrativo disciplinar quando o ilícito ensejar:",
+"a": [
+"suspensão por mais de 30 dias, demissão, cassação de aposentadoria ou disponibilidade, ou destituição",
+"advertência",
+"qualquer penalidade, inclusive advertência verbal",
+"apenas demissão por crime"
+],
+"c": 0,
+"e": "Art. 165 da LC 93/2003."
+},
+{
+"t": "LC 93/2003 - PAD",
+"d": "Médio",
+"q": "O prazo para conclusão do processo administrativo disciplinar, pela LC nº 93/2003, é de até:",
+"a": [
+"90 dias, prorrogável por igual prazo",
+"60 dias, improrrogável",
+"120 dias, prorrogável por 30",
+"30 dias, prorrogável por 30"
+],
+"c": 0,
+"e": "Art. 171 da LC 93/2003. A autoridade julgadora decide em 60 dias, prorrogáveis por igual período (art. 175)."
+},
+{
+"t": "LC 235/2011 - Cargos",
+"d": "Médio",
+"q": "A Lei Complementar nº 609/2026, ao alterar a LC nº 235/2011, criou na Câmara de Cuiabá, entre outros, os cargos de:",
+"a": [
+"Analista Legislativo – Tecnologia da Informação e Técnico Legislativo – Sonorização",
+"Procurador Legislativo e Taquígrafo Legislativo",
+"Auxiliar Legislativo e Auxiliar Técnico de Enfermagem",
+"Médico e Odontólogo"
+],
+"c": 0,
+"e": "A LC 609/2026 criou as especialidades de Analista (TI, Segurança do Trabalho, Psicólogo, Assistente Social e Jornalismo) e de Técnico (Sonorização e Cerimonial), conforme o item 2.3 do edital."
+},
+{
+"t": "LC 235/2011 - Cargos em extinção",
+"d": "Médio",
+"q": "Segundo a LC nº 235/2011, ficam extintos à medida que vagarem os cargos de:",
+"a": [
+"Taquígrafo Legislativo, Auxiliar Técnico Legislativo de Enfermagem, Auxiliar Legislativo e Auxiliar Legislativo de Serviços Diversos",
+"Analista Legislativo e Técnico Legislativo",
+"Controlador Interno e Contador",
+"Procurador Legislativo e Analista de TI"
+],
+"c": 0,
+"e": "Art. 45-A da LC 235/2011."
+},
+{
+"t": "LC 235/2011 - Evolução funcional",
+"d": "Médio",
+"q": "Na LC nº 235/2011, as formas de evolução funcional são:",
+"a": [
+"promoção horizontal (mudança de classe, por qualificação) e progressão vertical (mudança de referência, por tempo e desempenho)",
+"promoção por antiguidade e por merecimento",
+"ascensão e acesso",
+"transferência e readaptação"
+],
+"c": 0,
+"e": "Arts. 2º, IV e V, e 9º da LC 235/2011."
+},
+{
+"t": "LC 235/2011 - Progressão",
+"d": "Difícil",
+"q": "A progressão vertical prevista na LC nº 235/2011 ocorre a cada:",
+"a": [
+"3 anos, desde que a avaliação de desempenho seja superior a 60 pontos (escala de 0 a 100), assegurada a progressão automática em caso de omissão da Administração",
+"2 anos, independentemente de avaliação",
+"5 anos, com avaliação mínima de 70 pontos",
+"ano, mediante requerimento"
+],
+"c": 0,
+"e": "Art. 9º, § 2º, e art. 12 da LC 235/2011 (média superior a 6 em escala de 0 a 10)."
+},
+{
+"t": "LC 235/2011 - Tabela de vencimentos",
+"d": "Médio",
+"q": "Os vencimentos dos cargos efetivos da Câmara, segundo a LC nº 235/2011, compõem-se de:",
+"a": [
+"13 referências (vertical) e 4 classes — A, B, C e D (horizontal)",
+"10 níveis e 3 classes",
+"15 padrões e 5 classes",
+"8 referências e 4 classes"
+],
+"c": 0,
+"e": "Art. 13. O art. 14 prevê acréscimo de 5% por referência e de 20% por mudança de classe."
+},
+{
+"t": "LC 235/2011 - Promoção horizontal",
+"d": "Difícil",
+"q": "Para o Técnico Legislativo, a promoção para a Classe C, segundo a LC nº 235/2011, exige:",
+"a": [
+"ensino superior completo",
+"pós-graduação lato sensu de 360 horas",
+"cursos de qualificação totalizando 120 horas",
+"mestrado"
+],
+"c": 0,
+"e": "Art. 11, II: Classe B — 120 horas de cursos ou outro curso médio/técnico; Classe C — ensino superior completo; Classe D — pós-graduação lato sensu de 360 horas."
+},
+{
+"t": "LC 235/2011 - Ingresso",
+"d": "Médio",
+"q": "Conforme a LC nº 235/2011, o servidor, ao ingressar na carreira, é enquadrado:",
+"a": [
+"na Classe A e no nível 1, independentemente da titulação que possua",
+"na classe correspondente à sua maior titulação",
+"na Classe B, se tiver pós-graduação",
+"em qualquer classe, a critério do Presidente"
+],
+"c": 0,
+"e": "Art. 12-B, § 2º. Após o estágio probatório, é enquadrado conforme instrução e tempo de serviço (§ 3º)."
+},
+{
+"t": "LC 235/2011 - Cargo em comissão",
+"d": "Difícil",
+"q": "O ocupante de cargo efetivo da Câmara nomeado para cargo em comissão pode optar, segundo a LC nº 235/2011, pelo vencimento do cargo comissionado ou pelo vencimento do cargo efetivo acrescido de:",
+"a": [
+"70% do vencimento do cargo comissionado",
+"50% do vencimento do cargo comissionado",
+"100% do vencimento do cargo comissionado",
+"30% do vencimento do cargo efetivo"
+],
+"c": 0,
+"e": "Art. 19 da LC 235/2011; a opção pode ser feita a qualquer momento."
+},
+{
+"t": "LC 235/2011 - Jornada",
+"d": "Fácil",
+"q": "A carga horária oficial dos servidores efetivos da Câmara Municipal de Cuiabá, segundo a LC nº 235/2011, é de:",
+"a": [
+"30 horas semanais, podendo chegar a 40 horas com anuência expressa do servidor e incremento remuneratório proporcional",
+"40 horas semanais, obrigatoriamente",
+"44 horas semanais",
+"20 horas semanais"
+],
+"c": 0,
+"e": "Art. 36 da LC 235/2011, citado no item 2.2 do edital."
+},
+{
+"t": "LC 235/2011 - Despesa com pessoal",
+"d": "Médio",
+"q": "Segundo a LC nº 235/2011, o Poder Legislativo Municipal não poderá despender com pessoal mais do que:",
+"a": [
+"70% de sua receita, na forma do art. 29-A, § 1º, da Constituição Federal",
+"54% da receita corrente líquida do Município",
+"6% da receita corrente líquida",
+"50% de sua receita"
+],
+"c": 0,
+"e": "Art. 25 da LC 235/2011, que remete ao limite constitucional de 70% da receita da Câmara com folha de pagamento."
+},
+{
+"t": "LC 235/2011 - Cargos em comissão",
+"d": "Médio",
+"q": "A LC nº 235/2011 reserva aos servidores efetivos da Câmara um percentual mínimo dos cargos de provimento em comissão de:",
+"a": [
+"5%",
+"10%",
+"20%",
+"50%"
+],
+"c": 0,
+"e": "Art. 35 da LC 235/2011, nos termos do art. 37, V, da CF."
+},
+{
+"t": "LC 235/2011 - Data-base",
+"d": "Médio",
+"q": "A revisão geral do vencimento dos servidores do Legislativo Municipal de Cuiabá deve ocorrer, segundo a LC nº 235/2011, no mês de:",
+"a": [
+"março",
+"janeiro",
+"maio",
+"dezembro"
+],
+"c": 0,
+"e": "Art. 40 da LC 235/2011: março é a data-base."
+},
+{
+"t": "LC 235/2011 - Controlador Interno",
+"d": "Difícil",
+"q": "Entre as atribuições do Controlador Interno da Câmara, previstas no art. 6º-A da LC nº 235/2011, está:",
+"a": [
+"emitir parecer conclusivo sobre as contas anuais prestadas pela administração",
+"julgar as contas do Prefeito",
+"sancionar leis aprovadas pela Câmara",
+"presidir a Comissão de Ética"
+],
+"c": 0,
+"e": "Art. 6º-A, parágrafo único, XVIII. Também deve representar ao TCE-MT, sob pena de responsabilidade solidária, sobre irregularidades não reparadas (XVII)."
+}
+]
+}

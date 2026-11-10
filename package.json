@@ -11,7 +11,8 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc --noEmit",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build:trilhas": "node scripts/build-track-seed.mjs camara-cuiaba-2026"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

@@ -29,7 +29,8 @@ import {
   X,
   TrendingUp,
   ChevronRight,
-  Award
+  Award,
+  Map as MapIcon
 } from 'lucide-react';
 import { PremiumBadge } from '@/components/PremiumBadge';
 import { ShareModal } from '@/components/ShareModal';
@@ -55,6 +56,7 @@ export function AppHeader() {
 
   const navItems = [
     { path: '/', icon: Home, label: 'Início' },
+    { path: '/trilhas', icon: MapIcon, label: 'Trilhas' },
     { path: '/quiz', icon: BookOpen, label: 'Quiz' },
     { path: '/ranking', icon: Trophy, label: 'Ranking' },
     { path: '/achievements', icon: Award, label: 'Conquistas' },

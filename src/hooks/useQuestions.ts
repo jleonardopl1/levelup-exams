@@ -12,6 +12,9 @@ export interface Question {
   created_at: string;
   subject_id: string | null;
   is_premium: boolean;
+  topico?: string | null;
+  origem?: string | null;
+  nivel?: string | null;
 }
 
 // Response from server-side answer validation
@@ -22,26 +25,48 @@ export interface AnswerValidationResult {
   error?: string;
 }
 
+export type PracticeMode = 'smart' | 'review' | 'new' | 'weekly';
+
 interface UseQuestionsOptions {
   limit?: number;
   categoria?: string;
   subjectId?: string;
+  /** Nivel do modulo da trilha ('medio' | 'superior'): filtra questoes exclusivas do outro nivel. */
+  nivel?: string;
+  mode?: PracticeMode;
 }
 
 export function useQuestions(options: UseQuestionsOptions = {}) {
-  const { limit = 10, categoria, subjectId } = options;
+  const { limit = 10, categoria, subjectId, nivel, mode = 'smart' } = options;
   
   return useQuery({
-    queryKey: ['questions', limit, categoria, subjectId],
+    queryKey: ['questions', limit, categoria, subjectId, nivel, mode],
+    // O conjunto de um quiz em andamento e um snapshot: nunca refazer a busca em
+    // segundo plano (foco/reconexao), pois o RPC sorteia e reordena as questoes.
+    // gcTime 0 descarta o cache ao sair, entao a proxima tentativa busca um novo conjunto.
+    staleTime: Infinity,
+    gcTime: 0,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
     queryFn: async () => {
+      if (subjectId) {
+        // Selecao no servidor: ineditas primeiro, depois erros; 'review' traz so os erros.
+        const { data, error } = await supabase.rpc('get_practice_questions', {
+          p_subject_id: subjectId,
+          p_nivel: nivel ?? null,
+          p_limit: limit,
+          p_mode: mode,
+        });
+        if (error) throw error;
+        return (data ?? []).map((q) => ({ ...q, explicacao: null })) as Question[];
+      }
+
       let query = supabase
         .from('questions_public')
         .select('*')
         .limit(limit);
       
-      if (subjectId) {
-        query = query.eq('subject_id', subjectId);
-      } else if (categoria && categoria !== 'Todas') {
+      if (categoria && categoria !== 'Todas') {
         query = query.eq('categoria', categoria);
       }
       

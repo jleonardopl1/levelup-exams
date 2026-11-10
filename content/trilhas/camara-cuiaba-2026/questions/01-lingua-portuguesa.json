@@ -1,0 +1,707 @@
+{
+"slug": "cmc26-lingua-portuguesa",
+"questions": [
+{
+"t": "Interpretação de texto",
+"d": "Médio",
+"q": "Leia o trecho: \"A transparência legislativa não se esgota na publicação de atos no diário oficial. Ela exige linguagem acessível, dados abertos e canais que permitam ao cidadão não apenas saber o que foi decidido, mas compreender por que foi decidido.\" A ideia central do trecho é que a transparência:",
+"a": [
+"exige mais do que a simples publicação formal dos atos, alcançando a compreensão das decisões pelo cidadão",
+"se restringe à publicação dos atos no diário oficial, como determina a lei",
+"deve priorizar os dados abertos em detrimento da linguagem acessível",
+"é responsabilidade exclusiva do cidadão, que deve buscar as informações"
+],
+"c": 0,
+"e": "O trecho afirma que a transparência 'não se esgota' na publicação e exige compreensão do 'porquê' das decisões. As demais alternativas contrariam ou extrapolam o texto."
+},
+{
+"t": "Interpretação de texto",
+"d": "Médio",
+"q": "No trecho \"Ela exige linguagem acessível, dados abertos e canais que permitam ao cidadão não apenas saber o que foi decidido, mas compreender por que foi decidido\", a expressão \"não apenas... mas\" estabelece relação de:",
+"a": [
+"adição, com ênfase no segundo elemento",
+"oposição, anulando o primeiro elemento",
+"conclusão, decorrente do primeiro elemento",
+"condição, necessária ao primeiro elemento"
+],
+"c": 0,
+"e": "A correlação 'não apenas... mas (também)' é aditiva: soma as duas ideias, destacando a segunda. Não há anulação do primeiro termo."
+},
+{
+"t": "Coesão referencial",
+"d": "Fácil",
+"q": "Em \"A transparência legislativa não se esgota na publicação de atos no diário oficial. Ela exige linguagem acessível\", o pronome \"Ela\" retoma:",
+"a": [
+"a transparência legislativa",
+"a publicação de atos",
+"a linguagem acessível",
+"o diário oficial"
+],
+"c": 0,
+"e": "'Ela' é elemento coesivo anafórico que retoma o sujeito da oração anterior, 'a transparência legislativa'."
+},
+{
+"t": "Crase",
+"d": "Médio",
+"q": "Assinale a alternativa em que o emprego do acento indicativo de crase está correto.",
+"a": [
+"O servidor compareceu à sessão ordinária de terça-feira.",
+"O vereador se dirigiu à todos os presentes no plenário.",
+"A audiência começará à partir das nove horas.",
+"O documento foi entregue à uma assessora da Mesa."
+],
+"c": 0,
+"e": "'Comparecer a' + 'a sessão' = à. Não há crase antes de pronome indefinido ('todos'), antes de verbo ('partir') nem antes de artigo indefinido ('uma')."
+},
+{
+"t": "Crase",
+"d": "Médio",
+"q": "Considere as frases: I. Fui à Cuiabá dos meus avós. II. Refiro-me àquela proposta de emenda. III. Assisti à votação do projeto. IV. Entreguei o ofício a Vossa Excelência. Está correto o que se afirma em:",
+"a": [
+"I, II, III e IV",
+"apenas II e III",
+"apenas I e IV",
+"apenas II, III e IV"
+],
+"c": 0,
+"e": "I: nome de cidade especificado admite artigo ('a Cuiabá dos meus avós'), logo há crase. II: a + aquela = àquela. III: 'assistir' (ver) rege 'a' + a votação. IV: não há crase antes de pronome de tratamento como 'Vossa Excelência'. Todas corretas."
+},
+{
+"t": "Concordância verbal",
+"d": "Médio",
+"q": "Assinale a frase que está de acordo com a norma-padrão quanto à concordância verbal.",
+"a": [
+"Fazem dois anos que o projeto tramita na Câmara.",
+"Haviam muitas emendas a serem analisadas.",
+"Existem documentos que precisam ser protocolados hoje.",
+"Devem haver servidores suficientes na recepção."
+],
+"c": 2,
+"e": "'Existir' é pessoal e concorda com 'documentos'. 'Fazer' indicando tempo e 'haver' no sentido de existir são impessoais (faz, havia, deve haver)."
+},
+{
+"t": "Concordância verbal",
+"d": "Difícil",
+"q": "Assinale a alternativa correta quanto à concordância.",
+"a": [
+"Mais de um vereador votaram contra o parecer.",
+"A maioria dos servidores aprovou a nova escala.",
+"Os Estados Unidos é um parceiro comercial relevante.",
+"Fui eu quem redigiram a ata."
+],
+"c": 1,
+"e": "Com núcleo coletivo seguido de especificador ('a maioria dos servidores'), admite-se o verbo no singular (ou no plural). 'Mais de um' pede singular; 'Os Estados Unidos', com artigo, pede plural; 'quem' leva o verbo à 3ª pessoa do singular (ou concorda com 'eu': 'fui eu quem redigiu' ou 'fui eu que redigi')."
+},
+{
+"t": "Concordância nominal",
+"d": "Médio",
+"q": "Está correta a concordância nominal em:",
+"a": [
+"Seguem anexo os relatórios solicitados.",
+"É proibido a entrada de pessoas sem identificação.",
+"As servidoras ficaram meio preocupadas com o prazo.",
+"Bastante pessoas compareceram à audiência pública."
+],
+"c": 2,
+"e": "'Meio', advérbio (= um pouco), é invariável. O correto seria 'seguem anexos os relatórios', 'é proibida a entrada' (há artigo) e 'bastantes pessoas' (adjetivo/pronome variável)."
+},
+{
+"t": "Regência verbal",
+"d": "Médio",
+"q": "Assinale a frase em que a regência verbal está de acordo com a norma-padrão.",
+"a": [
+"O assessor visou o cheque antes de encaminhá-lo.",
+"Prefiro mais o turno da manhã do que o da tarde.",
+"Os candidatos aspiram o cargo de Técnico Legislativo.",
+"Esqueci-me o horário da sessão."
+],
+"c": 0,
+"e": "'Visar' no sentido de pôr visto é transitivo direto. 'Preferir' rege 'a' e não aceita 'mais... do que'; 'aspirar' (desejar) rege 'a'; 'esquecer-se' pronominal pede 'de'."
+},
+{
+"t": "Regência verbal",
+"d": "Médio",
+"q": "Em qual alternativa o pronome relativo está empregado corretamente segundo a regência?",
+"a": [
+"O cargo que aspiro exige nível superior.",
+"Este é o regimento de que todos dependem.",
+"A sessão que assisti foi longa.",
+"O prazo que me referi já venceu."
+],
+"c": 1,
+"e": "'Depender de' → 'de que'. As demais deveriam ser 'a que aspiro', 'a que assisti' e 'a que me referi'."
+},
+{
+"t": "Regência nominal",
+"d": "Médio",
+"q": "Assinale a opção em que a regência nominal está correta.",
+"a": [
+"O servidor estava apto a assumir a função.",
+"A população tem aversão com a burocracia.",
+"Ela é muito devota com a causa pública.",
+"O projeto é compatível para o orçamento."
+],
+"c": 0,
+"e": "'Apto a' é regência correta. O padrão seria 'aversão a', 'devota a/de' e 'compatível com'."
+},
+{
+"t": "Colocação pronominal",
+"d": "Médio",
+"q": "De acordo com a norma-padrão, a colocação pronominal está correta em:",
+"a": [
+"Me informaram que a sessão foi suspensa.",
+"Não esqueça-se de assinar o termo de posse.",
+"Quando se aprovou a lei, houve comemoração.",
+"Tinha informado-me sobre o prazo."
+],
+"c": 2,
+"e": "A conjunção subordinativa 'quando' atrai o pronome (próclise). Não se inicia período com pronome oblíquo átono; 'não' exige próclise; não se usa ênclise a particípio ('tinha-me informado')."
+},
+{
+"t": "Colocação pronominal",
+"d": "Difícil",
+"q": "Assinale a alternativa em que a mesóclise é obrigatória segundo a norma-padrão.",
+"a": [
+"Convidar-se-ão os vereadores para a sessão solene.",
+"Não se convidarão os vereadores para a sessão solene.",
+"Os vereadores se convidarão para a sessão solene.",
+"Quem se convidará para a sessão solene?"
+],
+"c": 0,
+"e": "Com verbo no futuro do presente/pretérito em início de oração, sem fator de próclise, usa-se a mesóclise. Nas demais há fator de próclise ('não', pronome interrogativo) ou sujeito anteposto que permite a próclise."
+},
+{
+"t": "Pontuação",
+"d": "Médio",
+"q": "Assinale a frase pontuada corretamente.",
+"a": [
+"Os vereadores, aprovaram o projeto por unanimidade.",
+"O presidente da Câmara, que presidia a sessão, encerrou os trabalhos.",
+"Cuiabá capital de Mato Grosso, completou 300 anos em 2019.",
+"Na sessão de ontem foram votados, três projetos."
+],
+"c": 1,
+"e": "A oração adjetiva explicativa vem entre vírgulas. Não se separa sujeito do verbo nem verbo do complemento; o aposto 'capital de Mato Grosso' deveria estar entre vírgulas."
+},
+{
+"t": "Pontuação",
+"d": "Difícil",
+"q": "Em \"Os servidores que trabalham na recepção receberão treinamento\", a inserção de vírgulas antes de \"que\" e depois de \"recepção\":",
+"a": [
+"manteria o sentido, pois a vírgula é facultativa nesse caso",
+"alteraria o sentido, pois indicaria que todos os servidores trabalham na recepção",
+"tornaria a frase incorreta, pois não se usa vírgula antes de pronome relativo",
+"transformaria a oração em adverbial de causa"
+],
+"c": 1,
+"e": "Sem vírgulas, a oração é restritiva (só os servidores da recepção). Com vírgulas, passa a explicativa, generalizando: todos os servidores (que, aliás, trabalham na recepção)."
+},
+{
+"t": "Conjunções",
+"d": "Médio",
+"q": "Em \"O projeto foi aprovado, embora houvesse resistência da oposição\", a conjunção \"embora\" pode ser substituída, sem prejuízo do sentido, por:",
+"a": [
+"porque",
+"conquanto",
+"portanto",
+"contanto que"
+],
+"c": 1,
+"e": "'Embora' e 'conquanto' são concessivas. 'Porque' é causal, 'portanto' é conclusiva e 'contanto que' é condicional."
+},
+{
+"t": "Conjunções",
+"d": "Médio",
+"q": "A relação de sentido estabelecida pelo conectivo destacado está corretamente indicada em:",
+"a": [
+"\"Estudou muito, LOGO foi aprovado\" — explicação",
+"\"Chegou cedo, PORÉM a sessão já havia começado\" — adversidade",
+"\"SE houver quórum, a votação ocorrerá\" — finalidade",
+"\"Saiu cedo PARA QUE não perdesse o ônibus\" — consequência"
+],
+"c": 1,
+"e": "'Porém' é adversativa. 'Logo' é conclusiva; 'se' é condicional; 'para que' é final."
+},
+{
+"t": "Conjunções",
+"d": "Difícil",
+"q": "Em \"Como o quórum não foi atingido, a sessão foi encerrada\", a palavra \"como\" exprime:",
+"a": [
+"comparação",
+"conformidade",
+"causa",
+"concessão"
+],
+"c": 2,
+"e": "Iniciando oração anteposta à principal com sentido de 'visto que', 'como' é conjunção causal."
+},
+{
+"t": "Classes de palavras",
+"d": "Médio",
+"q": "Na frase \"O plenário estava cheio, mas o silêncio era absoluto\", a palavra \"cheio\" é classificada como:",
+"a": [
+"advérbio",
+"substantivo",
+"adjetivo",
+"verbo"
+],
+"c": 2,
+"e": "'Cheio' caracteriza o substantivo 'plenário', funcionando como predicativo do sujeito; é adjetivo."
+},
+{
+"t": "Classes de palavras",
+"d": "Difícil",
+"q": "Assinale a alternativa em que a palavra \"que\" é pronome relativo.",
+"a": [
+"Espero que a sessão seja breve.",
+"Que bela homenagem!",
+"O projeto que votamos foi sancionado.",
+"Fale baixo, que o orador está discursando."
+],
+"c": 2,
+"e": "Em 'o projeto que votamos', 'que' retoma 'projeto' (= o qual): pronome relativo. Nas demais é conjunção integrante, intensificador/determinante exclamativo e conjunção explicativa."
+},
+{
+"t": "Formação de palavras",
+"d": "Médio",
+"q": "A palavra \"infelizmente\" é formada por:",
+"a": [
+"derivação prefixal e sufixal",
+"derivação parassintética",
+"composição por justaposição",
+"derivação regressiva"
+],
+"c": 0,
+"e": "In- (prefixo) + feliz + -mente (sufixo); existem 'infeliz' e 'felizmente', logo é prefixal e sufixal, não parassintética."
+},
+{
+"t": "Formação de palavras",
+"d": "Médio",
+"q": "Assinale a palavra formada por derivação parassintética.",
+"a": [
+"desleal",
+"entardecer",
+"pontapé",
+"combate"
+],
+"c": 1,
+"e": "'Entardecer' recebe prefixo e sufixo simultaneamente (não existem 'entarde' nem 'tardecer'). 'Desleal' é prefixal, 'pontapé' é composição e 'combate' é derivação regressiva."
+},
+{
+"t": "Flexão verbal",
+"d": "Médio",
+"q": "Assinale a alternativa em que o verbo está corretamente flexionado.",
+"a": [
+"Se o vereador propor a emenda, ela será votada.",
+"Quando a comissão vir o relatório, emitirá parecer.",
+"Os servidores interviram na discussão.",
+"Eles reaveram os documentos extraviados."
+],
+"c": 1,
+"e": "Futuro do subjuntivo de 'ver' é 'vir'. O correto seria 'propuser', 'intervieram' e 'reouveram'."
+},
+{
+"t": "Modos e tempos verbais",
+"d": "Médio",
+"q": "Em \"Se a Mesa aprovasse o requerimento, a audiência seria realizada\", os verbos estão, respectivamente, no:",
+"a": [
+"pretérito imperfeito do subjuntivo e futuro do pretérito do indicativo",
+"presente do subjuntivo e futuro do presente",
+"pretérito perfeito do indicativo e futuro do pretérito",
+"futuro do subjuntivo e presente do indicativo"
+],
+"c": 0,
+"e": "'Aprovasse' é pretérito imperfeito do subjuntivo; 'seria' é futuro do pretérito do indicativo, correlação típica da hipótese."
+},
+{
+"t": "Vozes verbais",
+"d": "Médio",
+"q": "A transposição de \"A comissão analisou o projeto\" para a voz passiva analítica resulta em:",
+"a": [
+"O projeto foi analisado pela comissão.",
+"Analisou-se o projeto pela comissão.",
+"O projeto analisou-se.",
+"O projeto tinha sido analisado pela comissão."
+],
+"c": 0,
+"e": "Na passiva analítica, o objeto vira sujeito e o verbo auxiliar 'ser' mantém o tempo do verbo original (pretérito perfeito): 'foi analisado'."
+},
+{
+"t": "Semântica - paronímia",
+"d": "Fácil",
+"q": "Assinale a frase em que a palavra destacada está empregada corretamente.",
+"a": [
+"O juiz deferiu o pedido, isto é, o aceitou.",
+"O vereador fez uma descrição sobre o tema, de forma sigilosa.",
+"A sessão foi ratificada para o dia seguinte.",
+"O orador foi eminente: o perigo estava prestes a ocorrer."
+],
+"c": 0,
+"e": "'Deferir' = conceder, atender. 'Discrição' (reserva) ≠ 'descrição'; 'retificar' (corrigir) ou 'adiar' seria o adequado; 'iminente' (prestes a ocorrer) ≠ 'eminente' (ilustre)."
+},
+{
+"t": "Semântica - paronímia",
+"d": "Médio",
+"q": "Complete corretamente: \"O servidor foi ______ do cargo após o processo, e a nova eleição foi ______ pela Mesa.\"",
+"a": [
+"destituído / ratificada",
+"distituído / retificada",
+"destituído / retificada no sentido de confirmada",
+"destituido / ratificada"
+],
+"c": 0,
+"e": "Grafia: 'destituído' (com acento no i tônico do hiato). 'Ratificar' = confirmar; 'retificar' = corrigir."
+},
+{
+"t": "Semântica - polissemia",
+"d": "Médio",
+"q": "A palavra \"casa\" está empregada em sentido polissêmico, referindo-se a uma instituição, em:",
+"a": [
+"A Casa aprovou o projeto por maioria absoluta.",
+"Comprei uma casa perto da Prainha.",
+"O botão saiu da casa da camisa.",
+"Ele acertou a casa decimal."
+],
+"c": 0,
+"e": "'Casa', com maiúscula, designa o órgão legislativo (a Câmara). Nas demais, os sentidos são moradia, abertura do botão e posição decimal — exemplos de polissemia."
+},
+{
+"t": "Denotação e conotação",
+"d": "Fácil",
+"q": "Há linguagem conotativa em:",
+"a": [
+"O plenário tem capacidade para trezentas pessoas.",
+"A sessão começou às nove horas.",
+"O debate foi uma tempestade de argumentos.",
+"O projeto foi protocolado ontem."
+],
+"c": 2,
+"e": "'Tempestade de argumentos' é metáfora (sentido figurado). As demais usam linguagem denotativa, literal."
+},
+{
+"t": "Homonímia",
+"d": "Médio",
+"q": "As palavras \"sessão\", \"seção\" e \"cessão\" são, entre si:",
+"a": [
+"sinônimas",
+"homônimas homófonas",
+"parônimas homógrafas",
+"antônimas"
+],
+"c": 1,
+"e": "Têm a mesma pronúncia e grafias diferentes: homônimas homófonas. Sessão = reunião; seção/secção = divisão; cessão = ato de ceder."
+},
+{
+"t": "Ortografia",
+"d": "Fácil",
+"q": "Assinale a alternativa em que todas as palavras estão grafadas corretamente.",
+"a": [
+"exceção, paralisação, análise",
+"excessão, paralização, análize",
+"exceção, paralização, análise",
+"esceção, paralisação, analise"
+],
+"c": 0,
+"e": "Grafias corretas: exceção, paralisação (de 'paralisar'), análise."
+},
+{
+"t": "Acentuação gráfica",
+"d": "Médio",
+"q": "Pelas regras do Acordo Ortográfico vigente, está corretamente acentuado:",
+"a": [
+"idéia",
+"vôo",
+"heroico",
+"pára (verbo)"
+],
+"c": 2,
+"e": "Após o Acordo, ditongos abertos 'ei' e 'oi' de paroxítonas perderam o acento (ideia, heroico); 'voo' e 'para' (verbo) também não são acentuados."
+},
+{
+"t": "Acentuação gráfica",
+"d": "Médio",
+"q": "As palavras \"órgão\", \"túnel\" e \"inconstitucionalíssimo\" são acentuadas, respectivamente, por serem:",
+"a": [
+"paroxítona terminada em ditongo; paroxítona terminada em -l; proparoxítona",
+"oxítona; paroxítona; proparoxítona",
+"paroxítona terminada em -ão; oxítona terminada em -l; paroxítona",
+"proparoxítona; paroxítona terminada em -l; proparoxítona"
+],
+"c": 0,
+"e": "Órgão: paroxítona terminada em ditongo nasal; túnel: paroxítona terminada em -l; o superlativo em -íssimo é proparoxítona (todas acentuadas)."
+},
+{
+"t": "Uso do hífen",
+"d": "Médio",
+"q": "Conforme o Acordo Ortográfico vigente, ambas as palavras estão grafadas corretamente em:",
+"a": [
+"auto-estima e anti-inflamatório",
+"micro-ondas e autoescola",
+"contra-regra e semi-árido",
+"anti-social e micro-ondas"
+],
+"c": 1,
+"e": "Usa-se hífen quando o prefixo termina na mesma vogal que inicia o segundo elemento (micro-ondas, anti-inflamatório) e não se usa quando as vogais são diferentes (autoescola, autoestima, antissocial — dobrando o s) ou diante de r/s (contrarregra). 'Semiárido' perdeu o hífen e mantém o acento."
+},
+{
+"t": "Variação linguística",
+"d": "Fácil",
+"q": "Expressões típicas do falar cuiabano, como \"pai-dégua\" e \"tchá por Deus\", são exemplos de variação linguística:",
+"a": [
+"diafásica (situacional)",
+"diatópica (regional)",
+"diacrônica (histórica)",
+"que constitui erro de português"
+],
+"c": 1,
+"e": "A variação geográfica/regional é chamada diatópica. A Selecon cobra o respeito às variedades: não se trata de 'erro', mas de adequação ao contexto."
+},
+{
+"t": "Variação linguística",
+"d": "Médio",
+"q": "Um servidor usa linguagem formal ao redigir um ofício e linguagem coloquial ao conversar com colegas no intervalo. Isso exemplifica a variação:",
+"a": [
+"diatópica",
+"diastrática",
+"diafásica",
+"diacrônica"
+],
+"c": 2,
+"e": "Diafásica é a variação conforme a situação comunicativa (registro formal x informal). Diastrática relaciona-se a grupos sociais; diacrônica, ao tempo."
+},
+{
+"t": "Registro formal e informal",
+"d": "Médio",
+"q": "Considerando a adequação ao registro formal exigido em um requerimento à Mesa Diretora, a melhor redação é:",
+"a": [
+"Venho, respeitosamente, requerer a Vossa Excelência a inclusão da matéria na pauta.",
+"Tô pedindo pra botar o projeto na pauta, valeu.",
+"Gostaria que vocês colocassem a matéria na pauta aí.",
+"Exijo a imediata colocação do projeto em pauta!"
+],
+"c": 0,
+"e": "Formalidade, impessoalidade, polidez e pronome de tratamento adequado caracterizam a redação oficial; as demais são coloquiais ou descorteses."
+},
+{
+"t": "Discurso direto e indireto",
+"d": "Médio",
+"q": "Transpondo para o discurso indireto a frase \"O presidente afirmou: — Encerro a sessão agora.\", obtém-se:",
+"a": [
+"O presidente afirmou que encerrava a sessão naquele momento.",
+"O presidente afirmou que encerro a sessão agora.",
+"O presidente afirmou que encerrará a sessão agora.",
+"O presidente afirmou: encerrava a sessão naquele momento."
+],
+"c": 0,
+"e": "No discurso indireto, o presente passa a pretérito imperfeito ('encerrava'), a 1ª pessoa passa a 3ª e 'agora' vira 'naquele momento'."
+},
+{
+"t": "Discurso direto e indireto",
+"d": "Difícil",
+"q": "Assinale a transposição correta de \"A vereadora perguntou: — Vocês já leram o parecer?\" para o discurso indireto.",
+"a": [
+"A vereadora perguntou se eles já tinham lido o parecer.",
+"A vereadora perguntou se vocês já leram o parecer.",
+"A vereadora perguntou que eles já leram o parecer?",
+"A vereadora perguntou se eles já leriam o parecer."
+],
+"c": 0,
+"e": "Pergunta direta vira oração com 'se'; 'vocês' passa a 'eles' e o pretérito perfeito ('leram') passa ao mais-que-perfeito ('tinham lido')."
+},
+{
+"t": "Gêneros textuais",
+"d": "Fácil",
+"q": "Um texto que registra, de forma resumida e fiel, os fatos ocorridos e as deliberações de uma reunião, lavrado por um secretário, pertence ao gênero:",
+"a": [
+"ata",
+"ofício",
+"editorial",
+"crônica"
+],
+"c": 0,
+"e": "A ata é o registro formal do que se passou em uma reunião/sessão, característica marcante de seu gênero e de sua função documental."
+},
+{
+"t": "Gêneros textuais",
+"d": "Médio",
+"q": "A notícia jornalística caracteriza-se, entre outros aspectos, por:",
+"a": [
+"predomínio de opinião explícita do autor",
+"relato de fato recente, com linguagem objetiva e lide",
+"presença obrigatória de rimas e métrica",
+"narrativa ficcional com personagens inventados"
+],
+"c": 1,
+"e": "A notícia relata fatos atuais com objetividade e, em geral, apresenta no lide as respostas a o quê, quem, quando, onde, como e por quê."
+},
+{
+"t": "Intertextualidade",
+"d": "Médio",
+"q": "Um cartaz da Câmara diz: \"Minha cidade tem palmeiras, onde canta o sabiá — e tem também lixo nas ruas\". Esse texto estabelece intertextualidade, por meio de paródia, com:",
+"a": [
+"a \"Canção do Exílio\", de Gonçalves Dias",
+"o Hino Nacional Brasileiro",
+"o \"Navio Negreiro\", de Castro Alves",
+"a Carta de Pero Vaz de Caminha"
+],
+"c": 0,
+"e": "A referência a 'palmeiras onde canta o sabiá' retoma a 'Canção do Exílio', de Gonçalves Dias; ao alterar seu sentido com tom crítico, constitui paródia."
+},
+{
+"t": "Coerência",
+"d": "Médio",
+"q": "Assinale a frase que apresenta problema de coerência.",
+"a": [
+"Como choveu muito, a sessão itinerante foi adiada.",
+"Embora estivesse doente, o servidor compareceu ao trabalho.",
+"O projeto foi rejeitado por unanimidade, já que todos votaram a favor.",
+"Quem chegou cedo conseguiu lugar no plenário."
+],
+"c": 2,
+"e": "Há contradição lógica: se todos votaram a favor, o projeto não poderia ter sido rejeitado por unanimidade."
+},
+{
+"t": "Argumentação",
+"d": "Médio",
+"q": "Em um artigo de opinião, o autor afirma: \"Segundo o IBGE, Cuiabá tem mais de 650 mil habitantes; portanto, os serviços públicos precisam ser planejados em escala metropolitana\". O argumento utilizado é predominantemente de:",
+"a": [
+"autoridade e dados estatísticos",
+"exemplificação ficcional",
+"apelo emocional",
+"comparação histórica"
+],
+"c": 0,
+"e": "O autor apoia-se em dado estatístico atribuído a instituição reconhecida (IBGE), estratégia de argumento por autoridade e comprovação numérica."
+},
+{
+"t": "Emprego de pronomes",
+"d": "Médio",
+"q": "Assinale a alternativa em que o pronome está empregado de acordo com a norma-padrão.",
+"a": [
+"Isto que você disse ontem foi importante.",
+"Entre eu e você não há problemas.",
+"Este documento que está em minhas mãos é o original.",
+"Trouxe o relatório para mim revisar."
+],
+"c": 2,
+"e": "'Este' refere-se ao que está próximo de quem fala. O correto seria 'isso que você disse' (próximo ao interlocutor/passado recente), 'entre mim e você' e 'para eu revisar' (sujeito de infinitivo)."
+},
+{
+"t": "Pronomes de tratamento",
+"d": "Médio",
+"q": "Ao se dirigir diretamente ao Presidente da Câmara Municipal, em correspondência oficial, a concordância correta é:",
+"a": [
+"Vossa Excelência sabeis que o prazo terminou.",
+"Vossa Excelência sabe que seu prazo terminou.",
+"Vossa Excelência sabe que vosso prazo terminou.",
+"Sua Excelência sabeis que o prazo terminou."
+],
+"c": 1,
+"e": "Pronomes de tratamento levam o verbo e os possessivos à 3ª pessoa: 'Vossa Excelência sabe... seu prazo'. 'Sua Excelência' é usado para falar sobre a autoridade, não com ela."
+},
+{
+"t": "Emprego do infinitivo",
+"d": "Difícil",
+"q": "Assinale a alternativa correta quanto ao emprego do infinitivo, segundo a norma-padrão.",
+"a": [
+"Os vereadores pediram para nós aguardar.",
+"Os servidores insistiram em entrarem no plenário.",
+"Para os candidatos serem aprovados, precisam estudar.",
+"Eles começaram a discutirem o projeto."
+],
+"c": 2,
+"e": "O infinitivo flexiona quando tem sujeito próprio expresso ('os candidatos serem'; 'para nós aguardarmos'). Em locuções verbais e quando o sujeito é o mesmo do verbo principal ('insistiram em entrar', 'começaram a discutir'), o infinitivo não se flexiona."
+},
+{
+"t": "Sintaxe - termos da oração",
+"d": "Médio",
+"q": "Em \"A Câmara Municipal de Cuiabá aprovou, ontem, o orçamento\", o termo \"o orçamento\" exerce a função de:",
+"a": [
+"sujeito",
+"objeto direto",
+"objeto indireto",
+"adjunto adverbial"
+],
+"c": 1,
+"e": "'Aprovar' é transitivo direto; 'o orçamento' é o complemento sem preposição: objeto direto."
+},
+{
+"t": "Sintaxe - termos da oração",
+"d": "Médio",
+"q": "Na oração \"Foram nomeados os candidatos aprovados\", o sujeito é:",
+"a": [
+"oculto",
+"indeterminado",
+"\"os candidatos aprovados\"",
+"inexistente"
+],
+"c": 2,
+"e": "Voz passiva analítica com sujeito posposto: 'os candidatos aprovados' (concorda com 'foram nomeados')."
+},
+{
+"t": "Sintaxe - período composto",
+"d": "Difícil",
+"q": "Em \"É importante que todos participem da audiência\", a oração destacada \"que todos participem da audiência\" classifica-se como subordinada substantiva:",
+"a": [
+"objetiva direta",
+"subjetiva",
+"predicativa",
+"completiva nominal"
+],
+"c": 1,
+"e": "Em estruturas 'é + adjetivo + que', a oração introduzida por 'que' funciona como sujeito da principal: substantiva subjetiva."
+},
+{
+"t": "Vírgula e conectivos",
+"d": "Médio",
+"q": "Assinale a reescrita que mantém o sentido e a correção de \"Os servidores, portanto, devem cumprir o horário\".",
+"a": [
+"Os servidores devem, portanto, cumprir o horário.",
+"Os servidores, porém, devem cumprir o horário.",
+"Portanto os servidores, devem cumprir o horário.",
+"Os servidores devem portanto, cumprir o horário."
+],
+"c": 0,
+"e": "A conjunção conclusiva deslocada fica entre vírgulas. B muda o sentido (adversidade); C e D têm vírgula mal empregada."
+},
+{
+"t": "Interpretação - inferência",
+"d": "Médio",
+"q": "Leia: \"Desde que o painel eletrônico foi instalado, nenhuma votação precisou ser repetida por erro de contagem.\" Pode-se inferir corretamente que:",
+"a": [
+"antes do painel, houve votações repetidas por erro de contagem",
+"o painel eliminou todas as votações da Câmara",
+"as votações passaram a ser secretas",
+"os vereadores deixaram de votar nominalmente"
+],
+"c": 0,
+"e": "O trecho pressupõe que, antes da instalação, ocorriam repetições por erro de contagem. As demais não decorrem do texto."
+},
+{
+"t": "Semântica - sinonímia",
+"d": "Fácil",
+"q": "Em \"A medida foi considerada inócua pelos técnicos\", a palavra \"inócua\" significa:",
+"a": [
+"perigosa",
+"inofensiva, sem efeito",
+"urgente",
+"ilegal"
+],
+"c": 1,
+"e": "'Inócuo' é o que não causa dano ou não produz efeito."
+},
+{
+"t": "Plural de compostos",
+"d": "Médio",
+"q": "O plural de \"abaixo-assinado\" e \"guarda-municipal\" é, respectivamente:",
+"a": [
+"abaixo-assinados e guardas-municipais",
+"abaixos-assinados e guarda-municipais",
+"abaixo-assinados e guarda-municipais",
+"abaixos-assinado e guardas-municipal"
+],
+"c": 0,
+"e": "Em 'abaixo-assinado', o advérbio é invariável. Em 'guarda-municipal', 'guarda' é substantivo (a pessoa) seguido de adjetivo: ambos variam."
+}
+]
+}

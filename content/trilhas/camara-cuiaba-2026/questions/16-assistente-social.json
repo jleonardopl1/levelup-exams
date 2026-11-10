@@ -1,0 +1,668 @@
+{
+"slug": "cmc26-assistente-social",
+"questions": [
+{
+"t": "Fundamentos - questão social",
+"d": "Médio",
+"q": "Na perspectiva crítica do Serviço Social (Marilda Iamamoto), a questão social é entendida como:",
+"a": [
+"o conjunto das expressões das desigualdades da sociedade capitalista, enraizadas na contradição entre capital e trabalho",
+"um problema moral de indivíduos desajustados",
+"fenômeno natural e inevitável, sem relação com a economia",
+"sinônimo de pobreza extrema apenas"
+],
+"c": 0,
+"e": "As expressões da questão social (desemprego, fome, violência, falta de moradia) são o objeto de trabalho do assistente social."
+},
+{
+"t": "Fundamentos - histórico",
+"d": "Médio",
+"q": "O Movimento de Reconceituação do Serviço Social na América Latina (décadas de 1960-1970) caracterizou-se por:",
+"a": [
+"questionar o Serviço Social tradicional e buscar uma profissão comprometida com a realidade latino-americana e as classes subalternas",
+"consolidar o modelo assistencialista norte-americano sem críticas",
+"defender a neutralidade absoluta da profissão",
+"abandonar a intervenção profissional"
+],
+"c": 0,
+"e": "Foi marco da renovação crítica da profissão, embora com vertentes diversas."
+},
+{
+"t": "Fundamentos - renovação no Brasil",
+"d": "Difícil",
+"q": "Segundo José Paulo Netto, a renovação do Serviço Social no Brasil apresentou três direções: perspectiva modernizadora, reatualização do conservadorismo e:",
+"a": [
+"intenção de ruptura",
+"perspectiva assistencialista",
+"teoria funcionalista pura",
+"positivismo clássico"
+],
+"c": 0,
+"e": "A intenção de ruptura, com referência na tradição marxista (ex.: Método BH), consolidou-se no projeto ético-político."
+},
+{
+"t": "Fundamentos - histórico",
+"d": "Médio",
+"q": "O III Congresso Brasileiro de Assistentes Sociais (1979), que marcou o posicionamento da categoria ao lado dos trabalhadores, ficou conhecido como:",
+"a": [
+"Congresso da Virada",
+"Seminário de Araxá",
+"Encontro de Teresópolis",
+"Seminário de Sumaré"
+],
+"c": 0,
+"e": "Araxá (1967) e Teresópolis (1970) expressam a perspectiva modernizadora; Sumaré (1978), a reatualização do conservadorismo."
+},
+{
+"t": "Fundamentos - projeto ético-político",
+"d": "Médio",
+"q": "O projeto ético-político do Serviço Social brasileiro tem como valor ético central:",
+"a": [
+"a liberdade, concebida como possibilidade de escolha entre alternativas concretas, com compromisso com a autonomia, a emancipação e a plena expansão dos indivíduos sociais",
+"a neutralidade política da profissão",
+"a caridade e a filantropia",
+"a disciplina e o ajustamento social"
+],
+"c": 0,
+"e": "É o primeiro princípio fundamental do Código de Ética de 1993."
+},
+{
+"t": "Lei 8.662/1993 - competências",
+"d": "Médio",
+"q": "Segundo a Lei nº 8.662/1993, é ATRIBUIÇÃO PRIVATIVA do assistente social:",
+"a": [
+"realizar vistorias, perícias técnicas, laudos periciais, informações e pareceres sobre a matéria de Serviço Social",
+"encaminhar providências e prestar orientação social a indivíduos, grupos e população",
+"elaborar, implementar, executar e avaliar políticas sociais",
+"prestar assessoria a movimentos sociais"
+],
+"c": 0,
+"e": "Art. 5º, IV. As demais alternativas são competências (art. 4º), que podem ser exercidas também por outros profissionais."
+},
+{
+"t": "Lei 8.662/1993 - atribuições privativas",
+"d": "Médio",
+"q": "É atribuição privativa do assistente social, nos termos do art. 5º da Lei nº 8.662/1993:",
+"a": [
+"treinamento, avaliação e supervisão direta de estagiários de Serviço Social",
+"coordenar qualquer programa social",
+"executar políticas públicas em geral",
+"realizar pesquisas socioeconômicas de qualquer natureza"
+],
+"c": 0,
+"e": "Art. 5º, VI. A supervisão de estágio em Serviço Social é privativa e regulamentada pela Resolução CFESS 533/2008."
+},
+{
+"t": "Lei 8.662/1993 - jornada",
+"d": "Médio",
+"q": "Pela Lei nº 8.662/1993 (com redação da Lei nº 12.317/2010), a duração do trabalho do assistente social é de:",
+"a": [
+"30 horas semanais",
+"40 horas semanais",
+"20 horas semanais",
+"44 horas semanais"
+],
+"c": 0,
+"e": "Art. 5º-A da Lei 8.662/1993, sem redução salarial."
+},
+{
+"t": "Lei 8.662/1993 - conselhos",
+"d": "Fácil",
+"q": "Os órgãos responsáveis por disciplinar e fiscalizar o exercício da profissão de assistente social são:",
+"a": [
+"o Conselho Federal de Serviço Social (CFESS) e os Conselhos Regionais (CRESS)",
+"o Ministério do Trabalho e as Secretarias de Assistência",
+"a ABEPSS e a ENESSO",
+"o Conselho Nacional de Assistência Social (CNAS)"
+],
+"c": 0,
+"e": "Conjunto CFESS-CRESS. A ABEPSS é a entidade de ensino e pesquisa; a ENESSO, dos estudantes."
+},
+{
+"t": "Código de Ética",
+"d": "Médio",
+"q": "É princípio fundamental do Código de Ética do Assistente Social (Resolução CFESS nº 273/1993):",
+"a": [
+"defesa intransigente dos direitos humanos e recusa do arbítrio e do autoritarismo",
+"neutralidade diante das desigualdades",
+"prioridade aos interesses da instituição empregadora sobre os do usuário",
+"imparcialidade política absoluta"
+],
+"c": 0,
+"e": "Outros princípios: ampliação da cidadania, aprofundamento da democracia, equidade, eliminação de preconceitos, pluralismo."
+},
+{
+"t": "Código de Ética",
+"d": "Médio",
+"q": "Segundo o Código de Ética do Assistente Social, o sigilo profissional:",
+"a": [
+"protege o usuário em tudo aquilo de que o assistente social tome conhecimento no exercício profissional, admitida a quebra nos casos em que se trate de situações cuja gravidade possa trazer prejuízo aos interesses do usuário, de terceiros e da coletividade",
+"é absoluto e não admite quebra em nenhuma hipótese",
+"pode ser quebrado a pedido da chefia",
+"não se aplica a trabalhos em equipe"
+],
+"c": 0,
+"e": "Arts. 15 a 18 do Código. A revelação deve limitar-se ao estritamente necessário."
+},
+{
+"t": "Código de Ética - penalidades",
+"d": "Difícil",
+"q": "São penalidades previstas no Código de Ética do Assistente Social:",
+"a": [
+"multa, advertência reservada, advertência pública, suspensão do exercício profissional e cassação do registro",
+"prisão administrativa e multa",
+"apenas advertência verbal",
+"demissão do cargo público"
+],
+"c": 0,
+"e": "Art. 24 do Código de Ética. A demissão é sanção do regime estatutário, não do Código."
+},
+{
+"t": "Código de Ética - relação com usuários",
+"d": "Médio",
+"q": "É direito do usuário, segundo o Código de Ética do Assistente Social, e dever do profissional:",
+"a": [
+"garantir a plena informação e discussão sobre as possibilidades e consequências das situações apresentadas, respeitando democraticamente as decisões dos usuários",
+"decidir pelos usuários o que é melhor para eles",
+"omitir informações para evitar sofrimento",
+"condicionar o atendimento à adesão política do usuário"
+],
+"c": 0,
+"e": "Art. 5º do Código: democratização das informações e respeito à autonomia."
+},
+{
+"t": "Seguridade social",
+"d": "Fácil",
+"q": "Segundo o art. 194 da Constituição, a seguridade social compreende um conjunto integrado de ações destinadas a assegurar os direitos relativos à:",
+"a": [
+"saúde, à previdência e à assistência social",
+"educação, à saúde e ao trabalho",
+"habitação, à previdência e ao lazer",
+"segurança pública, à saúde e à educação"
+],
+"c": 0,
+"e": "O tripé da seguridade social."
+},
+{
+"t": "Seguridade social",
+"d": "Médio",
+"q": "Quanto ao caráter contributivo, é correto afirmar que, na seguridade social brasileira:",
+"a": [
+"a previdência é contributiva, enquanto a saúde é universal e a assistência é prestada a quem dela necessitar, ambas independentemente de contribuição",
+"as três políticas exigem contribuição prévia",
+"somente a assistência social exige contribuição",
+"a saúde é restrita aos contribuintes da previdência"
+],
+"c": 0,
+"e": "Arts. 196, 201 e 203 da CF."
+},
+{
+"t": "Seguridade social - objetivos",
+"d": "Médio",
+"q": "É objetivo da seguridade social previsto no art. 194, parágrafo único, da Constituição:",
+"a": [
+"universalidade da cobertura e do atendimento",
+"privatização da previdência",
+"centralização da gestão na União",
+"exclusão dos trabalhadores rurais"
+],
+"c": 0,
+"e": "Também: uniformidade e equivalência urbano/rural, seletividade e distributividade, irredutibilidade dos benefícios, equidade no custeio, diversidade do financiamento e gestão democrática e descentralizada."
+},
+{
+"t": "Assistência social - CF",
+"d": "Médio",
+"q": "Segundo o art. 203 da Constituição, a assistência social tem por objetivos, entre outros:",
+"a": [
+"a proteção à família, à maternidade, à infância, à adolescência e à velhice, e a garantia de um salário mínimo de benefício mensal à pessoa com deficiência e ao idoso que comprovem não possuir meios de prover à própria manutenção",
+"a concessão de aposentadoria por tempo de contribuição",
+"o financiamento exclusivo de hospitais",
+"a oferta de crédito habitacional"
+],
+"c": 0,
+"e": "O inciso V fundamenta o Benefício de Prestação Continuada (BPC), regulado pelo art. 20 da LOAS."
+},
+{
+"t": "LOAS",
+"d": "Médio",
+"q": "Segundo a LOAS, as instâncias deliberativas do SUAS, de caráter permanente e composição paritária entre governo e sociedade civil, são:",
+"a": [
+"os Conselhos de Assistência Social (nacional, estaduais, distrital e municipais)",
+"as Secretarias de Assistência Social",
+"os CRAS e CREAS",
+"os Tribunais de Contas"
+],
+"c": 0,
+"e": "Arts. 16 e 17 da LOAS. As conferências avaliam a política e propõem diretrizes."
+},
+{
+"t": "SUAS - níveis de proteção",
+"d": "Médio",
+"q": "A Proteção Social Básica tem como objetivo:",
+"a": [
+"prevenir situações de risco, por meio do desenvolvimento de potencialidades e do fortalecimento de vínculos familiares e comunitários",
+"atender exclusivamente situações de violação de direitos com rompimento de vínculos",
+"acolher pessoas em situação de rua de forma permanente",
+"executar medidas socioeducativas de internação"
+],
+"c": 0,
+"e": "PNAS/2004. A Proteção Especial atende situações de risco pessoal e social e violação de direitos."
+},
+{
+"t": "SUAS - equipamentos",
+"d": "Médio",
+"q": "O atendimento a adolescentes em cumprimento de medidas socioeducativas de Liberdade Assistida (LA) e de Prestação de Serviços à Comunidade (PSC) é ofertado, no SUAS, pelo:",
+"a": [
+"CREAS",
+"CRAS",
+"Centro POP",
+"acolhimento institucional"
+],
+"c": 0,
+"e": "Tipificação Nacional dos Serviços Socioassistenciais: serviço de Proteção Social Especial de Média Complexidade."
+},
+{
+"t": "SUAS - Centro POP",
+"d": "Médio",
+"q": "O Centro POP é a unidade de referência para o atendimento especializado à:",
+"a": [
+"população em situação de rua",
+"população idosa institucionalizada",
+"população indígena aldeada",
+"população carcerária"
+],
+"c": 0,
+"e": "Integra a Proteção Social Especial de Média Complexidade."
+},
+{
+"t": "SUAS - benefícios eventuais",
+"d": "Médio",
+"q": "Os benefícios eventuais da assistência social (art. 22 da LOAS) são prestados:",
+"a": [
+"em virtude de nascimento, morte, situações de vulnerabilidade temporária e de calamidade pública",
+"de forma permanente a todos os aposentados",
+"apenas a servidores públicos",
+"somente mediante contribuição previdenciária"
+],
+"c": 0,
+"e": "São regulamentados e custeados principalmente pelos Municípios."
+},
+{
+"t": "Instrumentais técnico-operativos",
+"d": "Médio",
+"q": "O estudo social, no Serviço Social, consiste em:",
+"a": [
+"processo metodológico de conhecimento aprofundado de determinada situação social, com uso de instrumentos como entrevistas, visitas e análise documental",
+"um formulário de cadastro preenchido pelo usuário",
+"uma decisão judicial sobre a guarda",
+"a simples transcrição de documentos"
+],
+"c": 0,
+"e": "O estudo social subsidia o parecer, o relatório e o laudo social."
+},
+{
+"t": "Instrumentais técnico-operativos",
+"d": "Médio",
+"q": "O documento que apresenta a opinião técnica conclusiva do assistente social sobre uma situação, fundamentada no estudo realizado, é o:",
+"a": [
+"parecer social",
+"relatório social",
+"prontuário",
+"ofício"
+],
+"c": 0,
+"e": "O relatório descreve e analisa; o parecer contém a manifestação técnica conclusiva; o laudo é o documento final da perícia."
+},
+{
+"t": "Instrumentais técnico-operativos",
+"d": "Médio",
+"q": "A perícia social, realizada por assistente social, caracteriza-se por:",
+"a": [
+"ser um estudo social solicitado para subsidiar decisão, em geral judicial, resultando em laudo social",
+"ser uma visita sem objetivo definido",
+"não exigir fundamentação técnica",
+"ser atribuição comum a qualquer servidor"
+],
+"c": 0,
+"e": "Atribuição privativa (art. 5º, IV, da Lei 8.662/1993)."
+},
+{
+"t": "Instrumentais - visita domiciliar",
+"d": "Médio",
+"q": "A visita domiciliar, como instrumento do Serviço Social, deve:",
+"a": [
+"ter objetivos definidos e respeitar a privacidade e a autonomia dos sujeitos, sem caráter fiscalizatório ou policialesco",
+"ser feita sempre sem aviso, para verificar a 'verdade' da família",
+"ter como finalidade principal controlar o comportamento dos usuários",
+"ser substituída por denúncias anônimas"
+],
+"c": 0,
+"e": "A visita aproxima o profissional da realidade cotidiana, sempre orientada pelo Código de Ética."
+},
+{
+"t": "Instrumentais - entrevista",
+"d": "Médio",
+"q": "A entrevista, no Serviço Social, é compreendida como:",
+"a": [
+"instrumento de diálogo e escuta qualificada, que permite conhecer a realidade do usuário e socializar informações sobre direitos",
+"interrogatório para apurar a veracidade das declarações",
+"procedimento meramente burocrático de preenchimento de fichas",
+"técnica exclusiva da psicologia"
+],
+"c": 0,
+"e": "A entrevista tem dimensão política e pedagógica, contribuindo para a autonomia do usuário."
+},
+{
+"t": "Planejamento",
+"d": "Médio",
+"q": "No planejamento social, a relação entre plano, programa e projeto (Myrian Veras Baptista) pode ser descrita como:",
+"a": [
+"o plano é mais abrangente; o programa detalha setores do plano; o projeto é a unidade mais operativa e delimitada",
+"o projeto é o nível mais amplo",
+"os três termos são sinônimos",
+"o programa é sempre anual e o plano é sempre mensal"
+],
+"c": 0,
+"e": "O projeto detalha objetivos, metas, atividades, cronograma, recursos e avaliação."
+},
+{
+"t": "Planejamento - projeto",
+"d": "Médio",
+"q": "Em um projeto social, as metas diferenciam-se dos objetivos porque:",
+"a": [
+"as metas são a quantificação dos objetivos no tempo (o quanto e até quando)",
+"as metas são mais genéricas que os objetivos",
+"os objetivos são sempre numéricos",
+"não há diferença"
+],
+"c": 0,
+"e": "Ex.: objetivo — fortalecer vínculos familiares; meta — atender 100 famílias em grupos até dezembro."
+},
+{
+"t": "Avaliação de políticas",
+"d": "Médio",
+"q": "A avaliação ex ante de uma política ou projeto social é realizada:",
+"a": [
+"antes da implementação, para analisar a viabilidade e a pertinência da proposta",
+"ao final da execução, para medir os impactos",
+"durante a execução, para corrigir rumos",
+"somente pelos órgãos de controle externo"
+],
+"c": 0,
+"e": "A avaliação durante a execução é chamada de monitoramento/avaliação de processo; ex post, ao final."
+},
+{
+"t": "Controle social",
+"d": "Médio",
+"q": "O controle social das políticas públicas, conquista da Constituição de 1988, é exercido principalmente por meio de:",
+"a": [
+"conselhos de políticas e de direitos, conferências e outros mecanismos de participação da sociedade civil",
+"decisões exclusivas dos gestores",
+"auditorias privadas",
+"fiscalização policial"
+],
+"c": 0,
+"e": "O controle social é democrático e se exerce sobre a formulação, execução e financiamento das políticas."
+},
+{
+"t": "Controle social",
+"d": "Médio",
+"q": "Os conselhos de assistência social têm composição:",
+"a": [
+"paritária entre representantes do governo e da sociedade civil",
+"majoritariamente governamental",
+"exclusivamente de usuários",
+"definida livremente pelo Prefeito, sem regras"
+],
+"c": 0,
+"e": "A paridade é exigência da LOAS (art. 16) e expressão da gestão democrática."
+},
+{
+"t": "Família",
+"d": "Médio",
+"q": "Na PNAS/2004, a família é concebida como:",
+"a": [
+"um conjunto de pessoas unidas por laços consanguíneos, afetivos e/ou de solidariedade, reconhecendo-se a diversidade de arranjos familiares",
+"exclusivamente o núcleo formado por pai, mãe e filhos",
+"um grupo definido somente pelo casamento civil",
+"unidade que deve ser responsabilizada isoladamente por sua situação"
+],
+"c": 0,
+"e": "A matricialidade sociofamiliar exige reconhecer a família como sujeito de proteção, e não apenas de responsabilização."
+},
+{
+"t": "Violência",
+"d": "Médio",
+"q": "Segundo a Lei Maria da Penha (Lei nº 11.340/2006), são formas de violência doméstica e familiar contra a mulher:",
+"a": [
+"física, psicológica, sexual, patrimonial e moral",
+"apenas física e sexual",
+"apenas física",
+"física e verbal, exclusivamente"
+],
+"c": 0,
+"e": "Art. 7º da Lei 11.340/2006."
+},
+{
+"t": "Direitos humanos",
+"d": "Médio",
+"q": "A atuação do assistente social na defesa dos direitos humanos implica:",
+"a": [
+"reconhecer os usuários como sujeitos de direitos e atuar contra todas as formas de discriminação e violação",
+"tratar os direitos humanos como concessão do Estado",
+"limitar-se ao atendimento de demandas individuais sem dimensão coletiva",
+"neutralidade diante de violações"
+],
+"c": 0,
+"e": "Articula-se aos princípios do Código de Ética e ao projeto ético-político."
+},
+{
+"t": "ECA",
+"d": "Médio",
+"q": "Segundo o ECA, são diretrizes da política de atendimento à criança e ao adolescente, entre outras:",
+"a": [
+"municipalização do atendimento e criação de conselhos de direitos paritários",
+"centralização das ações na União",
+"institucionalização como medida prioritária",
+"proibição de participação da sociedade civil"
+],
+"c": 0,
+"e": "Art. 88 do ECA: municipalização do atendimento, conselhos de direitos deliberativos e paritários, fundos vinculados e integração operacional dos órgãos."
+},
+{
+"t": "ECA - Conselho Tutelar",
+"d": "Médio",
+"q": "O Conselho Tutelar, segundo o ECA, é órgão:",
+"a": [
+"permanente e autônomo, não jurisdicional, encarregado pela sociedade de zelar pelo cumprimento dos direitos da criança e do adolescente",
+"jurisdicional, que julga atos infracionais",
+"temporário, criado em situações de emergência",
+"subordinado ao Ministério Público"
+],
+"c": 0,
+"e": "Art. 131 do ECA. Cada Município deve ter ao menos um Conselho Tutelar, com cinco membros escolhidos pela comunidade."
+},
+{
+"t": "ECA - convivência familiar",
+"d": "Médio",
+"q": "Segundo o ECA, a falta ou a carência de recursos materiais:",
+"a": [
+"não constitui motivo suficiente para a perda ou a suspensão do poder familiar",
+"justifica o acolhimento institucional imediato",
+"autoriza a adoção sem processo",
+"implica perda automática da guarda"
+],
+"c": 0,
+"e": "Art. 23 do ECA: a família deve ser incluída em serviços e programas de proteção e apoio."
+},
+{
+"t": "Estatuto da Pessoa Idosa",
+"d": "Médio",
+"q": "Segundo o Estatuto da Pessoa Idosa, é obrigação da família, da comunidade, da sociedade e do Poder Público assegurar à pessoa idosa, com:",
+"a": [
+"absoluta prioridade, a efetivação do direito à vida, à saúde, à alimentação, à educação, à cultura, ao esporte, ao lazer, ao trabalho, à cidadania, à liberdade, à dignidade, ao respeito e à convivência familiar e comunitária",
+"prioridade apenas nos serviços de saúde",
+"prioridade somente quando maior de 80 anos",
+"tratamento igual ao das demais pessoas, sem prioridade"
+],
+"c": 0,
+"e": "Art. 3º do Estatuto da Pessoa Idosa."
+},
+{
+"t": "LBI",
+"d": "Médio",
+"q": "Pela Lei Brasileira de Inclusão, considera-se pessoa com deficiência aquela que tem impedimento de longo prazo de natureza física, mental, intelectual ou sensorial, o qual, em interação com uma ou mais barreiras:",
+"a": [
+"pode obstruir sua participação plena e efetiva na sociedade em igualdade de condições com as demais pessoas",
+"impede totalmente qualquer participação social",
+"torna-a absolutamente incapaz",
+"dispensa avaliação biopsicossocial"
+],
+"c": 0,
+"e": "Art. 2º da LBI — modelo social da deficiência."
+},
+{
+"t": "LBI - acessibilidade",
+"d": "Médio",
+"q": "Segundo a LBI, as barreiras atitudinais são:",
+"a": [
+"atitudes ou comportamentos que impeçam ou prejudiquem a participação social da pessoa com deficiência em igualdade de condições",
+"obstáculos arquitetônicos em edifícios",
+"falhas em sistemas de transporte",
+"problemas de comunicação digital"
+],
+"c": 0,
+"e": "Art. 3º, IV, e, da LBI. Outras barreiras: urbanísticas, arquitetônicas, nos transportes, nas comunicações e tecnológicas."
+},
+{
+"t": "Supervisão de estágio",
+"d": "Difícil",
+"q": "Segundo a Resolução CFESS nº 533/2008, a relação máxima entre supervisor de campo e estagiários é de:",
+"a": [
+"1 estagiário para cada 10 horas semanais de trabalho do supervisor",
+"5 estagiários por supervisor, independentemente da jornada",
+"1 estagiário por supervisor",
+"10 estagiários por supervisor de 30 horas"
+],
+"c": 0,
+"e": "Com jornada de 30 horas, o assistente social pode supervisionar até 3 estagiários."
+},
+{
+"t": "Supervisão de estágio",
+"d": "Médio",
+"q": "A supervisão direta de estágio em Serviço Social compreende:",
+"a": [
+"a supervisão acadêmica, pelo professor, e a supervisão de campo, pelo assistente social da instituição, de forma integrada",
+"apenas a supervisão do professor",
+"apenas a assinatura da frequência",
+"a supervisão por profissional de qualquer área"
+],
+"c": 0,
+"e": "Art. 2º da Resolução CFESS 533/2008."
+},
+{
+"t": "Trabalho interdisciplinar",
+"d": "Médio",
+"q": "No trabalho em equipe multiprofissional, o assistente social deve:",
+"a": [
+"contribuir com sua especificidade, preservar o sigilo e as atribuições privativas e não assinar documentos de matéria de Serviço Social elaborados por outros profissionais",
+"assumir atribuições de outras profissões quando necessário",
+"dispensar o registro de suas intervenções",
+"delegar pareceres sociais a outros profissionais"
+],
+"c": 0,
+"e": "O Código de Ética veda assinar documentos que não tenha elaborado e exige respeito às competências profissionais."
+},
+{
+"t": "Assessoria e consultoria",
+"d": "Médio",
+"q": "A assessoria em Serviço Social, prestada a órgãos públicos ou movimentos sociais, caracteriza-se por:",
+"a": [
+"oferecer subsídios técnicos e políticos para que o assessorado tome suas decisões, sem substituí-lo",
+"assumir a gestão da instituição assessorada",
+"executar diretamente todos os atendimentos",
+"impor decisões ao assessorado"
+],
+"c": 0,
+"e": "A assessoria em matéria de Serviço Social é atribuição privativa (art. 5º, III, da Lei 8.662/1993)."
+},
+{
+"t": "Pesquisa social",
+"d": "Médio",
+"q": "Na pesquisa social, a abordagem qualitativa caracteriza-se por:",
+"a": [
+"buscar compreender significados, valores e relações sociais, com técnicas como entrevistas em profundidade e grupos focais",
+"basear-se exclusivamente em estatísticas",
+"dispensar o rigor metodológico",
+"ter como único objetivo testar hipóteses numéricas"
+],
+"c": 0,
+"e": "Abordagens qualitativa e quantitativa são complementares na produção de conhecimento sobre a realidade social."
+},
+{
+"t": "Política de saúde",
+"d": "Médio",
+"q": "Segundo a Lei nº 8.080/1990, são princípios do SUS:",
+"a": [
+"universalidade de acesso, integralidade da assistência, equidade e participação da comunidade",
+"seletividade e contributividade",
+"centralização federal",
+"atendimento exclusivo a trabalhadores formais"
+],
+"c": 0,
+"e": "Diretrizes organizativas: descentralização, regionalização, hierarquização e participação social (Lei 8.142/1990)."
+},
+{
+"t": "Previdência social",
+"d": "Médio",
+"q": "A previdência social, segundo o art. 201 da Constituição, organiza-se sob a forma de:",
+"a": [
+"regime geral, de caráter contributivo e de filiação obrigatória, observados critérios que preservem o equilíbrio financeiro e atuarial",
+"regime não contributivo e facultativo",
+"política assistencial universal",
+"sistema exclusivo para servidores públicos"
+],
+"c": 0,
+"e": "Os servidores efetivos possuem regimes próprios (art. 40 da CF)."
+},
+{
+"t": "Mobilização social",
+"d": "Médio",
+"q": "A mobilização social, no trabalho do assistente social, visa:",
+"a": [
+"fortalecer a organização coletiva e a participação dos sujeitos na defesa de seus direitos",
+"manipular a população para fins institucionais",
+"substituir a participação popular pela decisão técnica",
+"evitar o diálogo com movimentos sociais"
+],
+"c": 0,
+"e": "Articula-se ao princípio de aprofundamento da democracia e à articulação com movimentos sociais."
+},
+{
+"t": "Documentos técnicos",
+"d": "Médio",
+"q": "O relatório social, como documento técnico do Serviço Social:",
+"a": [
+"apresenta de forma descritiva e interpretativa uma situação social atendida, podendo subsidiar encaminhamentos e decisões",
+"é sinônimo de parecer conclusivo obrigatório",
+"dispensa identificação do profissional",
+"só pode ser emitido em processos judiciais"
+],
+"c": 0,
+"e": "O documento deve conter identificação, objetivos, procedimentos, análise e, quando cabível, conclusões, com assinatura e número do CRESS."
+},
+{
+"t": "Ética e instituição",
+"d": "Médio",
+"q": "Diante de determinação institucional que contrarie os princípios do Código de Ética (ex.: expor dados sigilosos dos usuários), o assistente social deve:",
+"a": [
+"recusar-se a cumprir a determinação, podendo denunciar ao CRESS e às instâncias competentes",
+"cumprir, pois a instituição é a empregadora",
+"cumprir parcialmente, sem registrar",
+"transferir a tarefa a um estagiário"
+],
+"c": 0,
+"e": "O Código de Ética garante ao profissional a autonomia técnica e o dever de denunciar falhas que violem os princípios éticos."
+}
+]
+}

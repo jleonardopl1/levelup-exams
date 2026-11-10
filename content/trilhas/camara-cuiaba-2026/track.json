@@ -1,0 +1,410 @@
+{
+  "slug": "camara-cuiaba-2026",
+  "migration_file": "20261110130100_trilha_camara_cuiaba_2026.sql",
+  "name": "Câmara Municipal de Cuiabá-MT — Concurso 2026",
+  "short_name": "Câmara de Cuiabá 2026",
+  "organ": "Câmara Municipal de Cuiabá-MT",
+  "banca": "Instituto Selecon",
+  "exam_date": "2026-12-20",
+  "edital_url": "https://anexos-r2.selecao.net.br/uploads/779/concursos/102/anexos/5b03b63a-c8e5-47ff-b655-88572a17db55.pdf",
+  "description": "Trilha completa baseada no Edital nº 001/2026-CMC (consolidado com as retificações 01 e 02). Questões no padrão Selecon (4 alternativas, uma correta), cobrindo todo o Anexo V, com novas questões publicadas automaticamente toda semana.",
+  "min_questions_per_subject": 50,
+  "weekly_new_per_subject": 15,
+  "category": {
+    "name": "Câmara de Cuiabá 2026",
+    "description": "Trilha do concurso da Câmara Municipal de Cuiabá-MT (Selecon) — níveis médio e superior.",
+    "icon": "landmark",
+    "display_order": 0
+  },
+  "rules": {
+    "prova_objetiva": "70 questões de múltipla escolha com 4 alternativas (A a D) e uma única resposta correta. Básicos e Gerais valem 1 ponto por questão; Específicos valem 1,75 ponto. Total: 100 pontos.",
+    "aprovacao": "Habilitado quem fizer no mínimo 40 pontos (40%) e não zerar nenhuma das áreas (Básicos, Gerais e Específicos).",
+    "discursiva": "Mesmo dia da objetiva. Tema de conhecimento específico do cargo, 20 a 30 linhas, 100 pontos (80 de conteúdo e 20 de correção formal). Só é corrigida até 20 vezes o número de vagas.",
+    "titulos": "Avaliação de títulos (classificatória) apenas para os cargos de nível superior.",
+    "desempate": "Após os critérios legais: maior nota em Específicos, depois em Gerais, depois em Básicos.",
+    "cronograma": [
+      {
+        "data": "2026-11-30",
+        "evento": "Fim das inscrições"
+      },
+      {
+        "data": "2026-12-01",
+        "evento": "Último dia para pagamento da taxa"
+      },
+      {
+        "data": "2026-12-09",
+        "evento": "Cartão de confirmação (local de prova)"
+      },
+      {
+        "data": "2026-12-20",
+        "evento": "Provas objetiva e discursiva"
+      },
+      {
+        "data": "2026-12-21",
+        "evento": "Gabarito preliminar"
+      }
+    ]
+  },
+  "subjects": [
+    {
+      "slug": "cmc26-lingua-portuguesa",
+      "name": "Língua Portuguesa",
+      "icon": "book-open"
+    },
+    {
+      "slug": "cmc26-raciocinio-logico",
+      "name": "Raciocínio Lógico e Matemático",
+      "icon": "brain"
+    },
+    {
+      "slug": "cmc26-informatica",
+      "name": "Noções de Informática",
+      "icon": "monitor"
+    },
+    {
+      "slug": "cmc26-legislacao",
+      "name": "Legislação Municipal (LOM, Regimento, LC 93/2003 e LC 235/2011)",
+      "icon": "scroll"
+    },
+    {
+      "slug": "cmc26-historia-geografia-mt",
+      "name": "História e Geografia de Mato Grosso",
+      "icon": "leaf"
+    },
+    {
+      "slug": "cmc26-etica-filosofia",
+      "name": "Noções de Ética e Filosofia",
+      "icon": "scale"
+    },
+    {
+      "slug": "cmc26-relacoes-interpessoais",
+      "name": "Relações Interpessoais",
+      "icon": "users"
+    },
+    {
+      "slug": "cmc26-administracao-publica",
+      "name": "Noções de Administração Pública",
+      "icon": "building"
+    },
+    {
+      "slug": "cmc26-tecnico-legislativo",
+      "name": "Técnico Legislativo — Conhecimentos Específicos",
+      "icon": "file-text"
+    },
+    {
+      "slug": "cmc26-sonorizacao",
+      "name": "Técnico Legislativo — Sonorização",
+      "icon": "activity"
+    },
+    {
+      "slug": "cmc26-cerimonial",
+      "name": "Técnico Legislativo — Cerimonial",
+      "icon": "presentation"
+    },
+    {
+      "slug": "cmc26-analista-legislativo",
+      "name": "Analista Legislativo — Conhecimentos Específicos",
+      "icon": "gavel"
+    },
+    {
+      "slug": "cmc26-analista-ti",
+      "name": "Analista Legislativo — Tecnologia da Informação",
+      "icon": "code"
+    },
+    {
+      "slug": "cmc26-seguranca-trabalho",
+      "name": "Analista Legislativo — Segurança do Trabalho",
+      "icon": "shield"
+    },
+    {
+      "slug": "cmc26-psicologo",
+      "name": "Analista Legislativo — Psicólogo",
+      "icon": "heart"
+    },
+    {
+      "slug": "cmc26-assistente-social",
+      "name": "Analista Legislativo — Assistente Social",
+      "icon": "handshake"
+    },
+    {
+      "slug": "cmc26-jornalismo",
+      "name": "Analista Legislativo — Jornalismo",
+      "icon": "pen-tool"
+    },
+    {
+      "slug": "cmc26-contador",
+      "name": "Contador",
+      "icon": "calculator"
+    },
+    {
+      "slug": "cmc26-controlador-interno",
+      "name": "Controlador Interno",
+      "icon": "clipboard-check"
+    }
+  ],
+  "modules": [
+    {
+      "slug": "nivel-medio",
+      "name": "Nível Médio",
+      "nivel": "medio",
+      "description": "Técnico Legislativo, Técnico Legislativo – Sonorização e Técnico Legislativo – Cerimonial. Vencimento inicial R$ 5.518,91 + auxílio-alimentação R$ 1.500 + auxílio-saúde R$ 1.000. Jornada de 30h.",
+      "cargos": [
+        "Técnico Legislativo",
+        "Técnico Legislativo – Sonorização",
+        "Técnico Legislativo – Cerimonial"
+      ],
+      "structure": [
+        {
+          "area": "Conhecimentos Básicos",
+          "questoes": 15,
+          "pontos_por_questao": 1,
+          "disciplinas": [
+            "Língua Portuguesa",
+            "Raciocínio Lógico e Matemático",
+            "Noções de Informática",
+            "Legislação"
+          ]
+        },
+        {
+          "area": "Conhecimentos Gerais",
+          "questoes": 15,
+          "pontos_por_questao": 1,
+          "disciplinas": [
+            "História e Geografia de Mato Grosso",
+            "Noções de Ética e Filosofia",
+            "Relações Interpessoais"
+          ]
+        },
+        {
+          "area": "Conhecimentos Específicos",
+          "questoes": 40,
+          "pontos_por_questao": 1.75,
+          "disciplinas": [
+            "Disciplina específica do cargo"
+          ]
+        }
+      ],
+      "subjects": [
+        {
+          "slug": "cmc26-lingua-portuguesa",
+          "area": "Conhecimentos Básicos",
+          "syllabus": "1. Leitura e interpretação de textos de variados gêneros discursivos. 2. Condições de produção de um texto e marcas composicionais de gêneros textuais. 3. Linguagem e adequação social: variedades linguísticas e seus determinantes sociais, regionais, históricos e individuais; registros formal e informal. 4. Aspectos linguísticos: fonética (prosódia, ortografia); morfologia (formação, classificação e flexão das palavras); sintaxe (concordâncias verbal e nominal, regências verbal e nominal, colocação pronominal, emprego de nomes, pronomes, conjunções, advérbios, modos e tempos verbais); semântica (polissemia, paronímia, homonímia, denotação e conotação). 5. Textualidade: coesão, coerência, intertextualidade, argumentação. 6. Pontuação. 7. Tipos de discurso: direto e indireto.",
+          "tips": "A Selecon cobra muita interpretação com texto-base, valor semântico de conectivos, crase, regência, concordância e pontuação. Treine reescrita de frases (mantém o sentido? mantém a correção?)."
+        },
+        {
+          "slug": "cmc26-raciocinio-logico",
+          "area": "Conhecimentos Básicos",
+          "syllabus": "1. Operações com conjuntos. 2. Raciocínio lógico numérico: problemas com números reais e raciocínio sequencial. 3. Proposição: valores lógicos, conectivos e negação. 4. Argumentação lógica e diagramas lógicos. 5. Equivalências e implicações lógicas. 6. Quantificadores universal e existencial. 7. Problemas de contagem: princípios aditivo e multiplicativo.",
+          "tips": "Domine negação de proposições compostas (De Morgan, negação do 'se... então'), equivalência contrapositiva, diagramas de Venn e princípio multiplicativo."
+        },
+        {
+          "slug": "cmc26-informatica",
+          "area": "Conhecimentos Básicos",
+          "syllabus": "1. Microinformática: hardware, software, dispositivos de entrada, saída e armazenamento. 2. Windows 10 e 11 e distribuições Linux. 3. Microsoft Office/365 (Word, Excel, PowerPoint) e LibreOffice 7+ (Writer, Calc, Impress): recursos e atalhos. 4. Redes e internet: protocolos, TCP/IP, navegadores (Edge, Firefox, Chrome), e-mail e colaboração. 5. Computação em nuvem, armazenamento e serviços online; redes sociais. 6. Segurança da informação: vírus, malware, phishing, engenharia social, backup, firewall, antivírus, 2FA. 7. Noções da LGPD (Lei nº 13.709/2018).",
+          "tips": "Atalhos de teclado (Word x Writer, Excel x Calc), funções de planilha (SE, SOMASE, PROCV), protocolos (HTTP/HTTPS, SMTP, POP3, IMAP), tipos de malware e bases legais da LGPD."
+        },
+        {
+          "slug": "cmc26-legislacao",
+          "area": "Conhecimentos Básicos",
+          "syllabus": "1. Lei Orgânica do Município de Cuiabá-MT. 2. Regimento Interno da Câmara Municipal de Cuiabá (Resolução nº 08/2016). 3. Lei Complementar nº 93/2003 (Estatuto dos Servidores). 4. Lei Complementar nº 235/2011 (PCCV da Câmara), com as alterações da LC nº 609/2026.",
+          "tips": "Decore prazos e quóruns: posse em 30 dias (prorrogável), exercício em 5 dias, estágio probatório de 3 anos, prescrição disciplinar (5 anos/2 anos/180 dias), quóruns de maioria absoluta e 2/3 do Regimento, jornada de 30h (art. 36 da LC 235).",
+          "grounded": true
+        },
+        {
+          "slug": "cmc26-historia-geografia-mt",
+          "area": "Conhecimentos Gerais",
+          "syllabus": "História de MT — Colônia: bandeirantes, escravidão indígena e ouro; fundação de Cuiabá; Vila Bela e a Capitania de Mato Grosso; escravidão negra. Império: crise da mineração; Rusga; quilombos; presidentes de província; Guerra da Tríplice Aliança; economia pós-guerra; fim do Império. República: coronelismo; usinas de açúcar e pecuária; relações de trabalho; Era Vargas; política fundiária e conflitos no campo; governadores; temas atuais. Geografia de MT: Centro-Oeste, geopolítica, ocupação do território, aspectos físicos e biomas (Amazônia, Cerrado, Pantanal), aspectos político-administrativos e socioeconômicos, formação étnica, programas governamentais e fronteira agrícola, economia no contexto nacional, urbanização.",
+          "tips": "Datas-chave: 1719 (descoberta do ouro no Coxipó), 8/4/1719 (ata de fundação), 1727 (Vila Real do Senhor Bom Jesus de Cuiabá), 1748 (Capitania), 1752 (Vila Bela), 1834 (Rusga), 1835 (capital para Cuiabá), 1977/1979 (divisão do estado). Biomas e agronegócio aparecem sempre."
+        },
+        {
+          "slug": "cmc26-etica-filosofia",
+          "area": "Conhecimentos Gerais",
+          "syllabus": "1. Fundamentos da Filosofia. 2. Filosofia moral: ética ou filosofia moral. 3. Consciência crítica e filosofia. 4. Valores éticos/morais e cultura. 5. Juízos de fato e juízos de valor. 6. Ética e cidadania. 7. Racionalismo ético. 8. Ética e liberdade.",
+          "tips": "Distinga juízo de fato x juízo de valor, ética x moral, heteronomia x autonomia (Kant), e as visões de liberdade (Sartre, Espinosa). A base é o livro 'Convite à Filosofia' (Marilena Chaui)."
+        },
+        {
+          "slug": "cmc26-relacoes-interpessoais",
+          "area": "Conhecimentos Gerais",
+          "syllabus": "1. Relações humanas/interpessoais. 2. Comunicação interpessoal. 3. Características de um bom atendimento. 4. Postura profissional. 5. Integração. 6. Empatia. 7. Capacidade de ouvir. 8. Argumentação flexível.",
+          "tips": "Questões situacionais: escolha sempre a conduta que combina escuta ativa, empatia, cordialidade, objetividade e respeito às normas — sem se omitir nem 'resolver' fora das regras."
+        },
+        {
+          "slug": "cmc26-tecnico-legislativo",
+          "area": "Conhecimentos Específicos",
+          "cargo": "Técnico Legislativo",
+          "syllabus": "1. Estado, governo e Administração Pública. 2. Organização administrativa: Administração Direta e Indireta; órgãos; agentes (cargo, emprego, função). 3. Direito Administrativo: princípios, poderes, atos administrativos. 4. Controle da Administração e responsabilidade civil do Estado. 5. Direitos e garantias fundamentais; direitos sociais; cidadania; arts. 37 a 41 da CF. 6. Poder Legislativo Municipal: Câmara, Mesa, Plenário, comissões. 7. Processo legislativo e técnica legislativa (LC 95/1998). 8. Redação oficial: comunicações, ofícios, memorandos, requerimentos, atas, sinopses, relatórios. 9. Arquivologia. 10. Atendimento ao público. 11. Noções de contabilidade pública: receita, despesa e orçamento. 12. Noções de higiene e segurança do trabalho. 13. Redação Oficial.",
+          "tips": "Peso 1,75 por questão: é aqui que se passa. Foque em atos administrativos, arts. 37-41 da CF, Manual de Redação da Presidência (3ª ed.), LC 95/1998 e arquivologia (teoria das três idades)."
+        },
+        {
+          "slug": "cmc26-sonorizacao",
+          "area": "Conhecimentos Específicos",
+          "cargo": "Técnico Legislativo – Sonorização",
+          "syllabus": "1. Acústica e fundamentos de áudio: propriedades do som, frequência, amplitude, decibel e acústica de ambientes. 2. Equipamentos: microfones, mesas analógicas e digitais, amplificadores, caixas, processadores, interfaces, cabos, conectores. 3. Configuração, operação, monitoramento e ajuste de sistemas de sonorização, gravação e reprodução. 4. Instalação, teste, operação e manutenção em plenários, auditórios, sessões e audiências públicas. 5. Captação, gravação, edição, tratamento e armazenamento de áudio: formatos, mídias e arquivos. 6. Projetos de sonorização e gravação. 7. Acompanhamento de eventos e transmissões. 8. Segurança em instalações elétricas, montagem e prevenção de acidentes.",
+          "tips": "Conheça padrões de microfonação (cardioide, supercardioide, omni), phantom power (+48 V), balanceamento (XLR/TRS), ganho x volume, realimentação (microfonia), taxas de amostragem e formatos (WAV, MP3, FLAC)."
+        },
+        {
+          "slug": "cmc26-cerimonial",
+          "area": "Conhecimentos Específicos",
+          "cargo": "Técnico Legislativo – Cerimonial",
+          "syllabus": "1. Cerimonial, protocolo e etiqueta na Administração Pública. 2. Ordem de precedência e tratamentos protocolares (Decreto nº 70.274/1972). 3. Planejamento e execução de eventos: solenidades, sessões especiais e solenes, audiências públicas, posses, homenagens, inaugurações. 4. Símbolos oficiais: bandeiras, brasões e hinos (Lei nº 5.700/1971). 5. Composição de mesas e disposição de autoridades. 6. Roteiros, ordens de serviço, programas, convites, listas de presença, certificados. 7. Recepção de autoridades e convidados. 8. Comunicação institucional aplicada ao cerimonial. 9. Sessões solenes, especiais e audiências públicas do Regimento Interno da Câmara de Cuiabá.",
+          "tips": "Precedência: anfitrião ocupa o centro; a direita do centro é o lugar de honra. A Bandeira Nacional ocupa o lugar de honra (centro, ou o mais próximo do centro e à direita dele — art. 31 da Lei 5.700/1971). Estude também a ordem de precedência do Decreto 70.274/1972 e as regras de execução do Hino Nacional."
+        }
+      ]
+    },
+    {
+      "slug": "nivel-superior",
+      "name": "Nível Superior",
+      "nivel": "superior",
+      "description": "Analista Legislativo (geral, TI, Segurança do Trabalho, Psicólogo, Assistente Social e Jornalismo), Contador e Controlador Interno. Vencimento inicial de R$ 7.070,51 (Analista) a R$ 11.629,67 (Contador e Controlador Interno), mais auxílios de R$ 2.500. Jornada de 30h.",
+      "cargos": [
+        "Analista Legislativo",
+        "Analista Legislativo – Tecnologia da Informação",
+        "Analista Legislativo – Segurança do Trabalho",
+        "Analista Legislativo – Psicólogo",
+        "Analista Legislativo – Assistente Social",
+        "Analista Legislativo – Jornalismo",
+        "Contador",
+        "Controlador Interno"
+      ],
+      "structure": [
+        {
+          "area": "Conhecimentos Básicos",
+          "questoes": 15,
+          "pontos_por_questao": 1,
+          "disciplinas": [
+            "Língua Portuguesa",
+            "Raciocínio Lógico e Matemático",
+            "Noções de Informática"
+          ]
+        },
+        {
+          "area": "Conhecimentos Gerais",
+          "questoes": 15,
+          "pontos_por_questao": 1,
+          "disciplinas": [
+            "História e Geografia de Mato Grosso",
+            "Noções de Ética e Filosofia",
+            "Relações Interpessoais",
+            "Noções de Administração Pública"
+          ]
+        },
+        {
+          "area": "Conhecimentos Específicos",
+          "questoes": 40,
+          "pontos_por_questao": 1.75,
+          "disciplinas": [
+            "Legislação",
+            "Disciplina específica do cargo"
+          ]
+        }
+      ],
+      "subjects": [
+        {
+          "slug": "cmc26-lingua-portuguesa",
+          "area": "Conhecimentos Básicos",
+          "syllabus": "1. Leitura e interpretação de textos de variados gêneros discursivos. 2. Condições de produção de um texto e marcas composicionais de gêneros textuais. 3. Linguagem e adequação social: variedades linguísticas; registros formal e informal. 4. Fonética (prosódia, ortografia); morfologia; sintaxe (concordância, regência, colocação pronominal, emprego de classes de palavras, modos e tempos verbais); semântica (polissemia, paronímia, homonímia, denotação e conotação). 5. Coesão, coerência, intertextualidade, argumentação. 6. Pontuação. 7. Discurso direto e indireto.",
+          "tips": "Mesmo conteúdo do nível médio, com textos mais densos. Atenção a reescritas, valor de conectivos concessivos/conclusivos, crase e sentido de palavras no contexto."
+        },
+        {
+          "slug": "cmc26-raciocinio-logico",
+          "area": "Conhecimentos Básicos",
+          "syllabus": "1. Operações com conjuntos. 2. Raciocínio lógico numérico e sequencial. 3. Proposições: valores lógicos, conectivos, negação e tabela-verdade; tautologias; condição necessária e suficiente. 4. Argumentação lógica, estruturas e diagramas lógicos. 5. Equivalências e implicações. 6. Quantificadores. 7. Contagem: princípios aditivo e multiplicativo; arranjos, combinações e permutações. 8. Noções de probabilidade.",
+          "tips": "No superior entram tabela-verdade, tautologia, condição necessária/suficiente, análise combinatória e probabilidade — questões marcadas como 'nível superior' na trilha."
+        },
+        {
+          "slug": "cmc26-informatica",
+          "area": "Conhecimentos Básicos",
+          "syllabus": "1. Hardware, software, dispositivos de entrada, saída e armazenamento. 2. Windows 10/11 e Linux. 3. Microsoft Office/365 e LibreOffice 7+: recursos e atalhos. 4. Redes, internet, TCP/IP, navegadores, e-mail e colaboração. 5. Nuvem, serviços online, redes sociais. 6. Segurança da informação: ameaças, backup, firewall, antivírus, 2FA. 7. Noções da LGPD.",
+          "tips": "Mesma ementa do nível médio."
+        },
+        {
+          "slug": "cmc26-historia-geografia-mt",
+          "area": "Conhecimentos Gerais",
+          "syllabus": "História de Mato Grosso (Colônia, Império e República) e Geografia de Mato Grosso (Centro-Oeste, ocupação, biomas, aspectos político-administrativos e socioeconômicos, formação étnica, fronteira agrícola, economia e urbanização).",
+          "tips": "Mesma ementa do nível médio."
+        },
+        {
+          "slug": "cmc26-etica-filosofia",
+          "area": "Conhecimentos Gerais",
+          "syllabus": "Fundamentos da Filosofia; filosofia moral; consciência crítica; valores e cultura; juízos de fato e de valor; ética e cidadania; racionalismo ético; ética e liberdade.",
+          "tips": "Mesma ementa do nível médio."
+        },
+        {
+          "slug": "cmc26-relacoes-interpessoais",
+          "area": "Conhecimentos Gerais",
+          "syllabus": "Relações humanas; comunicação interpessoal; bom atendimento; postura profissional; integração; empatia; capacidade de ouvir; argumentação flexível.",
+          "tips": "Mesma ementa do nível médio."
+        },
+        {
+          "slug": "cmc26-administracao-publica",
+          "area": "Conhecimentos Gerais",
+          "syllabus": "1. Estado, governo e administração pública: conceitos, elementos, poderes, organização, natureza, fins e princípios. 2. Organização administrativa do Estado. 3. Administração direta e indireta. 4. Agentes públicos: espécies, classificação, poderes, deveres e prerrogativas; cargo, emprego e função. 5. Poderes administrativos. 6. Atos administrativos: conceito, requisitos, atributos, classificação, espécies e invalidação. 7. Controle e responsabilização da administração: administrativo, judicial, legislativo; responsabilidade civil.",
+          "tips": "Exclusiva do nível superior na área de Conhecimentos Gerais. Requisitos (COMFIFOMOB), atributos (PATI), anulação x revogação (Súmula 473 STF) e responsabilidade objetiva (art. 37, §6º, CF)."
+        },
+        {
+          "slug": "cmc26-legislacao",
+          "area": "Conhecimentos Específicos",
+          "syllabus": "1. Lei Orgânica do Município de Cuiabá-MT. 2. Regimento Interno da Câmara Municipal de Cuiabá (Resolução nº 08/2016). 3. LC nº 93/2003 (Estatuto dos Servidores). 4. LC nº 235/2011 (PCCV da Câmara), com as alterações da LC nº 609/2026.",
+          "tips": "No nível superior a Legislação está em Conhecimentos Específicos (vale 1,75 por questão). Prioridade máxima.",
+          "grounded": true
+        },
+        {
+          "slug": "cmc26-analista-legislativo",
+          "area": "Conhecimentos Específicos",
+          "cargo": "Analista Legislativo",
+          "syllabus": "Direito Administrativo: princípios; Administração direta e indireta; atos; poderes; contratos; licitação (Lei nº 14.133/2021); processo administrativo; agentes; serviços públicos; controle; improbidade; bens públicos. Direito Constitucional: direitos e garantias fundamentais; Municípios. Administração Pública: organização governamental; paradigmas (burocrática, Estado de bem-estar, nova gestão pública); governança; políticas públicas (ciclo, formulação e avaliação); planejamento e orçamento (PPA, LDO, LOA); PPP, consórcios, terceirização, OS, OSCIP, agências; governabilidade e accountability; estratégia (5 Ps de Mintzberg); gestão por resultados e indicadores.",
+          "tips": "Lei 14.133/2021 (modalidades, fases, dispensa/inexigibilidade), Lei 8.429/1992 com a reforma da Lei 14.230/2021 (dolo obrigatório) e ciclo de políticas públicas são campeões de cobrança."
+        },
+        {
+          "slug": "cmc26-analista-ti",
+          "area": "Conhecimentos Específicos",
+          "cargo": "Analista Legislativo – Tecnologia da Informação",
+          "syllabus": "Arquitetura de computadores; algoritmos, estruturas de dados e POO; engenharia de software, requisitos, testes e métodos ágeis; web e APIs REST (HTML, CSS, JavaScript); banco de dados relacional e SQL; redes (OSI, TCP/IP, IP, equipamentos, cabeamento, serviços); Windows e Linux; segurança da informação (criptografia, certificados, firewall, vulnerabilidades, pentest, incidentes, ISO 27001/27002); governança de TI (PDTI, ITIL, projetos, riscos); Git, CI/CD e contêineres; BI e análise de dados; contratações de TI e Lei 14.133/2021; LGPD e LAI; suporte e documentação.",
+          "tips": "SQL (JOIN, GROUP BY/HAVING), normalização, máscaras de sub-rede, portas TCP/UDP, criptografia simétrica x assimétrica, Scrum e comandos Linux/Git são os tópicos mais cobrados."
+        },
+        {
+          "slug": "cmc26-seguranca-trabalho",
+          "area": "Conhecimentos Específicos",
+          "cargo": "Analista Legislativo – Segurança do Trabalho",
+          "syllabus": "Legislação de SST (CF art. 7º XXII e XXIII, CLT Cap. V, Lei 8.213/1991, NRs 1, 5, 6, 7, 10, 15, 16, 17, 18, 23 e 35); GRO/PGR, PCMSO, LTCAT, mapas de risco; higiene ocupacional; ergonomia; segurança em máquinas e instalações; EPC e EPI; prevenção e combate a incêndio; investigação de acidentes e CAT; laudos, pareceres e vistorias; engenharia civil aplicada; fiscalização de obras; licitações de obras (Lei 14.133/2021); meio ambiente do trabalho; treinamentos; ética profissional.",
+          "tips": "NR-1 (GRO/PGR), NR-5 (CIPA), NR-6 (EPI/CA), NR-15/16 (insalubridade 10/20/40% x periculosidade 30%), NR-35 (altura > 2 m) e NR-10 (tensões e SEP) concentram a prova."
+        },
+        {
+          "slug": "cmc26-psicologo",
+          "area": "Conhecimentos Específicos",
+          "cargo": "Analista Legislativo – Psicólogo",
+          "syllabus": "Ética e legislação profissional (Lei 4.119/1962, Código de Ética, resoluções do CFP); psicologia social e comunitária; SUAS, LOAS, PNAS, proteção básica e especial; desenvolvimento humano, personalidade, psicopatologia; intervenções psicossociais (acolhimento, escuta, entrevistas, grupos, visitas, referência e contrarreferência); convivência familiar e comunitária; mediação de conflitos e trabalho em rede; ECA, Estatuto da Pessoa Idosa e LBI; avaliação de intervenções; planejamento socioassistencial; educação permanente; documentos psicológicos (Resolução CFP nº 06/2019).",
+          "tips": "Resolução CFP 06/2019 (tipos de documentos), sigilo no Código de Ética, CRAS (PAIF) x CREAS (PAEFI), e marcos do desenvolvimento (Piaget, Erikson, Vygotsky)."
+        },
+        {
+          "slug": "cmc26-assistente-social",
+          "area": "Conhecimentos Específicos",
+          "cargo": "Analista Legislativo – Assistente Social",
+          "syllabus": "Fundamentos históricos e teórico-metodológicos do Serviço Social; questão social; Lei 8.662/1993 e Código de Ética (Res. CFESS 273/1993); seguridade social (CF arts. 194 a 204); SUAS, LOAS, PNAS; planejamento e gestão de políticas sociais; instrumentais técnico-operativos (estudo social, entrevista, visita, parecer, laudo, perícia); projetos; direitos humanos, família, violência, controle social; ECA, Estatuto da Pessoa Idosa e LBI; assessoria, supervisão de estágio, trabalho interdisciplinar; pesquisa social e documentos técnicos.",
+          "tips": "Diferencie competências (art. 4º) de atribuições privativas (art. 5º) da Lei 8.662/1993; tripé da seguridade; BPC (art. 20 da LOAS); princípios do Código de Ética."
+        },
+        {
+          "slug": "cmc26-jornalismo",
+          "area": "Conhecimentos Específicos",
+          "cargo": "Analista Legislativo – Jornalismo",
+          "syllabus": "Teorias da comunicação e do jornalismo; comunicação pública e institucional; redação jornalística e gêneros (notícia, reportagem, entrevista, nota, editorial); apuração, edição e revisão; rádio, TV, internet e plataformas digitais; cobertura legislativa; assessoria de comunicação e relacionamento com a imprensa; materiais de divulgação institucional; mídias digitais, checagem e combate à desinformação; Código de Ética dos Jornalistas, liberdade de imprensa, direito de resposta (Lei 13.188/2015), LAI e LGPD; Poder Legislativo Municipal e transparência.",
+          "tips": "Lide (o quê, quem, quando, onde, como, por quê), pirâmide invertida, teorias (agenda-setting, gatekeeper, newsmaking, espiral do silêncio) e prazos da Lei do Direito de Resposta."
+        },
+        {
+          "slug": "cmc26-contador",
+          "area": "Conhecimentos Específicos",
+          "cargo": "Contador",
+          "syllabus": "Orçamento público (conceito, ciclo, exercício financeiro, princípios, créditos adicionais, orçamento-programa, PPA, LDO e LOA); receita pública (classificações, estágios, dívida ativa); despesa pública (classificações, estágios, restos a pagar, suprimento de fundos, DEA, dívida pública); LRF (RCL, LDO, LOA, execução, transferências, endividamento, reserva de contingência, contingenciamento, transparência, RREO e RGF); Contabilidade Aplicada ao Setor Público (subsistemas, VPA/VPD, escrituração, PCO, PCP, PCE, PCASP, DCASP — BO, BF, BP, DVP, DFC); bens públicos; NBC TSP e IPC da STN.",
+          "tips": "Lei 4.320/1964 + LRF + MCASP 11ª ed. Estágios da despesa (empenho, liquidação, pagamento), créditos adicionais, regime misto x patrimonial (competência) e estrutura do PCASP (classes 1 a 8) caem sempre."
+        },
+        {
+          "slug": "cmc26-controlador-interno",
+          "area": "Conhecimentos Específicos",
+          "cargo": "Controlador Interno",
+          "syllabus": "Fundamentos da Administração Pública; finanças e orçamento público (receita, despesa, princípios, ciclo, PPA, LDO, LOA, orçamento participativo, LRF); Direito Administrativo e Constitucional (organização, atos, controle, responsabilidade, serviços, poder de polícia, convênios, PPP, consórcios, bens e organização do Município); Lei 14.133/2021 e pregão; gestão de pessoas; gestão de materiais e patrimônio (lote econômico de compra); controle interno (CF arts. 70 a 74); auditoria (planejamento, instrumentos de fiscalização, riscos, evidências, fraudes e erros); contabilidade aplicada ao setor público.",
+          "tips": "Art. 74 da CF (finalidades do controle interno e responsabilidade solidária), modelo das três linhas (IIA), COSO, tipos de auditoria e as atribuições do Controlador previstas no art. 6º-A da LC 235/2011."
+        }
+      ]
+    }
+  ]
+}

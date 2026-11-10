@@ -1,0 +1,694 @@
+{
+"slug": "cmc26-cerimonial",
+"questions": [
+{
+"t": "Conceitos",
+"d": "Fácil",
+"q": "O conjunto de formalidades que regem a realização de um ato ou evento solene, como uma posse ou inauguração, denomina-se:",
+"a": [
+"cerimonial",
+"etiqueta",
+"marketing",
+"assessoria de imprensa"
+],
+"c": 0,
+"e": "Cerimonial é a sequência ordenada de formalidades de um evento. Protocolo é o conjunto de normas que o regem; etiqueta, as regras de comportamento social."
+},
+{
+"t": "Conceitos",
+"d": "Médio",
+"q": "No âmbito do cerimonial público, o protocolo corresponde:",
+"a": [
+"ao conjunto de normas (inclusive jurídicas) que disciplinam o cerimonial, como a ordem de precedência",
+"às regras de boas maneiras à mesa",
+"à decoração do ambiente",
+"ao cardápio de um coquetel"
+],
+"c": 0,
+"e": "O protocolo é a 'regra'; o cerimonial é a 'execução' dessas regras no evento."
+},
+{
+"t": "Conceitos",
+"d": "Médio",
+"q": "Etiqueta, em sentido cerimonial, refere-se:",
+"a": [
+"às normas de comportamento e convivência social adequadas a cada ocasião",
+"à ordem jurídica de precedência entre autoridades",
+"à legislação sobre símbolos nacionais",
+"aos documentos de identificação dos convidados"
+],
+"c": 0,
+"e": "A etiqueta orienta condutas (cumprimentos, trajes, postura à mesa) que complementam o cerimonial."
+},
+{
+"t": "Legislação - precedência",
+"d": "Fácil",
+"q": "As Normas do Cerimonial Público e a Ordem Geral de Precedência no Brasil estão estabelecidas no:",
+"a": [
+"Decreto nº 70.274/1972",
+"Decreto-Lei nº 200/1967",
+"Lei nº 8.112/1990",
+"Decreto nº 1.171/1994"
+],
+"c": 0,
+"e": "O Decreto 70.274/1972 regula o cerimonial público federal e serve de referência para Estados e Municípios."
+},
+{
+"t": "Legislação - precedência",
+"d": "Médio",
+"q": "Segundo as normas do cerimonial público, o Presidente da República:",
+"a": [
+"presidirá sempre a cerimônia a que comparecer",
+"só preside cerimônias federais",
+"nunca compõe mesas em eventos estaduais",
+"cede a presidência ao Governador nos eventos estaduais"
+],
+"c": 0,
+"e": "Regra do Decreto 70.274/1972: o Presidente da República preside sempre a cerimônia a que comparecer."
+},
+{
+"t": "Legislação - precedência",
+"d": "Médio",
+"q": "Pelas normas de cerimonial, o Governador do Estado preside as solenidades a que comparecer em seu Estado, salvo:",
+"a": [
+"as dos Poderes Legislativo e Judiciário e as de caráter exclusivamente militar, que seguem cerimonial próprio, e quando presente o Presidente da República",
+"as realizadas em municípios do interior",
+"as cerimônias religiosas, que são sempre presididas pelo bispo",
+"nenhuma exceção"
+],
+"c": 0,
+"e": "Nas solenidades do Legislativo, quem preside é o Presidente da Casa, observando-se o cerimonial próprio — caso da Câmara Municipal."
+},
+{
+"t": "Precedência - Legislativo municipal",
+"d": "Médio",
+"q": "Em uma sessão solene realizada pela Câmara Municipal de Cuiabá, quem preside a solenidade, em regra, é:",
+"a": [
+"o Presidente da Câmara Municipal, como anfitrião e chefe do Poder que promove o ato",
+"o Prefeito, obrigatoriamente",
+"o Governador do Estado, se presente, em qualquer hipótese",
+"o Vereador mais idoso"
+],
+"c": 0,
+"e": "Nas solenidades do Legislativo observa-se o cerimonial próprio, cabendo a presidência ao Presidente da Casa (salvo a presença do Presidente da República)."
+},
+{
+"t": "Precedência - anfitrião",
+"d": "Médio",
+"q": "Na composição de uma mesa de honra, o anfitrião (quem promove o evento):",
+"a": [
+"ocupa, em regra, o lugar central, salvo quando cede a presidência a autoridade de maior precedência",
+"senta-se sempre na extremidade da mesa",
+"não deve compor a mesa",
+"fica sempre à esquerda do centro"
+],
+"c": 0,
+"e": "O anfitrião preside; diante de autoridade hierarquicamente superior que deva presidir, ele cede o centro e ocupa o lugar à direita dela."
+},
+{
+"t": "Composição de mesa",
+"d": "Médio",
+"q": "Em uma mesa com número ímpar de lugares, após a autoridade que preside no centro, a segunda autoridade em precedência ocupa o lugar:",
+"a": [
+"à direita do centro (direita de quem está sentado à mesa, voltado para a plateia)",
+"à esquerda do centro",
+"na extremidade direita",
+"na extremidade esquerda"
+],
+"c": 0,
+"e": "A disposição alterna: 2º à direita do centro, 3º à esquerda, 4º à direita, e assim por diante."
+},
+{
+"t": "Composição de mesa",
+"d": "Médio",
+"q": "Na referência a 'direita' e 'esquerda' em dispositivos de cerimonial (mesa, bandeiras), considera-se:",
+"a": [
+"a direita de quem está no dispositivo, voltado para o público",
+"a direita de quem está na plateia, olhando para a mesa",
+"sempre a direita do mestre de cerimônias",
+"o lado mais próximo da porta de entrada"
+],
+"c": 0,
+"e": "Lei 5.700/1971 (bandeiras) e prática do cerimonial: a referência é a pessoa no dispositivo voltada para o público."
+},
+{
+"t": "Composição de mesa",
+"d": "Difícil",
+"q": "Uma mesa terá 5 lugares, com as autoridades A (maior precedência, preside), B, C, D e E, em ordem decrescente. Da esquerda para a direita de quem olha da plateia, a disposição correta é:",
+"a": [
+"D, B, A, C, E",
+"E, C, A, B, D",
+"B, D, A, E, C",
+"A, B, C, D, E"
+],
+"c": 0,
+"e": "A no centro; B à direita de A (que, para a plateia, é o lado esquerdo); C à esquerda de A; D à direita de B; E à esquerda de C. Visto da plateia: D, B, A, C, E."
+},
+{
+"t": "Composição de mesa",
+"d": "Médio",
+"q": "Na prática do cerimonial, é recomendado que a mesa de honra tenha:",
+"a": [
+"número reduzido de integrantes, compatível com a importância do evento, evitando mesas excessivamente extensas",
+"todas as autoridades presentes, sem exceção",
+"apenas o anfitrião",
+"sempre mais de 15 integrantes"
+],
+"c": 0,
+"e": "Mesas enxutas facilitam a organização; demais autoridades são acomodadas em lugares reservados e citadas na nominata."
+},
+{
+"t": "Pronunciamentos",
+"d": "Médio",
+"q": "Em solenidades, a ordem dos pronunciamentos usualmente adotada é:",
+"a": [
+"crescente de precedência, falando por último a autoridade de maior precedência (ou o anfitrião que preside)",
+"decrescente, falando primeiro a maior autoridade",
+"por ordem alfabética",
+"por sorteio"
+],
+"c": 0,
+"e": "A maior autoridade fala por último, encerrando os discursos; a nominata, por sua vez, é lida em ordem decrescente."
+},
+{
+"t": "Nominata",
+"d": "Médio",
+"q": "A nominata, em um evento oficial, é:",
+"a": [
+"a relação das autoridades presentes, organizada por ordem de precedência, para citação pelo mestre de cerimônias e oradores",
+"a lista de convidados que faltaram",
+"o cardápio do coquetel",
+"a lista de músicas da cerimônia"
+],
+"c": 0,
+"e": "A nominata deve ser conferida e atualizada até o início do evento, evitando omissões e erros de cargos/nomes."
+},
+{
+"t": "Mestre de cerimônias",
+"d": "Médio",
+"q": "Sobre a atuação do mestre de cerimônias, é correto afirmar:",
+"a": [
+"conduz o evento conforme o roteiro, com neutralidade, sem fazer pronunciamentos pessoais ou opinativos",
+"pode improvisar discursos políticos",
+"deve compor a mesa de honra",
+"define a ordem de precedência no momento"
+],
+"c": 0,
+"e": "O mestre de cerimônias anuncia, chama autoridades e conduz a sequência, seguindo rigorosamente o roteiro aprovado."
+},
+{
+"t": "Roteiro",
+"d": "Médio",
+"q": "O documento que descreve, passo a passo e com textos, toda a sequência da solenidade, a ser lido pelo mestre de cerimônias, é o:",
+"a": [
+"roteiro (script) do cerimonial",
+"convite",
+"release",
+"check-list de compras"
+],
+"c": 0,
+"e": "O roteiro inclui abertura, composição da mesa, Hino, pronunciamentos, homenagens e encerramento."
+},
+{
+"t": "Planejamento de eventos",
+"d": "Médio",
+"q": "As fases de um evento institucional costumam ser divididas em:",
+"a": [
+"pré-evento (planejamento), transevento (execução) e pós-evento (avaliação e agradecimentos)",
+"convite, coquetel e encerramento",
+"abertura, almoço e sorteio",
+"ensaio, apresentação e aplauso"
+],
+"c": 0,
+"e": "O pós-evento inclui avaliação, relatório, prestação de contas e envio de agradecimentos."
+},
+{
+"t": "Planejamento de eventos",
+"d": "Médio",
+"q": "O check-list de um evento oficial serve para:",
+"a": [
+"controlar todas as providências necessárias (local, som, símbolos, convites, credenciamento, segurança) e seus responsáveis e prazos",
+"substituir o roteiro do mestre de cerimônias",
+"listar apenas os convidados",
+"registrar a ata da sessão"
+],
+"c": 0,
+"e": "O check-list reduz falhas ao permitir acompanhar cada item do planejamento."
+},
+{
+"t": "Convites",
+"d": "Médio",
+"q": "A sigla RSVP, presente em convites, solicita ao convidado:",
+"a": [
+"que confirme sua presença (ou ausência)",
+"que traga um acompanhante",
+"que use traje a rigor",
+"que chegue com antecedência"
+],
+"c": 0,
+"e": "RSVP vem do francês 'Répondez s'il vous plaît' ('responda, por favor')."
+},
+{
+"t": "Convites",
+"d": "Médio",
+"q": "Em relação aos convites para solenidades oficiais, recomenda-se:",
+"a": [
+"enviá-los com antecedência adequada (em geral de 10 a 15 dias), contendo quem convida, o motivo, data, hora, local e, se for o caso, traje",
+"enviá-los no dia do evento",
+"omitir o horário para permitir flexibilidade",
+"enviar apenas por telefone para autoridades"
+],
+"c": 0,
+"e": "A antecedência permite organização das agendas e a confirmação de presença."
+},
+{
+"t": "Convites - traje",
+"d": "Médio",
+"q": "Em um convite oficial, a indicação \"traje passeio completo\" significa, para homens:",
+"a": [
+"terno completo e gravata",
+"bermuda e camisa polo",
+"smoking",
+"calça jeans e camisa social sem gravata"
+],
+"c": 0,
+"e": "Passeio completo: terno e gravata (para mulheres, vestido ou conjunto social). Black-tie/rigor exigem smoking/vestido longo."
+},
+{
+"t": "Tratamento protocolar",
+"d": "Fácil",
+"q": "O pronome de tratamento adequado para Vereadores, Prefeitos, Deputados, Juízes e Governadores é:",
+"a": [
+"Vossa Excelência",
+"Vossa Senhoria",
+"Vossa Magnificência",
+"Vossa Eminência"
+],
+"c": 0,
+"e": "Vossa Excelência é o tratamento das altas autoridades dos três Poderes."
+},
+{
+"t": "Tratamento protocolar",
+"d": "Médio",
+"q": "O pronome de tratamento usado para reitores de universidades é:",
+"a": [
+"Vossa Magnificência",
+"Vossa Excelência Reverendíssima",
+"Vossa Santidade",
+"Vossa Senhoria"
+],
+"c": 0,
+"e": "Vossa Magnificência — reitores; Vossa Santidade — Papa; Vossa Eminência — cardeais."
+},
+{
+"t": "Tratamento protocolar",
+"d": "Médio",
+"q": "Em comunicações e citações formais, o pronome de tratamento \"Vossa Eminência\" é destinado a:",
+"a": [
+"cardeais",
+"bispos e arcebispos",
+"reitores",
+"juízes de direito"
+],
+"c": 0,
+"e": "Bispos e arcebispos: Vossa Excelência Reverendíssima; cardeais: Vossa Eminência (ou Eminência Reverendíssima)."
+},
+{
+"t": "Tratamento protocolar",
+"d": "Médio",
+"q": "Ao se referir a uma autoridade ausente (falando dela e não com ela), em vez de \"Vossa Excelência\", usa-se:",
+"a": [
+"Sua Excelência",
+"Vossa Senhoria",
+"Excelentíssima Pessoa",
+"Digníssima Excelência"
+],
+"c": 0,
+"e": "'Vossa' para falar com a autoridade; 'Sua' para falar sobre ela."
+},
+{
+"t": "Símbolos nacionais",
+"d": "Fácil",
+"q": "São símbolos nacionais, segundo a Constituição e a Lei nº 5.700/1971:",
+"a": [
+"a Bandeira, o Hino, as Armas e o Selo nacionais",
+"a Bandeira, o Brasão do Estado e o Hino",
+"a Bandeira e o Hino da Independência",
+"as Armas, o Selo e a Moeda"
+],
+"c": 0,
+"e": "Art. 13, § 1º, da CF e art. 1º da Lei 5.700/1971."
+},
+{
+"t": "Bandeira Nacional",
+"d": "Médio",
+"q": "Quando a Bandeira Nacional estiver em um dispositivo com outras bandeiras, ela ocupa o lugar de honra, compreendido como:",
+"a": [
+"a posição central ou a mais próxima do centro e à direita deste",
+"sempre a extremidade esquerda",
+"o último lugar à direita",
+"qualquer posição, desde que mais alta"
+],
+"c": 0,
+"e": "Art. 31 da Lei 5.700/1971."
+},
+{
+"t": "Bandeira Nacional",
+"d": "Médio",
+"q": "Em um dispositivo com três bandeiras — do Brasil, de Mato Grosso e de Cuiabá —, a disposição correta é:",
+"a": [
+"Bandeira do Brasil ao centro, de Mato Grosso à sua direita e de Cuiabá à sua esquerda",
+"Bandeira de Cuiabá ao centro, por ser o município anfitrião",
+"Bandeira de Mato Grosso ao centro",
+"Bandeira do Brasil na extremidade direita"
+],
+"c": 0,
+"e": "Com número ímpar: Nacional ao centro; a de maior hierarquia seguinte (Estado) à direita; a do Município à esquerda."
+},
+{
+"t": "Bandeira Nacional",
+"d": "Médio",
+"q": "Em um dispositivo com duas bandeiras — a Nacional e a do Estado —, a Bandeira Nacional deve ficar:",
+"a": [
+"à direita do dispositivo",
+"à esquerda do dispositivo",
+"atrás da bandeira do Estado",
+"abaixo da bandeira do Estado"
+],
+"c": 0,
+"e": "Com número par, a Bandeira Nacional fica à direita do centro (lugar de honra), observada a direita de quem está no dispositivo voltado ao público."
+},
+{
+"t": "Bandeira Nacional",
+"d": "Médio",
+"q": "Segundo a Lei nº 5.700/1971, quando várias bandeiras são hasteadas ou arriadas simultaneamente, a Bandeira Nacional:",
+"a": [
+"é a primeira a atingir o topo e a última a dele descer",
+"é a última a ser hasteada",
+"é hasteada junto com as demais, sem distinção",
+"não pode ser hasteada com outras bandeiras"
+],
+"c": 0,
+"e": "Regra da Lei 5.700/1971: a Bandeira Nacional é a primeira a atingir o topo do mastro e a última a dele descer."
+},
+{
+"t": "Bandeira Nacional",
+"d": "Médio",
+"q": "A Bandeira Nacional pode permanecer hasteada durante a noite?",
+"a": [
+"Sim, desde que esteja devidamente iluminada",
+"Não, em nenhuma hipótese",
+"Sim, somente em datas comemorativas e sem iluminação",
+"Apenas em órgãos militares"
+],
+"c": 0,
+"e": "A regra é hastear de sol a sol, mas ela pode ficar à noite se iluminada (Lei 5.700/1971)."
+},
+{
+"t": "Bandeira Nacional - funeral",
+"d": "Difícil",
+"q": "Em sinal de luto oficial, a Bandeira é hasteada a meio-mastro. O procedimento correto é:",
+"a": [
+"hasteá-la primeiro até o topo e depois descê-la até o meio do mastro; ao arriar, levá-la novamente ao topo antes de descer",
+"hasteá-la diretamente até o meio do mastro",
+"mantê-la no topo coberta com fita preta",
+"arriá-la definitivamente durante o luto"
+],
+"c": 0,
+"e": "Procedimento previsto na Lei 5.700/1971 para a Bandeira em funeral."
+},
+{
+"t": "Bandeira Nacional",
+"d": "Médio",
+"q": "O Dia da Bandeira, com hasteamento em solenidade especial às 12 horas, é comemorado em:",
+"a": [
+"19 de novembro",
+"7 de setembro",
+"15 de novembro",
+"21 de abril"
+],
+"c": 0,
+"e": "Lei 5.700/1971: no dia 19 de novembro o hasteamento é realizado às 12 horas, com solenidades especiais."
+},
+{
+"t": "Hino Nacional",
+"d": "Médio",
+"q": "Durante a execução do Hino Nacional, segundo a Lei nº 5.700/1971, os presentes devem:",
+"a": [
+"permanecer de pé e em silêncio, em atitude de respeito, sendo vedada qualquer outra forma de saudação gestual ou vocal",
+"aplaudir ao final de cada estrofe",
+"colocar a mão no peito obrigatoriamente",
+"permanecer sentados, se for execução instrumental"
+],
+"c": 0,
+"e": "Art. 30 da Lei 5.700/1971; o civil do sexo masculino descobre a cabeça e os militares fazem continência."
+},
+{
+"t": "Hino Nacional",
+"d": "Médio",
+"q": "Na execução vocal do Hino Nacional, segundo a Lei nº 5.700/1971:",
+"a": [
+"devem ser cantadas sempre as duas partes do poema, em uníssono",
+"basta cantar a primeira estrofe",
+"pode ser cantado em ritmo livre",
+"admite adaptação da letra para o evento"
+],
+"c": 0,
+"e": "Na execução instrumental, toca-se a música integralmente, sem repetição; na vocal, as duas partes do poema."
+},
+{
+"t": "Hino Nacional",
+"d": "Difícil",
+"q": "Em cerimônia oficial na qual também será executado o hino de um país estrangeiro, a ordem adequada, por cortesia, é:",
+"a": [
+"o hino estrangeiro precede o Hino Nacional Brasileiro",
+"o Hino Nacional Brasileiro precede o estrangeiro",
+"executa-se apenas o Hino Nacional Brasileiro",
+"os dois são executados simultaneamente"
+],
+"c": 0,
+"e": "Por cortesia internacional, a Lei 5.700/1971 prevê que o hino estrangeiro preceda o brasileiro."
+},
+{
+"t": "Símbolos estaduais e municipais",
+"d": "Fácil",
+"q": "Segundo a Lei Orgânica de Cuiabá, são símbolos do Município:",
+"a": [
+"o Brasão, o Hino e a Bandeira",
+"o Selo e as Armas municipais",
+"a Bandeira e o Mapa do Município",
+"o Hino e o Selo"
+],
+"c": 0,
+"e": "Art. 3º da LOM de Cuiabá."
+},
+{
+"t": "Sessões solenes",
+"d": "Médio",
+"q": "Pelo Regimento Interno da Câmara de Cuiabá, as sessões solenes:",
+"a": [
+"podem ser realizadas a qualquer dia e hora, sem prefixação de duração, inclusive fora da sede da Câmara",
+"só ocorrem às terças e quintas-feiras, às 9 horas",
+"duram no máximo 3 horas",
+"dependem de convocação do Prefeito"
+],
+"c": 0,
+"e": "Arts. 20, parágrafo único, e 113, IV, do Regimento Interno."
+},
+{
+"t": "Sessões solenes",
+"d": "Médio",
+"q": "É hipótese de sessão solene prevista no Regimento Interno da Câmara de Cuiabá:",
+"a": [
+"entrega de honrarias e homenagens que a Câmara entender relevantes",
+"votação do orçamento anual",
+"julgamento das contas do Prefeito",
+"eleição de comissões permanentes ordinárias"
+],
+"c": 0,
+"e": "Art. 20 do Regimento: posse do Prefeito e Vice, posse/eleição da Mesa, fatos históricos (incluindo o aniversário de Cuiabá), inauguração da legislatura e entrega de honrarias."
+},
+{
+"t": "Honrarias",
+"d": "Médio",
+"q": "Segundo o Regimento Interno da Câmara de Cuiabá, a concessão de títulos honoríficos e honrarias depende de aprovação por:",
+"a": [
+"dois terços dos membros da Câmara",
+"maioria simples",
+"maioria absoluta",
+"um terço dos membros"
+],
+"c": 0,
+"e": "Art. 177, IV, do Regimento Interno."
+},
+{
+"t": "Audiências públicas",
+"d": "Médio",
+"q": "Na organização de uma audiência pública na Câmara, cabe ao cerimonial, entre outras tarefas:",
+"a": [
+"preparar o espaço, a lista de presença, a ordem de inscrições para falas e o apoio à condução pelo vereador proponente",
+"decidir o mérito das propostas debatidas",
+"votar as conclusões da audiência",
+"impedir a participação de cidadãos não convidados"
+],
+"c": 0,
+"e": "Audiências públicas são abertas à sociedade; o cerimonial dá suporte logístico e protocolar."
+},
+{
+"t": "Recepção de autoridades",
+"d": "Médio",
+"q": "Na recepção de autoridades em uma solenidade, recomenda-se:",
+"a": [
+"designar recepcionistas que conheçam as autoridades esperadas, conduzi-las aos lugares reservados e comunicar suas chegadas ao cerimonial",
+"deixar que as autoridades escolham livremente seus lugares",
+"pedir às autoridades que aguardem em fila comum",
+"acomodar todos por ordem de chegada"
+],
+"c": 0,
+"e": "Lugares reservados e identificados evitam constrangimentos e garantem a ordem de precedência."
+},
+{
+"t": "Recepção de autoridades",
+"d": "Médio",
+"q": "Uma autoridade de alta precedência chega após o início da solenidade e a mesa já está composta. A conduta adequada do cerimonial é:",
+"a": [
+"avaliar, com o presidente da solenidade, a conveniência de convidá-la à mesa no momento oportuno ou acomodá-la em lugar reservado, registrando sua presença na nominata",
+"ignorar sua chegada",
+"interromper o discurso em andamento para recompor a mesa",
+"pedir que aguarde do lado de fora até o fim"
+],
+"c": 0,
+"e": "Flexibilidade e discrição: a recomposição, se houver, ocorre em momento adequado, sem interromper pronunciamentos."
+},
+{
+"t": "Lugares reservados",
+"d": "Médio",
+"q": "Na plateia de uma sessão solene, os lugares reservados às autoridades que não compõem a mesa devem:",
+"a": [
+"ser identificados e distribuídos conforme a ordem de precedência, geralmente nas primeiras fileiras",
+"ser livres, por ordem de chegada",
+"ficar ao fundo do auditório",
+"ser compartilhados com a imprensa"
+],
+"c": 0,
+"e": "A reserva identificada evita disputas e confusões na acomodação."
+},
+{
+"t": "Posse",
+"d": "Médio",
+"q": "Em uma solenidade de posse, o termo de posse deve ser:",
+"a": [
+"assinado pelo empossado e pela autoridade competente, com leitura e registro adequados conforme o roteiro",
+"dispensado quando houver discurso",
+"assinado apenas pelo mestre de cerimônias",
+"assinado após o encerramento, sem formalidade"
+],
+"c": 0,
+"e": "A assinatura do termo é o ato jurídico central da posse; o cerimonial organiza sua leitura e assinatura."
+},
+{
+"t": "Inauguração",
+"d": "Médio",
+"q": "Em cerimônias de inauguração de obras, é parte tradicional do roteiro:",
+"a": [
+"o descerramento da placa inaugural e/ou o corte da fita",
+"o hasteamento da bandeira estrangeira",
+"a leitura da ata da sessão anterior",
+"a eleição da comissão organizadora"
+],
+"c": 0,
+"e": "O descerramento da placa ou o corte da fita simbolizam a entrega da obra; a placa não pode conter promoção pessoal (art. 37, § 1º, CF)."
+},
+{
+"t": "Comunicação institucional",
+"d": "Médio",
+"q": "A articulação do cerimonial com a comunicação institucional em uma solenidade envolve:",
+"a": [
+"credenciamento e posicionamento da imprensa, divulgação prévia e cobertura do evento",
+"censura prévia das reportagens",
+"proibição de fotos",
+"dispensa de divulgação de atos oficiais"
+],
+"c": 0,
+"e": "Área reservada para imprensa, informações aos jornalistas e cobertura pela equipe da Casa ampliam a transparência."
+},
+{
+"t": "Comunicação institucional",
+"d": "Médio",
+"q": "Em eventos públicos promovidos pela Câmara, a comunicação visual e a divulgação devem observar:",
+"a": [
+"caráter educativo, informativo ou de orientação social, sem nomes, símbolos ou imagens que caracterizem promoção pessoal",
+"a promoção da imagem do Presidente da Casa",
+"o uso de cores partidárias",
+"slogans de campanha eleitoral"
+],
+"c": 0,
+"e": "Art. 37, § 1º, da CF (princípio da impessoalidade)."
+},
+{
+"t": "Logística e segurança",
+"d": "Médio",
+"q": "No planejamento de uma solenidade com autoridades, o cerimonial deve articular-se com a segurança para:",
+"a": [
+"definir acessos, fluxos de entrada e saída, estacionamento de autoridades e plano para emergências",
+"decidir quem pode discursar",
+"escolher o cardápio",
+"definir a ordem de precedência"
+],
+"c": 0,
+"e": "Integração com segurança, logística e comunicação é parte do planejamento do evento."
+},
+{
+"t": "Certificados e listas",
+"d": "Médio",
+"q": "Em eventos institucionais com emissão de certificados, como seminários, a lista de presença é importante porque:",
+"a": [
+"comprova a participação e fundamenta a emissão dos certificados",
+"substitui a nominata",
+"é exigida apenas para autoridades",
+"serve somente para o coquetel"
+],
+"c": 0,
+"e": "Controle de presença garante a correção dos certificados e o registro do evento."
+},
+{
+"t": "Ordem de serviço",
+"d": "Médio",
+"q": "A ordem de serviço, no contexto do cerimonial, é o instrumento que:",
+"a": [
+"distribui tarefas e responsabilidades entre as equipes envolvidas no evento (montagem, som, recepção, limpeza)",
+"convida as autoridades",
+"registra os discursos",
+"substitui o convite oficial"
+],
+"c": 0,
+"e": "A ordem de serviço define quem faz o quê e quando, garantindo coordenação."
+},
+{
+"t": "Cronograma",
+"d": "Fácil",
+"q": "O cronograma de um evento institucional serve para:",
+"a": [
+"organizar no tempo as etapas e prazos de preparação e execução do evento",
+"listar os pronomes de tratamento",
+"definir a ordem dos hinos",
+"substituir a ata"
+],
+"c": 0,
+"e": "O cronograma permite acompanhar o andamento do planejamento e evitar atrasos."
+},
+{
+"t": "Postura do cerimonialista",
+"d": "Médio",
+"q": "Diante de um imprevisto durante a solenidade (ex.: falha no som), o cerimonialista deve:",
+"a": [
+"agir com discrição e rapidez, acionando a equipe responsável e ajustando o roteiro, sem expor o problema ao público",
+"interromper a solenidade e explicar os detalhes técnicos",
+"culpar publicamente a equipe de som",
+"encerrar imediatamente o evento"
+],
+"c": 0,
+"e": "Discrição, planejamento de contingência (plano B) e serenidade caracterizam o bom cerimonial."
+}
+]
+}

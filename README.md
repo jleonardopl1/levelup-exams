@@ -21,6 +21,7 @@ Plataforma gamificada de estudos para concursos publicos, vestibulares e ENEM.
 - Sistema de assinaturas (Free/Plus) via Stripe
 - Painel administrativo completo
 - Sistema de indicacoes (afiliados)
+- Trilhas de estudo por concurso com questoes novas toda semana (ver `docs/TRILHAS.md`)
 
 ## Setup Local
 
