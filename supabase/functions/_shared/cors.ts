@@ -1,4 +1,4 @@
-const ALLOWED_ORIGIN = Deno.env.get("ALLOWED_ORIGIN") || "https://simuladosconcursos.com.br";
+const ALLOWED_ORIGIN = Deno.env.get("ALLOWED_ORIGIN") || "https://levelupexams.lovable.app";
 
 export const corsHeaders: Record<string, string> = {
   "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
