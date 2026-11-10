@@ -299,10 +299,55 @@ export type Database = {
         }
         Relationships: []
       }
+      question_generation_runs: {
+        Row: {
+          created_at: string
+          error: string | null
+          id: number
+          inserted: number
+          model: string | null
+          requested: number
+          run_date: string
+          status: string
+          subject_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          error?: string | null
+          id?: never
+          inserted?: number
+          model?: string | null
+          requested?: number
+          run_date?: string
+          status: string
+          subject_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          error?: string | null
+          id?: never
+          inserted?: number
+          model?: string | null
+          requested?: number
+          run_date?: string
+          status?: string
+          subject_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "question_generation_runs_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       questions: {
         Row: {
           alternativas: string[]
           categoria: string
+          content_hash: string | null
           correta: number
           created_at: string
           dificuldade: string
@@ -310,15 +355,15 @@ export type Database = {
           explicacao: string | null
           id: string
           is_premium: boolean
+          nivel: string | null
+          origem: string
           subject_id: string | null
           topico: string | null
-          origem: string
-          nivel: string | null
-          content_hash: string | null
         }
         Insert: {
           alternativas: string[]
           categoria?: string
+          content_hash?: string | null
           correta: number
           created_at?: string
           dificuldade?: string
@@ -326,15 +371,15 @@ export type Database = {
           explicacao?: string | null
           id?: string
           is_premium?: boolean
+          nivel?: string | null
+          origem?: string
           subject_id?: string | null
           topico?: string | null
-          origem?: string
-          nivel?: string | null
-          content_hash?: string | null
         }
         Update: {
           alternativas?: string[]
           categoria?: string
+          content_hash?: string | null
           correta?: number
           created_at?: string
           dificuldade?: string
@@ -342,11 +387,10 @@ export type Database = {
           explicacao?: string | null
           id?: string
           is_premium?: boolean
+          nivel?: string | null
+          origem?: string
           subject_id?: string | null
           topico?: string | null
-          origem?: string
-          nivel?: string | null
-          content_hash?: string | null
         }
         Relationships: [
           {
@@ -537,48 +581,21 @@ export type Database = {
         }
         Relationships: []
       }
-      study_tracks: {
+      stripe_webhook_events: {
         Row: {
-          banca: string
-          created_at: string
-          description: string | null
-          edital_url: string | null
-          exam_date: string | null
           id: string
-          is_active: boolean
-          name: string
-          organ: string
-          rules: Json
-          short_name: string
-          slug: string
+          received_at: string
+          type: string
         }
         Insert: {
-          banca: string
-          created_at?: string
-          description?: string | null
-          edital_url?: string | null
-          exam_date?: string | null
-          id?: string
-          is_active?: boolean
-          name: string
-          organ: string
-          rules?: Json
-          short_name: string
-          slug: string
+          id: string
+          received_at?: string
+          type: string
         }
         Update: {
-          banca?: string
-          created_at?: string
-          description?: string | null
-          edital_url?: string | null
-          exam_date?: string | null
           id?: string
-          is_active?: boolean
-          name?: string
-          organ?: string
-          rules?: Json
-          short_name?: string
-          slug?: string
+          received_at?: string
+          type?: string
         }
         Relationships: []
       }
@@ -680,74 +697,48 @@ export type Database = {
           },
         ]
       }
-      question_generation_runs: {
+      study_tracks: {
         Row: {
+          banca: string
           created_at: string
-          error: string | null
-          id: number
-          inserted: number
-          model: string | null
-          requested: number
-          run_date: string
-          status: string
-          subject_id: string | null
+          description: string | null
+          edital_url: string | null
+          exam_date: string | null
+          id: string
+          is_active: boolean
+          name: string
+          organ: string
+          rules: Json
+          short_name: string
+          slug: string
         }
         Insert: {
+          banca: string
           created_at?: string
-          error?: string | null
-          id?: never
-          inserted?: number
-          model?: string | null
-          requested?: number
-          run_date?: string
-          status: string
-          subject_id?: string | null
+          description?: string | null
+          edital_url?: string | null
+          exam_date?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          organ: string
+          rules?: Json
+          short_name: string
+          slug: string
         }
         Update: {
+          banca?: string
           created_at?: string
-          error?: string | null
-          id?: never
-          inserted?: number
-          model?: string | null
-          requested?: number
-          run_date?: string
-          status?: string
-          subject_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "question_generation_runs_subject_id_fkey"
-            columns: ["subject_id"]
-            isOneToOne: false
-            referencedRelation: "subjects"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      user_question_attempts: {
-        Row: {
-          created_at: string
-          id: number
-          is_correct: boolean
-          question_id: string
-          selected_index: number
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: never
-          is_correct: boolean
-          question_id: string
-          selected_index: number
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: never
-          is_correct?: boolean
-          question_id?: string
-          selected_index?: number
-          user_id?: string
+          description?: string | null
+          edital_url?: string | null
+          exam_date?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          organ?: string
+          rules?: Json
+          short_name?: string
+          slug?: string
         }
         Relationships: []
       }
@@ -772,6 +763,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           name: string
+          slug?: string | null
         }
         Update: {
           career_category_id?: string
@@ -985,6 +977,48 @@ export type Database = {
         }
         Relationships: []
       }
+      user_question_attempts: {
+        Row: {
+          created_at: string
+          id: number
+          is_correct: boolean
+          question_id: string
+          selected_index: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: never
+          is_correct: boolean
+          question_id: string
+          selected_index: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: never
+          is_correct?: boolean
+          question_id?: string
+          selected_index?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_question_attempts_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_question_attempts_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_redemptions: {
         Row: {
           expires_at: string | null
@@ -1028,6 +1062,8 @@ export type Database = {
           consecutive_correct: number
           created_at: string
           current_level: number
+          daily_points_date: string | null
+          daily_points_earned: number
           id: string
           last_session_date: string | null
           max_consecutive_correct: number
@@ -1040,6 +1076,8 @@ export type Database = {
           consecutive_correct?: number
           created_at?: string
           current_level?: number
+          daily_points_date?: string | null
+          daily_points_earned?: number
           id?: string
           last_session_date?: string | null
           max_consecutive_correct?: number
@@ -1052,6 +1090,8 @@ export type Database = {
           consecutive_correct?: number
           created_at?: string
           current_level?: number
+          daily_points_date?: string | null
+          daily_points_earned?: number
           id?: string
           last_session_date?: string | null
           max_consecutive_correct?: number
@@ -1089,13 +1129,12 @@ export type Database = {
           created_at: string | null
           dificuldade: string | null
           enunciado: string | null
-          explicacao: string | null
           id: string | null
           is_premium: boolean | null
+          nivel: string | null
+          origem: string | null
           subject_id: string | null
           topico: string | null
-          origem: string | null
-          nivel: string | null
         }
         Insert: {
           alternativas?: string[] | null
@@ -1103,13 +1142,12 @@ export type Database = {
           created_at?: string | null
           dificuldade?: string | null
           enunciado?: string | null
-          explicacao?: string | null
           id?: string | null
           is_premium?: boolean | null
+          nivel?: string | null
+          origem?: string | null
           subject_id?: string | null
           topico?: string | null
-          origem?: string | null
-          nivel?: string | null
         }
         Update: {
           alternativas?: string[] | null
@@ -1117,13 +1155,12 @@ export type Database = {
           created_at?: string | null
           dificuldade?: string | null
           enunciado?: string | null
-          explicacao?: string | null
           id?: string | null
           is_premium?: boolean | null
+          nivel?: string | null
+          origem?: string | null
           subject_id?: string | null
           topico?: string | null
-          origem?: string | null
-          nivel?: string | null
         }
         Relationships: [
           {
@@ -1166,8 +1203,21 @@ export type Database = {
       }
     }
     Functions: {
+      check_rate_limit: {
+        Args: {
+          p_endpoint: string
+          p_identifier: string
+          p_max: number
+          p_window_seconds: number
+        }
+        Returns: boolean
+      }
       cleanup_audit_logs: { Args: never; Returns: undefined }
       cleanup_rate_limits: { Args: never; Returns: undefined }
+      consume_ai_mentor_quota: {
+        Args: { p_limit: number; p_user_id: string }
+        Returns: boolean
+      }
       get_leaderboard: {
         Args: { limit_count?: number; period?: string }
         Returns: {
@@ -1184,7 +1234,7 @@ export type Database = {
         Args: {
           p_limit?: number
           p_mode?: string
-          p_nivel?: string | null
+          p_nivel?: string
           p_subject_id: string
         }
         Returns: {
@@ -1195,12 +1245,13 @@ export type Database = {
           enunciado: string
           id: string
           is_premium: boolean
-          nivel: string | null
+          nivel: string
           origem: string
           subject_id: string
-          topico: string | null
+          topico: string
         }[]
       }
+      get_question_cron_secret: { Args: never; Returns: string }
       get_track_progress: {
         Args: { p_module_id: string }
         Returns: {
@@ -1213,21 +1264,24 @@ export type Database = {
           wrong_latest: number
         }[]
       }
+      get_user_id_by_email: { Args: { p_email: string }; Returns: string }
       get_user_tier: { Args: { p_user_id: string }; Returns: string }
-      increment_daily_usage: {
-        Args: { p_count?: number; p_date: string; p_user_id: string }
-        Returns: number
-      }
-      redeem_reward: {
-        Args: { p_points_cost: number; p_reward_id: string; p_user_id: string }
-        Returns: Json
-      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
+      }
+      increment_daily_usage: {
+        Args: { p_count?: number; p_date: string; p_user_id: string }
+        Returns: number
+      }
+      is_user_banned: { Args: { p_user_id: string }; Returns: boolean }
+      level_for_points: { Args: { p_points: number }; Returns: number }
+      redeem_reward: {
+        Args: { p_points_cost: number; p_reward_id: string; p_user_id: string }
+        Returns: Json
       }
       validate_answer: {
         Args: { p_question_id: string; p_selected_index: number }
@@ -1260,12 +1314,12 @@ export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1289,11 +1343,11 @@ export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1314,11 +1368,11 @@ export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1339,11 +1393,11 @@ export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1356,11 +1410,11 @@ export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
+    : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
