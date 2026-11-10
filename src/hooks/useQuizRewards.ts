@@ -143,8 +143,6 @@ export function useProcessQuizRewards() {
         const totalCorrectOverall = profile.total_correct + correctAnswers;
         const streakDays = profile.streak_days;
 
-        // Accumulate achievement points to add in a single update
-        let accumulatedAchievementPoints = 0;
 
         for (const achievement of allAchievements) {
           if (unlockedIds.has(achievement.id)) continue;
@@ -188,7 +186,6 @@ export function useProcessQuizRewards() {
 
             if (!error) {
               result.achievementsUnlocked.push(achievement.name);
-              accumulatedAchievementPoints += achievement.points_reward;
               
               if (achievement.tier === 'gold' || achievement.tier === 'platinum') {
                 result.shouldShowConfetti = true;
@@ -217,13 +214,8 @@ export function useProcessQuizRewards() {
           }
         }
 
-        // Single atomic update for all accumulated achievement points
-        if (accumulatedAchievementPoints > 0) {
-          await supabase.rpc('increment_user_points', {
-            p_user_id: user.id,
-            p_points: accumulatedAchievementPoints,
-          });
-        }
+        // Os pontos de conquista sao creditados no servidor (trigger
+        // award_achievement_points) no momento do INSERT em user_achievements.
       }
 
       // Invalidate queries to refresh data

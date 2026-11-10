@@ -55,17 +55,17 @@ export function ShareModal({ open, onOpenChange }: ShareModalProps) {
 
   const shareToLinkedin = () => {
     const url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`;
-    window.open(url, '_blank', 'width=600,height=400');
+    window.open(url, '_blank', 'width=600,height=400,noopener,noreferrer');
   };
 
   const shareToFacebook = () => {
     const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`;
-    window.open(url, '_blank', 'width=600,height=400');
+    window.open(url, '_blank', 'width=600,height=400,noopener,noreferrer');
   };
 
   const shareToWhatsapp = () => {
     const url = `https://wa.me/?text=${encodeURIComponent(`${shareText}\n\n${shareUrl}`)}`;
-    window.open(url, '_blank');
+    window.open(url, '_blank', 'noopener,noreferrer');
   };
 
   const shareToInstagram = () => {

@@ -1,102 +1,48 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { corsHeaders } from "../_shared/cors.ts";
+import { checkRateLimit, jsonResponse, requireUser } from "../_shared/utils.ts";
+import { findCustomerForUser, getCustomerEntitlement, getStripe } from "../_shared/stripe.ts";
 
-const logStep = (step: string, details?: any) => {
-  const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
-  console.log(`[CHECK-SUBSCRIPTION] ${step}${detailsStr}`);
-};
+const RATE_LIMIT_WINDOW_MS = 60000;
+const RATE_LIMIT_MAX_REQUESTS = 20;
 
 serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
+  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  if (req.method !== "POST" && req.method !== "GET") return jsonResponse({ error: "Método não permitido" }, 405);
 
-  const supabaseClient = createClient(
+  const supabase = createClient(
     Deno.env.get("SUPABASE_URL") ?? "",
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
-    { auth: { persistSession: false } }
+    { auth: { persistSession: false } },
   );
 
   try {
-    logStep("Function started");
+    const stripe = getStripe();
+    if (!stripe) return jsonResponse({ error: "Serviço de pagamento indisponível" }, 503);
 
-    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
-    if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
+    const auth = await requireUser(supabase, req);
+    if ("error" in auth) return auth.error;
+    const { user } = auth;
 
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) throw new Error("No authorization header provided");
+    // Cada chamada consulta a API do Stripe: limitar para evitar abuso de custo/cota.
+    const rl = await checkRateLimit(supabase, `user:${user.id}`, "check-subscription", RATE_LIMIT_WINDOW_MS, RATE_LIMIT_MAX_REQUESTS);
+    if (!rl.allowed) return jsonResponse({ error: "Muitas requisições" }, 429, { "Retry-After": "60" });
 
-    const token = authHeader.replace("Bearer ", "");
-    const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
-    if (userError) throw new Error(`Authentication error: ${userError.message}`);
-    
-    const user = userData.user;
-    if (!user?.email) throw new Error("User not authenticated or email not available");
-    logStep("User authenticated", { userId: user.id, email: user.email });
+    const customer = await findCustomerForUser(stripe, user);
+    const ent = customer
+      ? await getCustomerEntitlement(stripe, customer.id)
+      : { tier: "free" as const, subscriptionEnd: null };
 
-    const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
-    const customers = await stripe.customers.list({ email: user.email, limit: 1 });
+    await supabase.from("profiles").update({ tier: ent.tier }).eq("user_id", user.id);
 
-    if (customers.data.length === 0) {
-      logStep("No customer found, user is free tier");
-      
-      await supabaseClient
-        .from("profiles")
-        .update({ tier: "free" })
-        .eq("user_id", user.id);
-
-      return new Response(JSON.stringify({ subscribed: false, tier: "free" }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 200,
-      });
-    }
-
-    const customerId = customers.data[0].id;
-    logStep("Found Stripe customer", { customerId });
-
-    const subscriptions = await stripe.subscriptions.list({
-      customer: customerId,
-      status: "active",
-      limit: 1,
+    return jsonResponse({
+      subscribed: ent.tier === "plus",
+      tier: ent.tier,
+      subscription_end: ent.subscriptionEnd,
     });
-
-    const hasActiveSub = subscriptions.data.length > 0;
-    let subscriptionEnd = null;
-
-    if (hasActiveSub) {
-      const subscription = subscriptions.data[0];
-      subscriptionEnd = new Date(subscription.current_period_end * 1000).toISOString();
-      logStep("Active subscription found", { subscriptionId: subscription.id, endDate: subscriptionEnd });
-
-      await supabaseClient
-        .from("profiles")
-        .update({ tier: "plus" })
-        .eq("user_id", user.id);
-    } else {
-      logStep("No active subscription found");
-      
-      await supabaseClient
-        .from("profiles")
-        .update({ tier: "free" })
-        .eq("user_id", user.id);
-    }
-
-    return new Response(JSON.stringify({
-      subscribed: hasActiveSub,
-      tier: hasActiveSub ? "plus" : "free",
-      subscription_end: subscriptionEnd
-    }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 200,
-    });
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    logStep("ERROR", { message: errorMessage });
-    return new Response(JSON.stringify({ error: errorMessage }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 500,
-    });
+  } catch {
+    console.error("[CHECK-SUBSCRIPTION] error");
+    return jsonResponse({ error: "Não foi possível verificar a assinatura" }, 500);
   }
 });
