@@ -1,0 +1,681 @@
+{
+"slug": "cmc26-psicologo",
+"questions": [
+{
+"t": "Legislação profissional",
+"d": "Médio",
+"q": "A Lei nº 4.119/1962, que regulamenta a profissão de psicólogo, estabelece como função privativa do psicólogo a utilização de métodos e técnicas psicológicas com o objetivo de:",
+"a": [
+"diagnóstico psicológico, orientação e seleção profissional, orientação psicopedagógica e solução de problemas de ajustamento",
+"prescrição de medicamentos psiquiátricos",
+"realização de perícias médicas",
+"emissão de atestados de saúde física"
+],
+"c": 0,
+"e": "Art. 13, § 1º, da Lei 4.119/1962."
+},
+{
+"t": "Código de Ética",
+"d": "Médio",
+"q": "Segundo o Código de Ética Profissional do Psicólogo (Resolução CFP nº 010/2005), o psicólogo baseará seu trabalho no respeito e na promoção da liberdade, da dignidade, da igualdade e da integridade do ser humano, apoiado nos valores que embasam a:",
+"a": [
+"Declaração Universal dos Direitos Humanos",
+"Constituição do Estado de Mato Grosso",
+"Lei de Diretrizes e Bases da Educação",
+"Consolidação das Leis do Trabalho"
+],
+"c": 0,
+"e": "Princípio fundamental I do Código de Ética."
+},
+{
+"t": "Código de Ética - sigilo",
+"d": "Médio",
+"q": "Segundo o Código de Ética do Psicólogo, nas situações em que se configure conflito entre as exigências decorrentes do sigilo e as afirmações dos princípios fundamentais, a decisão de quebra de sigilo deve basear-se:",
+"a": [
+"na busca do menor prejuízo, restringindo-se a prestar as informações estritamente necessárias",
+"na vontade da instituição empregadora",
+"na solicitação de qualquer familiar",
+"na conveniência do psicólogo"
+],
+"c": 0,
+"e": "Art. 10 e parágrafo único do Código de Ética."
+},
+{
+"t": "Código de Ética - vedações",
+"d": "Médio",
+"q": "É vedado ao psicólogo, segundo o Código de Ética:",
+"a": [
+"induzir a convicções políticas, filosóficas, morais, ideológicas, religiosas, de orientação sexual ou a qualquer tipo de preconceito",
+"prestar serviços em instituições públicas",
+"atuar em equipes multiprofissionais",
+"registrar seus atendimentos em prontuário"
+],
+"c": 0,
+"e": "Art. 2º, b, do Código de Ética."
+},
+{
+"t": "Código de Ética - crianças e adolescentes",
+"d": "Difícil",
+"q": "Para o atendimento não eventual de criança ou adolescente, o psicólogo deve, em regra, obter:",
+"a": [
+"autorização de ao menos um de seus responsáveis, observadas as determinações da legislação vigente",
+"autorização judicial em todos os casos",
+"autorização do Conselho Tutelar",
+"apenas o consentimento verbal da criança"
+],
+"c": 0,
+"e": "Art. 8º do Código de Ética. Na impossibilidade, comunicam-se as autoridades competentes, nos termos do ECA."
+},
+{
+"t": "Código de Ética - equipe",
+"d": "Médio",
+"q": "Ao trabalhar em equipe multiprofissional, o psicólogo, segundo o Código de Ética:",
+"a": [
+"compartilha somente as informações relevantes para qualificar o serviço prestado, resguardando o caráter confidencial das comunicações",
+"deve compartilhar todo o conteúdo dos atendimentos",
+"não pode compartilhar nenhuma informação",
+"subordina-se tecnicamente aos demais profissionais"
+],
+"c": 0,
+"e": "Art. 6º, b, do Código de Ética."
+},
+{
+"t": "Documentos psicológicos",
+"d": "Médio",
+"q": "Segundo a Resolução CFP nº 06/2019, o documento que tem por finalidade informar a ocorrência de fatos ou situações objetivas relacionadas ao atendimento psicológico (como comparecimento ou acompanhamento), sem registrar sintomas ou estados psicológicos, é a:",
+"a": [
+"declaração",
+"atestado psicológico",
+"laudo psicológico",
+"parecer psicológico"
+],
+"c": 0,
+"e": "A declaração não pode conter informações sobre o estado psicológico; o atestado certifica uma condição psicológica com base em avaliação."
+},
+{
+"t": "Documentos psicológicos",
+"d": "Médio",
+"q": "O documento resultante de um processo de avaliação psicológica, que apresenta procedimentos, análise e conclusões, é o:",
+"a": [
+"laudo psicológico",
+"declaração",
+"parecer psicológico",
+"relatório multiprofissional"
+],
+"c": 0,
+"e": "Resolução CFP 06/2019. O parecer é resposta técnica a uma questão específica, que pode prescindir de avaliação."
+},
+{
+"t": "Documentos psicológicos",
+"d": "Médio",
+"q": "O parecer psicológico, segundo a Resolução CFP nº 06/2019, caracteriza-se por:",
+"a": [
+"ser um pronunciamento técnico que responde a uma questão-problema específica do campo psicológico, fundamentado em referencial teórico",
+"registrar o comparecimento do usuário",
+"ser emitido somente após psicoterapia",
+"certificar aptidão para porte de arma, exclusivamente"
+],
+"c": 0,
+"e": "O parecerista analisa a questão e manifesta-se tecnicamente, sem necessariamente realizar avaliação do sujeito."
+},
+{
+"t": "Documentos psicológicos",
+"d": "Difícil",
+"q": "Segundo a Resolução CFP nº 06/2019, os documentos escritos decorrentes da prestação de serviços psicológicos, bem como os registros que os embasam, devem ser guardados pelo prazo mínimo de:",
+"a": [
+"5 anos",
+"1 ano",
+"10 anos",
+"20 anos"
+],
+"c": 0,
+"e": "O prazo pode ser ampliado nos casos previstos em lei ou por determinação judicial."
+},
+{
+"t": "SUAS - LOAS",
+"d": "Médio",
+"q": "Segundo a LOAS (Lei nº 8.742/1993), a assistência social é:",
+"a": [
+"direito do cidadão e dever do Estado, política de seguridade social não contributiva",
+"benefício contributivo vinculado à previdência",
+"ação de caridade de entidades privadas",
+"política exclusiva para trabalhadores formais"
+],
+"c": 0,
+"e": "Art. 1º da LOAS; integra o tripé da seguridade social com saúde e previdência (art. 194 da CF)."
+},
+{
+"t": "SUAS - proteção básica",
+"d": "Médio",
+"q": "O equipamento público responsável pela oferta do Serviço de Proteção e Atendimento Integral à Família (PAIF), na Proteção Social Básica, é o:",
+"a": [
+"CRAS — Centro de Referência de Assistência Social",
+"CREAS — Centro de Referência Especializado de Assistência Social",
+"CAPS — Centro de Atenção Psicossocial",
+"Centro POP"
+],
+"c": 0,
+"e": "Tipificação Nacional dos Serviços Socioassistenciais (Resolução CNAS 109/2009)."
+},
+{
+"t": "SUAS - proteção especial",
+"d": "Médio",
+"q": "O Serviço de Proteção e Atendimento Especializado a Famílias e Indivíduos (PAEFI), destinado a situações de violação de direitos, é ofertado no:",
+"a": [
+"CREAS, na Proteção Social Especial de Média Complexidade",
+"CRAS, na Proteção Social Básica",
+"abrigo institucional, na Alta Complexidade",
+"UBS, na Atenção Primária à Saúde"
+],
+"c": 0,
+"e": "Situações de violência, abuso, exploração e descumprimento de medidas protetivas são acompanhadas pelo PAEFI."
+},
+{
+"t": "SUAS - alta complexidade",
+"d": "Médio",
+"q": "Os serviços de acolhimento institucional e de família acolhedora integram a:",
+"a": [
+"Proteção Social Especial de Alta Complexidade",
+"Proteção Social Básica",
+"Proteção Social Especial de Média Complexidade",
+"Atenção Primária em Saúde"
+],
+"c": 0,
+"e": "Destinam-se a pessoas com vínculos familiares rompidos ou que necessitem de proteção integral."
+},
+{
+"t": "SUAS - princípios organizativos",
+"d": "Médio",
+"q": "O eixo estruturante do SUAS que coloca a família como foco central da atenção socioassistencial denomina-se:",
+"a": [
+"matricialidade sociofamiliar",
+"descentralização político-administrativa",
+"controle social",
+"vigilância socioassistencial"
+],
+"c": 0,
+"e": "Outros eixos: territorialização, financiamento partilhado, controle social, política de recursos humanos e informação/monitoramento."
+},
+{
+"t": "SUAS - BPC",
+"d": "Médio",
+"q": "O Benefício de Prestação Continuada (BPC) garante um salário mínimo mensal:",
+"a": [
+"à pessoa com deficiência e à pessoa idosa com 65 anos ou mais que comprovem não possuir meios de prover a própria manutenção nem de tê-la provida por sua família",
+"a todos os desempregados",
+"às gestantes de baixa renda, por 12 meses",
+"aos trabalhadores rurais aposentados"
+],
+"c": 0,
+"e": "Art. 20 da LOAS. O critério de renda familiar per capita é de até 1/4 do salário mínimo, admitida flexibilização em regulamento."
+},
+{
+"t": "Referência e contrarreferência",
+"d": "Médio",
+"q": "No SUAS, o fluxo pelo qual o CRAS encaminha uma família ao CREAS e o CREAS, após o atendimento especializado, devolve informações e o acompanhamento ao CRAS denomina-se:",
+"a": [
+"referência e contrarreferência",
+"busca ativa",
+"vigilância epidemiológica",
+"matriciamento clínico"
+],
+"c": 0,
+"e": "A articulação em rede garante a integralidade e a continuidade do atendimento."
+},
+{
+"t": "Psicologia social",
+"d": "Médio",
+"q": "A psicologia sócio-histórica, desenvolvida no Brasil por Silvia Lane, entende o sujeito:",
+"a": [
+"como ser histórico e social, constituído nas relações sociais e na atividade, a partir de referenciais do materialismo histórico-dialético",
+"como entidade isolada e determinada apenas biologicamente",
+"como mero conjunto de reflexos condicionados",
+"a partir exclusivamente do inconsciente individual"
+],
+"c": 0,
+"e": "Categorias centrais: atividade, consciência, identidade, afetividade e linguagem."
+},
+{
+"t": "Psicologia social",
+"d": "Médio",
+"q": "Os experimentos de Solomon Asch sobre o julgamento do comprimento de linhas demonstraram a influência social denominada:",
+"a": [
+"conformidade ao grupo",
+"obediência à autoridade",
+"dissonância cognitiva",
+"facilitação social"
+],
+"c": 0,
+"e": "Milgram estudou obediência à autoridade; Festinger, a dissonância cognitiva."
+},
+{
+"t": "Psicologia comunitária",
+"d": "Médio",
+"q": "Na perspectiva da psicologia social comunitária, a atuação do psicólogo deve priorizar:",
+"a": [
+"o fortalecimento da participação, da autonomia e do protagonismo da comunidade na transformação de sua realidade",
+"a substituição da comunidade nas decisões",
+"o atendimento clínico individual exclusivo",
+"a culpabilização dos indivíduos por sua condição"
+],
+"c": 0,
+"e": "A Psicologia da Libertação (Martín-Baró) e a psicologia comunitária latino-americana enfatizam conscientização e transformação social."
+},
+{
+"t": "Grupos",
+"d": "Médio",
+"q": "Na teoria do grupo operativo de Pichon-Rivière, o grupo é definido como um conjunto de pessoas reunidas em torno de uma:",
+"a": [
+"tarefa, com objetivos comuns, articuladas por mútua representação interna",
+"liderança autoritária",
+"terapia individual compartilhada",
+"competição entre membros"
+],
+"c": 0,
+"e": "Conceitos: tarefa explícita e implícita, emergente, porta-voz, papéis, verticalidade e horizontalidade."
+},
+{
+"t": "Desenvolvimento humano - Piaget",
+"d": "Médio",
+"q": "Segundo Piaget, a fase em que a criança desenvolve a conservação de quantidades e a reversibilidade do pensamento, operando sobre objetos concretos, é a:",
+"a": [
+"operatória concreta (aproximadamente dos 7 aos 11/12 anos)",
+"sensório-motora (0 a 2 anos)",
+"pré-operatória (2 a 7 anos)",
+"operatória formal (a partir dos 12 anos)"
+],
+"c": 0,
+"e": "O pensamento hipotético-dedutivo surge na fase operatória formal."
+},
+{
+"t": "Desenvolvimento humano - Vygotsky",
+"d": "Médio",
+"q": "Para Vygotsky, a distância entre o que a criança consegue fazer sozinha e o que consegue fazer com a ajuda de outra pessoa mais experiente é a:",
+"a": [
+"zona de desenvolvimento proximal",
+"assimilação",
+"fase de latência",
+"estrutura do ego"
+],
+"c": 0,
+"e": "Conceito central da teoria histórico-cultural, que destaca a mediação social e a linguagem."
+},
+{
+"t": "Desenvolvimento humano - Erikson",
+"d": "Médio",
+"q": "Segundo Erik Erikson, a crise psicossocial característica da adolescência é:",
+"a": [
+"identidade versus confusão de papéis",
+"confiança versus desconfiança",
+"intimidade versus isolamento",
+"integridade versus desespero"
+],
+"c": 0,
+"e": "Erikson descreve oito estágios ao longo do ciclo vital; integridade x desespero corresponde à velhice."
+},
+{
+"t": "Teorias da personalidade - Freud",
+"d": "Médio",
+"q": "Na teoria estrutural de Freud, a instância psíquica que funciona segundo o princípio de realidade e media as exigências do id, do superego e do mundo externo é o:",
+"a": [
+"ego",
+"id",
+"superego",
+"inconsciente coletivo"
+],
+"c": 0,
+"e": "O id rege-se pelo princípio do prazer; o superego representa as normas internalizadas."
+},
+{
+"t": "Teorias da personalidade - Rogers",
+"d": "Médio",
+"q": "Na abordagem centrada na pessoa, de Carl Rogers, as condições facilitadoras da relação terapêutica são:",
+"a": [
+"congruência, aceitação positiva incondicional e compreensão empática",
+"interpretação, transferência e resistência",
+"reforço, extinção e punição",
+"confrontação, diretividade e aconselhamento"
+],
+"c": 0,
+"e": "Essas atitudes também orientam a escuta qualificada em contextos psicossociais."
+},
+{
+"t": "Teorias da personalidade - Bowlby",
+"d": "Médio",
+"q": "A teoria do apego, de John Bowlby, destaca:",
+"a": [
+"a importância do vínculo afetivo seguro com figuras de cuidado na infância para o desenvolvimento emocional",
+"que o desenvolvimento independe das relações iniciais",
+"que o apego é prejudicial ao desenvolvimento",
+"que somente fatores genéticos determinam a personalidade"
+],
+"c": 0,
+"e": "A teoria fundamenta práticas de convivência familiar e de acolhimento de crianças."
+},
+{
+"t": "Psicopatologia",
+"d": "Médio",
+"q": "Em psicopatologia, a percepção sem objeto real, como ouvir vozes inexistentes, denomina-se:",
+"a": [
+"alucinação",
+"ilusão",
+"delírio",
+"obsessão"
+],
+"c": 0,
+"e": "Ilusão é percepção deformada de objeto real; delírio é alteração do juízo (crença falsa e irredutível)."
+},
+{
+"t": "Psicopatologia",
+"d": "Médio",
+"q": "A crença falsa, mantida com convicção inabalável e não compartilhada pelo grupo sociocultural, mesmo diante de evidências contrárias, caracteriza:",
+"a": [
+"o delírio",
+"a alucinação",
+"a fobia",
+"a compulsão"
+],
+"c": 0,
+"e": "O delírio é alteração do conteúdo do pensamento/juízo de realidade."
+},
+{
+"t": "Saúde mental - rede",
+"d": "Médio",
+"q": "No Sistema Único de Saúde, o serviço estratégico da Rede de Atenção Psicossocial (RAPS) para pessoas com transtornos mentais graves e persistentes é o:",
+"a": [
+"CAPS — Centro de Atenção Psicossocial",
+"CRAS",
+"CREAS",
+"Conselho Tutelar"
+],
+"c": 0,
+"e": "A Lei 10.216/2001 (Reforma Psiquiátrica) privilegia o tratamento em serviços comunitários."
+},
+{
+"t": "Intervenções psicossociais",
+"d": "Médio",
+"q": "O acolhimento, nas políticas públicas de saúde e assistência social, deve ser entendido como:",
+"a": [
+"postura ética de escuta qualificada, reconhecimento das necessidades e responsabilização pelo encaminhamento, presente em todo o atendimento",
+"mera triagem burocrática na recepção",
+"atividade exclusiva do psicólogo",
+"ação realizada somente uma vez, na primeira visita"
+],
+"c": 0,
+"e": "Acolher envolve vínculo, escuta e resolutividade, não apenas 'receber' o usuário."
+},
+{
+"t": "Intervenções psicossociais - entrevista",
+"d": "Médio",
+"q": "Na entrevista psicológica semiestruturada:",
+"a": [
+"há um roteiro de temas, mas com flexibilidade para explorar conteúdos trazidos pelo entrevistado",
+"as perguntas são fixas e devem ser feitas na mesma ordem, sem desvios",
+"não há qualquer planejamento",
+"só se usam perguntas fechadas de sim/não"
+],
+"c": 0,
+"e": "Combina direcionamento e abertura, sendo muito usada em contextos institucionais."
+},
+{
+"t": "Intervenções psicossociais - visita domiciliar",
+"d": "Médio",
+"q": "Na realização de visitas domiciliares pelo psicólogo no contexto socioassistencial, é adequado:",
+"a": [
+"ter objetivo definido, respeitar a privacidade e a autonomia da família e registrar as informações pertinentes de forma ética",
+"realizar a visita sem aviso para 'flagrar' a família",
+"fotografar a residência sem consentimento",
+"usar a visita para fiscalizar a família em nome da polícia"
+],
+"c": 0,
+"e": "A visita é instrumento de conhecimento da realidade e de fortalecimento de vínculos, não de controle punitivo."
+},
+{
+"t": "Convivência familiar e comunitária",
+"d": "Médio",
+"q": "O Serviço de Convivência e Fortalecimento de Vínculos (SCFV) caracteriza-se por:",
+"a": [
+"atividades em grupos, organizadas por ciclos de vida, para prevenir situações de risco e fortalecer vínculos familiares e comunitários",
+"atendimento clínico psicoterápico individual",
+"acolhimento institucional de longa duração",
+"cumprimento de medidas socioeducativas de internação"
+],
+"c": 0,
+"e": "O SCFV integra a Proteção Social Básica e é referenciado ao CRAS."
+},
+{
+"t": "Mediação de conflitos",
+"d": "Médio",
+"q": "São princípios da mediação, segundo a Lei nº 13.140/2015:",
+"a": [
+"imparcialidade do mediador, isonomia entre as partes, oralidade, informalidade, autonomia da vontade, busca do consenso, confidencialidade e boa-fé",
+"decisão imposta pelo mediador às partes",
+"publicidade obrigatória de tudo o que for dito",
+"julgamento de mérito pelo mediador"
+],
+"c": 0,
+"e": "Art. 2º da Lei 13.140/2015. O mediador facilita o diálogo; não decide."
+},
+{
+"t": "Trabalho em rede",
+"d": "Médio",
+"q": "O trabalho intersetorial em rede na proteção social pressupõe:",
+"a": [
+"articulação entre políticas (assistência, saúde, educação, justiça) e serviços, com fluxos e corresponsabilidade pelo atendimento",
+"que cada serviço atue isoladamente",
+"que o psicólogo resolva sozinho todas as demandas",
+"a centralização de todas as ações em um único órgão"
+],
+"c": 0,
+"e": "A intersetorialidade responde à complexidade das situações de vulnerabilidade."
+},
+{
+"t": "ECA",
+"d": "Fácil",
+"q": "Segundo o Estatuto da Criança e do Adolescente (Lei nº 8.069/1990), considera-se criança a pessoa até ___ incompletos, e adolescente aquela entre ___ e ___ anos de idade.",
+"a": [
+"12 anos; 12; 18",
+"10 anos; 10; 16",
+"14 anos; 14; 21",
+"12 anos; 12; 21"
+],
+"c": 0,
+"e": "Art. 2º do ECA. Excepcionalmente, aplica-se o ECA a pessoas entre 18 e 21 anos."
+},
+{
+"t": "ECA",
+"d": "Médio",
+"q": "Segundo o ECA, os casos de suspeita ou confirmação de castigo físico, tratamento cruel ou degradante e de maus-tratos contra criança ou adolescente serão obrigatoriamente comunicados ao:",
+"a": [
+"Conselho Tutelar da respectiva localidade, sem prejuízo de outras providências legais",
+"Ministério do Trabalho",
+"Conselho Regional de Psicologia apenas",
+"diretor da escola, exclusivamente"
+],
+"c": 0,
+"e": "Art. 13 do ECA: a comunicação ao Conselho Tutelar é obrigatória, sem prejuízo de outras providências legais (ex.: notificação ao serviço de saúde e à autoridade policial)."
+},
+{
+"t": "Escuta protegida",
+"d": "Difícil",
+"q": "A Lei nº 13.431/2017 distingue a escuta especializada do depoimento especial. A escuta especializada é:",
+"a": [
+"o procedimento de entrevista sobre situação de violência com criança ou adolescente perante órgão da rede de proteção, limitado ao estritamente necessário para cumprir sua finalidade",
+"a oitiva da criança perante autoridade policial ou judiciária",
+"o interrogatório do agressor",
+"uma perícia psiquiátrica obrigatória"
+],
+"c": 0,
+"e": "Arts. 7º e 8º da Lei 13.431/2017: evita a revitimização."
+},
+{
+"t": "ECA - medidas socioeducativas",
+"d": "Médio",
+"q": "Entre as medidas socioeducativas previstas no ECA, a de internação:",
+"a": [
+"não comporta prazo determinado, devendo ser reavaliada no máximo a cada 6 meses, e não pode exceder 3 anos",
+"pode durar até 10 anos",
+"é aplicada a crianças",
+"dispensa reavaliação periódica"
+],
+"c": 0,
+"e": "Art. 121 do ECA, regida pelos princípios da brevidade e da excepcionalidade."
+},
+{
+"t": "Estatuto da Pessoa Idosa",
+"d": "Fácil",
+"q": "O Estatuto da Pessoa Idosa (Lei nº 10.741/2003) aplica-se às pessoas com idade igual ou superior a:",
+"a": [
+"60 anos",
+"65 anos",
+"70 anos",
+"55 anos"
+],
+"c": 0,
+"e": "Entre os idosos, os maiores de 80 anos têm prioridade especial (Lei 13.466/2017)."
+},
+{
+"t": "Estatuto da Pessoa Idosa",
+"d": "Médio",
+"q": "Pelo Estatuto da Pessoa Idosa, os casos de suspeita ou confirmação de violência praticada contra pessoa idosa serão objeto de notificação compulsória pelos serviços de saúde e comunicados, entre outros, a:",
+"a": [
+"autoridade policial, Ministério Público e Conselhos Municipal, Estadual ou Nacional da Pessoa Idosa",
+"somente ao cartório",
+"somente à família",
+"Receita Federal"
+],
+"c": 0,
+"e": "Art. 19 do Estatuto da Pessoa Idosa."
+},
+{
+"t": "LBI",
+"d": "Médio",
+"q": "Segundo a Lei Brasileira de Inclusão (Lei nº 13.146/2015), a avaliação da deficiência, quando necessária, será:",
+"a": [
+"biopsicossocial, realizada por equipe multiprofissional e interdisciplinar",
+"exclusivamente médica, com base no CID",
+"feita pelo próprio interessado",
+"feita somente pela família"
+],
+"c": 0,
+"e": "Art. 2º, § 1º, da LBI, que considera impedimentos, fatores ambientais e participação."
+},
+{
+"t": "LBI",
+"d": "Difícil",
+"q": "Segundo a LBI, a deficiência:",
+"a": [
+"não afeta a plena capacidade civil da pessoa, inclusive para casar, exercer direitos sexuais e reprodutivos e exercer a guarda de filhos",
+"implica incapacidade absoluta",
+"impede o casamento",
+"exige curatela em todos os casos"
+],
+"c": 0,
+"e": "Art. 6º da LBI. A curatela é medida extraordinária; há também a tomada de decisão apoiada."
+},
+{
+"t": "Avaliação de intervenções",
+"d": "Médio",
+"q": "Na avaliação de programas e serviços psicossociais, indicadores de resultado diferem de indicadores de processo porque:",
+"a": [
+"os de resultado medem as mudanças produzidas nos usuários/comunidade, e os de processo medem a execução das atividades",
+"são sinônimos",
+"os de processo medem impacto social",
+"os de resultado medem apenas o número de atendimentos"
+],
+"c": 0,
+"e": "Contar atendimentos é processo; medir fortalecimento de vínculos ou redução de violações é resultado."
+},
+{
+"t": "Planejamento socioassistencial",
+"d": "Médio",
+"q": "Na elaboração de um projeto de intervenção psicossocial, o diagnóstico inicial deve:",
+"a": [
+"identificar demandas, necessidades, potencialidades e recursos do território e dos usuários",
+"ser dispensado para ganhar tempo",
+"basear-se apenas na opinião da chefia",
+"limitar-se a dados de outros municípios"
+],
+"c": 0,
+"e": "O diagnóstico orienta objetivos, metas, atividades, indicadores e avaliação."
+},
+{
+"t": "Educação permanente",
+"d": "Médio",
+"q": "A educação permanente no SUAS, segundo a Política Nacional de Educação Permanente (PNEP/SUAS), tem como perspectiva:",
+"a": [
+"a formação a partir da reflexão sobre a prática e os processos de trabalho, valorizando o saber dos trabalhadores",
+"cursos esporádicos desvinculados do cotidiano",
+"apenas treinamentos técnicos individuais",
+"a substituição das equipes por voluntários"
+],
+"c": 0,
+"e": "Busca qualificar serviços e fortalecer o trabalho interdisciplinar."
+},
+{
+"t": "Atuação em serviços públicos",
+"d": "Médio",
+"q": "No atendimento a servidores ou cidadãos em um órgão público, o psicólogo deve:",
+"a": [
+"respeitar o sigilo profissional, mesmo perante a chefia institucional, e compartilhar apenas o necessário para a finalidade do serviço",
+"repassar à chefia o conteúdo integral dos atendimentos",
+"emitir laudos sem avaliação, se solicitado",
+"usar os atendimentos para avaliação de desempenho funcional sem o conhecimento do servidor"
+],
+"c": 0,
+"e": "O vínculo institucional não afasta os deveres do Código de Ética."
+},
+{
+"t": "Psicologia organizacional",
+"d": "Médio",
+"q": "No âmbito da saúde do trabalhador em órgãos públicos, a atuação preventiva do psicólogo diante de riscos psicossociais (sobrecarga, assédio, conflitos) envolve:",
+"a": [
+"diagnóstico das condições de trabalho, ações coletivas de prevenção e encaminhamentos, além do acolhimento individual",
+"apenas atendimento individual após o adoecimento",
+"a identificação de culpados para punição",
+"a recomendação de exoneração dos servidores adoecidos"
+],
+"c": 0,
+"e": "A perspectiva da saúde do trabalhador privilegia a organização do trabalho, e não apenas o indivíduo."
+},
+{
+"t": "Diversidade e direitos",
+"d": "Médio",
+"q": "Segundo resoluções do Conselho Federal de Psicologia, os psicólogos não colaborarão com eventos ou serviços que proponham:",
+"a": [
+"tratamento e cura de orientações sexuais não heterossexuais ou de identidades trans",
+"acolhimento de pessoas LGBTQIA+",
+"atendimento psicológico a famílias",
+"pesquisas sobre diversidade"
+],
+"c": 0,
+"e": "Resoluções CFP 01/1999 e 01/2018: orientação sexual e identidade de gênero não são patologias."
+},
+{
+"t": "Racismo",
+"d": "Médio",
+"q": "Pela Resolução CFP nº 18/2002, os psicólogos atuarão segundo os princípios éticos da profissão:",
+"a": [
+"contribuindo com seu conhecimento para uma reflexão sobre o preconceito e para a eliminação do racismo",
+"sem qualquer relação com o tema do racismo",
+"apenas em pesquisas acadêmicas",
+"somente quando solicitados judicialmente"
+],
+"c": 0,
+"e": "A norma veda práticas que favoreçam discriminação racial."
+},
+{
+"t": "Registro documental",
+"d": "Médio",
+"q": "O registro documental dos atendimentos psicológicos (prontuário ou registro), conforme o CFP, é:",
+"a": [
+"obrigatório, devendo conter informações essenciais e ser guardado com sigilo",
+"facultativo",
+"público, podendo ser consultado por qualquer servidor",
+"dispensável em serviços públicos"
+],
+"c": 0,
+"e": "Resolução CFP 01/2009: o registro é obrigatório e o acesso é restrito."
+}
+]
+}

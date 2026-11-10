@@ -311,6 +311,10 @@ export type Database = {
           id: string
           is_premium: boolean
           subject_id: string | null
+          topico: string | null
+          origem: string
+          nivel: string | null
+          content_hash: string | null
         }
         Insert: {
           alternativas: string[]
@@ -323,6 +327,10 @@ export type Database = {
           id?: string
           is_premium?: boolean
           subject_id?: string | null
+          topico?: string | null
+          origem?: string
+          nivel?: string | null
+          content_hash?: string | null
         }
         Update: {
           alternativas?: string[]
@@ -335,6 +343,10 @@ export type Database = {
           id?: string
           is_premium?: boolean
           subject_id?: string | null
+          topico?: string | null
+          origem?: string
+          nivel?: string | null
+          content_hash?: string | null
         }
         Relationships: [
           {
@@ -525,6 +537,220 @@ export type Database = {
         }
         Relationships: []
       }
+      study_tracks: {
+        Row: {
+          banca: string
+          created_at: string
+          description: string | null
+          edital_url: string | null
+          exam_date: string | null
+          id: string
+          is_active: boolean
+          name: string
+          organ: string
+          rules: Json
+          short_name: string
+          slug: string
+        }
+        Insert: {
+          banca: string
+          created_at?: string
+          description?: string | null
+          edital_url?: string | null
+          exam_date?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          organ: string
+          rules?: Json
+          short_name: string
+          slug: string
+        }
+        Update: {
+          banca?: string
+          created_at?: string
+          description?: string | null
+          edital_url?: string | null
+          exam_date?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          organ?: string
+          rules?: Json
+          short_name?: string
+          slug?: string
+        }
+        Relationships: []
+      }
+      study_track_modules: {
+        Row: {
+          cargos: string[]
+          description: string | null
+          display_order: number
+          id: string
+          name: string
+          nivel: string
+          slug: string
+          structure: Json
+          track_id: string
+        }
+        Insert: {
+          cargos?: string[]
+          description?: string | null
+          display_order?: number
+          id?: string
+          name: string
+          nivel: string
+          slug: string
+          structure?: Json
+          track_id: string
+        }
+        Update: {
+          cargos?: string[]
+          description?: string | null
+          display_order?: number
+          id?: string
+          name?: string
+          nivel?: string
+          slug?: string
+          structure?: Json
+          track_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "study_track_modules_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "study_tracks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      study_track_subjects: {
+        Row: {
+          ai_grounded_only: boolean
+          area: string
+          cargo: string | null
+          display_order: number
+          id: string
+          module_id: string
+          study_tips: string | null
+          subject_id: string
+          syllabus: string | null
+          weekly_target: number
+        }
+        Insert: {
+          ai_grounded_only?: boolean
+          area: string
+          cargo?: string | null
+          display_order?: number
+          id?: string
+          module_id: string
+          study_tips?: string | null
+          subject_id: string
+          syllabus?: string | null
+          weekly_target?: number
+        }
+        Update: {
+          ai_grounded_only?: boolean
+          area?: string
+          cargo?: string | null
+          display_order?: number
+          id?: string
+          module_id?: string
+          study_tips?: string | null
+          subject_id?: string
+          syllabus?: string | null
+          weekly_target?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "study_track_subjects_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "study_track_modules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "study_track_subjects_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      question_generation_runs: {
+        Row: {
+          created_at: string
+          error: string | null
+          id: number
+          inserted: number
+          model: string | null
+          requested: number
+          run_date: string
+          status: string
+          subject_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          error?: string | null
+          id?: never
+          inserted?: number
+          model?: string | null
+          requested?: number
+          run_date?: string
+          status: string
+          subject_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          error?: string | null
+          id?: never
+          inserted?: number
+          model?: string | null
+          requested?: number
+          run_date?: string
+          status?: string
+          subject_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "question_generation_runs_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_question_attempts: {
+        Row: {
+          created_at: string
+          id: number
+          is_correct: boolean
+          question_id: string
+          selected_index: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: never
+          is_correct: boolean
+          question_id: string
+          selected_index: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: never
+          is_correct?: boolean
+          question_id?: string
+          selected_index?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       subjects: {
         Row: {
           career_category_id: string
@@ -535,6 +761,7 @@ export type Database = {
           id: string
           is_active: boolean
           name: string
+          slug: string | null
         }
         Insert: {
           career_category_id: string
@@ -555,6 +782,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           name?: string
+          slug?: string | null
         }
         Relationships: [
           {
@@ -865,6 +1093,9 @@ export type Database = {
           id: string | null
           is_premium: boolean | null
           subject_id: string | null
+          topico: string | null
+          origem: string | null
+          nivel: string | null
         }
         Insert: {
           alternativas?: string[] | null
@@ -876,6 +1107,9 @@ export type Database = {
           id?: string | null
           is_premium?: boolean | null
           subject_id?: string | null
+          topico?: string | null
+          origem?: string | null
+          nivel?: string | null
         }
         Update: {
           alternativas?: string[] | null
@@ -887,6 +1121,9 @@ export type Database = {
           id?: string | null
           is_premium?: boolean | null
           subject_id?: string | null
+          topico?: string | null
+          origem?: string | null
+          nivel?: string | null
         }
         Relationships: [
           {
@@ -941,6 +1178,39 @@ export type Database = {
           is_current_user: boolean
           score: number
           total_questions: number
+        }[]
+      }
+      get_practice_questions: {
+        Args: {
+          p_limit?: number
+          p_mode?: string
+          p_nivel?: string | null
+          p_subject_id: string
+        }
+        Returns: {
+          alternativas: string[]
+          categoria: string
+          created_at: string
+          dificuldade: string
+          enunciado: string
+          id: string
+          is_premium: boolean
+          nivel: string | null
+          origem: string
+          subject_id: string
+          topico: string | null
+        }[]
+      }
+      get_track_progress: {
+        Args: { p_module_id: string }
+        Returns: {
+          answered: number
+          attempts_7d: number
+          correct_latest: number
+          new_this_week: number
+          subject_id: string
+          total_questions: number
+          wrong_latest: number
         }[]
       }
       get_user_tier: { Args: { p_user_id: string }; Returns: string }

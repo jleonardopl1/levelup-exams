@@ -8,6 +8,7 @@ import { AppHeader } from '@/components/AppHeader';
 import { AdminMetricsDashboard } from '@/components/admin/AdminMetricsDashboard';
 import { AdminUserManagement } from '@/components/admin/AdminUserManagement';
 import { AdminAuditLogs } from '@/components/admin/AdminAuditLogs';
+import { AdminQuestionGeneration } from '@/components/admin/AdminQuestionGeneration';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -163,6 +164,7 @@ export default function Admin() {
 
           {/* Questions Tab */}
           <TabsContent value="questions" className="space-y-4">
+            <AdminQuestionGeneration />
             <div className="flex gap-2">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />

@@ -1,0 +1,892 @@
+{
+"slug": "cmc26-raciocinio-logico",
+"questions": [
+{
+"t": "Conjuntos",
+"d": "Fácil",
+"q": "Em um grupo de 40 servidores, 25 falam inglês, 18 falam espanhol e 7 falam os dois idiomas. Quantos servidores não falam nenhum dos dois idiomas?",
+"a": [
+"4",
+"3",
+"7",
+"0"
+],
+"c": 0,
+"e": "|I ∪ E| = 25 + 18 − 7 = 36. Logo, 40 − 36 = 4 não falam nenhum dos dois."
+},
+{
+"t": "Conjuntos",
+"d": "Médio",
+"q": "Em uma pesquisa com 100 cidadãos sobre o uso dos canais da Câmara, 60 usam o site, 45 usam as redes sociais e 20 usam ambos. Quantos usam apenas um dos dois canais?",
+"a": [
+"65",
+"85",
+"45",
+"80"
+],
+"c": 0,
+"e": "Apenas site: 60 − 20 = 40; apenas redes: 45 − 20 = 25. Total com apenas um canal: 40 + 25 = 65."
+},
+{
+"t": "Conjuntos",
+"d": "Médio",
+"q": "Sejam A = {1, 2, 3, 4, 5} e B = {4, 5, 6, 7}. O conjunto A − B é:",
+"a": [
+"{1, 2, 3}",
+"{6, 7}",
+"{4, 5}",
+"{1, 2, 3, 6, 7}"
+],
+"c": 0,
+"e": "A − B reúne os elementos de A que não estão em B: {1, 2, 3}."
+},
+{
+"t": "Conjuntos",
+"d": "Médio",
+"q": "Um conjunto com 5 elementos possui quantos subconjuntos?",
+"a": [
+"32",
+"25",
+"10",
+"16"
+],
+"c": 0,
+"e": "O número de subconjuntos de um conjunto com n elementos é 2ⁿ = 2⁵ = 32 (incluindo o vazio e o próprio conjunto)."
+},
+{
+"t": "Conjuntos",
+"d": "Difícil",
+"q": "Em uma turma de capacitação, 30 servidores fizeram o curso de Excel, 25 o de Redação Oficial e 20 o de LGPD; 10 fizeram Excel e Redação, 8 Excel e LGPD, 6 Redação e LGPD e 3 fizeram os três. Quantos servidores fizeram pelo menos um curso?",
+"a": [
+"54",
+"61",
+"47",
+"58"
+],
+"c": 0,
+"e": "Inclusão-exclusão: 30 + 25 + 20 − 10 − 8 − 6 + 3 = 54."
+},
+{
+"t": "Proposições",
+"d": "Fácil",
+"q": "Assinale a alternativa que apresenta uma proposição.",
+"a": [
+"Que horas começa a sessão?",
+"Feche a porta do plenário.",
+"Cuiabá é a capital de Mato Grosso.",
+"x + 3 = 10"
+],
+"c": 2,
+"e": "Proposição é sentença declarativa que pode ser julgada como V ou F. Perguntas, ordens e sentenças abertas (com variável) não são proposições."
+},
+{
+"t": "Conectivos",
+"d": "Fácil",
+"q": "Sabendo que p é verdadeira e q é falsa, assinale a proposição verdadeira.",
+"a": [
+"p ∧ q",
+"p → q",
+"p ∨ q",
+"p ↔ q"
+],
+"c": 2,
+"e": "A disjunção é verdadeira se ao menos um componente for V. p ∧ q é F; p → q (V → F) é F; p ↔ q (valores diferentes) é F."
+},
+{
+"t": "Conectivos",
+"d": "Médio",
+"q": "A proposição \"Se o projeto for aprovado, então a lei será publicada\" é falsa somente quando:",
+"a": [
+"o projeto é aprovado e a lei não é publicada",
+"o projeto não é aprovado e a lei é publicada",
+"o projeto não é aprovado e a lei não é publicada",
+"o projeto é aprovado e a lei é publicada"
+],
+"c": 0,
+"e": "A condicional p → q só é falsa quando o antecedente é verdadeiro e o consequente é falso (V → F)."
+},
+{
+"t": "Negação",
+"d": "Médio",
+"q": "A negação de \"O vereador discursou e votou\" é:",
+"a": [
+"O vereador não discursou e não votou.",
+"O vereador não discursou ou não votou.",
+"O vereador discursou ou votou.",
+"Se o vereador discursou, então votou."
+],
+"c": 1,
+"e": "Pela lei de De Morgan, ~(p ∧ q) ≡ ~p ∨ ~q."
+},
+{
+"t": "Negação",
+"d": "Médio",
+"q": "A negação de \"Maria estuda ou trabalha\" é:",
+"a": [
+"Maria não estuda e não trabalha.",
+"Maria não estuda ou não trabalha.",
+"Maria estuda e trabalha.",
+"Maria estuda e não trabalha."
+],
+"c": 0,
+"e": "~(p ∨ q) ≡ ~p ∧ ~q (De Morgan)."
+},
+{
+"t": "Negação",
+"d": "Médio",
+"q": "A negação lógica de \"Se chover, a sessão itinerante será cancelada\" é:",
+"a": [
+"Se não chover, a sessão itinerante não será cancelada.",
+"Chove e a sessão itinerante não é cancelada.",
+"Não chove ou a sessão itinerante é cancelada.",
+"Não chove e a sessão itinerante é cancelada."
+],
+"c": 1,
+"e": "~(p → q) ≡ p ∧ ~q: mantém-se o antecedente e nega-se o consequente."
+},
+{
+"t": "Negação",
+"d": "Fácil",
+"q": "A negação de \"Nenhum servidor faltou\" é:",
+"a": [
+"Todos os servidores faltaram.",
+"Algum servidor faltou.",
+"Nenhum servidor compareceu.",
+"Algum servidor não faltou."
+],
+"c": 1,
+"e": "A negação de 'nenhum A é B' é 'algum A é B' (existe ao menos um)."
+},
+{
+"t": "Quantificadores",
+"d": "Médio",
+"q": "A negação de \"Todos os candidatos foram aprovados\" é:",
+"a": [
+"Nenhum candidato foi aprovado.",
+"Todos os candidatos foram reprovados.",
+"Pelo menos um candidato não foi aprovado.",
+"Algum candidato foi aprovado."
+],
+"c": 2,
+"e": "A negação do quantificador universal é o existencial com o predicado negado: 'existe pelo menos um que não...'."
+},
+{
+"t": "Quantificadores",
+"d": "Médio",
+"q": "Considere verdadeira a afirmação \"Algum servidor da Câmara é advogado\". Com base nela, é necessariamente verdadeiro que:",
+"a": [
+"todo servidor da Câmara é advogado",
+"algum advogado é servidor da Câmara",
+"nenhum advogado é servidor da Câmara",
+"algum servidor da Câmara não é advogado"
+],
+"c": 1,
+"e": "A proposição particular afirmativa é conversível: 'algum A é B' equivale a 'algum B é A'. As demais não decorrem necessariamente."
+},
+{
+"t": "Equivalências",
+"d": "Médio",
+"q": "Uma proposição logicamente equivalente a \"Se sou aprovado, então sou nomeado\" é:",
+"a": [
+"Se sou nomeado, então sou aprovado.",
+"Se não sou aprovado, então não sou nomeado.",
+"Se não sou nomeado, então não sou aprovado.",
+"Sou aprovado e não sou nomeado."
+],
+"c": 2,
+"e": "A contrapositiva (~q → ~p) é equivalente à condicional p → q. A recíproca e a inversa não são equivalentes."
+},
+{
+"t": "Equivalências",
+"d": "Difícil",
+"q": "A proposição \"Se o servidor não bater o ponto, então receberá falta\" é equivalente a:",
+"a": [
+"O servidor bate o ponto ou recebe falta.",
+"O servidor não bate o ponto e recebe falta.",
+"O servidor bate o ponto e não recebe falta.",
+"Se o servidor bater o ponto, não receberá falta."
+],
+"c": 0,
+"e": "p → q ≡ ~p ∨ q. Com p = 'não bate o ponto', ~p = 'bate o ponto': 'bate o ponto ou recebe falta'."
+},
+{
+"t": "Equivalências",
+"d": "Médio",
+"q": "A proposição \"Não é verdade que Ana é técnica e João é analista\" é equivalente a:",
+"a": [
+"Ana não é técnica e João não é analista.",
+"Ana não é técnica ou João não é analista.",
+"Se Ana é técnica, então João é analista.",
+"Ana é técnica ou João é analista."
+],
+"c": 1,
+"e": "De Morgan: ~(p ∧ q) ≡ ~p ∨ ~q."
+},
+{
+"t": "Argumentação",
+"d": "Médio",
+"q": "Considere as premissas: \"Todo vereador é eleito\" e \"Carlos é vereador\". A conclusão válida é:",
+"a": [
+"Carlos é eleito.",
+"Todo eleito é vereador.",
+"Carlos não é eleito.",
+"Algum eleito não é vereador."
+],
+"c": 0,
+"e": "Silogismo válido (modus ponens categórico): se todo V é E e Carlos é V, então Carlos é E."
+},
+{
+"t": "Argumentação",
+"d": "Médio",
+"q": "Premissas: \"Se há quórum, a votação ocorre.\" e \"A votação não ocorreu.\" Conclui-se validamente que:",
+"a": [
+"houve quórum",
+"não houve quórum",
+"a sessão foi cancelada",
+"a votação foi adiada para o dia seguinte"
+],
+"c": 1,
+"e": "Modus tollens: de p → q e ~q, conclui-se ~p."
+},
+{
+"t": "Argumentação",
+"d": "Difícil",
+"q": "Assinale o argumento INVÁLIDO.",
+"a": [
+"Se chove, a rua molha. Choveu. Logo, a rua molhou.",
+"Se chove, a rua molha. A rua não molhou. Logo, não choveu.",
+"Se chove, a rua molha. A rua molhou. Logo, choveu.",
+"Chove ou neva. Não nevou. Logo, choveu."
+],
+"c": 2,
+"e": "Afirmar o consequente é falácia: a rua pode ter molhado por outro motivo. As demais são modus ponens, modus tollens e silogismo disjuntivo."
+},
+{
+"t": "Diagramas lógicos",
+"d": "Médio",
+"q": "Se \"Todo técnico é servidor\" e \"Nenhum servidor é terceirizado\", então:",
+"a": [
+"algum técnico é terceirizado",
+"nenhum técnico é terceirizado",
+"todo terceirizado é técnico",
+"algum servidor é terceirizado"
+],
+"c": 1,
+"e": "O conjunto dos técnicos está contido no dos servidores, que é disjunto do dos terceirizados; logo, técnicos e terceirizados são disjuntos."
+},
+{
+"t": "Diagramas lógicos",
+"d": "Médio",
+"q": "Sabe-se que \"Alguns analistas são contadores\" e \"Todos os contadores são graduados\". Pode-se concluir que:",
+"a": [
+"alguns analistas são graduados",
+"todos os analistas são graduados",
+"nenhum analista é graduado",
+"todos os graduados são contadores"
+],
+"c": 0,
+"e": "Os analistas que são contadores estão dentro do conjunto dos graduados; logo, ao menos alguns analistas são graduados."
+},
+{
+"t": "Sequências",
+"d": "Fácil",
+"q": "Qual o próximo termo da sequência 3, 7, 11, 15, 19, ...?",
+"a": [
+"23",
+"22",
+"24",
+"21"
+],
+"c": 0,
+"e": "Progressão aritmética de razão 4: 19 + 4 = 23."
+},
+{
+"t": "Sequências",
+"d": "Médio",
+"q": "Qual o próximo termo da sequência 2, 6, 18, 54, ...?",
+"a": [
+"162",
+"108",
+"72",
+"216"
+],
+"c": 0,
+"e": "Progressão geométrica de razão 3: 54 × 3 = 162."
+},
+{
+"t": "Sequências",
+"d": "Médio",
+"q": "Observe a sequência 1, 1, 2, 3, 5, 8, 13, ... O próximo termo é:",
+"a": [
+"21",
+"18",
+"20",
+"26"
+],
+"c": 0,
+"e": "Sequência de Fibonacci: cada termo é a soma dos dois anteriores (8 + 13 = 21)."
+},
+{
+"t": "Sequências",
+"d": "Médio",
+"q": "Na sequência de letras A, C, F, J, O, ..., considerando o alfabeto de 26 letras, a próxima letra é:",
+"a": [
+"U",
+"T",
+"V",
+"S"
+],
+"c": 0,
+"e": "Os saltos aumentam: +2, +3, +4, +5, logo o próximo é +6. O é a 15ª letra; 15 + 6 = 21ª letra, U."
+},
+{
+"t": "Sequências",
+"d": "Difícil",
+"q": "Os termos da sequência 1, 4, 9, 16, 25, ... seguem um padrão. O 12º termo é:",
+"a": [
+"144",
+"121",
+"132",
+"169"
+],
+"c": 0,
+"e": "Os termos são os quadrados perfeitos n²; o 12º termo é 12² = 144."
+},
+{
+"t": "Números reais",
+"d": "Fácil",
+"q": "O valor de 2,5 × 0,4 + 3/4 é:",
+"a": [
+"1,75",
+"1,25",
+"2,15",
+"1,50"
+],
+"c": 0,
+"e": "2,5 × 0,4 = 1,0 e 3/4 = 0,75; soma = 1,75."
+},
+{
+"t": "Porcentagem",
+"d": "Médio",
+"q": "O vencimento de um servidor era de R$ 5.000,00 e recebeu reajuste de 8%. O novo vencimento é:",
+"a": [
+"R$ 5.400,00",
+"R$ 5.080,00",
+"R$ 5.800,00",
+"R$ 5.040,00"
+],
+"c": 0,
+"e": "8% de 5.000 = 400; 5.000 + 400 = 5.400."
+},
+{
+"t": "Porcentagem",
+"d": "Difícil",
+"q": "Um preço sofreu aumento de 20% e, em seguida, desconto de 20%. Em relação ao preço inicial, o preço final é:",
+"a": [
+"4% menor",
+"igual",
+"4% maior",
+"20% menor"
+],
+"c": 0,
+"e": "1,20 × 0,80 = 0,96: o preço final corresponde a 96% do inicial, ou seja, 4% menor."
+},
+{
+"t": "Razão e proporção",
+"d": "Médio",
+"q": "Três servidores digitalizam 600 documentos em 4 horas. Mantido o ritmo, quantos documentos 5 servidores digitalizarão em 6 horas?",
+"a": [
+"1.500",
+"1.200",
+"1.000",
+"1.800"
+],
+"c": 0,
+"e": "Cada servidor faz 600/(3×4) = 50 documentos por hora. 5 × 6 × 50 = 1.500."
+},
+{
+"t": "Regra de três",
+"d": "Médio",
+"q": "Se 8 operários constroem um muro em 12 dias, em quantos dias 6 operários, com a mesma produtividade, construiriam o mesmo muro?",
+"a": [
+"16",
+"9",
+"14",
+"18"
+],
+"c": 0,
+"e": "Grandezas inversamente proporcionais: 8 × 12 = 6 × d → d = 96/6 = 16 dias."
+},
+{
+"t": "Frações",
+"d": "Médio",
+"q": "Do orçamento de um evento, 1/3 foi gasto com som e 1/4 com decoração. Que fração do orçamento ainda resta?",
+"a": [
+"5/12",
+"7/12",
+"1/2",
+"2/7"
+],
+"c": 0,
+"e": "1/3 + 1/4 = 4/12 + 3/12 = 7/12 gastos; restam 5/12."
+},
+{
+"t": "Médias",
+"d": "Fácil",
+"q": "As notas de um candidato em três provas foram 6, 8 e 10. Sua média aritmética é:",
+"a": [
+"8",
+"7",
+"9",
+"24"
+],
+"c": 0,
+"e": "(6 + 8 + 10)/3 = 24/3 = 8."
+},
+{
+"t": "Médias",
+"d": "Médio",
+"q": "Em um concurso, a prova objetiva tem peso 2 e a discursiva peso 1. Um candidato obteve 70 na objetiva e 85 na discursiva. Sua média ponderada é:",
+"a": [
+"75",
+"77,5",
+"80",
+"72"
+],
+"c": 0,
+"e": "(70 × 2 + 85 × 1)/3 = (140 + 85)/3 = 225/3 = 75."
+},
+{
+"t": "Problemas aritméticos",
+"d": "Médio",
+"q": "Uma sessão começou às 9h15min e durou 3h50min. Ela terminou às:",
+"a": [
+"13h05min",
+"12h65min",
+"12h55min",
+"13h15min"
+],
+"c": 0,
+"e": "9h15 + 3h = 12h15; 12h15 + 50 min = 13h05."
+},
+{
+"t": "Problemas aritméticos",
+"d": "Médio",
+"q": "Uma prova tem 70 questões: 30 valem 1 ponto e 40 valem 1,75 ponto. Qual é a pontuação máxima?",
+"a": [
+"100",
+"110",
+"90",
+"70"
+],
+"c": 0,
+"e": "30 × 1 + 40 × 1,75 = 30 + 70 = 100 pontos — exatamente a estrutura do edital da Câmara de Cuiabá."
+},
+{
+"t": "Problemas aritméticos",
+"d": "Médio",
+"q": "Um candidato precisa de pelo menos 40 pontos na prova (30 questões de 1 ponto e 40 de 1,75). Se acertou 18 questões de 1 ponto, quantas questões de 1,75 ponto, no mínimo, ele precisa acertar?",
+"a": [
+"13",
+"12",
+"11",
+"14"
+],
+"c": 0,
+"e": "Faltam 40 − 18 = 22 pontos. 22/1,75 ≈ 12,57, então são necessárias 13 questões (12 dariam 21 pontos)."
+},
+{
+"t": "Princípio multiplicativo",
+"d": "Fácil",
+"q": "Um servidor tem 4 camisas e 3 calças. De quantas maneiras diferentes ele pode se vestir com uma camisa e uma calça?",
+"a": [
+"12",
+"7",
+"24",
+"9"
+],
+"c": 0,
+"e": "Princípio multiplicativo: 4 × 3 = 12."
+},
+{
+"t": "Princípio multiplicativo",
+"d": "Médio",
+"q": "Quantas senhas de 3 dígitos distintos podem ser formadas com os algarismos de 0 a 9?",
+"a": [
+"720",
+"1.000",
+"504",
+"210"
+],
+"c": 0,
+"e": "10 × 9 × 8 = 720 (cada dígito escolhido não pode repetir)."
+},
+{
+"t": "Princípio aditivo",
+"d": "Fácil",
+"q": "Para ir da sede da Câmara ao CPA, há 3 linhas de ônibus e 2 opções de transporte por aplicativo. Usando um único meio, de quantas formas é possível fazer o trajeto?",
+"a": [
+"5",
+"6",
+"3",
+"2"
+],
+"c": 0,
+"e": "Princípio aditivo: as opções são mutuamente exclusivas, então 3 + 2 = 5."
+},
+{
+"t": "Princípio multiplicativo",
+"d": "Médio",
+"q": "Quantos números de 3 algarismos (podendo repetir) podem ser formados usando apenas os algarismos 1, 2, 3 e 4?",
+"a": [
+"64",
+"24",
+"12",
+"81"
+],
+"c": 0,
+"e": "Com repetição: 4 × 4 × 4 = 64."
+},
+{
+"t": "Princípio multiplicativo",
+"d": "Médio",
+"q": "Uma placa de identificação usa 2 letras (de 26) seguidas de 2 algarismos (de 0 a 9), podendo repetir. Quantas placas distintas existem?",
+"a": [
+"67.600",
+"6.760",
+"676",
+"52.000"
+],
+"c": 0,
+"e": "26 × 26 × 10 × 10 = 676 × 100 = 67.600."
+},
+{
+"t": "Raciocínio lógico",
+"d": "Médio",
+"q": "Ana, Bruno e Carla ocupam os cargos de técnico, analista e contador, não necessariamente nessa ordem. Ana não é contadora; Bruno não é técnico nem contador. Então:",
+"a": [
+"Carla é contadora",
+"Ana é analista",
+"Bruno é técnico",
+"Carla é técnica"
+],
+"c": 0,
+"e": "Bruno não é técnico nem contador, logo é analista. Ana não é contadora (e não é analista), logo é técnica; Carla é contadora."
+},
+{
+"t": "Raciocínio lógico",
+"d": "Médio",
+"q": "Em uma fila, Pedro está à frente de Luísa, que está à frente de Marcos. Rita está atrás de Marcos. Quem está em último lugar?",
+"a": [
+"Rita",
+"Marcos",
+"Luísa",
+"Pedro"
+],
+"c": 0,
+"e": "Ordem: Pedro, Luísa, Marcos, Rita. Rita é a última."
+},
+{
+"t": "Verdades e mentiras",
+"d": "Difícil",
+"q": "Um dos três servidores — Ari, Bia ou Caio — esqueceu a porta do arquivo aberta. Ari diz: \"Fui eu.\" Bia diz: \"Não fui eu.\" Caio diz: \"Foi o Ari.\" Sabendo que apenas um deles diz a verdade, quem esqueceu a porta aberta?",
+"a": [
+"Caio",
+"Ari",
+"Bia",
+"Não é possível determinar"
+],
+"c": 0,
+"e": "Teste cada hipótese. Se foi Ari: Ari (V) e Bia (V) — duas verdades, não serve. Se foi Bia: Ari (F), Bia (F), Caio (F) — nenhuma verdade, não serve. Se foi Caio: Ari (F), Bia (V), Caio (F) — exatamente uma verdade. Logo, foi Caio."
+},
+{
+"t": "Operações com números reais",
+"d": "Médio",
+"q": "O resultado de (−3)² − 2 × (−4) + 10 ÷ 5 é:",
+"a": [
+"19",
+"−1",
+"15",
+"11"
+],
+"c": 0,
+"e": "(−3)² = 9; −2 × (−4) = +8; 10 ÷ 5 = 2. Total: 9 + 8 + 2 = 19."
+},
+{
+"t": "Operações com números reais",
+"d": "Médio",
+"q": "Qual é o menor número que, dividido por 6, 8 e 12, deixa resto zero (MMC)?",
+"a": [
+"24",
+"48",
+"12",
+"96"
+],
+"c": 0,
+"e": "O menor múltiplo comum de 6, 8 e 12 é o MMC(6, 8, 12) = 24 (24 = 2³ × 3)."
+},
+{
+"t": "Operações com números reais",
+"d": "Médio",
+"q": "Três sessões temáticas ocorrem a cada 4, 6 e 10 dias. Se ocorreram juntas hoje, voltarão a coincidir daqui a:",
+"a": [
+"60 dias",
+"40 dias",
+"120 dias",
+"20 dias"
+],
+"c": 0,
+"e": "MMC(4, 6, 10) = 60 dias."
+},
+{
+"t": "Operações com números reais",
+"d": "Médio",
+"q": "Deseja-se dividir 48 cadeiras azuis e 36 brancas em fileiras com a mesma quantidade de cadeiras e de uma só cor, com o maior número possível de cadeiras por fileira. Quantas cadeiras terá cada fileira?",
+"a": [
+"12",
+"6",
+"18",
+"4"
+],
+"c": 0,
+"e": "O maior número que divide 48 e 36 ao mesmo tempo é o MDC(48, 36) = 12: serão 4 fileiras azuis e 3 brancas de 12 cadeiras."
+},
+{
+"t": "Raciocínio sequencial",
+"d": "Difícil",
+"q": "Um relógio adianta 3 minutos a cada hora. Se foi acertado às 8h, que horas ele marcará quando forem, de fato, 18h do mesmo dia?",
+"a": [
+"18h30min",
+"18h10min",
+"18h03min",
+"18h20min"
+],
+"c": 0,
+"e": "De 8h às 18h passam 10 horas; 10 × 3 = 30 minutos de adiantamento: marcará 18h30min."
+},
+{
+"t": "Tabela-verdade",
+"d": "Médio",
+"n": "superior",
+"q": "Quantas linhas tem a tabela-verdade de uma proposição composta por 4 proposições simples distintas?",
+"a": [
+"16",
+"8",
+"4",
+"32"
+],
+"c": 0,
+"e": "O número de linhas é 2ⁿ, com n proposições simples: 2⁴ = 16."
+},
+{
+"t": "Tautologia",
+"d": "Médio",
+"n": "superior",
+"q": "Assinale a proposição que é uma tautologia.",
+"a": [
+"p ∨ ~p",
+"p ∧ ~p",
+"p → ~p",
+"p ↔ ~p"
+],
+"c": 0,
+"e": "p ∨ ~p (princípio do terceiro excluído) é sempre verdadeira. p ∧ ~p é contradição; as demais são contingentes ou contradições."
+},
+{
+"t": "Tautologia",
+"d": "Difícil",
+"n": "superior",
+"q": "A proposição (p ∧ q) → p é:",
+"a": [
+"uma tautologia",
+"uma contradição",
+"uma contingência",
+"equivalente a ~p"
+],
+"c": 0,
+"e": "Se p ∧ q é verdadeira, então p é verdadeira; a condicional nunca tem a forma V → F. Logo, é tautologia (simplificação)."
+},
+{
+"t": "Condição necessária e suficiente",
+"d": "Médio",
+"n": "superior",
+"q": "Na proposição \"Se o candidato é aprovado, então ele é nomeado\", pode-se afirmar que:",
+"a": [
+"ser aprovado é condição suficiente para ser nomeado",
+"ser aprovado é condição necessária para ser nomeado",
+"ser nomeado é condição suficiente para ser aprovado",
+"ser aprovado é condição necessária e suficiente para ser nomeado"
+],
+"c": 0,
+"e": "Em p → q, p é condição suficiente para q, e q é condição necessária para p."
+},
+{
+"t": "Condição necessária e suficiente",
+"d": "Difícil",
+"n": "superior",
+"q": "\"Ter quórum é condição necessária para haver votação.\" Essa frase equivale a:",
+"a": [
+"Se há votação, então há quórum.",
+"Se há quórum, então há votação.",
+"Há quórum se, e somente se, há votação.",
+"Se não há votação, então não há quórum."
+],
+"c": 0,
+"e": "Se q é condição necessária para p, então p → q: 'se há votação, há quórum'."
+},
+{
+"t": "Bicondicional",
+"d": "Médio",
+"n": "superior",
+"q": "A proposição p ↔ q é verdadeira quando:",
+"a": [
+"p e q têm o mesmo valor lógico",
+"p é verdadeira e q é falsa",
+"apenas p é verdadeira",
+"p e q têm valores lógicos opostos"
+],
+"c": 0,
+"e": "A bicondicional é verdadeira quando ambos os componentes têm o mesmo valor (V e V, ou F e F)."
+},
+{
+"t": "Permutação",
+"d": "Fácil",
+"n": "superior",
+"q": "De quantas maneiras 5 vereadores podem ser dispostos em fila para uma foto oficial?",
+"a": [
+"120",
+"25",
+"60",
+"24"
+],
+"c": 0,
+"e": "Permutação simples: 5! = 120."
+},
+{
+"t": "Permutação com repetição",
+"d": "Médio",
+"n": "superior",
+"q": "Quantos anagramas tem a palavra CUIABA?",
+"a": [
+"360",
+"720",
+"120",
+"180"
+],
+"c": 0,
+"e": "6 letras com A repetido 2 vezes: 6!/2! = 720/2 = 360."
+},
+{
+"t": "Arranjo",
+"d": "Médio",
+"n": "superior",
+"q": "De um grupo de 8 vereadores, de quantas formas é possível escolher um Presidente, um Vice-Presidente e um Secretário?",
+"a": [
+"336",
+"56",
+"512",
+"24"
+],
+"c": 0,
+"e": "A ordem importa (cargos distintos): A(8,3) = 8 × 7 × 6 = 336."
+},
+{
+"t": "Combinação",
+"d": "Médio",
+"n": "superior",
+"q": "De quantas formas é possível formar uma comissão de 3 membros a partir de 8 vereadores?",
+"a": [
+"56",
+"336",
+"24",
+"40"
+],
+"c": 0,
+"e": "A ordem não importa: C(8,3) = 8!/(3!5!) = 56."
+},
+{
+"t": "Combinação",
+"d": "Difícil",
+"n": "superior",
+"q": "Uma comissão de 4 pessoas será formada com 6 analistas e 4 técnicos, devendo ter exatamente 2 técnicos. Quantas comissões são possíveis?",
+"a": [
+"90",
+"210",
+"36",
+"60"
+],
+"c": 0,
+"e": "C(4,2) × C(6,2) = 6 × 15 = 90."
+},
+{
+"t": "Probabilidade",
+"d": "Fácil",
+"n": "superior",
+"q": "Lançando-se um dado honesto de seis faces, qual a probabilidade de sair um número par?",
+"a": [
+"1/2",
+"1/3",
+"1/6",
+"2/3"
+],
+"c": 0,
+"e": "Casos favoráveis {2, 4, 6} = 3; possíveis = 6. P = 3/6 = 1/2."
+},
+{
+"t": "Probabilidade",
+"d": "Médio",
+"n": "superior",
+"q": "Uma urna tem 5 bolas vermelhas e 3 azuis. Retirando-se duas bolas, sem reposição, qual a probabilidade de ambas serem vermelhas?",
+"a": [
+"5/14",
+"25/64",
+"5/8",
+"1/4"
+],
+"c": 0,
+"e": "(5/8) × (4/7) = 20/56 = 5/14."
+},
+{
+"t": "Probabilidade",
+"d": "Médio",
+"n": "superior",
+"q": "Lançando-se duas moedas honestas, qual a probabilidade de obter pelo menos uma cara?",
+"a": [
+"3/4",
+"1/2",
+"1/4",
+"2/3"
+],
+"c": 0,
+"e": "Probabilidade complementar: P(nenhuma cara) = 1/4; logo, P(pelo menos uma) = 1 − 1/4 = 3/4."
+},
+{
+"t": "Probabilidade",
+"d": "Difícil",
+"n": "superior",
+"q": "Em um concurso, 60% dos inscritos são do nível médio e 40% do superior. Entre os do médio, 20% são aprovados; entre os do superior, 30%. Sorteando-se um inscrito, a probabilidade de ele ter sido aprovado é:",
+"a": [
+"24%",
+"25%",
+"50%",
+"12%"
+],
+"c": 0,
+"e": "Probabilidade total: 0,6 × 0,2 + 0,4 × 0,3 = 0,12 + 0,12 = 0,24 = 24%."
+},
+{
+"t": "Probabilidade",
+"d": "Médio",
+"n": "superior",
+"q": "Lançando-se dois dados honestos, qual a probabilidade de a soma ser 7?",
+"a": [
+"1/6",
+"1/12",
+"7/36",
+"1/36"
+],
+"c": 0,
+"e": "Pares com soma 7: (1,6), (2,5), (3,4), (4,3), (5,2), (6,1) = 6 em 36 possibilidades: 6/36 = 1/6."
+}
+]
+}

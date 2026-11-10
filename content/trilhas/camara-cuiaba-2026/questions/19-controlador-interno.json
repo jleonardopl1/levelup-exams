@@ -1,0 +1,681 @@
+{
+"slug": "cmc26-controlador-interno",
+"questions": [
+{
+"t": "Controle interno - CF",
+"d": "Médio",
+"q": "Segundo o art. 70 da Constituição, a fiscalização contábil, financeira, orçamentária, operacional e patrimonial será exercida quanto à:",
+"a": [
+"legalidade, legitimidade, economicidade, aplicação das subvenções e renúncia de receitas",
+"conveniência política, oportunidade e eficiência",
+"lucratividade, liquidez e rentabilidade",
+"moralidade, publicidade e impessoalidade, apenas"
+],
+"c": 0,
+"e": "Exercida pelo controle externo (Legislativo com auxílio do Tribunal de Contas) e pelo sistema de controle interno de cada Poder."
+},
+{
+"t": "Controle interno - CF art. 74",
+"d": "Médio",
+"q": "É finalidade do sistema de controle interno, segundo o art. 74 da Constituição:",
+"a": [
+"avaliar o cumprimento das metas previstas no PPA, a execução dos programas de governo e dos orçamentos",
+"julgar as contas dos administradores",
+"aplicar sanções aos gestores por ilegalidade de despesa",
+"sustar contratos administrativos"
+],
+"c": 0,
+"e": "Também: comprovar a legalidade e avaliar resultados (eficácia e eficiência), controlar operações de crédito, avais e garantias, e apoiar o controle externo."
+},
+{
+"t": "Controle interno - CF art. 74",
+"d": "Médio",
+"q": "Pelo art. 74, § 1º, da Constituição, os responsáveis pelo controle interno, ao tomarem conhecimento de irregularidade ou ilegalidade, dela darão ciência ao Tribunal de Contas:",
+"a": [
+"sob pena de responsabilidade solidária",
+"apenas se houver dano superior a determinado valor",
+"somente após autorização do chefe do Poder",
+"no prazo de um ano"
+],
+"c": 0,
+"e": "Regra reproduzida nas atribuições do Controlador Interno da Câmara (art. 6º-A, XV e XVII, da LC 235/2011)."
+},
+{
+"t": "Controle interno - CF art. 74",
+"d": "Fácil",
+"q": "Segundo a Constituição, é parte legítima para, na forma da lei, denunciar irregularidades ou ilegalidades perante o Tribunal de Contas:",
+"a": [
+"qualquer cidadão, partido político, associação ou sindicato",
+"apenas o Ministério Público",
+"somente os vereadores",
+"exclusivamente o controlador interno"
+],
+"c": 0,
+"e": "Art. 74, § 2º, da CF."
+},
+{
+"t": "Controle interno - conceitos",
+"d": "Médio",
+"q": "O controle interno administrativo, entendido como processo integrado, tem como objetivos, segundo o COSO:",
+"a": [
+"eficácia e eficiência das operações, confiabilidade das informações (relatórios) e conformidade com leis e regulamentos",
+"apenas a detecção de fraudes após sua ocorrência",
+"exclusivamente o cumprimento do orçamento",
+"a substituição do controle externo"
+],
+"c": 0,
+"e": "O COSO I também orienta a gestão de riscos no setor público, incorporado por normas como a IN Conjunta MP/CGU 01/2016 (federal)."
+},
+{
+"t": "Controle interno - COSO",
+"d": "Médio",
+"q": "São componentes do controle interno, segundo o modelo COSO:",
+"a": [
+"ambiente de controle, avaliação de riscos, atividades de controle, informação e comunicação, e atividades de monitoramento",
+"planejamento, organização, direção e controle",
+"legalidade, legitimidade e economicidade",
+"auditoria, inspeção e levantamento"
+],
+"c": 0,
+"e": "O ambiente de controle (integridade, valores, estrutura) é a base dos demais componentes."
+},
+{
+"t": "Controle interno - três linhas",
+"d": "Médio",
+"q": "No Modelo das Três Linhas (IIA, 2020), a auditoria interna corresponde:",
+"a": [
+"à terceira linha, oferecendo avaliação e assessoria independentes e objetivas",
+"à primeira linha, que executa as operações",
+"à segunda linha, responsável pela gestão de riscos operacional",
+"ao órgão de governança que define a estratégia"
+],
+"c": 0,
+"e": "Primeira linha: gestores operacionais; segunda: gestão de riscos/conformidade; terceira: auditoria interna, que se reporta ao órgão de governança."
+},
+{
+"t": "Controle interno - segregação",
+"d": "Médio",
+"q": "O princípio de controle interno que impede que um mesmo servidor autorize, execute, registre e controle uma mesma operação é a:",
+"a": [
+"segregação de funções",
+"rotatividade de pessoal",
+"delegação de competência",
+"centralização administrativa"
+],
+"c": 0,
+"e": "A segregação reduz o risco de erros e fraudes; a Lei 14.133/2021 a exige expressamente nas contratações (art. 7º, § 1º)."
+},
+{
+"t": "Controle - momento",
+"d": "Médio",
+"q": "Quanto ao momento, o controle exercido antes da prática do ato, como a análise prévia de minuta de edital, é denominado controle:",
+"a": [
+"prévio (preventivo, a priori)",
+"concomitante",
+"posterior (a posteriori)",
+"corretivo"
+],
+"c": 0,
+"e": "Concomitante: durante a execução (acompanhamento); posterior: após a conclusão (ex.: auditoria de contas)."
+},
+{
+"t": "Auditoria - conceitos",
+"d": "Médio",
+"q": "A auditoria de conformidade (compliance), no setor público, tem por objetivo principal:",
+"a": [
+"verificar se as atividades, transações e informações estão de acordo com as normas e regulamentos aplicáveis",
+"avaliar a economicidade, eficiência, eficácia e efetividade de programas",
+"emitir opinião sobre as demonstrações financeiras",
+"investigar crimes"
+],
+"c": 0,
+"e": "As ISSAI dividem as auditorias em financeira, de conformidade e operacional (de desempenho)."
+},
+{
+"t": "Auditoria - operacional",
+"d": "Médio",
+"q": "A auditoria operacional (de desempenho) examina:",
+"a": [
+"a economicidade, a eficiência, a eficácia e a efetividade de programas, órgãos e atividades",
+"exclusivamente a legalidade dos atos",
+"somente a fidedignidade dos balanços",
+"apenas a documentação de despesas com diárias"
+],
+"c": 0,
+"e": "Os '4 Es' do desempenho, com foco em melhoria da gestão."
+},
+{
+"t": "Auditoria - planejamento",
+"d": "Médio",
+"q": "Na fase de planejamento da auditoria, entre outros elementos, o auditor deve:",
+"a": [
+"conhecer o objeto, avaliar riscos e controles, definir escopo, questões, critérios e procedimentos (matriz de planejamento)",
+"emitir o relatório final",
+"aplicar penalidades aos gestores",
+"executar diretamente as atividades do auditado"
+],
+"c": 0,
+"e": "A matriz de planejamento relaciona questões de auditoria, informações requeridas, fontes, procedimentos e possíveis achados."
+},
+{
+"t": "Auditoria - papéis de trabalho",
+"d": "Médio",
+"q": "Os papéis de trabalho de auditoria são:",
+"a": [
+"a documentação que registra o planejamento, os procedimentos aplicados, as evidências obtidas e as conclusões alcançadas",
+"os documentos pessoais do auditor",
+"as notas fiscais do auditado",
+"o relatório publicado ao cidadão, exclusivamente"
+],
+"c": 0,
+"e": "Devem ser suficientes para que outro auditor experiente compreenda o trabalho e as conclusões."
+},
+{
+"t": "Auditoria - evidências",
+"d": "Médio",
+"q": "Segundo as normas de auditoria, as evidências devem ser:",
+"a": [
+"suficientes (quantidade) e apropriadas (qualidade: relevância e confiabilidade)",
+"sempre obtidas por declaração verbal do gestor",
+"dispensáveis quando houver opinião do auditor",
+"exclusivamente documentais"
+],
+"c": 0,
+"e": "Evidências externas e documentais tendem a ser mais confiáveis que as internas e orais."
+},
+{
+"t": "Auditoria - técnicas",
+"d": "Médio",
+"q": "A técnica de auditoria que consiste em obter confirmação, por escrito, de terceiros externos à entidade (ex.: bancos, fornecedores) sobre saldos ou informações é a:",
+"a": [
+"circularização (confirmação externa)",
+"inspeção física",
+"recálculo",
+"indagação oral"
+],
+"c": 0,
+"e": "Outras técnicas: inspeção, observação, recálculo, reexecução, procedimentos analíticos e indagação."
+},
+{
+"t": "Auditoria - fraude e erro",
+"d": "Médio",
+"q": "Diferencia-se fraude de erro porque:",
+"a": [
+"a fraude é ato intencional de omissão ou manipulação, enquanto o erro é não intencional",
+"o erro é sempre doloso",
+"a fraude não causa prejuízo",
+"ambos são sinônimos para fins de auditoria"
+],
+"c": 0,
+"e": "NBC TA 240. O auditor deve manter ceticismo profissional diante de indícios de fraude."
+},
+{
+"t": "Auditoria - risco",
+"d": "Difícil",
+"q": "O risco de auditoria pode ser decomposto em:",
+"a": [
+"risco inerente, risco de controle e risco de detecção",
+"risco político, risco eleitoral e risco jurídico",
+"risco de mercado e risco de crédito",
+"risco de liquidez e de taxa de juros"
+],
+"c": 0,
+"e": "O auditor controla apenas o risco de detecção, ajustando natureza, época e extensão dos procedimentos."
+},
+{
+"t": "Instrumentos de fiscalização",
+"d": "Médio",
+"q": "O instrumento de fiscalização utilizado para conhecer a organização e o funcionamento de um órgão, identificar objetos e instrumentos de fiscalização e avaliar a viabilidade de auditorias é o:",
+"a": [
+"levantamento",
+"monitoramento",
+"acompanhamento",
+"inspeção"
+],
+"c": 0,
+"e": "Nomenclatura do Regimento Interno do TCU, adotada por vários tribunais de contas."
+},
+{
+"t": "Instrumentos de fiscalização",
+"d": "Médio",
+"q": "O instrumento de fiscalização usado para verificar o cumprimento de deliberações e os resultados delas advindos é o:",
+"a": [
+"monitoramento",
+"levantamento",
+"acompanhamento",
+"auditoria de regularidade"
+],
+"c": 0,
+"e": "Acompanhamento: examina, ao longo de um período, a legalidade e a legitimidade de atos ou o desempenho; inspeção: supre omissões ou apura denúncias pontuais."
+},
+{
+"t": "Riscos",
+"d": "Médio",
+"q": "Na gestão de riscos, o nível de risco é tipicamente avaliado pela combinação de:",
+"a": [
+"probabilidade de ocorrência e impacto do evento",
+"custo do controle e salário do gestor",
+"número de servidores e tamanho do órgão",
+"valor do orçamento e quantidade de contratos"
+],
+"c": 0,
+"e": "A matriz probabilidade × impacto orienta a priorização e as respostas: evitar, mitigar, transferir/compartilhar ou aceitar."
+},
+{
+"t": "Fundamentos de administração",
+"d": "Fácil",
+"q": "As funções clássicas do processo administrativo (Fayol, revisitado) aplicadas à gestão pública são:",
+"a": [
+"planejamento, organização, direção e controle",
+"compra, venda, lucro e investimento",
+"legislação, execução, julgamento e fiscalização",
+"recrutamento, seleção, treinamento e desligamento"
+],
+"c": 0,
+"e": "O controle fecha o ciclo, comparando resultados com o planejado e corrigindo desvios."
+},
+{
+"t": "Fundamentos - setor público x privado",
+"d": "Médio",
+"q": "Uma diferença fundamental entre a gestão pública e a privada é que:",
+"a": [
+"na gestão pública o administrador só pode agir conforme a lei e em busca do interesse público, enquanto o privado pode fazer o que a lei não proíbe, visando ao lucro",
+"a gestão pública dispensa planejamento",
+"a gestão privada está sujeita a licitação obrigatória",
+"não há diferença de finalidade"
+],
+"c": 0,
+"e": "Legalidade estrita e finalidade pública marcam a administração pública."
+},
+{
+"t": "Orçamento - técnicas",
+"d": "Médio",
+"q": "O orçamento base zero caracteriza-se por:",
+"a": [
+"exigir justificativa de todas as despesas a cada novo orçamento, sem tomar como base os valores do exercício anterior",
+"repetir o orçamento anterior com reajuste inflacionário",
+"dispensar o planejamento",
+"ser sinônimo de orçamento incremental"
+],
+"c": 0,
+"e": "O orçamento incremental parte da base anterior; o OBZ reavalia cada programa desde o início."
+},
+{
+"t": "Orçamento participativo",
+"d": "Médio",
+"q": "O orçamento participativo caracteriza-se por:",
+"a": [
+"permitir a participação direta da população na definição de prioridades de investimento, em geral por meio de assembleias e conselhos",
+"substituir a aprovação da LOA pela Câmara",
+"ser obrigatório por lei federal para todos os Municípios",
+"dispensar o PPA"
+],
+"c": 0,
+"e": "É mecanismo de democracia participativa; a LOA continua sendo aprovada pelo Legislativo."
+},
+{
+"t": "Receita - restituição",
+"d": "Difícil",
+"q": "Segundo o MCASP, a restituição de receita orçamentária recolhida indevidamente no próprio exercício, em regra, é registrada como:",
+"a": [
+"dedução da receita orçamentária",
+"despesa orçamentária de capital",
+"despesa extraorçamentária",
+"variação patrimonial aumentativa"
+],
+"c": 0,
+"e": "Restituições de receitas de exercícios anteriores, em regra, também são tratadas como dedução (no exercício corrente), conforme o MCASP."
+},
+{
+"t": "Despesa - classificação funcional",
+"d": "Médio",
+"q": "A classificação funcional da despesa orçamentária, instituída pela Portaria MOG nº 42/1999, é composta por:",
+"a": [
+"funções e subfunções",
+"categorias econômicas e grupos de natureza",
+"programas e ações",
+"elementos e subelementos"
+],
+"c": 0,
+"e": "Funções e subfunções agregam os gastos por área de atuação governamental (ex.: 01 Legislativa)."
+},
+{
+"t": "LRF",
+"d": "Médio",
+"q": "Segundo a LRF, a criação, expansão ou aperfeiçoamento de ação governamental que acarrete aumento da despesa será acompanhado de:",
+"a": [
+"estimativa do impacto orçamentário-financeiro no exercício e nos dois subsequentes e declaração do ordenador de adequação orçamentária e compatibilidade com PPA e LDO",
+"autorização do Tribunal de Contas",
+"aprovação por plebiscito",
+"parecer do Ministério Público"
+],
+"c": 0,
+"e": "Art. 16 da LRF: estimativa de impacto no exercício e nos dois seguintes, e declaração de adequação orçamentária e financeira com a LOA e compatibilidade com PPA e LDO."
+},
+{
+"t": "LRF - despesa obrigatória continuada",
+"d": "Difícil",
+"q": "Despesa obrigatória de caráter continuado, segundo a LRF, é a despesa corrente derivada de lei, medida provisória ou ato administrativo normativo que fixe para o ente a obrigação legal de sua execução por período superior a:",
+"a": [
+"dois exercícios",
+"um exercício",
+"quatro exercícios",
+"seis meses"
+],
+"c": 0,
+"e": "Art. 17 da LRF, que exige a demonstração da origem dos recursos e a compensação de seus efeitos."
+},
+{
+"t": "Direito Administrativo - convênios",
+"d": "Médio",
+"q": "O convênio administrativo caracteriza-se por:",
+"a": [
+"acordo entre entes ou entidades com interesses comuns e convergentes, visando a objetivos de interesse recíproco, em regime de mútua cooperação",
+"contrato com interesses opostos, em que uma parte busca lucro",
+"ato unilateral de delegação de serviço",
+"instrumento exclusivo de compras governamentais"
+],
+"c": 0,
+"e": "Nos contratos, os interesses são contrapostos; no convênio, convergentes. Parcerias com OSC seguem a Lei 13.019/2014."
+},
+{
+"t": "Direito Administrativo - poder de polícia",
+"d": "Médio",
+"q": "A atuação do Município na fiscalização de obras particulares, exigindo alvará e embargando construções irregulares, é manifestação do:",
+"a": [
+"poder de polícia administrativa, relativo a urbanismo",
+"poder hierárquico",
+"poder disciplinar",
+"poder regulamentar autônomo"
+],
+"c": 0,
+"e": "O Município tem competência para promover o ordenamento territorial (art. 30, VIII, CF)."
+},
+{
+"t": "Direito Administrativo - fundações",
+"d": "Médio",
+"q": "As fundações públicas de direito público:",
+"a": [
+"são espécie do gênero autarquia (fundações autárquicas), criadas por lei específica",
+"são pessoas jurídicas de direito privado com finalidade lucrativa",
+"não integram a administração indireta",
+"dependem apenas de escritura pública"
+],
+"c": 0,
+"e": "As fundações públicas de direito privado têm a criação autorizada por lei e registro de seus atos constitutivos."
+},
+{
+"t": "Organização do Município",
+"d": "Médio",
+"q": "Segundo a Constituição, o controle externo da Câmara Municipal sobre o Município será exercido com o auxílio:",
+"a": [
+"dos Tribunais de Contas dos Estados ou do Município ou dos Conselhos/Tribunais de Contas dos Municípios, onde houver",
+"exclusivamente do TCU",
+"da Controladoria-Geral da União",
+"do Ministério Público de Contas, apenas"
+],
+"c": 0,
+"e": "Art. 31, § 1º, da CF. Em Mato Grosso, o TCE-MT exerce esse papel."
+},
+{
+"t": "Bens municipais",
+"d": "Médio",
+"q": "A alienação de bens imóveis da Administração, segundo a Lei nº 14.133/2021, depende, em regra, de:",
+"a": [
+"existência de interesse público justificado, avaliação prévia, autorização legislativa e licitação na modalidade leilão",
+"simples decisão do gestor",
+"autorização judicial",
+"pregão eletrônico"
+],
+"c": 0,
+"e": "Art. 76, I, da Lei 14.133/2021, ressalvadas as hipóteses de dispensa previstas."
+},
+{
+"t": "Licitações - pregão",
+"d": "Médio",
+"q": "Na Lei nº 14.133/2021, o pregão adota como critérios de julgamento:",
+"a": [
+"menor preço ou maior desconto",
+"técnica e preço",
+"melhor técnica",
+"maior retorno econômico"
+],
+"c": 0,
+"e": "Art. 6º, XLI. O pregão é obrigatório para bens e serviços comuns, incluídos os serviços comuns de engenharia."
+},
+{
+"t": "Licitações - pregão",
+"d": "Médio",
+"q": "Na forma eletrônica do pregão, a fase de lances caracteriza-se por:",
+"a": [
+"disputa em que os licitantes ofertam lances sucessivos, em modo aberto, fechado ou combinado, conforme o edital",
+"entrega de envelopes lacrados abertos em sessão sem disputa",
+"sorteio entre os participantes",
+"negociação apenas com o primeiro inscrito"
+],
+"c": 0,
+"e": "Art. 56 da Lei 14.133/2021. Após a disputa, admite-se negociação com o primeiro colocado (art. 61)."
+},
+{
+"t": "Licitações - planejamento",
+"d": "Médio",
+"q": "O plano de contratações anual, previsto na Lei nº 14.133/2021, tem como objetivo:",
+"a": [
+"racionalizar as contratações, garantir o alinhamento ao planejamento estratégico e subsidiar a elaboração das leis orçamentárias",
+"substituir o processo licitatório",
+"dispensar o estudo técnico preliminar",
+"definir os vencimentos dos servidores"
+],
+"c": 0,
+"e": "Art. 12, VII, da Lei 14.133/2021."
+},
+{
+"t": "Licitações - contratos",
+"d": "Médio",
+"q": "O controle interno, nas contratações públicas, segundo a Lei nº 14.133/2021, integra:",
+"a": [
+"a segunda linha de defesa, ao lado da assessoria jurídica",
+"a primeira linha, executando as compras",
+"a terceira linha, exclusivamente",
+"nenhuma das linhas de defesa"
+],
+"c": 0,
+"e": "Art. 169 da Lei 14.133/2021: 1ª linha — servidores e autoridades; 2ª — assessoria jurídica e controle interno; 3ª — órgão central de controle interno e tribunal de contas."
+},
+{
+"t": "Gestão de pessoas",
+"d": "Médio",
+"q": "No setor público, o recrutamento externo para cargos efetivos ocorre obrigatoriamente por meio de:",
+"a": [
+"concurso público de provas ou de provas e títulos",
+"entrevista com a chefia",
+"indicação política",
+"análise de currículo apenas"
+],
+"c": 0,
+"e": "Art. 37, II, da CF e art. 7º da LC 235/2011."
+},
+{
+"t": "Gestão de pessoas - avaliação",
+"d": "Médio",
+"q": "A avaliação de desempenho 360 graus caracteriza-se por:",
+"a": [
+"reunir avaliações de chefia, pares, subordinados, autoavaliação e, eventualmente, usuários",
+"ser feita exclusivamente pela chefia imediata",
+"considerar apenas a assiduidade",
+"ser realizada somente na admissão"
+],
+"c": 0,
+"e": "A LC 235/2011 prevê avaliação com autoavaliação, colegas do setor e Secretário (art. 12, §§ 3º a 6º)."
+},
+{
+"t": "Gestão de pessoas - desenvolvimento",
+"d": "Médio",
+"q": "Diferencia-se treinamento de desenvolvimento de pessoas porque:",
+"a": [
+"o treinamento foca o desempenho no cargo atual, no curto prazo; o desenvolvimento prepara para desafios futuros e crescimento na carreira",
+"são sinônimos",
+"o desenvolvimento é sempre obrigatório e o treinamento opcional",
+"o treinamento só ocorre fora do trabalho"
+],
+"c": 0,
+"e": "A aprendizagem organizacional integra ambos, promovendo a melhoria contínua."
+},
+{
+"t": "Gestão por competências",
+"d": "Médio",
+"q": "Na gestão por competências, as competências são usualmente descritas pelo tripé CHA, que significa:",
+"a": [
+"conhecimentos, habilidades e atitudes",
+"cargos, horários e atribuições",
+"controle, hierarquia e autoridade",
+"capacitação, honestidade e assiduidade"
+],
+"c": 0,
+"e": "O mapeamento de lacunas (gap) orienta capacitação e alocação de pessoas."
+},
+{
+"t": "Gestão de materiais",
+"d": "Médio",
+"q": "Na classificação ABC de estoques, os itens da classe A são aqueles que:",
+"a": [
+"representam pequena quantidade de itens e grande parcela do valor total do estoque, exigindo controle rigoroso",
+"representam a maioria dos itens e pequena parcela do valor",
+"não precisam de controle",
+"são sempre de consumo imediato"
+],
+"c": 0,
+"e": "Baseada no princípio de Pareto (80/20)."
+},
+{
+"t": "Gestão de materiais",
+"d": "Difícil",
+"q": "O lote econômico de compra (LEC) é a quantidade que:",
+"a": [
+"minimiza o custo total, equilibrando os custos de pedido e de armazenagem",
+"maximiza o estoque disponível",
+"corresponde ao consumo anual integral",
+"elimina a necessidade de estoque de segurança"
+],
+"c": 0,
+"e": "Fórmula clássica: LEC = √(2 × D × Cp / Ca), em que D é a demanda, Cp o custo por pedido e Ca o custo de armazenagem por unidade."
+},
+{
+"t": "Gestão de materiais",
+"d": "Médio",
+"q": "O estoque de segurança (estoque mínimo) tem como finalidade:",
+"a": [
+"proteger contra variações de consumo e atrasos no reabastecimento, evitando a falta de material",
+"aumentar os gastos com armazenagem sem benefício",
+"substituir o planejamento de compras",
+"eliminar a necessidade de inventário"
+],
+"c": 0,
+"e": "O ponto de pedido considera consumo médio, tempo de reposição e estoque de segurança."
+},
+{
+"t": "Patrimônio público",
+"d": "Médio",
+"q": "Na gestão patrimonial de bens móveis, o tombamento consiste em:",
+"a": [
+"registrar o bem no patrimônio, atribuindo-lhe número de identificação (plaqueta) e responsável pela guarda",
+"declarar o bem como patrimônio histórico",
+"alienar o bem por leilão",
+"baixar o bem por inservível"
+],
+"c": 0,
+"e": "O inventário periódico confronta o registro com a existência física dos bens."
+},
+{
+"t": "Patrimônio público",
+"d": "Médio",
+"q": "Os bens patrimoniais classificados como inservíveis, conforme seu estado, podem ser classificados como:",
+"a": [
+"ociosos, recuperáveis, antieconômicos ou irrecuperáveis",
+"novos, usados e seminovos",
+"permanentes e de consumo",
+"móveis e imóveis apenas"
+],
+"c": 0,
+"e": "A classificação orienta a destinação: redistribuição, recuperação, alienação ou descarte."
+},
+{
+"t": "Contabilidade pública",
+"d": "Médio",
+"q": "Sob o enfoque patrimonial, as variações patrimoniais aumentativas (VPA) representam:",
+"a": [
+"aumentos no patrimônio líquido, como reconhecimento de tributos pela competência e doações recebidas",
+"entradas de caixa de qualquer natureza",
+"receitas orçamentárias arrecadadas, exclusivamente",
+"reduções do passivo por pagamento"
+],
+"c": 0,
+"e": "VPA e VPD compõem a DVP, que apura o resultado patrimonial."
+},
+{
+"t": "Contabilidade pública - demonstrações",
+"d": "Médio",
+"q": "A demonstração contábil aplicada ao setor público que apresenta o resultado patrimonial do exercício é a:",
+"a": [
+"Demonstração das Variações Patrimoniais (DVP)",
+"Balanço Financeiro",
+"Balanço Orçamentário",
+"Demonstração dos Fluxos de Caixa"
+],
+"c": 0,
+"e": "Resultado patrimonial = VPA − VPD; integra o patrimônio líquido no Balanço Patrimonial."
+},
+{
+"t": "Prestação de contas",
+"d": "Médio",
+"q": "Segundo a Constituição, prestará contas qualquer pessoa física ou jurídica, pública ou privada, que:",
+"a": [
+"utilize, arrecade, guarde, gerencie ou administre dinheiros, bens e valores públicos",
+"seja contribuinte de impostos municipais",
+"tenha contrato com empresa privada",
+"resida no Município"
+],
+"c": 0,
+"e": "Art. 70, parágrafo único, da CF."
+},
+{
+"t": "Tomada de contas especial",
+"d": "Difícil",
+"q": "A tomada de contas especial é instaurada para:",
+"a": [
+"apurar os fatos, identificar os responsáveis e quantificar o dano ao erário, quando houver omissão no dever de prestar contas, desvio, desfalque ou prejuízo",
+"conceder prêmios a servidores",
+"aprovar o orçamento anual",
+"avaliar o desempenho de servidores em estágio probatório"
+],
+"c": 0,
+"e": "O Controlador da Câmara revisa e emite parecer sobre tomadas de contas especiais (art. 6º-A, XVI, da LC 235/2011)."
+},
+{
+"t": "Controlador Interno - atribuições",
+"d": "Médio",
+"q": "Entre as atribuições do Controlador Interno da Câmara de Cuiabá previstas na LC nº 235/2011, está:",
+"a": [
+"acompanhar a divulgação dos instrumentos de transparência da gestão fiscal, em especial o RREO e o RGF, aferindo a consistência das informações",
+"julgar as contas do Presidente da Câmara",
+"aprovar a LOA",
+"nomear servidores efetivos"
+],
+"c": 0,
+"e": "Art. 6º-A, X, da LC 235/2011."
+},
+{
+"t": "Atendimento ao cidadão e ética",
+"d": "Médio",
+"q": "No atendimento ao cidadão e na atuação do controle interno, a ética e a responsabilidade social exigem:",
+"a": [
+"independência técnica, imparcialidade, sigilo das informações obtidas e foco no interesse público",
+"atuação alinhada a interesses político-partidários",
+"divulgação de informações sigilosas de auditoria antes da conclusão",
+"tratamento diferenciado a gestores aliados"
+],
+"c": 0,
+"e": "Independência e objetividade são princípios fundamentais da atividade de controle e auditoria."
+}
+]
+}

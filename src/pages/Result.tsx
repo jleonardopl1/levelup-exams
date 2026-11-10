@@ -8,7 +8,9 @@ import { Confetti, CelebrationGlow } from '@/components/Confetti';
 export default function Result() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { score = 0, correct = 0, total = 0, timeSpent = 0 } = location.state || {};
+  const { score = 0, correct = 0, total = 0, timeSpent = 0, backPath = '/', retry = '/quiz' } = location.state || {};
+  const safeBack = typeof backPath === 'string' && backPath.startsWith('/') && !backPath.startsWith('//') ? backPath : '/';
+  const safeRetry = typeof retry === 'string' && retry.startsWith('/quiz') ? retry : '/quiz';
   const [showConfetti, setShowConfetti] = useState(false);
   const [showGlow, setShowGlow] = useState(false);
 
@@ -90,13 +92,13 @@ export default function Result() {
 
         {/* Actions */}
         <div className="space-y-3 animate-fade-in" style={{ animationDelay: '0.4s' }}>
-          <Button variant="hero" size="xl" className="w-full" onClick={() => navigate('/quiz')}>
+          <Button variant="hero" size="xl" className="w-full" onClick={() => navigate(safeRetry)}>
             <RotateCcw className="w-5 h-5 mr-2" />
             Tentar Novamente
           </Button>
-          <Button variant="outline" size="lg" className="w-full" onClick={() => navigate('/')}>
+          <Button variant="outline" size="lg" className="w-full" onClick={() => navigate(safeBack)}>
             <Home className="w-5 h-5 mr-2" />
-            Voltar ao Início
+            {safeBack === '/' ? 'Voltar ao Início' : 'Voltar à Trilha'}
           </Button>
         </div>
       </div>

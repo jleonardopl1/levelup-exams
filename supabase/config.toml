@@ -23,3 +23,6 @@ verify_jwt = false
 
 [functions.admin-notify]
 verify_jwt = false
+
+[functions.generate-track-questions]
+verify_jwt = false

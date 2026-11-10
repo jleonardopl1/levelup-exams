@@ -20,6 +20,8 @@ const Rewards = lazy(() => import("./pages/Rewards"));
 const Achievements = lazy(() => import("./pages/Achievements"));
 const Admin = lazy(() => import("./pages/Admin"));
 const Affiliate = lazy(() => import("./pages/Affiliate"));
+const Trilhas = lazy(() => import("./pages/Trilhas"));
+const Trilha = lazy(() => import("./pages/Trilha"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient({
@@ -60,6 +62,8 @@ const App = () => (
               <Route path="/achievements" element={<Achievements />} />
               <Route path="/admin" element={<Admin />} />
               <Route path="/affiliate" element={<Affiliate />} />
+              <Route path="/trilhas" element={<Trilhas />} />
+              <Route path="/trilhas/:slug" element={<Trilha />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>

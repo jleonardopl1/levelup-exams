@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { useQuestions, useValidateAnswer, AnswerValidationResult } from '@/hooks/useQuestions';
+import { useQuestions, useValidateAnswer, AnswerValidationResult, type PracticeMode } from '@/hooks/useQuestions';
 import { useSubmitQuiz } from '@/hooks/useQuizResults';
 import { useQuestionLimits, useIncrementUsage } from '@/hooks/useDailyUsage';
 import { useProcessQuizRewards } from '@/hooks/useQuizRewards';
@@ -19,14 +19,21 @@ export default function Quiz() {
   const [searchParams] = useSearchParams();
   const categoria = searchParams.get('categoria') || undefined;
   const subjectId = searchParams.get('subject') || undefined;
+  const nivelParam = searchParams.get('nivel');
+  const nivel = nivelParam === 'medio' || nivelParam === 'superior' ? nivelParam : undefined;
+  const modeParam = searchParams.get('mode');
+  const mode: PracticeMode = modeParam === 'review' || modeParam === 'new' || modeParam === 'weekly' ? modeParam : 'smart';
+  const trilha = searchParams.get('trilha');
+  const backPath = trilha && /^[a-z0-9-]{1,80}$/.test(trilha) ? `/trilhas/${trilha}` : '/';
   const { user, loading: authLoading } = useAuth();
-  const { data: questions, isLoading } = useQuestions({ limit: 10, categoria, subjectId });
+  const { data: questions, isLoading } = useQuestions({ limit: 10, categoria, subjectId, nivel, mode });
   const validateAnswer = useValidateAnswer();
   const submitQuiz = useSubmitQuiz();
   const incrementUsage = useIncrementUsage();
   const { hasReachedLimit, isPremium } = useQuestionLimits();
   const { processRewards, showConfetti, setShowConfetti, showGlow, setShowGlow } = useProcessQuizRewards();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
@@ -60,7 +67,7 @@ export default function Quiz() {
   }, [currentIndex, currentQuestion?.is_premium, isPremium]);
 
   useEffect(() => {
-    if (quizFinished || !questions) return;
+    if (quizFinished || !questions || questions.length === 0) return;
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
@@ -158,14 +165,29 @@ export default function Quiz() {
     });
 
     navigate('/result', { 
-      state: { score, correct: correctCount, total, timeSpent } 
+      state: { score, correct: correctCount, total, timeSpent, backPath, retry: `${location.pathname}${location.search}` } 
     });
-  }, [answers, navigate, questions, quizFinished, showResult, validationResult, submitQuiz, timeLeft, categoria, isPremium, incrementUsage, processRewards]);
+  }, [answers, navigate, questions, quizFinished, showResult, validationResult, submitQuiz, timeLeft, categoria, isPremium, incrementUsage, processRewards, backPath, location.pathname, location.search]);
 
   if (isLoading || !questions) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="w-12 h-12 rounded-full border-4 border-primary border-t-transparent animate-spin" />
+      </div>
+    );
+  }
+
+  if (questions.length === 0) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4 p-6 text-center">
+        <CheckCircle className="w-12 h-12 text-success" />
+        <p className="font-semibold text-lg">
+          {mode === 'review' ? 'Nenhum erro para revisar nesta matéria.' : 'Nenhuma questão disponível para este filtro.'}
+        </p>
+        <p className="text-sm text-muted-foreground">
+          {mode === 'review' ? 'Continue praticando: as questões que você errar aparecerão aqui.' : 'Tente outro modo ou volte mais tarde.'}
+        </p>
+        <Button variant="outline" onClick={() => navigate(backPath)}>Voltar</Button>
       </div>
     );
   }
@@ -180,7 +202,7 @@ export default function Quiz() {
     <div className="min-h-screen bg-background p-4">
       {/* Header */}
       <div className="flex items-center gap-4 mb-6">
-        <Button variant="ghost" size="icon" onClick={() => navigate('/')}>
+        <Button variant="ghost" size="icon" onClick={() => navigate(backPath)} aria-label="Voltar">
           <ArrowLeft className="w-5 h-5" />
         </Button>
         <div className="flex-1">
@@ -201,7 +223,11 @@ export default function Quiz() {
       <Card variant="elevated" className="mb-6">
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-sm text-primary font-medium">{currentQuestion?.categoria}</p>
+            <p className="text-sm text-primary font-medium">
+              {currentQuestion?.categoria}
+              {currentQuestion?.topico && <span className="text-muted-foreground font-normal"> · {currentQuestion.topico}</span>}
+              {mode === 'review' && <span className="ml-2 text-xs text-destructive">revisão</span>}
+            </p>
             {currentQuestion?.is_premium && (
               <PremiumContentBadge size="sm" />
             )}

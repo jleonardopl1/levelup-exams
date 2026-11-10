@@ -16,6 +16,7 @@ import { MilestoneModal } from '@/components/MilestoneModal';
 import { RecentAchievementsCard } from '@/components/RecentAchievementsCard';
 import { StreakReminderBanner } from '@/components/StreakReminderToggle';
 import { CareerCategorySelector } from '@/components/CareerCategorySelector';
+import { FeaturedTrackCard } from '@/components/FeaturedTrackCard';
 
 export default function Index() {
   const { user, loading: authLoading } = useAuth();
@@ -314,6 +315,9 @@ export default function Index() {
             <div className="w-1.5 h-1.5 rounded-full bg-primary/20" />
           </div>
         </div>
+
+        {/* Trilha do concurso em destaque */}
+        <FeaturedTrackCard />
 
         {/* Daily Challenges */}
         <DailyChallengesCard />

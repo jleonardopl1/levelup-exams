@@ -1,0 +1,759 @@
+{
+"slug": "cmc26-tecnico-legislativo",
+"questions": [
+{
+"t": "Administração Pública - princípios",
+"d": "Fácil",
+"q": "Um servidor da Câmara atende primeiro um conhecido que chegou depois de outros cidadãos. Essa conduta viola diretamente o princípio da:",
+"a": [
+"impessoalidade",
+"eficiência",
+"publicidade",
+"continuidade"
+],
+"c": 0,
+"e": "A impessoalidade exige tratamento igualitário, sem favorecimentos pessoais (art. 37, caput, CF)."
+},
+{
+"t": "Administração Pública - princípios",
+"d": "Médio",
+"q": "A divulgação das sessões da Câmara e dos atos oficiais, salvo hipóteses de sigilo previstas em lei, concretiza o princípio da:",
+"a": [
+"publicidade",
+"legalidade",
+"impessoalidade",
+"autotutela"
+],
+"c": 0,
+"e": "Publicidade é condição de eficácia dos atos e instrumento de controle social (art. 37, caput, e art. 5º, XXXIII, CF)."
+},
+{
+"t": "Administração direta e indireta",
+"d": "Fácil",
+"q": "A Câmara Municipal de Cuiabá integra a Administração:",
+"a": [
+"direta do Município, como órgão do Poder Legislativo",
+"indireta, como autarquia",
+"indireta, como fundação pública",
+"federal, como órgão do Senado"
+],
+"c": 0,
+"e": "A Câmara é órgão (sem personalidade jurídica própria) do Município, integrante do Poder Legislativo municipal."
+},
+{
+"t": "Administração indireta",
+"d": "Médio",
+"q": "Uma entidade criada por lei específica, com personalidade jurídica de direito público, para executar atividade típica de Estado de forma descentralizada é uma:",
+"a": [
+"autarquia",
+"empresa pública",
+"sociedade de economia mista",
+"organização social"
+],
+"c": 0,
+"e": "Art. 37, XIX, da CF: autarquias são criadas por lei; empresas públicas e SEM têm criação autorizada por lei."
+},
+{
+"t": "Agentes públicos",
+"d": "Médio",
+"q": "O conjunto de atribuições e responsabilidades criado por lei, com denominação própria, número certo e pago pelos cofres públicos, ocupado por servidor estatutário, é o:",
+"a": [
+"cargo público",
+"emprego público",
+"contrato temporário",
+"mandato eletivo"
+],
+"c": 0,
+"e": "Definição presente nos estatutos (ex.: art. 7º da LC 93/2003 e art. 2º, VII, da LC 235/2011)."
+},
+{
+"t": "Atos administrativos",
+"d": "Médio",
+"q": "O requisito do ato administrativo que corresponde à situação de fato e de direito que autoriza ou exige sua prática é o:",
+"a": [
+"motivo",
+"objeto",
+"finalidade",
+"forma"
+],
+"c": 0,
+"e": "Motivo é o pressuposto fático e jurídico; motivação é a exposição desse motivo."
+},
+{
+"t": "Atos administrativos",
+"d": "Médio",
+"q": "Os atos administrativos gozam de presunção de legitimidade, o que significa que:",
+"a": [
+"presumem-se conformes à lei até prova em contrário",
+"nunca podem ser anulados",
+"não precisam ser publicados",
+"valem apenas após aprovação judicial"
+],
+"c": 0,
+"e": "A presunção é relativa: admite prova em contrário pelo interessado."
+},
+{
+"t": "Atos administrativos",
+"d": "Médio",
+"q": "A extinção de um ato válido, por razões de conveniência e oportunidade, chama-se:",
+"a": [
+"revogação",
+"anulação",
+"cassação",
+"caducidade"
+],
+"c": 0,
+"e": "Revogação: ato válido, motivo de mérito, efeitos ex nunc, só pela Administração. Anulação: ilegalidade."
+},
+{
+"t": "Atos administrativos",
+"d": "Difícil",
+"q": "A extinção de um ato administrativo porque o beneficiário deixou de cumprir as condições exigidas para mantê-lo (ex.: licença de funcionamento de bar que passa a operar como casa de jogos ilegais) é denominada:",
+"a": [
+"cassação",
+"revogação",
+"contraposição",
+"caducidade"
+],
+"c": 0,
+"e": "Cassação decorre do descumprimento de condições pelo beneficiário. Caducidade decorre de lei superveniente incompatível; contraposição, de ato posterior com efeitos opostos."
+},
+{
+"t": "Poderes administrativos",
+"d": "Médio",
+"q": "A fiscalização de posturas municipais, como a apreensão de mercadorias de comércio irregular em via pública, é exemplo de poder:",
+"a": [
+"de polícia",
+"hierárquico",
+"disciplinar",
+"regulamentar"
+],
+"c": 0,
+"e": "O poder de polícia limita a liberdade e a propriedade em favor do interesse coletivo."
+},
+{
+"t": "Controle da Administração",
+"d": "Médio",
+"q": "Quando a Câmara Municipal julga as contas anuais do Prefeito, com parecer prévio do Tribunal de Contas, exerce controle:",
+"a": [
+"externo, de natureza legislativa",
+"interno, de natureza administrativa",
+"judicial",
+"social"
+],
+"c": 0,
+"e": "Art. 31 da CF. O parecer prévio só deixa de prevalecer por decisão de 2/3 dos membros da Câmara."
+},
+{
+"t": "Responsabilidade civil",
+"d": "Médio",
+"q": "Um veículo oficial da Câmara, dirigido por servidor em serviço, colide com um carro particular. A responsabilidade da pessoa jurídica pelo dano é, em regra:",
+"a": [
+"objetiva, cabendo ação regressiva contra o servidor em caso de dolo ou culpa",
+"subjetiva, exigindo prova de culpa do servidor pela vítima",
+"exclusiva do servidor",
+"inexistente, pois o servidor estava em serviço"
+],
+"c": 0,
+"e": "Art. 37, § 6º, da CF: teoria do risco administrativo."
+},
+{
+"t": "Direitos fundamentais",
+"d": "Médio",
+"q": "Segundo o art. 5º da Constituição Federal, a casa é asilo inviolável do indivíduo, ninguém nela podendo penetrar sem consentimento do morador, salvo:",
+"a": [
+"em caso de flagrante delito, desastre, para prestar socorro ou, durante o dia, por determinação judicial",
+"por ordem de qualquer autoridade policial, a qualquer hora",
+"por requisição do Prefeito",
+"durante a noite, com ordem judicial"
+],
+"c": 0,
+"e": "Art. 5º, XI, da CF. A ordem judicial só pode ser cumprida durante o dia."
+},
+{
+"t": "Direitos fundamentais",
+"d": "Médio",
+"q": "O remédio constitucional cabível para assegurar o conhecimento de informações relativas à pessoa do impetrante constantes de registros de entidades governamentais é o:",
+"a": [
+"habeas data",
+"habeas corpus",
+"mandado de injunção",
+"mandado de segurança coletivo"
+],
+"c": 0,
+"e": "Art. 5º, LXXII, da CF."
+},
+{
+"t": "Direitos fundamentais",
+"d": "Médio",
+"q": "De acordo com a Constituição, todos têm direito a receber dos órgãos públicos informações de seu interesse particular, ou de interesse coletivo ou geral, que serão prestadas no prazo da lei, ressalvadas:",
+"a": [
+"aquelas cujo sigilo seja imprescindível à segurança da sociedade e do Estado",
+"todas as informações sobre servidores",
+"as informações sobre contratos",
+"as informações orçamentárias"
+],
+"c": 0,
+"e": "Art. 5º, XXXIII, da CF, regulamentado pela Lei de Acesso à Informação (Lei 12.527/2011)."
+},
+{
+"t": "Direitos sociais",
+"d": "Fácil",
+"q": "São direitos sociais previstos no art. 6º da Constituição Federal, entre outros:",
+"a": [
+"educação, saúde, alimentação, trabalho, moradia, transporte, lazer e segurança",
+"voto, plebiscito e referendo",
+"propriedade e herança",
+"liberdade de locomoção e de reunião"
+],
+"c": 0,
+"e": "O art. 6º lista educação, saúde, alimentação, trabalho, moradia, transporte, lazer, segurança, previdência, proteção à maternidade e à infância e assistência aos desamparados."
+},
+{
+"t": "Cidadania - direitos políticos",
+"d": "Médio",
+"q": "Segundo a Constituição, o alistamento eleitoral e o voto são facultativos para:",
+"a": [
+"os analfabetos, os maiores de 70 anos e os maiores de 16 e menores de 18 anos",
+"os maiores de 60 anos",
+"os servidores públicos",
+"os militares em serviço"
+],
+"c": 0,
+"e": "Art. 14, § 1º, II, da CF. São obrigatórios para os maiores de 18 anos."
+},
+{
+"t": "CF - art. 37",
+"d": "Médio",
+"q": "Pelo art. 37 da Constituição, o prazo de validade do concurso público será de:",
+"a": [
+"até 2 anos, prorrogável uma vez por igual período",
+"5 anos, improrrogável",
+"1 ano, prorrogável por 2 anos",
+"até 4 anos, sem prorrogação"
+],
+"c": 0,
+"e": "Art. 37, III, da CF."
+},
+{
+"t": "CF - art. 37",
+"d": "Médio",
+"q": "De acordo com o art. 37 da CF, a investidura em cargo ou emprego público depende de aprovação prévia em concurso público, ressalvadas as nomeações para:",
+"a": [
+"cargo em comissão declarado em lei de livre nomeação e exoneração",
+"qualquer cargo efetivo de nível médio",
+"cargos de Técnico Legislativo",
+"empregos em sociedades de economia mista"
+],
+"c": 0,
+"e": "Art. 37, II, da CF. Estatais também precisam de concurso para empregos públicos."
+},
+{
+"t": "CF - art. 37",
+"d": "Médio",
+"q": "Sobre o direito de greve do servidor público, a Constituição estabelece que:",
+"a": [
+"será exercido nos termos e nos limites definidos em lei específica",
+"é proibido para todos os servidores",
+"pode ser exercido sem qualquer limite",
+"é garantido apenas aos militares"
+],
+"c": 0,
+"e": "Art. 37, VII, da CF. Na ausência de lei, o STF determinou a aplicação da Lei 7.783/1989, no que couber (MI 670, 708 e 712)."
+},
+{
+"t": "CF - art. 37",
+"d": "Difícil",
+"q": "Segundo o art. 37, § 4º, da Constituição, os atos de improbidade administrativa importarão:",
+"a": [
+"suspensão dos direitos políticos, perda da função pública, indisponibilidade dos bens e ressarcimento ao erário, sem prejuízo da ação penal",
+"apenas multa administrativa",
+"prisão administrativa",
+"cassação definitiva da cidadania"
+],
+"c": 0,
+"e": "A Lei 8.429/1992 (alterada pela Lei 14.230/2021) regulamenta o dispositivo."
+},
+{
+"t": "CF - art. 39 a 41",
+"d": "Médio",
+"q": "Pelo art. 41 da CF, são estáveis após 3 anos de efetivo exercício os servidores nomeados para cargo de provimento efetivo em virtude de concurso público, sendo condição para a aquisição da estabilidade:",
+"a": [
+"a avaliação especial de desempenho por comissão instituída para essa finalidade",
+"a aprovação em segundo concurso",
+"a indicação da chefia imediata",
+"a filiação a sindicato"
+],
+"c": 0,
+"e": "Art. 41, § 4º, da CF."
+},
+{
+"t": "CF - art. 41",
+"d": "Médio",
+"q": "Extinto o cargo ou declarada sua desnecessidade, o servidor estável ficará em disponibilidade:",
+"a": [
+"com remuneração proporcional ao tempo de serviço, até seu adequado aproveitamento em outro cargo",
+"sem remuneração",
+"com remuneração integral, por tempo indeterminado",
+"sendo exonerado imediatamente"
+],
+"c": 0,
+"e": "Art. 41, § 3º, da CF."
+},
+{
+"t": "Poder Legislativo Municipal",
+"d": "Fácil",
+"q": "A Mesa Diretora da Câmara Municipal é o órgão:",
+"a": [
+"de direção dos trabalhos legislativos e administrativos da Câmara",
+"responsável por julgar os vereadores criminalmente",
+"que sanciona as leis municipais",
+"que fiscaliza o Tribunal de Contas"
+],
+"c": 0,
+"e": "Art. 15 da LOM de Cuiabá. A sanção cabe ao Prefeito."
+},
+{
+"t": "Poder Legislativo Municipal",
+"d": "Médio",
+"q": "O Plenário da Câmara Municipal é:",
+"a": [
+"o órgão deliberativo e soberano, constituído pela reunião dos vereadores em exercício",
+"o espaço físico reservado ao público",
+"sinônimo de Mesa Diretora",
+"uma comissão temporária"
+],
+"c": 0,
+"e": "O Plenário é o órgão máximo de deliberação, que vota as proposições."
+},
+{
+"t": "Comissões",
+"d": "Médio",
+"q": "A comissão que, na Câmara, examina os aspectos constitucionais, legais, jurídicos e de técnica legislativa das proposições é a:",
+"a": [
+"Comissão de Constituição, Justiça e Redação",
+"Comissão de Fiscalização e Acompanhamento da Execução Orçamentária",
+"Comissão de Ética e Decoro Parlamentar",
+"Comissão de Obras Públicas"
+],
+"c": 0,
+"e": "A CCJR é a comissão de admissibilidade jurídica — a mais importante na tramitação."
+},
+{
+"t": "Comissões",
+"d": "Médio",
+"q": "Comissões temporárias são aquelas que:",
+"a": [
+"são criadas para fins específicos e se extinguem quando cumprida sua finalidade ou esgotado seu prazo",
+"funcionam durante toda a legislatura",
+"são compostas por todos os vereadores",
+"só existem no Congresso Nacional"
+],
+"c": 0,
+"e": "Exemplos: CPI, comissão especial, processante e de representação."
+},
+{
+"t": "Processo legislativo",
+"d": "Médio",
+"q": "No processo legislativo, a sanção é o ato pelo qual:",
+"a": [
+"o Chefe do Executivo concorda com o projeto de lei aprovado pelo Legislativo",
+"o Legislativo aprova o projeto",
+"o Judiciário declara a constitucionalidade da lei",
+"a lei é publicada no diário oficial"
+],
+"c": 0,
+"e": "Após a sanção (expressa ou tácita) vêm a promulgação e a publicação."
+},
+{
+"t": "Processo legislativo",
+"d": "Médio",
+"q": "A promulgação de uma lei consiste em:",
+"a": [
+"atestar a existência da lei e determinar seu cumprimento",
+"vetar parcialmente o projeto",
+"discutir o projeto em plenário",
+"encaminhar o projeto às comissões"
+],
+"c": 0,
+"e": "Promulgação atesta que a ordem jurídica foi inovada; a publicação dá conhecimento e marca o início da vigência (salvo vacatio legis)."
+},
+{
+"t": "Processo legislativo",
+"d": "Médio",
+"q": "Uma emenda que suprime parte de uma proposição é chamada de emenda:",
+"a": [
+"supressiva",
+"aditiva",
+"modificativa",
+"substitutiva"
+],
+"c": 0,
+"e": "Supressiva retira; aditiva acrescenta; modificativa altera sem mudar substancialmente; substitutiva substitui o texto."
+},
+{
+"t": "Técnica legislativa - LC 95/1998",
+"d": "Médio",
+"q": "Segundo a Lei Complementar nº 95/1998, a lei é estruturada em três partes básicas:",
+"a": [
+"preliminar, normativa e final",
+"preâmbulo, corpo e anexos",
+"título, ementa e assinatura",
+"introdução, desenvolvimento e conclusão"
+],
+"c": 0,
+"e": "Art. 3º da LC 95/1998: parte preliminar (epígrafe, ementa, preâmbulo, objeto e âmbito), normativa e final (vigência, cláusula de revogação)."
+},
+{
+"t": "Técnica legislativa - LC 95/1998",
+"d": "Médio",
+"q": "A parte da lei que explicita, de modo conciso, o objeto da norma, localizando-se logo abaixo da epígrafe, é a:",
+"a": [
+"ementa",
+"preâmbulo",
+"cláusula de vigência",
+"justificativa"
+],
+"c": 0,
+"e": "Art. 5º da LC 95/1998."
+},
+{
+"t": "Técnica legislativa - LC 95/1998",
+"d": "Médio",
+"q": "Segundo a LC nº 95/1998, a unidade básica de articulação da lei é o:",
+"a": [
+"artigo",
+"inciso",
+"parágrafo",
+"capítulo"
+],
+"c": 0,
+"e": "Art. 10, I. Os artigos desdobram-se em parágrafos ou incisos; parágrafos em incisos; incisos em alíneas; alíneas em itens."
+},
+{
+"t": "Técnica legislativa - LC 95/1998",
+"d": "Difícil",
+"q": "De acordo com a LC nº 95/1998, a cláusula de revogação deverá:",
+"a": [
+"enumerar, expressamente, as leis ou disposições legais revogadas",
+"usar a expressão 'revogam-se as disposições em contrário'",
+"ser sempre omitida",
+"constar no preâmbulo"
+],
+"c": 0,
+"e": "Art. 9º da LC 95/1998 (redação da LC 107/2001)."
+},
+{
+"t": "Técnica legislativa - LC 95/1998",
+"d": "Médio",
+"q": "Pela LC nº 95/1998, os incisos de um artigo são representados por:",
+"a": [
+"algarismos romanos",
+"letras minúsculas",
+"algarismos arábicos",
+"o símbolo §"
+],
+"c": 0,
+"e": "Incisos: algarismos romanos; alíneas: letras minúsculas; itens: algarismos arábicos; parágrafos: § ou 'Parágrafo único'."
+},
+{
+"t": "Redação oficial",
+"d": "Médio",
+"q": "Segundo o Manual de Redação da Presidência da República (3ª edição), são atributos da redação oficial:",
+"a": [
+"clareza e precisão, objetividade, concisão, coesão e coerência, impessoalidade, formalidade e padronização, e uso da norma-padrão",
+"criatividade, linguagem figurada e informalidade",
+"prolixidade, jargões e subjetividade",
+"uso de regionalismos e gírias para aproximação"
+],
+"c": 0,
+"e": "Esses atributos garantem a compreensão uniforme e a impessoalidade das comunicações oficiais."
+},
+{
+"t": "Redação oficial",
+"d": "Médio",
+"q": "Na 3ª edição do Manual de Redação da Presidência da República, os antigos aviso, ofício e memorando passaram a seguir:",
+"a": [
+"um único formato, denominado padrão ofício",
+"formatos totalmente distintos, com fechos diferentes",
+"o modelo de carta comercial",
+"o formato de ata"
+],
+"c": 0,
+"e": "A 3ª edição (2018) unificou essas comunicações sob o 'padrão ofício', diferenciando-as apenas pela finalidade/destinatário."
+},
+{
+"t": "Redação oficial",
+"d": "Médio",
+"q": "Conforme o Manual de Redação da Presidência, o fecho \"Respeitosamente\" é usado para autoridades de hierarquia superior e \"Atenciosamente\" para:",
+"a": [
+"autoridades de mesma hierarquia ou hierarquia inferior",
+"qualquer destinatário estrangeiro",
+"comunicações informais",
+"autoridades eclesiásticas"
+],
+"c": 0,
+"e": "Apenas dois fechos são usados nas comunicações oficiais: 'Respeitosamente' e 'Atenciosamente'."
+},
+{
+"t": "Redação oficial",
+"d": "Médio",
+"q": "No vocativo de uma comunicação dirigida ao Presidente da Câmara Municipal, a forma adequada é:",
+"a": [
+"Senhor Presidente,",
+"Excelentíssimo Senhor Presidente,",
+"Digníssimo Presidente,",
+"Ilustríssimo Presidente,"
+],
+"c": 0,
+"e": "Pelo Manual de Redação da Presidência (3ª ed.), o vocativo 'Excelentíssimo Senhor' é reservado aos Chefes de Poder da União (Presidente da República, do Congresso Nacional e do STF). Para as demais autoridades usa-se 'Senhor + cargo'. 'Digníssimo' e 'Ilustríssimo' foram abolidos."
+},
+{
+"t": "Redação oficial",
+"d": "Médio",
+"q": "O pronome de tratamento adequado para dirigir-se a um Vereador em comunicação oficial é:",
+"a": [
+"Vossa Excelência",
+"Vossa Senhoria",
+"Vossa Magnificência",
+"Vossa Reverendíssima"
+],
+"c": 0,
+"e": "Vossa Excelência é usada para autoridades dos três Poderes, incluindo parlamentares (vereadores, deputados, senadores)."
+},
+{
+"t": "Redação oficial",
+"d": "Difícil",
+"q": "Segundo o Manual de Redação da Presidência (3ª ed.), na comunicação oficial é INADEQUADO:",
+"a": [
+"empregar o pronome de tratamento 'Vossa Excelência' e concordar o verbo na 2ª pessoa do plural (\"Vossa Excelência sabeis\")",
+"usar a 3ª pessoa com pronomes de tratamento",
+"identificar o signatário com nome e cargo",
+"usar o fecho 'Atenciosamente'"
+],
+"c": 0,
+"e": "Pronomes de tratamento exigem concordância na 3ª pessoa ('Vossa Excelência sabe')."
+},
+{
+"t": "Redação oficial - ata",
+"d": "Médio",
+"q": "Na redação de uma ata, recomenda-se:",
+"a": [
+"registrar os fatos de forma sucinta e fiel, sem rasuras e sem espaços em branco, com números preferencialmente por extenso",
+"usar parágrafos com recuos e espaços livres para acréscimos posteriores",
+"emitir opiniões pessoais sobre os oradores",
+"rasurar livremente os erros"
+],
+"c": 0,
+"e": "A ata é documento de valor jurídico; corrige-se erro com 'digo' ou 'em tempo', sem rasuras."
+},
+{
+"t": "Redação oficial - requerimento",
+"d": "Médio",
+"q": "O documento por meio do qual um cidadão ou servidor solicita algo a uma autoridade pública, com base em direito ou interesse, é o:",
+"a": [
+"requerimento",
+"atestado",
+"parecer",
+"despacho"
+],
+"c": 0,
+"e": "O requerimento é instrumento de petição; o despacho é a decisão da autoridade sobre ele."
+},
+{
+"t": "Redação oficial - relatório",
+"d": "Médio",
+"q": "O relatório administrativo destina-se a:",
+"a": [
+"expor, de forma organizada, fatos, atividades ou resultados apurados, podendo conter conclusões e recomendações",
+"certificar um fato de forma sucinta",
+"comunicar uma ordem a subordinados",
+"convocar para uma reunião"
+],
+"c": 0,
+"e": "Relatórios descrevem e analisam atividades (ex.: relatório de comissão ou de gestão)."
+},
+{
+"t": "Arquivologia",
+"d": "Fácil",
+"q": "Segundo a teoria das três idades, os documentos de uso frequente pela administração que os produziu ficam no arquivo:",
+"a": [
+"corrente",
+"intermediário",
+"permanente",
+"histórico privado"
+],
+"c": 0,
+"e": "Corrente (1ª idade, uso frequente), intermediário (2ª idade, uso eventual, aguardando destinação) e permanente (3ª idade, valor histórico/probatório)."
+},
+{
+"t": "Arquivologia",
+"d": "Médio",
+"q": "O instrumento arquivístico que define os prazos de guarda dos documentos nas fases corrente e intermediária e sua destinação final (eliminação ou guarda permanente) é a:",
+"a": [
+"tabela de temporalidade",
+"guia de remessa",
+"listagem de protocolo",
+"ficha de empréstimo"
+],
+"c": 0,
+"e": "A tabela de temporalidade, aprovada pela autoridade competente, orienta a avaliação documental."
+},
+{
+"t": "Arquivologia",
+"d": "Médio",
+"q": "A Lei nº 8.159/1991 (Política Nacional de Arquivos) estabelece que os documentos de valor permanente:",
+"a": [
+"são inalienáveis e imprescritíveis",
+"podem ser eliminados após 10 anos",
+"podem ser vendidos a colecionadores",
+"devem ser destruídos após digitalização"
+],
+"c": 0,
+"e": "Art. 10 da Lei 8.159/1991."
+},
+{
+"t": "Arquivologia - protocolo",
+"d": "Médio",
+"q": "As atividades de protocolo compreendem:",
+"a": [
+"recebimento, classificação, registro, distribuição, controle da tramitação e expedição de documentos",
+"apenas a eliminação de documentos",
+"restauração de documentos danificados",
+"exclusivamente o arquivamento permanente"
+],
+"c": 0,
+"e": "O protocolo controla a entrada, a movimentação e a saída de documentos."
+},
+{
+"t": "Arquivologia - métodos",
+"d": "Médio",
+"q": "O método de arquivamento que organiza os documentos pelo nome de pessoas ou instituições, em ordem alfabética, é o método:",
+"a": [
+"alfabético",
+"numérico cronológico",
+"geográfico",
+"ideográfico (por assunto)"
+],
+"c": 0,
+"e": "O alfabético é direto (consulta sem índice). Outros: geográfico, numérico, por assunto e mistos."
+},
+{
+"t": "Arquivologia - conservação",
+"d": "Médio",
+"q": "Constitui medida adequada de conservação preventiva de documentos em papel:",
+"a": [
+"controlar temperatura e umidade, evitar luz solar direta e usar materiais adequados de acondicionamento",
+"utilizar clipes metálicos e fitas adesivas para reparos",
+"armazenar documentos no chão, próximos a canos",
+"plastificar documentos de valor permanente"
+],
+"c": 0,
+"e": "Clipes enferrujam, fitas adesivas mancham e a plastificação é irreversível e prejudicial."
+},
+{
+"t": "Contabilidade pública - orçamento",
+"d": "Médio",
+"q": "São instrumentos de planejamento orçamentário previstos no art. 165 da Constituição:",
+"a": [
+"Plano Plurianual (PPA), Lei de Diretrizes Orçamentárias (LDO) e Lei Orçamentária Anual (LOA)",
+"Plano Diretor, Código Tributário e LOA",
+"Balanço Patrimonial, LDO e PPA",
+"Relatório de Gestão Fiscal e LOA"
+],
+"c": 0,
+"e": "PPA (médio prazo, 4 anos), LDO (metas e prioridades, orienta a LOA) e LOA (orçamento anual)."
+},
+{
+"t": "Contabilidade pública - receita",
+"d": "Médio",
+"q": "Os tributos (impostos, taxas e contribuições de melhoria) são classificados, quanto à categoria econômica, como receitas:",
+"a": [
+"correntes",
+"de capital",
+"extraorçamentárias",
+"intraorçamentárias de capital"
+],
+"c": 0,
+"e": "Lei 4.320/1964, art. 11. Receitas de capital incluem operações de crédito e alienação de bens."
+},
+{
+"t": "Contabilidade pública - despesa",
+"d": "Médio",
+"q": "Os estágios da despesa pública orçamentária, segundo a Lei nº 4.320/1964, ocorrem na seguinte ordem:",
+"a": [
+"empenho, liquidação e pagamento",
+"pagamento, liquidação e empenho",
+"liquidação, empenho e pagamento",
+"lançamento, arrecadação e recolhimento"
+],
+"c": 0,
+"e": "Empenho reserva a dotação; liquidação verifica o direito do credor; pagamento quita a obrigação. Lançamento/arrecadação/recolhimento são estágios da receita."
+},
+{
+"t": "Contabilidade pública - princípios",
+"d": "Médio",
+"q": "O princípio orçamentário segundo o qual a LOA não conterá dispositivo estranho à previsão da receita e à fixação da despesa é o da:",
+"a": [
+"exclusividade",
+"universalidade",
+"anualidade",
+"unidade"
+],
+"c": 0,
+"e": "Art. 165, § 8º, da CF, ressalvadas autorizações para créditos suplementares e operações de crédito."
+},
+{
+"t": "Higiene e segurança do trabalho",
+"d": "Fácil",
+"q": "O equipamento de uso individual destinado a proteger o trabalhador contra riscos que ameaçam sua segurança e saúde é o:",
+"a": [
+"EPI (Equipamento de Proteção Individual)",
+"EPC (Equipamento de Proteção Coletiva)",
+"PPRA",
+"CIPA"
+],
+"c": 0,
+"e": "NR-6. O EPI deve possuir Certificado de Aprovação (CA) e ser fornecido gratuitamente."
+},
+{
+"t": "Higiene e segurança do trabalho",
+"d": "Médio",
+"q": "Para prevenir lesões por esforço repetitivo (LER/DORT) em atividades de digitação, recomenda-se:",
+"a": [
+"mobiliário ajustável, pausas regulares e postura adequada, conforme a NR-17 (Ergonomia)",
+"jornadas contínuas sem pausas",
+"monitores abaixo da linha da mesa",
+"cadeiras sem regulagem"
+],
+"c": 0,
+"e": "A NR-17 trata da adaptação das condições de trabalho às características psicofisiológicas dos trabalhadores."
+},
+{
+"t": "Higiene e segurança do trabalho",
+"d": "Médio",
+"q": "Em caso de princípio de incêndio em equipamento elétrico energizado, o extintor adequado é o de:",
+"a": [
+"dióxido de carbono (CO₂) ou pó químico",
+"água pressurizada",
+"espuma mecânica",
+"água pulverizada sobre o equipamento ligado"
+],
+"c": 0,
+"e": "Incêndios classe C (equipamentos energizados) não devem ser combatidos com água ou espuma, que conduzem eletricidade."
+},
+{
+"t": "Atendimento ao público",
+"d": "Médio",
+"q": "Um cidadão procura o setor de protocolo da Câmara para obter informação sobre a tramitação de um projeto. O Técnico Legislativo deve:",
+"a": [
+"consultar o sistema e informar com clareza a situação, orientando sobre como acompanhar a tramitação",
+"recusar-se, pois a informação é sigilosa",
+"pedir que o cidadão protocole requerimento formal para qualquer informação",
+"encaminhá-lo diretamente ao Presidente da Câmara"
+],
+"c": 0,
+"e": "A tramitação de proposições é informação pública (transparência ativa, Lei 12.527/2011)."
+}
+]
+}
