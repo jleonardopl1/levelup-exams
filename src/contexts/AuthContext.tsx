@@ -18,7 +18,7 @@ interface AuthContextType {
   requestPasswordReset: (email: string) => Promise<{ error: Error | null }>;
   updatePassword: (password: string) => Promise<{ error: Error | null }>;
   /** Encerra a sessão em todos os dispositivos. */
-  signOutEverywhere: () => Promise<void>;
+  signOutEverywhere: () => Promise<{ error: Error | null }>;
 }
 
 const PASSWORD_RESET_PATH = '/redefinir-senha';
@@ -113,7 +113,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signOutEverywhere = async () => {
-    await supabase.auth.signOut({ scope: 'global' });
+    // signOut resolve com { error } (não rejeita) quando o servidor falha: propagar.
+    const { error } = await supabase.auth.signOut({ scope: 'global' });
+    return { error: error as Error | null };
   };
 
   const requestPasswordReset = async (email: string) => {

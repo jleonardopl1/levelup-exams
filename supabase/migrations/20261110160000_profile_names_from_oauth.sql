@@ -69,12 +69,26 @@ REVOKE ALL ON FUNCTION public.handle_new_user() FROM PUBLIC, anon, authenticated
 
 -- Backfill: contas existentes sem nome/foto recebem os dados do provedor de login.
 -- Nunca sobrescreve um nome ou foto que o usuario ja tenha definido.
+--
+-- As constraints de profiles foram criadas como NOT VALID (20261110120000), entao
+-- linhas antigas podem viola-las (ex.: nome com mais de 60 caracteres). Um UPDATE
+-- revalida a linha inteira e abortaria a migration; essas linhas sao ignoradas.
 UPDATE public.profiles p
-SET display_name = COALESCE(p.display_name, public._display_name_from_meta(COALESCE(u.raw_user_meta_data, '{}'::jsonb))),
-    avatar_url   = COALESCE(p.avatar_url, public._avatar_from_meta(COALESCE(u.raw_user_meta_data, '{}'::jsonb))),
+SET display_name = COALESCE(p.display_name, b.meta_name),
+    avatar_url   = COALESCE(p.avatar_url, b.meta_avatar),
     updated_at   = now()
-FROM auth.users u
-WHERE u.id = p.user_id
-  AND (p.display_name IS NULL OR p.avatar_url IS NULL)
-  AND (public._display_name_from_meta(COALESCE(u.raw_user_meta_data, '{}'::jsonb)) IS NOT NULL
-       OR public._avatar_from_meta(COALESCE(u.raw_user_meta_data, '{}'::jsonb)) IS NOT NULL);
+FROM (
+  SELECT u.id AS user_id,
+         public._display_name_from_meta(COALESCE(u.raw_user_meta_data, '{}'::jsonb)) AS meta_name,
+         public._avatar_from_meta(COALESCE(u.raw_user_meta_data, '{}'::jsonb)) AS meta_avatar
+  FROM auth.users u
+) b
+WHERE b.user_id = p.user_id
+  AND ((p.display_name IS NULL AND b.meta_name IS NOT NULL)
+       OR (p.avatar_url IS NULL AND b.meta_avatar IS NOT NULL))
+  -- linha ja compativel com todas as constraints (exceto as colunas preenchidas aqui)
+  AND (p.display_name IS NULL OR char_length(p.display_name) <= 60)
+  AND (p.avatar_url IS NULL OR p.avatar_url ~ '^https://')
+  AND p.tier IN ('free', 'plus')
+  AND p.total_quizzes >= 0 AND p.total_correct >= 0 AND p.total_questions >= 0 AND p.streak_days >= 0
+  AND p.total_correct <= p.total_questions;

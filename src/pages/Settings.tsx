@@ -254,8 +254,12 @@ function SecuritySection() {
 
   const logoutAll = async () => {
     setSigningOut(true);
-    await signOutEverywhere();
+    const { error: err } = await signOutEverywhere();
     setSigningOut(false);
+    if (err) {
+      toast.error('Não foi possível encerrar as sessões. Verifique sua conexão e tente novamente.');
+      return;
+    }
     toast.success('Sessões encerradas em todos os dispositivos.');
     navigate('/auth');
   };

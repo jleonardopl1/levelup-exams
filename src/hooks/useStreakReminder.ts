@@ -3,6 +3,24 @@ import { useProfile } from '@/hooks/useProfile';
 
 const NOTIFICATION_PERMISSION_KEY = 'streak_notification_permission';
 const LAST_REMINDER_KEY = 'last_streak_reminder';
+/** Avisa todas as instâncias do hook (cabeçalho, configurações...) que a preferência mudou. */
+const CHANGE_EVENT = 'levelup:streak-reminder-changed';
+
+function readPreference(): PushNotificationState {
+  const isSupported = typeof window !== 'undefined' && 'Notification' in window;
+  let savedEnabled = false;
+  try {
+    savedEnabled = localStorage.getItem(NOTIFICATION_PERMISSION_KEY) === 'true';
+  } catch {
+    // storage indisponível
+  }
+  const permission = isSupported ? Notification.permission : 'default';
+  return { isSupported, permission, isEnabled: savedEnabled && permission === 'granted' };
+}
+
+function broadcastChange() {
+  window.dispatchEvent(new Event(CHANGE_EVENT));
+}
 
 interface PushNotificationState {
   isSupported: boolean;
@@ -18,16 +36,20 @@ export function useStreakReminder() {
     isEnabled: false,
   });
 
-  // Check if notifications are supported
+  // Lê a preferência ao montar e acompanha mudanças feitas por outras instâncias
+  // (ex.: desligar nas Configurações também para o agendador do cabeçalho) e outras abas.
   useEffect(() => {
-    const isSupported = 'Notification' in window;
-    const savedEnabled = localStorage.getItem(NOTIFICATION_PERMISSION_KEY) === 'true';
-    
-    setState({
-      isSupported,
-      permission: isSupported ? Notification.permission : 'default',
-      isEnabled: savedEnabled && (isSupported ? Notification.permission === 'granted' : false),
-    });
+    const sync = () => setState(readPreference());
+    sync();
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === null || e.key === NOTIFICATION_PERMISSION_KEY) sync();
+    };
+    window.addEventListener(CHANGE_EVENT, sync);
+    window.addEventListener('storage', onStorage);
+    return () => {
+      window.removeEventListener(CHANGE_EVENT, sync);
+      window.removeEventListener('storage', onStorage);
+    };
   }, []);
 
   // Request permission
@@ -47,6 +69,7 @@ export function useStreakReminder() {
         permission,
         isEnabled: granted,
       }));
+      broadcastChange();
       
       return granted;
     } catch (error) {
@@ -59,6 +82,7 @@ export function useStreakReminder() {
   const disableNotifications = useCallback(() => {
     localStorage.removeItem(NOTIFICATION_PERMISSION_KEY);
     setState(prev => ({ ...prev, isEnabled: false }));
+    broadcastChange();
   }, []);
 
   // Enable notifications
@@ -66,6 +90,7 @@ export function useStreakReminder() {
     if (state.permission === 'granted') {
       localStorage.setItem(NOTIFICATION_PERMISSION_KEY, 'true');
       setState(prev => ({ ...prev, isEnabled: true }));
+      broadcastChange();
       return true;
     }
     return requestPermission();
@@ -74,6 +99,8 @@ export function useStreakReminder() {
   // Show streak reminder notification
   const showStreakReminder = useCallback(() => {
     if (!state.isEnabled || !profile) return;
+    // Revalida a preferência no momento do disparo (fonte da verdade: localStorage).
+    if (!readPreference().isEnabled) return;
 
     const lastReminder = localStorage.getItem(LAST_REMINDER_KEY);
     const today = new Date().toDateString();
