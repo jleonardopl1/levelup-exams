@@ -14,7 +14,23 @@ interface AuthContextType {
   signInWithGoogle: () => Promise<{ error: Error | null }>;
   signInWithOAuth: (provider: OAuthProvider) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
+  /** Envia o e-mail de redefinição (também serve para contas Google criarem uma senha). */
+  requestPasswordReset: (email: string) => Promise<{ error: Error | null }>;
+  updatePassword: (password: string) => Promise<{ error: Error | null }>;
+  /** Encerra a sessão em todos os dispositivos. */
+  signOutEverywhere: () => Promise<void>;
 }
+
+const PASSWORD_RESET_PATH = '/redefinir-senha';
+
+/**
+ * Força a tela de escolha de conta do provedor. Sem isso o Google entra direto com a
+ * conta ativa no navegador, sem dar chance de escolher outra.
+ */
+const ACCOUNT_PICKER: Partial<Record<OAuthProvider, Record<string, string>>> = {
+  google: { prompt: 'select_account' },
+  azure: { prompt: 'select_account' },
+};
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -79,32 +95,44 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return { error: error as Error | null };
   };
 
-  const signInWithGoogle = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/`,
-      },
-    });
-    return { error: error as Error | null };
-  };
-
   const signInWithOAuth = async (provider: OAuthProvider) => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
         redirectTo: `${window.location.origin}/`,
+        queryParams: ACCOUNT_PICKER[provider],
       },
     });
     return { error: error as Error | null };
   };
 
+  const signInWithGoogle = () => signInWithOAuth('google');
+
   const signOut = async () => {
     await supabase.auth.signOut();
   };
 
+  const signOutEverywhere = async () => {
+    await supabase.auth.signOut({ scope: 'global' });
+  };
+
+  const requestPasswordReset = async (email: string) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}${PASSWORD_RESET_PATH}`,
+    });
+    return { error: error as Error | null };
+  };
+
+  const updatePassword = async (password: string) => {
+    const { error } = await supabase.auth.updateUser({ password });
+    return { error: error as Error | null };
+  };
+
   return (
-    <AuthContext.Provider value={{ user, session, loading, signUp, signIn, signInWithGoogle, signInWithOAuth, signOut }}>
+    <AuthContext.Provider value={{
+      user, session, loading, signUp, signIn, signInWithGoogle, signInWithOAuth, signOut,
+      requestPasswordReset, updatePassword, signOutEverywhere,
+    }}>
       {children}
     </AuthContext.Provider>
   );

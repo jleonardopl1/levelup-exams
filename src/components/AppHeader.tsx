@@ -14,7 +14,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { 
-  LayoutDashboard, 
+  LayoutDashboard,
+  Settings,
   Share2, 
   Trophy, 
   Gift, 
@@ -42,6 +43,7 @@ import { getSafeDisplayName } from '@/lib/displayName';
 export function AppHeader() {
   const { user, signOut } = useAuth();
   const { data: profile } = useProfile();
+  const displayName = getSafeDisplayName(profile?.display_name, 'Defina seu nome');
   const { isPremium, tier } = useQuestionLimits();
   const { isStaff } = useIsAdmin();
   const navigate = useNavigate();
@@ -53,6 +55,12 @@ export function AppHeader() {
     if (!name) return 'U';
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   };
+
+  // Sem nome definido, usa a inicial do e-mail (antes caía em "Estudante" -> "E").
+  const hasName = !!profile?.display_name?.trim() && !profile.display_name.includes('@');
+  const avatarInitials = hasName
+    ? getInitials(displayName)
+    : (user?.email?.[0] ?? 'U').toUpperCase();
 
   const navItems = [
     { path: '/', icon: Home, label: 'Início' },
@@ -156,7 +164,7 @@ export function AppHeader() {
                   <Avatar className="h-10 w-10 border-2 border-primary/20">
                     <AvatarImage src={profile?.avatar_url || undefined} alt={getSafeDisplayName(profile?.display_name)} />
                     <AvatarFallback className="bg-gradient-to-br from-primary/20 to-accent/20 font-semibold">
-                      {getInitials(getSafeDisplayName(profile?.display_name))}
+                      {avatarInitials}
                     </AvatarFallback>
                   </Avatar>
                   {isPremium && (
@@ -170,10 +178,11 @@ export function AppHeader() {
                 <div className="flex items-center gap-3 p-3">
                   <Avatar className="h-10 w-10">
                     <AvatarImage src={profile?.avatar_url || undefined} />
-                    <AvatarFallback>{getInitials(profile?.display_name)}</AvatarFallback>
+                    <AvatarFallback>{avatarInitials}</AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">{getSafeDisplayName(profile?.display_name, 'Usuário')}</p>
+                    <p className="text-sm font-medium truncate">{displayName}</p>
+                    {user?.email && <p className="text-xs text-muted-foreground truncate" title={user.email}>{user.email}</p>}
                     <div className="flex items-center gap-1">
                       <PremiumBadge tier={tier} />
                     </div>
@@ -191,6 +200,10 @@ export function AppHeader() {
                 <DropdownMenuItem onClick={() => setShareModalOpen(true)}>
                   <Share2 className="mr-2 h-4 w-4" />
                   Compartilhar
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/configuracoes')}>
+                  <Settings className="mr-2 h-4 w-4" />
+                  Configurações
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => navigate('/faq')}>
                   <HelpCircle className="mr-2 h-4 w-4" />
