@@ -144,7 +144,7 @@ export async function readJson<T = unknown>(req: Request, maxBytes = 64 * 1024):
 
 /** URL publica do app (para redirects do Stripe). Nunca usar o header Origin. */
 export function getSiteUrl(): string {
-  const raw = Deno.env.get("SITE_URL") || Deno.env.get("ALLOWED_ORIGIN") || "https://simuladosconcursos.com.br";
+  const raw = Deno.env.get("SITE_URL") || Deno.env.get("ALLOWED_ORIGIN") || "https://levelupexams.lovable.app";
   return raw.replace(/\/+$/, "");
 }
 
