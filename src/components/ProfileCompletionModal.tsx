@@ -8,20 +8,14 @@ import { User, Camera, Sparkles } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
+import { AVATAR_OPTIONS } from '@/lib/avatars';
 
 interface ProfileCompletionModalProps {
   open: boolean;
   onComplete: () => void;
 }
 
-const avatarOptions = [
-  'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix',
-  'https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka',
-  'https://api.dicebear.com/7.x/avataaars/svg?seed=Milo',
-  'https://api.dicebear.com/7.x/avataaars/svg?seed=Luna',
-  'https://api.dicebear.com/7.x/avataaars/svg?seed=Oscar',
-  'https://api.dicebear.com/7.x/avataaars/svg?seed=Zoe',
-];
+const avatarOptions = AVATAR_OPTIONS;
 
 export default function ProfileCompletionModal({ open, onComplete }: ProfileCompletionModalProps) {
   const { user } = useAuth();

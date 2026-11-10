@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.2.1] - 2026-11-10
+
+### Fixes
+- Contas criadas pelo Google ficavam sem nome (o app mostrava "Estudante"/"Usuário"): o cadastro passa a usar o nome e a foto do provedor de login, e contas existentes sem nome foram preenchidas a partir dos dados do login
+- Login pelo Google sempre abre a tela de escolha de conta (antes entrava direto com a conta ativa no navegador)
+- Menu do usuário mostra o e-mail da conta logada
+
+### Features
+- Recuperação de senha: "Esqueci minha senha" no login e página `/redefinir-senha` (também permite que contas criadas pelo Google definam uma senha)
+- Página de Configurações (`/configuracoes`): nome e foto, dados da conta (e-mail, formas de login, plano, nível de acesso), criar/alterar senha, sair de todos os dispositivos, lembretes e pedido de exclusão de conta
+
+
 ## [1.2.0] - 2026-11-10
 
 ### Features

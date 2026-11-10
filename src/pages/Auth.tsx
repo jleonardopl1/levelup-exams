@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { Mail, Lock, User, Github } from 'lucide-react';
+import { Mail, Lock, User, Github, MailCheck, ArrowLeft } from 'lucide-react';
+import { passwordErrorMessage } from '@/lib/authErrors';
 import heroPattern from '@/assets/hero-pattern.png';
 import ProfileCompletionModal from '@/components/ProfileCompletionModal';
 import { supabase } from '@/integrations/supabase/client';
@@ -47,12 +48,14 @@ const FacebookIcon = () => (
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
+  const [forgotMode, setForgotMode] = useState(false);
+  const [resetSentTo, setResetSentTo] = useState<string | null>(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [loading, setLoading] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
-  const { signIn, signUp, signInWithGoogle, signInWithOAuth, user } = useAuth();
+  const { signIn, signUp, signInWithGoogle, signInWithOAuth, requestPasswordReset, user } = useAuth();
   const navigate = useNavigate();
 
   // Check if user needs to complete profile after signup
@@ -76,6 +79,25 @@ export default function Auth() {
 
     checkProfileCompletion();
   }, [user, navigate]);
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const emailResult = emailSchema.safeParse(email);
+    if (!emailResult.success) {
+      toast.error(emailResult.error.errors[0].message);
+      return;
+    }
+    setLoading(true);
+    const { error } = await requestPasswordReset(emailResult.data);
+    setLoading(false);
+    // Resposta igual exista ou não a conta (não revela quais e-mails estão cadastrados),
+    // exceto limite de envio, que o usuário precisa saber.
+    if (error && /rate limit|only request this after/i.test(error.message)) {
+      toast.error(passwordErrorMessage(error));
+      return;
+    }
+    setResetSentTo(emailResult.data);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -183,7 +205,8 @@ export default function Auth() {
         </CardHeader>
         
         <CardContent className="space-y-6">
-          {/* Social Login Buttons */}
+          {/* Social Login Buttons (ocultos na redefinição de senha) */}
+          {!forgotMode && (<>
           <div className="grid grid-cols-2 gap-3">
             <Button
               type="button"
@@ -246,59 +269,131 @@ export default function Auth() {
               <span className="bg-card px-2 text-muted-foreground">ou</span>
             </div>
           </div>
+          </>)}
 
+          {forgotMode ? (
+            resetSentTo ? (
+              <div className="space-y-4 text-center" role="status">
+                <MailCheck className="w-12 h-12 mx-auto text-primary" />
+                <div>
+                  <p className="font-semibold">Verifique seu e-mail</p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Se existir uma conta para <strong>{resetSentTo}</strong>, você receberá um link para criar uma nova senha.
+                    Confira também a caixa de spam.
+                  </p>
+                </div>
+                <Button variant="outline" className="w-full" onClick={() => { setForgotMode(false); setResetSentTo(null); }}>
+                  <ArrowLeft className="w-4 h-4 mr-2" /> Voltar para o login
+                </Button>
+              </div>
+            ) : (
+              <form onSubmit={handleForgotPassword} className="space-y-4">
+                <div className="text-center">
+                  <p className="font-semibold">Redefinir senha</p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Informe o e-mail da sua conta. Enviaremos um link para você criar uma nova senha.
+                  </p>
+                </div>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                  <Input
+                    type="email"
+                    placeholder="seu@email.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    autoFocus
+                    autoComplete="email"
+                    className="pl-10"
+                    aria-label="E-mail da conta"
+                  />
+                </div>
+                <Button type="submit" variant="hero" size="lg" className="w-full" disabled={loading}>
+                  {loading ? 'Enviando...' : 'Enviar link de redefinição'}
+                </Button>
+                <button
+                  type="button"
+                  onClick={() => setForgotMode(false)}
+                  className="w-full text-sm text-muted-foreground hover:text-primary transition-colors"
+                >
+                  Voltar para o login
+                </button>
+              </form>
+            )
+          ) : (
+            <>
           <form onSubmit={handleSubmit} className="space-y-4">
-            {!isLogin && (
+              {!isLogin && (
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                  <Input
+                    placeholder="Seu nome"
+                    value={displayName}
+                    onChange={(e) => setDisplayName(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+              )}
+              
               <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <Input
-                  placeholder="Seu nome"
-                  value={displayName}
-                  onChange={(e) => setDisplayName(e.target.value)}
+                  type="email"
+                  placeholder="seu@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
                   className="pl-10"
                 />
               </div>
+              
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                <Input
+                  type="password"
+                  placeholder="Sua senha"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  minLength={6}
+                  className="pl-10"
+                />
+              </div>
+              
+              {isLogin && (
+                <div className="flex justify-end -mt-1">
+                  <button
+                    type="button"
+                    onClick={() => { setForgotMode(true); setResetSentTo(null); }}
+                    className="text-sm text-primary hover:underline"
+                  >
+                    Esqueci minha senha
+                  </button>
+                </div>
+              )}
+  
+              <Button type="submit" variant="hero" size="lg" className="w-full" disabled={loading}>
+                {loading ? 'Carregando...' : isLogin ? 'Entrar' : 'Criar conta'}
+              </Button>
+            </form>
+  
+            {isLogin && (
+              <p className="mt-3 text-xs text-center text-muted-foreground">
+                Criou a conta pelo Google? Use “Esqueci minha senha” para definir uma senha e entrar também com e-mail.
+              </p>
             )}
             
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-              <Input
-                type="email"
-                placeholder="seu@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="pl-10"
-              />
+            <div className="mt-6 text-center">
+              <button
+                type="button"
+                onClick={() => setIsLogin(!isLogin)}
+                className="text-sm text-muted-foreground hover:text-primary transition-colors"
+              >
+                {isLogin ? 'Não tem conta? Cadastre-se' : 'Já tem conta? Entre'}
+              </button>
             </div>
-            
-            <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-              <Input
-                type="password"
-                placeholder="Sua senha"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                minLength={6}
-                className="pl-10"
-              />
-            </div>
-            
-            <Button type="submit" variant="hero" size="lg" className="w-full" disabled={loading}>
-              {loading ? 'Carregando...' : isLogin ? 'Entrar' : 'Criar conta'}
-            </Button>
-          </form>
-          
-          <div className="mt-6 text-center">
-            <button
-              type="button"
-              onClick={() => setIsLogin(!isLogin)}
-              className="text-sm text-muted-foreground hover:text-primary transition-colors"
-            >
-              {isLogin ? 'Não tem conta? Cadastre-se' : 'Já tem conta? Entre'}
-            </button>
-          </div>
+            </>
+          )}
         </CardContent>
       </Card>
 

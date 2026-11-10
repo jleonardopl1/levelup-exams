@@ -85,3 +85,4 @@ Afiliados ativos/pausados/removidos, receita via afiliados, comissões dos últi
 2. Garantir que a conta do master já existe e está com o e-mail **confirmado**, e que a confirmação de e-mail está **ligada** no Supabase (Authentication → Sign In / Providers → Email → Confirm email). Com a confirmação desligada, quem cadastrasse esse e-mail primeiro seria tratado como master.
 3. Publicar as Edge Functions alteradas: `admin-notify`, `create-checkout`, `stripe-webhook`.
 4. No Stripe, o webhook deve continuar recebendo `checkout.session.completed` (já incluso). A chave precisa de permissão para criar cupons (`coupons:write`), usada na primeira venda de cada percentual de desconto.
+5. Em Supabase → Authentication → URL Configuration, inclua `https://<seu-dominio>/redefinir-senha` (e a URL de preview, se usar) em **Redirect URLs**. Sem isso o link do e-mail de "Esqueci minha senha" é recusado.
