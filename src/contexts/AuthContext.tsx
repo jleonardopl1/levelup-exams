@@ -2,8 +2,10 @@ import React, { createContext, useContext, useEffect, useRef, useState } from 'r
 import { useQueryClient } from '@tanstack/react-query';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { signInWithManagedOAuth } from '@/integrations/lovable';
+import { SOCIAL_PROVIDERS, type SocialProviderId } from '@/lib/authProviders';
 
-type OAuthProvider = 'google' | 'github' | 'linkedin_oidc' | 'azure' | 'facebook';
+type OAuthProvider = SocialProviderId;
 
 interface AuthContextType {
   user: User | null;
@@ -22,15 +24,6 @@ interface AuthContextType {
 }
 
 const PASSWORD_RESET_PATH = '/redefinir-senha';
-
-/**
- * Força a tela de escolha de conta do provedor. Sem isso o Google entra direto com a
- * conta ativa no navegador, sem dar chance de escolher outra.
- */
-const ACCOUNT_PICKER: Partial<Record<OAuthProvider, Record<string, string>>> = {
-  google: { prompt: 'select_account' },
-  azure: { prompt: 'select_account' },
-};
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -96,11 +89,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signInWithOAuth = async (provider: OAuthProvider) => {
+    const config = SOCIAL_PROVIDERS.find((p) => p.id === provider);
+    if (!config) return { error: new Error('Provedor de login desconhecido') };
+
+    // Google, Apple e Microsoft gerenciados pelo Lovable Cloud passam pelo broker OAuth.
+    if (config.via === 'managed') {
+      try {
+        const { error } = await signInWithManagedOAuth(provider as 'microsoft' | 'apple' | 'google', `${window.location.origin}/`);
+        return { error };
+      } catch (e) {
+        return { error: e instanceof Error ? e : new Error(String(e)) };
+      }
+    }
+
     const { error } = await supabase.auth.signInWithOAuth({
-      provider,
+      provider: config.supabaseName as Parameters<typeof supabase.auth.signInWithOAuth>[0]['provider'],
       options: {
         redirectTo: `${window.location.origin}/`,
-        queryParams: ACCOUNT_PICKER[provider],
+        queryParams: config.queryParams,
       },
     });
     return { error: error as Error | null };

@@ -6,6 +6,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ReferralCapture } from "@/components/ReferralCapture";
+import { OAuthReturnHandler } from "@/components/OAuthReturnHandler";
+import { useSubscriptionSync } from "@/hooks/useSubscription";
 import Index from "./pages/Index";
 
 // Lazy-loaded pages for code splitting
@@ -26,6 +28,13 @@ const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const Trilhas = lazy(() => import("./pages/Trilhas"));
 const Trilha = lazy(() => import("./pages/Trilha"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const InstallApp = lazy(() => import("./pages/InstallApp"));
+
+/** Mantém o plano (Free/Plus) sincronizado com o Stripe a cada login. */
+const SubscriptionSync = () => {
+  useSubscriptionSync();
+  return null;
+};
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -51,6 +60,8 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <ReferralCapture />
+          <OAuthReturnHandler />
+          <SubscriptionSync />
           <Suspense fallback={<PageLoader />}>
             <Routes>
               <Route path="/" element={<Index />} />
@@ -70,6 +81,7 @@ const App = () => (
               <Route path="/redefinir-senha" element={<ResetPassword />} />
               <Route path="/trilhas" element={<Trilhas />} />
               <Route path="/trilhas/:slug" element={<Trilha />} />
+              <Route path="/instalar" element={<InstallApp />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { supabase } from '@/integrations/supabase/client';
 import { clearStoredReferralCode, getStoredReferralCode, REFERRAL_CODE_RE, storeReferralCode } from '@/hooks/useAffiliates';
 import { useQuestionLimits } from '@/hooks/useDailyUsage';
-import { useSubscription, useCreateCheckout, useCustomerPortal, PRICE_IDS } from '@/hooks/useSubscription';
+import { useSubscription, useCreateCheckout, useCustomerPortal, PRICE_IDS, syncSubscription } from '@/hooks/useSubscription';
 import { PremiumBadge } from '@/components/PremiumBadge';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
@@ -39,9 +39,10 @@ const features = {
 export default function Upgrade() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { user } = useAuth();
+  const { user, session } = useAuth();
+  const stripeReturnHandled = useRef(false);
   const { tier, isPremium } = useQuestionLimits();
-  const { data: subscription, refetch: refetchSubscription } = useSubscription();
+  const { data: subscription } = useSubscription();
   const createCheckout = useCreateCheckout();
   const customerPortal = useCustomerPortal();
   const queryClient = useQueryClient();
@@ -85,23 +86,49 @@ export default function Upgrade() {
     clearStoredReferralCode();
   };
 
-  // Handle success/cancel from Stripe
+  // Retorno do Stripe. O webhook pode levar alguns segundos (ou minutos, em pagamentos
+  // assíncronos): confirmamos o plano direto no Stripe e repetimos por ~30s antes de
+  // atualizar o perfil, em vez de recarregar o perfil antes da confirmação.
   useEffect(() => {
     const success = searchParams.get('success');
     const canceled = searchParams.get('canceled');
+    if (success !== 'true' && canceled !== 'true') return;
+    // Espera a sessão ser restaurada após o redirecionamento antes de confirmar.
+    if (!session?.access_token) return;
+    if (stripeReturnHandled.current) return;
+    stripeReturnHandled.current = true;
+    window.history.replaceState({}, '', '/upgrade');
 
-    if (success === 'true') {
-      clearStoredReferralCode();
-      toast.success('Assinatura realizada com sucesso! Bem-vindo ao Plus!');
-      refetchSubscription();
-      queryClient.invalidateQueries({ queryKey: ['profile'] });
-      // Clean URL
-      window.history.replaceState({}, '', '/upgrade');
-    } else if (canceled === 'true') {
-      toast.info('Assinatura cancelada');
-      window.history.replaceState({}, '', '/upgrade');
+    if (canceled === 'true') {
+      toast.info('Pagamento não concluído. Você pode assinar quando quiser.');
+      return;
     }
-  }, [searchParams, refetchSubscription, queryClient]);
+
+    clearStoredReferralCode();
+    let cancelled = false;
+    const toastId = toast.loading('Confirmando seu pagamento...');
+    (async () => {
+      for (let attempt = 0; attempt < 10 && !cancelled; attempt++) {
+        const status = await syncSubscription(session.access_token);
+        if (status?.tier === 'plus') {
+          queryClient.setQueryData(['subscription', session.user.id], status);
+          await queryClient.invalidateQueries({ queryKey: ['profile'] });
+          toast.success('Assinatura confirmada! Bem-vindo ao Plus!', { id: toastId });
+          return;
+        }
+        await new Promise((r) => setTimeout(r, 3000));
+      }
+      if (!cancelled) {
+        toast.info('Pagamento recebido pelo Stripe. A liberação do Plus pode levar alguns minutos — atualize esta página em instantes.', { id: toastId, duration: 10000 });
+      }
+    })();
+    return () => {
+      cancelled = true;
+      stripeReturnHandled.current = false; // StrictMode remonta o efeito: deixa a 2ª execução seguir
+      toast.dismiss(toastId);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams, session?.user?.id]);
 
   const handleSubscribe = (priceId: string) => {
     if (!user) {

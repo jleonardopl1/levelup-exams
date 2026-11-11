@@ -1,27 +1,27 @@
 {
-  "name": "LevelUp Exams - Plataforma Gamificada de Estudos para Concursos",
+  "id": "/",
+  "name": "LevelUp Exams - Estudos Gamificados para Concursos",
   "short_name": "LevelUp Exams",
-  "description": "Prepare-se para concursos públicos com quizzes gamificados, ranking, conquistas e mentor IA.",
-  "start_url": "/",
+  "description": "Prepare-se para concursos públicos com quizzes gamificados, trilhas por edital, ranking, conquistas e mentor IA.",
+  "start_url": "/?source=app",
+  "scope": "/",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
   "background_color": "#0a0f1e",
-  "theme_color": "#3b82f6",
-  "orientation": "portrait-primary",
-  "icons": [
-    {
-      "src": "/favicon.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/favicon.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
-  ],
-  "categories": ["education", "games"],
+  "theme_color": "#4f46e5",
+  "orientation": "portrait",
   "lang": "pt-BR",
-  "dir": "ltr"
+  "dir": "ltr",
+  "categories": ["education", "productivity"],
+  "prefer_related_applications": false,
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Responder questões", "short_name": "Quiz", "url": "/quiz?source=app", "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Minhas trilhas", "short_name": "Trilhas", "url": "/trilhas?source=app", "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Meu progresso", "short_name": "Progresso", "url": "/dashboard?source=app", "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }] }
+  ]
 }

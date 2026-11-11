@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.3.0] - 2026-11-10
+
+### Fixes
+- Login social: GitHub, LinkedIn, Microsoft e Facebook estavam desativados no backend e davam erro "Unsupported provider". A tela de login agora mostra apenas os provedores ativos (lidos do backend) e o Microsoft/Outlook usa o login gerenciado do Lovable Cloud
+- Erros na volta do login social viram mensagem em português e levam de volta ao login
+- Assinatura: o checkout do Stripe abre na mesma aba (antes era bloqueado como pop-up no iPhone, Safari e no app instalado)
+- Volta do pagamento confirma o Plus direto no Stripe antes de atualizar o perfil
+- "Gerenciar assinatura" mostra o motivo real do erro
+
+### Features
+- Plano Free/Plus sincronizado com o Stripe a cada login (não depende só do webhook)
+- App instalável no Android, iPhone e computador (PWA): ícones, tela cheia, atalhos, abertura offline do app
+- Página `/instalar` ("Baixar o app") com instalação em um toque e passo a passo para iPhone
+- Guia `docs/LOGIN_PAGAMENTO_APP.md` com o diagnóstico e os passos de configuração
+
+
 ## [1.2.1] - 2026-11-10
 
 ### Fixes

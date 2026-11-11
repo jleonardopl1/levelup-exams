@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import { useEffect } from 'react';
 
 // Price IDs from Stripe
 export const PRICE_IDS = {
@@ -9,7 +10,16 @@ export const PRICE_IDS = {
   annual: 'price_1SdkMfFQ1QkvCgEAnMRl3MXq',
 } as const;
 
-interface SubscriptionStatus {
+/** Extrai a mensagem real de erro de uma Edge Function (o corpo traz o motivo). */
+async function functionError(error: unknown): Promise<Error & { code?: string }> {
+  const context = (error as { context?: Response }).context;
+  const body = await context?.json?.().catch(() => null);
+  const err = new Error(body?.error || (error as Error)?.message || 'Erro inesperado') as Error & { code?: string };
+  err.code = body?.code;
+  return err;
+}
+
+export interface SubscriptionStatus {
   subscribed: boolean;
   tier: 'free' | 'plus';
   subscription_end: string | null;
@@ -46,7 +56,6 @@ export function useSubscription() {
 
 export function useCreateCheckout() {
   const { session } = useAuth();
-  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async ({ priceId, referralCode }: { priceId: string; referralCode?: string }) => {
@@ -61,13 +70,7 @@ export function useCreateCheckout() {
         },
       });
 
-      if (error) {
-        // FunctionsHttpError: a mensagem real vem no corpo da resposta (ex.: código inválido).
-        const body = await (error as { context?: Response }).context?.json?.().catch(() => null);
-        const err = new Error(body?.error || error.message) as Error & { code?: string };
-        err.code = body?.code;
-        throw err;
-      }
+      if (error) throw await functionError(error);
       if (data?.error) throw new Error(data.error);
 
       return data;
@@ -96,7 +99,7 @@ export function useCustomerPortal() {
         },
       });
 
-      if (error) throw error;
+      if (error) throw await functionError(error);
       if (data?.error) throw new Error(data.error);
 
       return data;
@@ -110,9 +113,16 @@ export function useCustomerPortal() {
   });
 }
 
-/** Abre apenas URLs do Stripe, sem expor window.opener (reverse tabnabbing). */
+/**
+ * Leva o usuário ao Stripe NA MESMA ABA. Antes era `window.open(..., '_blank')` depois
+ * de uma chamada assíncrona: Safari/iPhone, app instalado (PWA) e bloqueadores de pop-up
+ * barravam a janela e o botão "Assinar" parecia não fazer nada. Só aceita URLs do Stripe.
+ */
 function openStripeUrl(url: unknown) {
-  if (typeof url !== 'string') return;
+  if (typeof url !== 'string') {
+    toast.error('Não foi possível abrir o pagamento. Tente novamente.');
+    return;
+  }
   try {
     const parsed = new URL(url);
     const allowed = parsed.protocol === 'https:' &&
@@ -121,8 +131,44 @@ function openStripeUrl(url: unknown) {
       toast.error('Link de pagamento inválido');
       return;
     }
-    window.open(parsed.toString(), '_blank', 'noopener,noreferrer');
+    window.location.assign(parsed.toString());
   } catch {
     toast.error('Link de pagamento inválido');
   }
+}
+
+/** Consulta o Stripe (via Edge Function) e atualiza o plano salvo no perfil. */
+export async function syncSubscription(accessToken: string): Promise<SubscriptionStatus | null> {
+  const { data, error } = await supabase.functions.invoke('check-subscription', {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  if (error || !data || data.error) return null;
+  return data as SubscriptionStatus;
+}
+
+/**
+ * Sincroniza o plano uma vez por login. Garante o Plus mesmo se o webhook do Stripe
+ * atrasar ou falhar (e rebaixa quem cancelou), sem depender de abrir a página de planos.
+ */
+export function useSubscriptionSync() {
+  const { session } = useAuth();
+  const queryClient = useQueryClient();
+  const userId = session?.user?.id;
+  const token = session?.access_token;
+
+  useEffect(() => {
+    if (!userId || !token) return;
+    const key = `levelup:sub-sync:${userId}`;
+    try {
+      if (sessionStorage.getItem(key)) return;
+      sessionStorage.setItem(key, '1');
+    } catch { /* storage indisponível: sincroniza mesmo assim */ }
+    void syncSubscription(token).then((status) => {
+      if (!status) return;
+      queryClient.setQueryData(['subscription', userId], status);
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
+    });
+    // token muda a cada renovação; sincronizar só quando o usuário muda.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId, queryClient]);
 }

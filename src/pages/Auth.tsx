@@ -12,6 +12,9 @@ import ProfileCompletionModal from '@/components/ProfileCompletionModal';
 import { supabase } from '@/integrations/supabase/client';
 import Logo from '@/components/Logo';
 import { z } from 'zod';
+import { Link } from 'react-router-dom';
+import { Smartphone } from 'lucide-react';
+import { oauthErrorMessage, useAvailableSocialProviders, type SocialProviderId } from '@/lib/authProviders';
 
 // Validation schemas
 const emailSchema = z.string().trim().email({ message: "Email inválido" }).max(255);
@@ -46,6 +49,21 @@ const FacebookIcon = () => (
   </svg>
 );
 
+const AppleIcon = () => (
+  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M16.37 12.6c-.02-2.2 1.8-3.26 1.88-3.31-1.02-1.5-2.62-1.7-3.19-1.72-1.36-.14-2.65.8-3.34.8-.69 0-1.75-.78-2.88-.76-1.48.02-2.85.86-3.61 2.19-1.54 2.67-.39 6.62 1.11 8.79.73 1.06 1.6 2.25 2.75 2.21 1.1-.04 1.52-.71 2.85-.71 1.33 0 1.71.71 2.88.69 1.19-.02 1.94-1.08 2.67-2.15.84-1.23 1.19-2.42 1.21-2.48-.03-.01-2.32-.89-2.33-3.55zM14.17 6.13c.61-.74 1.02-1.76.91-2.78-.88.04-1.94.59-2.57 1.32-.56.65-1.06 1.69-.93 2.69.98.08 1.98-.5 2.59-1.23z"/>
+  </svg>
+);
+
+const PROVIDER_ICONS: Record<SocialProviderId, () => JSX.Element> = {
+  google: GoogleIcon,
+  microsoft: MicrosoftIcon,
+  apple: AppleIcon,
+  github: () => <Github className="w-5 h-5" />,
+  linkedin_oidc: LinkedInIcon,
+  facebook: FacebookIcon,
+};
+
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
   const [forgotMode, setForgotMode] = useState(false);
@@ -55,7 +73,8 @@ export default function Auth() {
   const [displayName, setDisplayName] = useState('');
   const [loading, setLoading] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
-  const { signIn, signUp, signInWithGoogle, signInWithOAuth, requestPasswordReset, user } = useAuth();
+  const { signIn, signUp, signInWithOAuth, requestPasswordReset, user } = useAuth();
+  const { providers: socialProviders, loading: providersLoading } = useAvailableSocialProviders();
   const navigate = useNavigate();
 
   // Check if user needs to complete profile after signup
@@ -155,26 +174,16 @@ export default function Auth() {
     }
   };
 
-  const handleOAuthSignIn = async (provider: 'google' | 'github' | 'linkedin_oidc' | 'azure' | 'facebook') => {
+  const handleOAuthSignIn = async (provider: SocialProviderId) => {
     setLoading(true);
-    const providerNames: Record<string, string> = {
-      google: 'Google',
-      github: 'GitHub',
-      linkedin_oidc: 'LinkedIn',
-      azure: 'Microsoft',
-      facebook: 'Facebook'
-    };
     try {
-      if (provider === 'google') {
-        const { error } = await signInWithGoogle();
-        if (error) throw error;
-      } else {
-        const { error } = await signInWithOAuth(provider);
-        if (error) throw error;
-      }
-    } catch (error: any) {
-      toast.error(error.message || `Erro ao entrar com ${providerNames[provider]}`);
+      const { error } = await signInWithOAuth(provider);
+      if (error) throw error;
+      // Sucesso: o navegador segue para o provedor (ou a sessão já foi criada).
+    } catch (error: unknown) {
+      toast.error(oauthErrorMessage(error instanceof Error ? error.message : String(error)));
     } finally {
+      // Libera os botões: se o aluno voltar do provedor, a tela não fica travada.
       setLoading(false);
     }
   };
@@ -207,60 +216,31 @@ export default function Auth() {
         <CardContent className="space-y-6">
           {/* Social Login Buttons (ocultos na redefinição de senha) */}
           {!forgotMode && (<>
-          <div className="grid grid-cols-2 gap-3">
-            <Button
-              type="button"
-              variant="outline"
-              className="gap-2"
-              onClick={() => handleOAuthSignIn('google')}
-              disabled={loading}
-            >
-              <GoogleIcon />
-              Google
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              className="gap-2"
-              onClick={() => handleOAuthSignIn('github')}
-              disabled={loading}
-            >
-              <Github className="w-5 h-5" />
-              GitHub
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              className="gap-2"
-              onClick={() => handleOAuthSignIn('linkedin_oidc')}
-              disabled={loading}
-            >
-              <LinkedInIcon />
-              LinkedIn
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              className="gap-2"
-              onClick={() => handleOAuthSignIn('azure')}
-              disabled={loading}
-            >
-              <MicrosoftIcon />
-              Microsoft
-            </Button>
-          </div>
+          {providersLoading ? (
+            <div className="h-10 rounded-md bg-muted/50 animate-pulse" aria-label="Carregando opções de login" />
+          ) : socialProviders.length > 0 && (
+            <div className={`grid gap-3 ${socialProviders.length > 1 ? 'grid-cols-2' : 'grid-cols-1'}`}>
+              {socialProviders.map((p, i) => {
+                const Icon = PROVIDER_ICONS[p.id];
+                const fullWidth = socialProviders.length > 1 && socialProviders.length % 2 === 1 && i === socialProviders.length - 1;
+                return (
+                  <Button
+                    key={p.id}
+                    type="button"
+                    variant="outline"
+                    className={`gap-2 ${fullWidth ? 'col-span-2' : ''}`}
+                    onClick={() => handleOAuthSignIn(p.id)}
+                    disabled={loading}
+                    title={p.id === 'microsoft' ? 'Contas Microsoft, Outlook, Hotmail e Live' : undefined}
+                  >
+                    <Icon />
+                    {socialProviders.length === 1 ? `Continuar com ${p.label}` : p.label}
+                  </Button>
+                );
+              })}
+            </div>
+          )}
 
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full gap-2"
-            onClick={() => handleOAuthSignIn('facebook')}
-            disabled={loading}
-          >
-            <FacebookIcon />
-            Continuar com Facebook
-          </Button>
-          
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <span className="w-full border-t" />
@@ -394,6 +374,13 @@ export default function Auth() {
             </div>
             </>
           )}
+
+          <Link
+            to="/instalar"
+            className="flex items-center justify-center gap-2 text-xs text-muted-foreground hover:text-primary transition-colors"
+          >
+            <Smartphone className="w-4 h-4" /> Baixe o app no Android ou iPhone
+          </Link>
         </CardContent>
       </Card>
 
