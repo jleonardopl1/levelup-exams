@@ -146,29 +146,72 @@ export async function syncSubscription(accessToken: string): Promise<Subscriptio
   return data as SubscriptionStatus;
 }
 
+const SYNC_KEY_PREFIX = 'levelup:sub-sync:';
+const RETRY_DELAY_MS = 60_000;
+const syncInFlight = new Set<string>();
+
+function readSynced(key: string): boolean {
+  try { return sessionStorage.getItem(key) === '1'; } catch { return false; }
+}
+
+function markSynced(key: string) {
+  try { sessionStorage.setItem(key, '1'); } catch { /* storage indisponível */ }
+}
+
+function clearSyncMarkers() {
+  try {
+    Object.keys(sessionStorage).filter((k) => k.startsWith(SYNC_KEY_PREFIX)).forEach((k) => sessionStorage.removeItem(k));
+  } catch { /* storage indisponível */ }
+}
+
 /**
  * Sincroniza o plano uma vez por login. Garante o Plus mesmo se o webhook do Stripe
  * atrasar ou falhar (e rebaixa quem cancelou), sem depender de abrir a página de planos.
+ * Só marca como feito quando a consulta dá certo; se falhar (sem internet, função fora
+ * do ar), tenta de novo ao reconectar ou após 1 minuto. Sair da conta zera a marcação.
  */
 export function useSubscriptionSync() {
-  const { session } = useAuth();
+  const { session, loading } = useAuth();
   const queryClient = useQueryClient();
   const userId = session?.user?.id;
-  const token = session?.access_token;
 
   useEffect(() => {
-    if (!userId || !token) return;
-    const key = `levelup:sub-sync:${userId}`;
-    try {
-      if (sessionStorage.getItem(key)) return;
-      sessionStorage.setItem(key, '1');
-    } catch { /* storage indisponível: sincroniza mesmo assim */ }
-    void syncSubscription(token).then((status) => {
-      if (!status) return;
-      queryClient.setQueryData(['subscription', userId], status);
-      queryClient.invalidateQueries({ queryKey: ['profile'] });
-    });
-    // token muda a cada renovação; sincronizar só quando o usuário muda.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userId, queryClient]);
+    if (!userId) {
+      // Só após a sessão carregar: no início da página o usuário ainda não foi restaurado.
+      if (!loading) clearSyncMarkers();
+      return;
+    }
+    const key = `${SYNC_KEY_PREFIX}${userId}`;
+    let disposed = false;
+    let retryTimer: ReturnType<typeof setTimeout> | undefined;
+
+    const attempt = async () => {
+      if (disposed || readSynced(key) || syncInFlight.has(key)) return;
+      syncInFlight.add(key);
+      try {
+        const { data } = await supabase.auth.getSession();
+        const token = data.session?.access_token;
+        const status = token ? await syncSubscription(token) : null;
+        if (status) {
+          markSynced(key);
+          queryClient.setQueryData(['subscription', userId], status);
+          queryClient.invalidateQueries({ queryKey: ['profile'] });
+        } else if (!disposed) {
+          clearTimeout(retryTimer);
+          retryTimer = setTimeout(() => void attempt(), RETRY_DELAY_MS);
+        }
+      } finally {
+        syncInFlight.delete(key);
+      }
+    };
+
+    const onOnline = () => void attempt();
+    window.addEventListener('online', onOnline);
+    void attempt();
+    return () => {
+      disposed = true;
+      clearTimeout(retryTimer);
+      window.removeEventListener('online', onOnline);
+    };
+  }, [userId, loading, queryClient]);
 }

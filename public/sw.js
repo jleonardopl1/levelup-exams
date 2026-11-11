@@ -13,7 +13,23 @@ const SHELL_CACHE = `levelup-shell-${VERSION}`;
 const ASSET_CACHE = `levelup-assets-${VERSION}`;
 const SHELL_URL = '/';
 
-/** Salva a página inicial e os arquivos principais do build (JS/CSS que ela referencia). */
+/** Guarda os arquivos do build (JS/CSS), inclusive as telas carregadas sob demanda. */
+async function precacheAssets(html) {
+  const fromHtml = [...html.matchAll(/(?:src|href)="(\/assets\/[^"]+)"/g)].map((m) => m[1]);
+  // Lista completa gerada no build (vite.config.ts).
+  const listed = await fetch('/asset-manifest.json', { cache: 'no-store' })
+    .then((r) => (r.ok ? r.json() : { files: [] }))
+    .then((m) => (Array.isArray(m.files) ? m.files : []))
+    .catch(() => []);
+  const assets = [...new Set([...fromHtml, ...listed])];
+  const assetCache = await caches.open(ASSET_CACHE);
+  await Promise.all(assets.map(async (url) => {
+    if (await assetCache.match(url)) return; // arquivos com hash nunca mudam
+    await assetCache.add(url).catch(() => undefined);
+  }));
+}
+
+/** Salva a página inicial e os arquivos do build. */
 async function cacheShell() {
   const response = await fetch(SHELL_URL, { cache: 'no-store' });
   if (!response.ok) return;
@@ -21,15 +37,23 @@ async function cacheShell() {
   const shell = await caches.open(SHELL_CACHE);
   await shell.put(SHELL_URL, response);
   await shell.addAll(['/manifest.json', '/icon-192.png', '/icon-512.png']).catch(() => undefined);
-  const fromHtml = [...html.matchAll(/(?:src|href)="(\/assets\/[^"]+)"/g)].map((m) => m[1]);
-  // Lista completa gerada no build (vite.config.ts): inclui as telas carregadas sob demanda.
-  const listed = await fetch('/asset-manifest.json', { cache: 'no-store' })
-    .then((r) => (r.ok ? r.json() : { files: [] }))
-    .then((m) => (Array.isArray(m.files) ? m.files : []))
-    .catch(() => []);
-  const assets = [...new Set([...fromHtml, ...listed])];
-  const assetCache = await caches.open(ASSET_CACHE);
-  await Promise.all(assets.map((url) => assetCache.add(url).catch(() => undefined)));
+  await precacheAssets(html);
+}
+
+/**
+ * Atualiza a cópia offline quando chega uma página nova. Se o HTML mudou (nova
+ * publicação, sem mudar o sw.js), baixa também os arquivos novos do build para o app
+ * continuar abrindo todas as telas sem internet.
+ */
+async function refreshShell(response) {
+  const html = await response.clone().text();
+  const shell = await caches.open(SHELL_CACHE);
+  const previous = await shell.match(SHELL_URL).then((r) => (r ? r.text() : null)).catch(() => null);
+  await shell.put(SHELL_URL, response);
+  if (previous !== html) {
+    await precacheAssets(html);
+    await trimAssets();
+  }
 }
 
 self.addEventListener('install', (event) => {
@@ -67,8 +91,7 @@ self.addEventListener('fetch', (event) => {
       fetch(request)
         .then((response) => {
           if (response.ok) {
-            const copy = response.clone();
-            caches.open(SHELL_CACHE).then((cache) => cache.put(SHELL_URL, copy)).catch(() => undefined);
+            event.waitUntil(refreshShell(response.clone()).catch(() => undefined));
           }
           return response;
         })
