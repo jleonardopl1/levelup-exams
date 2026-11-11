@@ -41,7 +41,8 @@ export default defineConfig(({ mode }) => ({
           vendor: ["react", "react-dom", "react-router-dom"],
           supabase: ["@supabase/supabase-js"],
           ui: ["@radix-ui/react-dialog", "@radix-ui/react-dropdown-menu", "@radix-ui/react-tabs", "@radix-ui/react-tooltip"],
-          charts: ["recharts"],
+          // recharts fica fora de manualChunks: forçá-lo num chunk proprio puxava clsx junto
+          // e fazia todas as telas (inclusive o login) baixarem ~100 KB de graficos.
           query: ["@tanstack/react-query"],
         },
       },
