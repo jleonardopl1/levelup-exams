@@ -10,7 +10,7 @@ import { useQuery } from '@tanstack/react-query';
  *   Cloud → Users → Auth settings. Controlado por VITE_MANAGED_OAUTH_PROVIDERS.
  *
  * Situação verificada em 10/11/2026 no backend publicado: Google ativo; GitHub,
- * LinkedIn, Microsoft (azure) e Facebook desativados no Supabase. O Lovable Cloud
+ * LinkedIn e Facebook desativados no Supabase. Microsoft e Apple via Lovable (11/11). O Lovable Cloud
  * oferece Google, Apple e Microsoft gerenciados; GitHub/LinkedIn/Facebook não são
  * suportados por ele (LinkedIn só via configuração OIDC própria).
  */
@@ -35,9 +35,12 @@ export const SOCIAL_PROVIDERS: SocialProvider[] = [
   { id: 'facebook', label: 'Facebook', via: 'supabase', supabaseName: 'facebook' },
 ];
 
-/** Provedores gerenciados pelo Lovable que foram ligados no painel (padrão: Microsoft). */
+/**
+ * Provedores gerenciados pelo Lovable ligados no painel. Microsoft e Apple ativados em
+ * 11/11/2026 (modo "Managed by Lovable"); confirmados no broker OAuth.
+ */
 const MANAGED_ENABLED = new Set(
-  (import.meta.env.VITE_MANAGED_OAUTH_PROVIDERS ?? 'microsoft')
+  (import.meta.env.VITE_MANAGED_OAUTH_PROVIDERS ?? 'microsoft,apple')
     .split(',')
     .map((s: string) => s.trim().toLowerCase())
     .filter(Boolean),
