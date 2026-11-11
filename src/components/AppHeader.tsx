@@ -31,7 +31,8 @@ import {
   TrendingUp,
   ChevronRight,
   Award,
-  Map as MapIcon
+  Map as MapIcon,
+  Smartphone
 } from 'lucide-react';
 import { PremiumBadge } from '@/components/PremiumBadge';
 import { ShareModal } from '@/components/ShareModal';
@@ -209,6 +210,10 @@ export function AppHeader() {
                   <HelpCircle className="mr-2 h-4 w-4" />
                   FAQ
                 </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/instalar')}>
+                  <Smartphone className="mr-2 h-4 w-4" />
+                  Baixar o app
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 {!isPremium && (
                   <DropdownMenuItem onClick={() => navigate('/upgrade')} className="text-accent">
@@ -267,6 +272,15 @@ export function AppHeader() {
               >
                 <TrendingUp className="w-5 h-5" />
                 Meu Progresso
+              </Link>
+
+              <Link
+                to="/instalar"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all text-muted-foreground hover:text-foreground hover:bg-muted/50"
+              >
+                <Smartphone className="w-5 h-5" />
+                Baixar o app
               </Link>
 
               <div className="pt-2 border-t border-border/40 mt-2">

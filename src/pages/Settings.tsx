@@ -33,7 +33,9 @@ const PROVIDER_LABELS: Record<string, string> = {
   email: 'E-mail e senha',
   google: 'Google',
   github: 'GitHub',
-  azure: 'Microsoft',
+  azure: 'Microsoft / Outlook',
+  microsoft: 'Microsoft / Outlook',
+  apple: 'Apple',
   linkedin_oidc: 'LinkedIn',
   facebook: 'Facebook',
 };
