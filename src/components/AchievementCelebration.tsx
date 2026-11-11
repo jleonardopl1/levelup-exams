@@ -79,7 +79,8 @@ export function AchievementCelebration({ achievement, open, onClose }: Achieveme
   const playSound = () => {
     try {
       // Create audio context for celebration sound
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      const audioContext = new AudioCtx();
       
       // Play a series of notes for celebration
       const playNote = (frequency: number, startTime: number, duration: number) => {
@@ -106,6 +107,9 @@ export function AchievementCelebration({ achievement, open, onClose }: Achieveme
       playNote(659.25, now + 0.1, 0.15); // E5
       playNote(783.99, now + 0.2, 0.15); // G5
       playNote(1046.50, now + 0.3, 0.3); // C6
+
+      // O iPhone limita a quantidade de AudioContext abertos: fecha ao terminar a melodia.
+      setTimeout(() => { audioContext.close().catch(() => undefined); }, 1000);
       
     } catch (error) {
       console.log('Audio not available');

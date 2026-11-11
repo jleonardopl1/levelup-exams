@@ -8,7 +8,8 @@ import { useProcessQuizRewards } from '@/hooks/useQuizRewards';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { ArrowLeft, Clock, CheckCircle, XCircle, Loader2 } from 'lucide-react';
+import { ArrowLeft, Clock, CheckCircle, XCircle, Loader2, WifiOff } from 'lucide-react';
+import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { DailyLimitModal } from '@/components/DailyLimitModal';
 import { Confetti, CelebrationGlow } from '@/components/Confetti';
@@ -26,7 +27,7 @@ export default function Quiz() {
   const trilha = searchParams.get('trilha');
   const backPath = trilha && /^[a-z0-9-]{1,80}$/.test(trilha) ? `/trilhas/${trilha}` : '/';
   const { user, loading: authLoading } = useAuth();
-  const { data: questions, isLoading } = useQuestions({ limit: 10, categoria, subjectId, nivel, mode });
+  const { data: questions, isLoading, isError, refetch } = useQuestions({ limit: 10, categoria, subjectId, nivel, mode });
   const validateAnswer = useValidateAnswer();
   const submitQuiz = useSubmitQuiz();
   const incrementUsage = useIncrementUsage();
@@ -66,16 +67,13 @@ export default function Quiz() {
     }
   }, [currentIndex, currentQuestion?.is_premium, isPremium]);
 
+  // O cronometro so decrementa. Encerrar o quiz fica num efeito separado que usa a versao
+  // mais recente de finishQuiz (via ref): antes, o intervalo chamava uma copia antiga,
+  // de quando ainda nao havia respostas, e o aluno recebia nota 0 ao acabar o tempo.
   useEffect(() => {
     if (quizFinished || !questions || questions.length === 0) return;
     const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          finishQuiz();
-          return 0;
-        }
-        return prev - 1;
-      });
+      setTimeLeft((prev) => (prev <= 1 ? 0 : prev - 1));
     }, 1000);
     return () => clearInterval(timer);
   }, [quizFinished, questions]);
@@ -118,6 +116,9 @@ export default function Quiz() {
       setShowResult(true);
     } catch (error) {
       console.error('Failed to validate answer:', error);
+      toast.error('Não foi possível conferir sua resposta', {
+        description: 'Verifique sua conexão e toque em Confirmar de novo.',
+      });
     }
   };
 
@@ -132,42 +133,75 @@ export default function Quiz() {
     }
   };
 
+  const finishingRef = useRef(false);
   const finishQuiz = useCallback(async () => {
-    if (quizFinished) return;
+    if (quizFinished || finishingRef.current) return;
+    finishingRef.current = true;
     setQuizFinished(true);
-    
-    const correctCount = answers.filter(a => a.correct).length + 
-      (showResult && validationResult?.is_correct ? 1 : 0);
+
+    // `answers` ja inclui a questao confirmada por ultimo (handleConfirm a adiciona antes
+    // de mostrar o resultado). Somar validationResult de novo contava o ultimo acerto em dobro.
+    const correctCount = answers.filter(a => a.correct).length;
     const total = questions?.length || 0;
-    const score = Math.round((correctCount / total) * 100);
+    const score = total > 0 ? Math.round((correctCount / total) * 100) : 0;
     const timeSpent = 600 - timeLeft;
 
-    // Increment usage for free users
-    if (!isPremium) {
-      await incrementUsage.mutateAsync(total);
+    try {
+      // Increment usage for free users
+      if (!isPremium) {
+        await incrementUsage.mutateAsync(total);
+      }
+
+      // Submit quiz result
+      await submitQuiz.mutateAsync({
+        score,
+        correctAnswers: correctCount,
+        totalQuestions: total,
+        timeSpentSeconds: timeSpent,
+        categoria: categoria || 'Todas',
+      });
+
+      // Process rewards and achievements
+      await processRewards({
+        correctAnswers: correctCount,
+        totalQuestions: total,
+        timeSpentSeconds: timeSpent,
+        consecutiveCorrect: maxStreakRef.current,
+      });
+    } catch (error) {
+      // Rede instavel no celular: nao prender o aluno na ultima questao.
+      console.error('Failed to save quiz result:', error);
+      toast.error('Não foi possível salvar este resultado', {
+        description: 'Sua nota aparece abaixo, mas pode não entrar no histórico e no ranking.',
+      });
     }
-
-    // Submit quiz result
-    await submitQuiz.mutateAsync({
-      score,
-      correctAnswers: correctCount,
-      totalQuestions: total,
-      timeSpentSeconds: timeSpent,
-      categoria: categoria || 'Todas',
-    });
-
-    // Process rewards and achievements
-    await processRewards({
-      correctAnswers: correctCount,
-      totalQuestions: total,
-      timeSpentSeconds: timeSpent,
-      consecutiveCorrect: maxStreakRef.current,
-    });
 
     navigate('/result', { 
       state: { score, correct: correctCount, total, timeSpent, backPath, retry: `${location.pathname}${location.search}` } 
     });
-  }, [answers, navigate, questions, quizFinished, showResult, validationResult, submitQuiz, timeLeft, categoria, isPremium, incrementUsage, processRewards, backPath, location.pathname, location.search]);
+  }, [answers, navigate, questions, quizFinished, submitQuiz, timeLeft, categoria, isPremium, incrementUsage, processRewards, backPath, location.pathname, location.search]);
+
+  const finishRef = useRef(finishQuiz);
+  useEffect(() => {
+    finishRef.current = finishQuiz;
+  }, [finishQuiz]);
+  useEffect(() => {
+    if (timeLeft === 0) finishRef.current();
+  }, [timeLeft]);
+
+  if (isError) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4 p-6 text-center">
+        <WifiOff className="w-12 h-12 text-muted-foreground" />
+        <p className="font-semibold text-lg">Não foi possível carregar as questões.</p>
+        <p className="text-sm text-muted-foreground">Verifique sua conexão com a internet e tente de novo.</p>
+        <div className="flex gap-3">
+          <Button onClick={() => refetch()}>Tentar de novo</Button>
+          <Button variant="outline" onClick={() => navigate(backPath)}>Voltar</Button>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading || !questions) {
     return (

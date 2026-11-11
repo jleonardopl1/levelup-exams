@@ -29,13 +29,13 @@ export class ErrorBoundary extends Component<Props, State> {
         <div className="flex flex-col items-center justify-center min-h-screen p-8 text-center">
           <h1 className="text-2xl font-bold mb-4">Algo deu errado</h1>
           <p className="text-muted-foreground mb-6">
-            Ocorreu um erro inesperado. Tente recarregar a pagina.
+            Ocorreu um erro inesperado. Verifique sua conexão e recarregue a página.
           </p>
           <button
             onClick={() => window.location.reload()}
-            className="px-6 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+            className="min-h-11 px-6 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
           >
-            Recarregar pagina
+            Recarregar página
           </button>
         </div>
       );

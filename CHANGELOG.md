@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.3.1] - 2026-11-11 (revisão diária)
+
+### Conteúdo
+- +50 questões autorais na trilha da Câmara de Cuiabá 2026, distribuídas pelo peso de cada matéria no edital (Legislação 6, Português 5, Raciocínio Lógico 4, Informática 3, História e Geografia de MT 3, Técnico e Analista Legislativo 3 cada, demais matérias 1–2)
+- Lotes diários em `content/trilhas/<slug>/diarias/AAAA-MM-DD.json`; o script gera uma migration própria por lote (a migration principal já foi aplicada e não roda de novo)
+
+### Fixes
+- Quiz: ao acabar o tempo, o aluno recebia nota 0 (o cronômetro chamava uma versão antiga da função de encerrar)
+- Quiz: o último acerto era contado em dobro (10 de 10 virava 110%)
+- Quiz: falha de rede ao salvar não prende mais o aluno na última questão; erro ao conferir resposta ou carregar questões agora aparece com opção de tentar de novo
+- Tela branca após nova publicação: as telas recarregam uma vez sozinhas e há tela de erro com botão de recarregar
+- App instalado: o cache nunca guarda uma página HTML no lugar de um arquivo JS/CSS
+- Login e demais telas não baixam mais a biblioteca de gráficos (~100 KB a menos no celular)
+- Página 404 em português; som de conquista não esgota mais o áudio no iPhone
+
 ## [1.3.0] - 2026-11-10
 
 ### Fixes

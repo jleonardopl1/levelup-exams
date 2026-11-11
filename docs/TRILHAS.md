@@ -46,6 +46,10 @@ node scripts/build-track-seed.mjs camara-cuiaba-2026
 
 O script valida tudo (4 alternativas distintas, gabarito, explicação, mínimo de 50 por matéria e por nível), embaralha as alternativas de forma determinística para equilibrar o gabarito e regera a migration `supabase/migrations/20261110130100_trilha_camara_cuiaba_2026.sql`. A migration é idempotente: pode ser reaplicada sem duplicar nada (`content_hash`).
 
+### Lotes diários revisados
+
+Além da geração automática, lotes de questões autorais revisadas entram em `content/trilhas/<slug>/diarias/AAAA-MM-DD.json` (formato compacto, com o campo `s` indicando a matéria). Ao rodar o script, cada lote vira sua própria migration (`AAAAMMDD120000_<slug>_diarias_AAAAMMDD.sql`), validada contra todo o banco para não repetir questões. A distribuição segue o peso da matéria no edital.
+
 ## Questões novas toda semana
 
 A Edge Function `generate-track-questions` publica **3 questões novas por matéria por dia** (21 por semana, acima do mínimo de 15). Para cada matéria ela:
