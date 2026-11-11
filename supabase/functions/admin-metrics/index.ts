@@ -51,8 +51,8 @@ serve(async (req) => {
         const thirtyDaysAgo = Math.floor(Date.now() / 1000) - 30 * 24 * 60 * 60;
         const charges = await stripe.charges.list({ created: { gte: thirtyDaysAgo }, limit: 100 });
         stripeMetrics.totalRevenue = charges.data
-          .filter((c) => c.paid && !c.refunded)
-          .reduce((sum, c) => sum + c.amount, 0);
+          .filter((c: { paid: boolean; refunded: boolean }) => c.paid && !c.refunded)
+          .reduce((sum: number, c: { amount: number }) => sum + c.amount, 0);
       } catch {
         console.error("Stripe metrics error");
       }
