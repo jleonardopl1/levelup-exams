@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { supabase } from '@/integrations/supabase/client';
 import { clearStoredReferralCode, getStoredReferralCode, REFERRAL_CODE_RE, storeReferralCode } from '@/hooks/useAffiliates';
 import { useQuestionLimits } from '@/hooks/useDailyUsage';
-import { useSubscription, useCreateCheckout, useCustomerPortal, PRICE_IDS, syncSubscription } from '@/hooks/useSubscription';
+import { useSubscription, useCreateCheckout, useCustomerPortal, syncSubscription, type SubscriptionPlan } from '@/hooks/useSubscription';
 import { PremiumBadge } from '@/components/PremiumBadge';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
@@ -130,14 +130,14 @@ export default function Upgrade() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams, session?.user?.id]);
 
-  const handleSubscribe = (priceId: string) => {
+  const handleSubscribe = (plan: SubscriptionPlan) => {
     if (!user) {
       toast.error('Você precisa estar logado para assinar');
       navigate('/auth');
       return;
     }
     createCheckout.mutate(
-      { priceId, referralCode: referral?.code },
+      { plan, referralCode: referral?.code },
       {
         onError: (error) => {
           // Código recusado no servidor (ex.: já usado antes): remove para não travar a compra.
@@ -290,7 +290,7 @@ export default function Upgrade() {
                 variant="hero" 
                 size="xl" 
                 className="w-full bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-600 hover:to-yellow-500"
-                onClick={() => handleSubscribe(PRICE_IDS.monthly)}
+                onClick={() => handleSubscribe('monthly')}
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -357,7 +357,7 @@ export default function Upgrade() {
                 variant="outline" 
                 size="lg" 
                 className="w-full"
-                onClick={() => handleSubscribe(PRICE_IDS.annual)}
+                onClick={() => handleSubscribe('annual')}
                 disabled={isLoading}
               >
                 {isLoading ? (

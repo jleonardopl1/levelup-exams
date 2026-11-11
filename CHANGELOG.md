@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.1] - 2026-11-11
+
+### Fixes
+- Assinatura: os preços Mensal e Anual estavam trocados (o botão Mensal cobrava R$ 159,90/ano). O app envia só o plano; o servidor escolhe o preço e confere a periodicidade no Stripe antes de criar o checkout
+- Preços configuráveis por secret (`STRIPE_PRICE_MONTHLY`, `STRIPE_PRICE_ANNUAL`) para trocar de teste para produção sem mudar código
+
+
 ## [1.3.0] - 2026-11-10
 
 ### Fixes

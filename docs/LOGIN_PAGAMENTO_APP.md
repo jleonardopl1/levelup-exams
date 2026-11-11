@@ -65,10 +65,22 @@ Opcional:
    `customer.subscription.created/updated/deleted/paused/resumed`,
    `invoice.payment_succeeded`, `invoice.payment_failed`.
 2. O "Signing secret" desse endpoint deve ser o mesmo salvo como `STRIPE_WEBHOOK_SECRET`.
-3. Conferir que o preço anual `price_1SdkMfFQ1QkvCgEAnMRl3MXq` existe no mesmo modo
-   (nunca foi usado em produção).
+3. ~~Conferir o preço anual~~ — verificado em 11/11/2026 (ver seção abaixo).
 4. Testar pagamentos no endereço publicado, não na pré-visualização do editor
    (as funções só aceitam chamadas de `levelupexams.lovable.app`).
+
+### Verificação de 11/11/2026
+
+- O app usa a **conta de teste (sandbox) "Área restrita de JL Data Solutions"** pela integração
+  Stripe do Lovable. Em modo teste **nenhum pagamento real é cobrado**: para vender de verdade é
+  preciso concluir o "Go live" (aba Payments do Lovable / verificação da conta no Stripe).
+- **Preços estavam trocados no app**: o botão "Mensal" enviava o preço anual (R$ 159,90/ano) e
+  o "Anual" enviava o mensal. Corrigido: o app agora envia só `monthly`/`annual` e o servidor
+  escolhe o preço (`STRIPE_PRICE_MONTHLY`, `STRIPE_PRICE_ANNUAL`) e confere a periodicidade
+  no Stripe antes de cobrar (`CHECKOUT_PRICE_MISCONFIGURED` no log se algo não bater).
+  - `price_1SdkMfFQ1QkvCgEAnMRl3MXq` = Plus Mensal, R$ 19,90/mês
+  - `price_1SdkO4FQ1QkvCgEAJsa9KbIE` = Plus Anual, R$ 159,90/ano
+- Não havia endpoint de webhook cadastrado no Stripe.
 
 ## 3. App para Android e iPhone
 
