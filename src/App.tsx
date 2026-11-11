@@ -29,6 +29,9 @@ const Trilhas = lazy(() => import("./pages/Trilhas"));
 const Trilha = lazy(() => import("./pages/Trilha"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const InstallApp = lazy(() => import("./pages/InstallApp"));
+const Privacy = lazy(() => import("./pages/Privacy"));
+const Terms = lazy(() => import("./pages/Terms"));
+const About = lazy(() => import("./pages/About"));
 
 /** Mantém o plano (Free/Plus) sincronizado com o Stripe a cada login. */
 const SubscriptionSync = () => {
@@ -82,6 +85,9 @@ const App = () => (
               <Route path="/trilhas" element={<Trilhas />} />
               <Route path="/trilhas/:slug" element={<Trilha />} />
               <Route path="/instalar" element={<InstallApp />} />
+              <Route path="/privacidade" element={<Privacy />} />
+              <Route path="/termos" element={<Terms />} />
+              <Route path="/sobre" element={<About />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>

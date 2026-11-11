@@ -381,6 +381,13 @@ export default function Auth() {
           >
             <Smartphone className="w-4 h-4" /> Baixe o app no Android ou iPhone
           </Link>
+
+          <p className="text-[11px] leading-snug text-center text-muted-foreground">
+            Ao continuar, você concorda com os{' '}
+            <Link to="/termos" className="underline hover:text-primary">Termos de Uso</Link> e a{' '}
+            <Link to="/privacidade" className="underline hover:text-primary">Política de Privacidade</Link>.
+            {' '}<Link to="/sobre" className="underline hover:text-primary">Conheça o LevelUp Exams</Link>
+          </p>
         </CardContent>
       </Card>
 
