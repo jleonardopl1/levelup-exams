@@ -4,11 +4,11 @@ import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { useEffect } from 'react';
 
-// Price IDs from Stripe
-export const PRICE_IDS = {
-  monthly: 'price_1SdkO4FQ1QkvCgEAJsa9KbIE',
-  annual: 'price_1SdkMfFQ1QkvCgEAnMRl3MXq',
-} as const;
+/**
+ * Planos de assinatura. O app envia só o NOME do plano; o servidor (create-checkout)
+ * escolhe o preço certo do Stripe e confere a periodicidade antes de cobrar.
+ */
+export type SubscriptionPlan = 'monthly' | 'annual';
 
 /** Extrai a mensagem real de erro de uma Edge Function (o corpo traz o motivo). */
 async function functionError(error: unknown): Promise<Error & { code?: string }> {
@@ -58,13 +58,13 @@ export function useCreateCheckout() {
   const { session } = useAuth();
 
   return useMutation({
-    mutationFn: async ({ priceId, referralCode }: { priceId: string; referralCode?: string }) => {
+    mutationFn: async ({ plan, referralCode }: { plan: SubscriptionPlan; referralCode?: string }) => {
       if (!session) {
         throw new Error('Você precisa estar logado');
       }
 
       const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: referralCode ? { priceId, referralCode } : { priceId },
+        body: referralCode ? { plan, referralCode } : { plan },
         headers: {
           Authorization: `Bearer ${session.access_token}`,
         },

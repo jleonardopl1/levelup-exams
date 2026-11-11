@@ -12,8 +12,25 @@ import {
 } from "../_shared/utils.ts";
 import { findCustomerForUser, getCustomerEntitlement, getStripe } from "../_shared/stripe.ts";
 
-const ALLOWED_PRICE_IDS = (Deno.env.get("STRIPE_ALLOWED_PRICE_IDS") ??
-  "price_1SdkO4FQ1QkvCgEAJsa9KbIE,price_1SdkMfFQ1QkvCgEAnMRl3MXq").split(",").map((s) => s.trim()).filter(Boolean);
+/**
+ * Planos -> preços do Stripe, definidos NO SERVIDOR (o app só envia "monthly" ou "annual").
+ * Para trocar de ambiente (teste -> produção) basta mudar os secrets, sem tocar no código:
+ *   STRIPE_PRICE_MONTHLY / STRIPE_PRICE_ANNUAL
+ * Padrões = preços atuais (conferidos no Stripe em 11/11/2026):
+ *   price_1SdkMf... = "Plus - Mensal" R$ 19,90/mês | price_1SdkO4... = "Plus Anual" R$ 159,90/ano
+ */
+const PLAN_PRICES: Record<"monthly" | "annual", { priceId: string; interval: "month" | "year" }> = {
+  monthly: { priceId: (Deno.env.get("STRIPE_PRICE_MONTHLY") ?? "price_1SdkMfFQ1QkvCgEAnMRl3MXq").trim(), interval: "month" },
+  annual: { priceId: (Deno.env.get("STRIPE_PRICE_ANNUAL") ?? "price_1SdkO4FQ1QkvCgEAJsa9KbIE").trim(), interval: "year" },
+};
+const PRICE_TO_PLAN = new Map(Object.entries(PLAN_PRICES).map(([plan, p]) => [p.priceId, plan as "monthly" | "annual"]));
+
+function resolvePlan(body: { plan?: unknown; priceId?: unknown } | null): "monthly" | "annual" | null {
+  if (body?.plan === "monthly" || body?.plan === "annual") return body.plan;
+  // Compatibilidade com versões antigas do app que ainda enviam o ID do preço.
+  if (typeof body?.priceId === "string") return PRICE_TO_PLAN.get(body.priceId) ?? null;
+  return null;
+}
 const RATE_LIMIT_WINDOW_MS = 60000;
 const RATE_LIMIT_MAX_REQUESTS = 5;
 const REFERRAL_CODE_RE = /^[A-Z0-9]{4,20}$/;
@@ -98,11 +115,21 @@ serve(async (req) => {
       return jsonResponse({ error: "Confirme seu e-mail antes de assinar." }, 403);
     }
 
-    const body = await readJson<{ priceId?: unknown; referralCode?: unknown }>(req, 4 * 1024);
-    const priceId = body?.priceId;
-    if (typeof priceId !== "string" || !ALLOWED_PRICE_IDS.includes(priceId)) {
-      await logAuditEvent(supabase, "CHECKOUT_INVALID_PRICE", user.id, null, clientIp, userAgent, false, "Invalid price ID");
+    const body = await readJson<{ plan?: unknown; priceId?: unknown; referralCode?: unknown }>(req, 4 * 1024);
+    const plan = resolvePlan(body);
+    if (!plan) {
+      await logAuditEvent(supabase, "CHECKOUT_INVALID_PRICE", user.id, null, clientIp, userAgent, false, "Invalid plan");
       return jsonResponse({ error: "Plano inválido" }, 400);
+    }
+    const { priceId, interval } = PLAN_PRICES[plan];
+
+    // Trava de segurança: o preço tem que estar ativo e ter a periodicidade do plano
+    // escolhido. Evita cobrar o anual de quem escolheu o mensal (erro que já aconteceu).
+    const price = await stripe.prices.retrieve(priceId).catch(() => null);
+    if (!price || !price.active || price.recurring?.interval !== interval) {
+      await logAuditEvent(supabase, "CHECKOUT_PRICE_MISCONFIGURED", user.id, null, clientIp, userAgent, false,
+        `plan=${plan} price=${priceId} interval=${price?.recurring?.interval ?? "none"} active=${price?.active ?? "missing"}`);
+      return jsonResponse({ error: "Plano temporariamente indisponível. Tente novamente mais tarde." }, 503);
     }
 
     const referral = await resolveReferral(supabase, body?.referralCode, user.id);
@@ -143,7 +170,9 @@ serve(async (req) => {
     }, { idempotencyKey: `checkout:${user.id}:${priceId}:${referral?.id ?? "none"}:${Math.floor(Date.now() / 60000)}` });
 
     await logAuditEvent(supabase, "CHECKOUT_CREATED", user.id, null, clientIp, userAgent, true, null, {
+      plan,
       price_id: priceId,
+      livemode: session.livemode,
       ...(referral ? { referral_code_id: referral.id } : {}),
     });
     return jsonResponse({ url: session.url });
