@@ -97,6 +97,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         const result = await lovable.auth.signInWithOAuth(provider as 'microsoft' | 'apple' | 'google', {
           redirect_uri: `${window.location.origin}/`,
+          extraParams: config.queryParams,
         });
         if (result.error) {
           return { error: result.error instanceof Error ? result.error : new Error(String(result.error)) };

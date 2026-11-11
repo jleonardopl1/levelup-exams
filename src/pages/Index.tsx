@@ -17,6 +17,7 @@ import { RecentAchievementsCard } from '@/components/RecentAchievementsCard';
 import { StreakReminderBanner } from '@/components/StreakReminderToggle';
 import { CareerCategorySelector } from '@/components/CareerCategorySelector';
 import { FeaturedTrackCard } from '@/components/FeaturedTrackCard';
+import { SiteFooter } from '@/components/SiteFooter';
 
 export default function Index() {
   const { user, loading: authLoading } = useAuth();
@@ -445,6 +446,8 @@ export default function Index() {
           </div>
         </div>
       </div>
+
+      <SiteFooter className="mt-10" />
 
       <DailyLimitModal open={showLimitModal} onOpenChange={setShowLimitModal} />
       

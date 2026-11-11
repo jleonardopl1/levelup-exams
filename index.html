@@ -50,7 +50,16 @@
   </head>
 
   <body>
-    <div id="root"></div>
+    <!-- Conteúdo estático lido por buscadores e pela verificação de marca do Google;
+         o React substitui tudo isto assim que o app carrega. -->
+    <div id="root">
+      <main style="font-family:system-ui,sans-serif;max-width:640px;margin:48px auto;padding:0 16px;color:#334155">
+        <h1>LevelUp Exams</h1>
+        <p>Plataforma gamificada de estudos para concursos públicos: simulados, trilhas de estudo, ranking, conquistas e Mentor com inteligência artificial.</p>
+        <p><a href="/sobre">Conheça o LevelUp Exams</a> · <a href="/auth">Entrar</a></p>
+        <p><a href="/privacidade">Política de Privacidade</a> · <a href="/termos">Termos de Uso</a></p>
+      </main>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

@@ -26,18 +26,17 @@ export interface SocialProvider {
   queryParams?: Record<string, string>;
 }
 
-export const SOCIAL_PROVIDERS: SocialProvider[] = [
-  { id: 'google', label: 'Google', via: 'supabase', supabaseName: 'google', queryParams: { prompt: 'select_account' } },
-  { id: 'microsoft', label: 'Microsoft', via: 'managed' }, // contas Outlook/Hotmail/Live
-  { id: 'apple', label: 'Apple', via: 'managed' },
-  { id: 'github', label: 'GitHub', via: 'supabase', supabaseName: 'github' },
-  { id: 'linkedin_oidc', label: 'LinkedIn', via: 'supabase', supabaseName: 'linkedin_oidc' },
-  { id: 'facebook', label: 'Facebook', via: 'supabase', supabaseName: 'facebook' },
-];
-
 /**
- * Provedores gerenciados pelo Lovable ligados no painel. Microsoft e Apple ativados em
- * 11/11/2026 (modo "Managed by Lovable"); confirmados no broker OAuth.
+ * Provedores que passam pelo broker OAuth do Lovable (Cloud → Users → Auth settings).
+ *
+ * GOOGLE: hoje vai direto ao Supabase, e por isso o Google mostra ao aluno o endereço
+ * técnico "rxsovhyimflzvxggppal.supabase.co" (na tela de login e no e-mail "Você
+ * compartilhou alguns dados..."). Pelo broker, com as CREDENCIAIS PRÓPRIAS do Google
+ * Cloud do LevelUp Exams, o retorno acontece no domínio do app e o Google exibe
+ * "LevelUp Exams" depois que a marca for verificada.
+ * Para ativar: 1) configure "Your own credentials" no Lovable e selecione a URI de
+ * retorno do domínio próprio; 2) acrescente "google" abaixo; 3) publique.
+ * Guia completo: docs/LOGIN_GOOGLE_MARCA.md
  */
 const MANAGED_ENABLED = new Set(
   (import.meta.env.VITE_MANAGED_OAUTH_PROVIDERS ?? 'microsoft,apple')
@@ -45,6 +44,19 @@ const MANAGED_ENABLED = new Set(
     .map((s: string) => s.trim().toLowerCase())
     .filter(Boolean),
 );
+
+const GOOGLE_VIA_BROKER = MANAGED_ENABLED.has('google');
+
+export const SOCIAL_PROVIDERS: SocialProvider[] = [
+  GOOGLE_VIA_BROKER
+    ? { id: 'google', label: 'Google', via: 'managed', queryParams: { prompt: 'select_account' } }
+    : { id: 'google', label: 'Google', via: 'supabase', supabaseName: 'google', queryParams: { prompt: 'select_account' } },
+  { id: 'microsoft', label: 'Microsoft', via: 'managed' }, // contas Outlook/Hotmail/Live
+  { id: 'apple', label: 'Apple', via: 'managed' },
+  { id: 'github', label: 'GitHub', via: 'supabase', supabaseName: 'github' },
+  { id: 'linkedin_oidc', label: 'LinkedIn', via: 'supabase', supabaseName: 'linkedin_oidc' },
+  { id: 'facebook', label: 'Facebook', via: 'supabase', supabaseName: 'facebook' },
+];
 
 /** Se a consulta ao backend falhar, mostramos só o que sabemos que funciona. */
 const FALLBACK_SUPABASE_ENABLED = new Set(['google']);
