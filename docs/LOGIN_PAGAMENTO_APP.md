@@ -27,15 +27,12 @@ OIDC. **GitHub e Facebook não são suportados pelo Lovable Cloud**; LinkedIn s�
 - Erros de login na volta do provedor viram mensagem clara em português e levam de volta ao login.
 - Cadastro: `src/lib/authProviders.ts`.
 
-### O que o Jonas precisa fazer (1 clique)
+### Status (11/11/2026)
 
-1. No Lovable, abra o projeto → **Cloud** → **Users** → **Auth settings** → **Microsoft**.
-2. Ligue **Enable Microsoft sign-in** (modo "Managed by Lovable").
-3. Pronto. Até isso ser feito, o botão Microsoft mostra "Este método de login ainda não está ativado".
+**Microsoft** e **Apple** foram ativados no modo "Managed by Lovable" (Cloud → Users → Auth
+settings) e confirmados no broker OAuth. A tela de login mostra Google, Microsoft e Apple.
 
-Opcionais:
-- **Apple**: ligar em Auth settings → Apple e definir `VITE_MANAGED_OAUTH_PROVIDERS=microsoft,apple`.
-  Necessário se um dia o app for para a App Store com login social.
+Opcional:
 - **LinkedIn**: Auth settings → OIDC, com Issuer `https://www.linkedin.com/oauth`, Client ID/Secret
   de um app em linkedin.com/developers (produto "Sign In with LinkedIn using OpenID Connect").
   Depois peça ao Lovable no chat: "adicione o botão de login OIDC do LinkedIn".
