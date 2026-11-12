@@ -1,13 +1,13 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
-import { corsHeaders } from "../_shared/cors.ts";
+import { corsHeaders, withCors } from "../_shared/cors.ts";
 import { checkRateLimit, jsonResponse, requireAdmin } from "../_shared/utils.ts";
 import { getStripe } from "../_shared/stripe.ts";
 
 const RATE_LIMIT_WINDOW_MS = 60000;
 const RATE_LIMIT_MAX_REQUESTS = 10;
 
-serve(async (req) => {
+serve(withCors(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   if (req.method !== "POST" && req.method !== "GET") return jsonResponse({ error: "Método não permitido" }, 405);
 
@@ -67,4 +67,4 @@ serve(async (req) => {
     console.error("admin-metrics error");
     return jsonResponse({ error: "Erro interno" }, 500);
   }
-});
+}));

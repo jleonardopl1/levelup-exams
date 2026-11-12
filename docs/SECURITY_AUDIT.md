@@ -66,7 +66,7 @@ Fluxos legítimos verificados após a correção: listar questões (free e plus)
 ## Deploy — ordem obrigatória
 
 1. Aplicar a migration **antes** de publicar as Edge Functions (as funções dependem de `check_rate_limit`, `consume_ai_mentor_quota`, `get_user_id_by_email`, `is_user_banned` e `stripe_webhook_events`; o rate limit é *fail-closed*).
-2. Variáveis das Edge Functions: `SITE_URL` (ex.: `https://simuladosconcursos.com.br`), `ALLOWED_ORIGIN`, opcionalmente `STRIPE_ALLOWED_PRICE_IDS`, `MAIL_FROM`, `CONTACT_INBOX`.
+2. Variáveis das Edge Functions: `SITE_URL` (ex.: `https://levelupexams.com.br`), `ALLOWED_ORIGIN` (uma ou mais origens extras, separadas por vírgula), opcionalmente `STRIPE_ALLOWED_PRICE_IDS`, `MAIL_FROM`, `CONTACT_INBOX`.
 3. Publicar o frontend (a RPC `get_leaderboard` mudou de assinatura).
 
 ## Pendências e riscos residuais (requerem decisão/arquitetura)

@@ -38,7 +38,7 @@ const faqItems = [
   },
   {
     question: "Como me tornar um Parceiro?",
-    answer: "Interessado em parcerias? Entre em contato conosco através do email parcerias@simuladosconcursos.com.br. Trabalhamos com criadores de conteúdo, professores, cursinhos preparatórios e instituições educacionais para expandir nosso banco de questões e alcance."
+    answer: "Interessado em parcerias? Entre em contato conosco através do e-mail contato@levelupexams.com.br. Trabalhamos com criadores de conteúdo, professores, cursinhos preparatórios e instituições educacionais para expandir nosso banco de questões e alcance."
   },
   {
     question: "Como funciona o sistema de níveis?",
