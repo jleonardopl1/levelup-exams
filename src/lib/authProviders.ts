@@ -29,17 +29,14 @@ export interface SocialProvider {
 /**
  * Provedores que passam pelo broker OAuth do Lovable (Cloud → Users → Auth settings).
  *
- * GOOGLE: hoje vai direto ao Supabase, e por isso o Google mostra ao aluno o endereço
- * técnico "rxsovhyimflzvxggppal.supabase.co" (na tela de login e no e-mail "Você
- * compartilhou alguns dados..."). Pelo broker, com as CREDENCIAIS PRÓPRIAS do Google
- * Cloud do LevelUp Exams, o retorno acontece no domínio do app e o Google exibe
- * "LevelUp Exams" depois que a marca for verificada.
- * Para ativar: 1) configure "Your own credentials" no Lovable e selecione a URI de
- * retorno do domínio próprio; 2) acrescente "google" abaixo; 3) publique.
+ * GOOGLE: migrado em 12/11/2026 para o broker gerenciado do Lovable Cloud. O retorno
+ * acontece no domínio do app e o Google deixa de mostrar ao aluno o endereço técnico
+ * "rxsovhyimflzvxggppal.supabase.co". Se um dia for preciso voltar às credenciais
+ * próprias do Google Cloud, remova "google" da lista abaixo e publique.
  * Guia completo: docs/LOGIN_GOOGLE_MARCA.md
- */
+  */
 const MANAGED_ENABLED = new Set(
-  (import.meta.env.VITE_MANAGED_OAUTH_PROVIDERS ?? 'microsoft,apple')
+  (import.meta.env.VITE_MANAGED_OAUTH_PROVIDERS ?? 'microsoft,apple,google')
     .split(',')
     .map((s: string) => s.trim().toLowerCase())
     .filter(Boolean),
