@@ -16,6 +16,13 @@
 - Nome, domínio e e-mail centralizados em `src/config/site.ts`.
 - Chave para o Google passar pelo login do Lovable com credenciais próprias, que devolve o aluno no domínio do app (`src/lib/authProviders.ts`). Fica desligada até a etapa 7.
 
+## Situação (12/11/2026)
+
+- [x] Domínio `levelupexams.com.br` registrado e conectado ao Lovable (o antigo `levelupexams.lovable.app` e o `www` já redirecionam para ele)
+- [x] E-mail `contato@levelupexams.com.br` criado
+- [ ] Registro **A** do domínio puro (`@` → `185.158.133.1`) no Registro.br — sem ele o site não abre
+- [ ] Etapas 4 a 8
+
 ## Ordem das etapas
 
 A ordem importa: o Google só aprova a marca se, no momento da análise, a tela de login já mostrar o domínio próprio e não o supabase.co.

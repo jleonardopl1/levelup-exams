@@ -26,7 +26,7 @@
  */
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
-import { corsHeaders } from "../_shared/cors.ts";
+import { corsHeaders, withCors } from "../_shared/cors.ts";
 import { jsonResponse, readJson, requireAdmin } from "../_shared/utils.ts";
 
 const GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
@@ -344,7 +344,7 @@ async function processSubject(
 // Handler
 // ---------------------------------------------------------------------------
 
-serve(async (req) => {
+serve(withCors(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   if (req.method !== "POST") return jsonResponse({ error: "Método não permitido" }, 405);
 
@@ -445,4 +445,4 @@ serve(async (req) => {
     processed: results,
     remaining_subjects: Math.max(pending.length - batch.length, 0),
   });
-});
+}));

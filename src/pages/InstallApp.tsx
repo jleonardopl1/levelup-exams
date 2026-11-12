@@ -8,8 +8,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { detectPlatform, isInAppBrowser, isIosNonSafari, useInstallPrompt, type Platform } from '@/lib/pwa';
+import { siteUrl } from '@/config/site';
 
-const APP_URL = 'https://levelupexams.lovable.app';
+const APP_URL = siteUrl('').replace(/\/$/, '');
 
 const TABS: { id: Platform; label: string; icon: typeof Smartphone }[] = [
   { id: 'android', label: 'Android', icon: Smartphone },
