@@ -39,7 +39,7 @@ export interface SocialProvider {
  * Guia completo: docs/LOGIN_GOOGLE_MARCA.md
  */
 const MANAGED_ENABLED = new Set(
-  (import.meta.env.VITE_MANAGED_OAUTH_PROVIDERS ?? 'microsoft,apple')
+  (import.meta.env.VITE_MANAGED_OAUTH_PROVIDERS ?? 'microsoft,apple,google')
     .split(',')
     .map((s: string) => s.trim().toLowerCase())
     .filter(Boolean),
