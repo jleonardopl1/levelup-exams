@@ -26,6 +26,8 @@ export interface QuizResultState {
   timedOut?: boolean;
   saved?: boolean;
   review?: QuizReviewItem[];
+  /** Conta dona do resultado: outra conta no mesmo navegador nunca o vê. */
+  userId?: string;
 }
 
 const KEY = 'levelup:last-quiz-result';
@@ -38,14 +40,25 @@ export function saveQuizResult(state: QuizResultState) {
   }
 }
 
-export function loadQuizResult(): QuizResultState | null {
+export function loadQuizResult(userId: string | null | undefined): QuizResultState | null {
+  if (!userId) return null;
   try {
     const raw = sessionStorage.getItem(KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as QuizResultState;
-    return typeof parsed?.score === 'number' ? parsed : null;
+    if (typeof parsed?.score !== 'number' || parsed.userId !== userId) return null;
+    return parsed;
   } catch {
     return null;
+  }
+}
+
+/** Apaga o último resultado (chamado ao sair ou trocar de conta). */
+export function clearQuizResult() {
+  try {
+    sessionStorage.removeItem(KEY);
+  } catch {
+    /* ignore */
   }
 }
 

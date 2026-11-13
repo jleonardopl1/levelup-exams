@@ -74,6 +74,14 @@ export function AdminQuestionBank({ canEditContent, initialStatus }: {
   const total = data?.total ?? 0;
   const pages = Math.max(1, Math.ceil(total / QUESTIONS_PAGE_SIZE));
 
+  // Ao retirar/editar a última questão da última página, a lista encolhe:
+  // volta para a última página que ainda existe em vez de ficar vazia.
+  useEffect(() => {
+    if (data && !isFetching && filters.page > 0 && filters.page >= pages) {
+      setFilters((f) => ({ ...f, page: pages - 1 }));
+    }
+  }, [data, isFetching, filters.page, pages]);
+
   return (
     <div className="space-y-3">
       <div className="flex flex-col gap-2">

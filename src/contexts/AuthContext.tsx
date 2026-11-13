@@ -4,6 +4,7 @@ import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable';
 import { SOCIAL_PROVIDERS, type SocialProviderId } from '@/lib/authProviders';
+import { clearQuizResult } from '@/lib/quizSession';
 
 type OAuthProvider = SocialProviderId;
 
@@ -45,6 +46,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const current = user?.id ?? null;
     if (lastUserId.current && lastUserId.current !== current) {
       queryClient.clear();
+      clearQuizResult();
     }
     lastUserId.current = current;
   }, [user?.id, loading, queryClient]);

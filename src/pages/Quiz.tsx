@@ -67,6 +67,8 @@ export default function Quiz() {
   const streakRef = useRef(0);
   const maxStreakRef = useRef(0);
   const pendingResultRef = useRef<QuizResultState | null>(null);
+  // O limite diário é cobrado uma única vez, mesmo se o aluno repetir "Tentar salvar".
+  const usageRecordedRef = useRef(false);
 
   useEffect(() => { answersRef.current = answers; }, [answers]);
   useEffect(() => { timeLeftRef.current = timeLeft; }, [timeLeft]);
@@ -119,9 +121,12 @@ export default function Quiz() {
     setPhase('saving');
     try {
       const answered = answersRef.current.length;
-      if (!isPremium && answered > 0) {
+      if (!isPremium && answered > 0 && !usageRecordedRef.current) {
         // Só conta no limite diário o que o aluno realmente respondeu.
-        await incrementUsage.mutateAsync(answered).catch(() => undefined);
+        await incrementUsage.mutateAsync(answered).then(
+          () => { usageRecordedRef.current = true; },
+          () => undefined,
+        );
       }
       await submitQuiz.mutateAsync({
         score: result.score,
@@ -149,10 +154,10 @@ export default function Quiz() {
       /* recompensas não devem impedir o aluno de ver o resultado */
     }
 
-    const final = { ...result, pointsEarned, saved: true };
+    const final = { ...result, pointsEarned, saved: true, userId: user?.id };
     saveQuizResult(final);
     navigate('/result', { state: final, replace: true });
-  }, [categoria, incrementUsage, isPremium, navigate, processRewards, submitQuiz]);
+  }, [categoria, incrementUsage, isPremium, navigate, processRewards, submitQuiz, user?.id]);
 
   const finishQuiz = useCallback((timedOut = false) => {
     if (finishingRef.current || !questions || questions.length === 0) return;
@@ -330,7 +335,7 @@ export default function Quiz() {
               <Button
                 variant="outline"
                 onClick={() => {
-                  const r = { ...(pendingResultRef.current ?? buildResult(false)), saved: false };
+                  const r = { ...(pendingResultRef.current ?? buildResult(false)), saved: false, userId: user?.id };
                   saveQuizResult(r);
                   navigate('/result', { state: r, replace: true });
                 }}

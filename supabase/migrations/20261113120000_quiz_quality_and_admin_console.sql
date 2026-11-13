@@ -596,6 +596,16 @@ BEGIN
   END IF;
 
   IF p_status = 'open' THEN
+    IF v_report.status = 'open' THEN
+      RETURN jsonb_build_object('ok', true, 'updated', 0);
+    END IF;
+    -- So pode haver um reporte aberto por aluno e questao (uq_question_reports_open_per_user).
+    IF EXISTS (SELECT 1 FROM public.question_reports r
+               WHERE r.question_id = v_report.question_id AND r.user_id = v_report.user_id
+                 AND r.status = 'open' AND r.id <> p_report_id) THEN
+      RAISE EXCEPTION 'Este aluno já tem um reporte aberto para esta questão. Trate o reporte aberto.'
+        USING ERRCODE = '23505';
+    END IF;
     UPDATE public.question_reports
        SET status = 'open', resolved_by = NULL, resolved_at = NULL, resolution_note = NULL
      WHERE id = p_report_id;

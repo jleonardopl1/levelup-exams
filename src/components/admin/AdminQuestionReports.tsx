@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Card, CardContent } from '@/components/ui/card';
@@ -74,6 +74,10 @@ export function AdminQuestionReports({ canEditContent }: { canEditContent: boole
 
   const total = data?.total ?? 0;
   const pages = Math.max(1, Math.ceil(total / PAGE));
+
+  useEffect(() => {
+    if (data && !isFetching && page > 0 && page >= pages) setPage(pages - 1);
+  }, [data, isFetching, page, pages]);
 
   return (
     <div className="space-y-3">

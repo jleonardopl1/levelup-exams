@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -102,10 +103,12 @@ function ReviewCard({ item, index, onReport, onMentor }: {
 export default function Result() {
   const location = useLocation();
   const navigate = useNavigate();
-  const data: QuizResultState | null = useMemo(
-    () => (location.state as QuizResultState | null) ?? loadQuizResult(),
-    [location.state],
-  );
+  const { user, loading: authLoading } = useAuth();
+  const data: QuizResultState | null = useMemo(() => {
+    const fromNav = location.state as QuizResultState | null;
+    if (fromNav && (!fromNav.userId || fromNav.userId === user?.id)) return fromNav;
+    return loadQuizResult(user?.id);
+  }, [location.state, user?.id]);
   const [showConfetti, setShowConfetti] = useState(false);
   const [showGlow, setShowGlow] = useState(false);
   const [filter, setFilter] = useState<ReviewFilter>('wrong');
@@ -118,6 +121,14 @@ export default function Result() {
       setShowGlow(true);
     }
   }, [score, location.state]);
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" role="status" aria-label="Carregando">
+        <div className="w-12 h-12 rounded-full border-4 border-primary border-t-transparent animate-spin" />
+      </div>
+    );
+  }
 
   if (!data) {
     return (
