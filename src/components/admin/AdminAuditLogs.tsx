@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import {
   Search, RefreshCw, Loader2, Shield, Ban, UserPlus, AlertTriangle, UserCog, Handshake, Wallet, Settings, DollarSign,
+  FilePenLine, Flag,
 } from 'lucide-react';
 import { useAdminAuditLogs, type AuditLogRow } from '@/hooks/useAdminAuditLogs';
 import { format } from 'date-fns';
@@ -22,6 +23,10 @@ const eventIcons: Record<string, typeof Shield> = {
   role_revoked: Shield,
   user_banned: Ban,
   user_unbanned: AlertTriangle,
+  question_updated: FilePenLine,
+  question_report_resolved: Flag,
+  question_report_dismissed: Flag,
+  question_report_open: Flag,
 };
 
 const eventLabels: Record<string, string> = {
@@ -36,6 +41,10 @@ const eventLabels: Record<string, string> = {
   role_revoked: 'Role Revogada',
   user_banned: 'Usuário Banido',
   user_unbanned: 'Usuário Desbanido',
+  question_updated: 'Questão Editada',
+  question_report_resolved: 'Reporte de Questão Resolvido',
+  question_report_dismissed: 'Reporte de Questão Descartado',
+  question_report_open: 'Reporte de Questão Reaberto',
 };
 
 const eventColors: Record<string, string> = {

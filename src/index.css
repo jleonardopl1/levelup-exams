@@ -355,3 +355,17 @@
 .app-container {
   @apply max-w-md mx-auto min-h-screen;
 }
+
+/* Espaço para a navegação inferior no celular (BottomNav) */
+@media (max-width: 1023px) {
+  body.has-bottom-nav {
+    padding-bottom: calc(4rem + env(safe-area-inset-bottom));
+  }
+}
+
+/* Avisos (toasts) acima da navegação inferior no celular */
+@media (max-width: 1023px) {
+  body.has-bottom-nav [data-sonner-toaster][data-y-position="bottom"] {
+    bottom: calc(4.75rem + env(safe-area-inset-bottom)) !important;
+  }
+}

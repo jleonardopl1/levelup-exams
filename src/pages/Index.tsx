@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
 import { useLeaderboard } from '@/hooks/useQuizResults';
 import { useQuestionLimits } from '@/hooks/useDailyUsage';
+import { useUserRewards, calculateLevel, getPointsForNextLevel } from '@/hooks/useRewards';
 import { Card, CardContent } from '@/components/ui/card';
 import { BookOpen, Trophy, Target, Flame, Play, TrendingUp, Zap, Star, ArrowUpRight } from 'lucide-react';
 import heroPattern from '@/assets/hero-pattern.png';
@@ -23,6 +24,7 @@ export default function Index() {
   const { user, loading: authLoading } = useAuth();
   const { data: profile } = useProfile();
   const { data: leaderboard } = useLeaderboard(5);
+  const { data: rewards } = useUserRewards();
   const { isPremium, questionsRemaining, dailyLimit, hasReachedLimit, tier } = useQuestionLimits();
   const navigate = useNavigate();
   const [showLimitModal, setShowLimitModal] = useState(false);
@@ -55,11 +57,26 @@ export default function Index() {
     ? Math.round((profile.total_correct / profile.total_questions) * 100) 
     : 0;
 
-  // Calculate user level and progress
-  const totalPoints = (profile?.total_correct || 0) * 10;
-  const currentLevel = Math.floor(totalPoints / 500) + 1;
-  const pointsInCurrentLevel = totalPoints % 500;
-  const levelProgress = (pointsInCurrentLevel / 500) * 100;
+  // Nível e XP vêm de user_rewards (mesma fonte do Dashboard e de Recompensas;
+  // antes a tela inicial usava outra fórmula e mostrava um nível diferente).
+  const totalPoints = rewards?.total_points ?? 0;
+  const currentLevel = rewards?.current_level || calculateLevel(totalPoints);
+  const levelStart = currentLevel > 1 ? getPointsForNextLevel(currentLevel - 1) : 0;
+  const levelEnd = getPointsForNextLevel(currentLevel);
+  const levelSpan = Math.max(1, levelEnd - levelStart);
+  const pointsInCurrentLevel = Math.min(levelSpan, Math.max(0, totalPoints - levelStart));
+  const levelProgress = (pointsInCurrentLevel / levelSpan) * 100;
+
+  // Cartões clicáveis acessíveis por teclado (Enter/Espaço) e leitores de tela.
+  const clickable = (action: () => void, label: string) => ({
+    role: 'button' as const,
+    tabIndex: 0,
+    'aria-label': label,
+    onClick: action,
+    onKeyDown: (e: React.KeyboardEvent) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); action(); }
+    },
+  });
 
   // Get time-based greeting
   const getGreeting = () => {
@@ -138,7 +155,7 @@ export default function Index() {
               <div className="mt-3 pt-3 border-t border-white/10">
                 <div className="flex items-center justify-between text-xs text-primary-foreground/70 mb-1.5">
                   <span>Progresso para nível {currentLevel + 1}</span>
-                  <span>{pointsInCurrentLevel}/500 XP</span>
+                  <span>{pointsInCurrentLevel}/{levelSpan} XP</span>
                 </div>
                 <div className="h-2 bg-white/20 rounded-full overflow-hidden">
                   <div 
@@ -210,22 +227,10 @@ export default function Index() {
 
       {/* Main Content */}
       <div className="relative z-20 px-4 -mt-10 pb-8 space-y-6">
-        {/* Usage Meter for Free Users */}
-        {!isPremium && (
-          <Card variant="elevated">
-            <CardContent className="p-4">
-              <UsageMeter questionsRemaining={questionsRemaining} dailyLimit={dailyLimit} />
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Recent Achievements */}
-        <RecentAchievementsCard />
-
         {/* Start Quiz CTA - Organic Style */}
-        <div 
-          className="relative cursor-pointer group"
-          onClick={handleStartQuiz}
+        <div
+          className="relative cursor-pointer group rounded-[1.5rem] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          {...clickable(handleStartQuiz, 'Iniciar simulado com 10 questões')}
         >
           {/* Organic background blobs */}
           <div className="absolute inset-0 overflow-hidden">
@@ -251,7 +256,7 @@ export default function Index() {
               <h3 className="font-display font-bold text-lg text-foreground group-hover:text-accent transition-colors duration-300">
                 Iniciar Simulado
               </h3>
-              <p className="text-sm text-muted-foreground">10 questões aleatórias 🚀</p>
+              <p className="text-sm text-muted-foreground">10 questões, priorizando as que você ainda não viu 🚀</p>
             </div>
 
             <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-accent/20 to-success/20 rounded-[45%_55%_50%_50%/50%_45%_55%_50%] flex items-center justify-center group-hover:bg-accent/30 group-hover:translate-x-1 transition-all duration-300">
@@ -268,10 +273,25 @@ export default function Index() {
           </div>
         </div>
 
+        {/* Trilha do concurso em destaque */}
+        <FeaturedTrackCard />
+
+        {/* Usage Meter for Free Users */}
+        {!isPremium && (
+          <Card variant="elevated">
+            <CardContent className="p-4">
+              <UsageMeter questionsRemaining={questionsRemaining} dailyLimit={dailyLimit} />
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Recent Achievements */}
+        <RecentAchievementsCard />
+
         {/* AI Mentor Card - Organic Style */}
-        <div 
-          className="relative cursor-pointer group"
-          onClick={() => navigate('/mentor')}
+        <div
+          className="relative cursor-pointer group rounded-[1.5rem] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          {...clickable(() => navigate('/mentor'), 'Abrir o Mentor IA')}
         >
           {/* Organic background blobs */}
           <div className="absolute inset-0 overflow-hidden">
@@ -316,9 +336,6 @@ export default function Index() {
             <div className="w-1.5 h-1.5 rounded-full bg-primary/20" />
           </div>
         </div>
-
-        {/* Trilha do concurso em destaque */}
-        <FeaturedTrackCard />
 
         {/* Daily Challenges */}
         <DailyChallengesCard />
@@ -384,9 +401,9 @@ export default function Index() {
         </div>
 
         {/* FAQ - Organic Floating Element */}
-        <div 
-          className="relative cursor-pointer group"
-          onClick={() => navigate('/faq')}
+        <div
+          className="relative cursor-pointer group rounded-[1.5rem] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          {...clickable(() => navigate('/faq'), 'Ver dúvidas frequentes')}
         >
           {/* Organic background blobs */}
           <div className="absolute inset-0 overflow-hidden">

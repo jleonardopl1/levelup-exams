@@ -61,18 +61,15 @@ export function useQuestions(options: UseQuestionsOptions = {}) {
         return (data ?? []).map((q) => ({ ...q, explicacao: null })) as Question[];
       }
 
-      let query = supabase
-        .from('questions_public')
-        .select('*')
-        .limit(limit);
-      
-      if (categoria && categoria !== 'Todas') {
-        query = query.eq('categoria', categoria);
-      }
-      
-      const { data, error } = await query;
-      
+      // Simulado geral: selecao no servidor (ineditas -> erradas -> demais, aleatorio).
+      // Antes a busca era um SELECT sem ordenacao e trazia sempre as mesmas questoes.
+      const { data, error } = await supabase.rpc('get_quiz_questions', {
+        p_categoria: categoria && categoria !== 'Todas' ? categoria : undefined,
+        p_limit: limit,
+      });
+
       if (error) throw error;
+      return (data ?? []).map((q) => ({ ...q, explicacao: null })) as Question[];
       return data as Question[];
     },
   });
@@ -88,7 +85,16 @@ export function useValidateAnswer() {
       });
       
       if (error) throw error;
-      return data as unknown as AnswerValidationResult;
+      const result = data as unknown as AnswerValidationResult | null;
+      // A RPC devolve { error } (rate limit, questao inexistente...) em vez de lancar.
+      if (!result || result.error || typeof result.is_correct !== 'boolean') {
+        throw new Error(
+          result?.error?.startsWith('Rate limit')
+            ? 'Muitas respostas em sequência. Aguarde alguns segundos e tente de novo.'
+            : 'Não foi possível validar a resposta. Verifique sua conexão e tente novamente.',
+        );
+      }
+      return result;
     },
   });
 }

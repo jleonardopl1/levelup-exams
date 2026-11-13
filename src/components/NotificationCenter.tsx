@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Bell, Trophy, Star, Zap, Gift, Check, Trash2, CheckCheck } from 'lucide-react';
+import { Bell, Trophy, Star, Zap, Gift, Check, Trash2, CheckCheck, CheckCircle2, Flag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -19,6 +19,8 @@ const iconMap: Record<string, React.ElementType> = {
   star: Star,
   zap: Zap,
   gift: Gift,
+  check: CheckCircle2,
+  flag: Flag,
 };
 
 export function NotificationCenter() {
@@ -45,6 +47,7 @@ export function NotificationCenter() {
       case 'achievement': return 'text-accent';
       case 'level_up': return 'text-primary';
       case 'reward': return 'text-success';
+      case 'question_report': return 'text-success';
       default: return 'text-muted-foreground';
     }
   };

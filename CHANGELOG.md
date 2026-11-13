@@ -1,5 +1,33 @@
 # Changelog
 
+## [1.4.0] - 2026-11-13
+
+### Fixes
+- Simulado geral ("Iniciar Simulado" e categorias) trazia sempre as mesmas 10 questões: agora prioriza as inéditas, depois as erradas, em ordem aleatória (RPC `get_quiz_questions`)
+- Fim do simulado por tempo esgotado calculava a nota com a lista de respostas vazia (o aluno recebia 0%)
+- Erro de validação da resposta (limite de requisições, conexão) contava como resposta errada sem aviso; agora mostra a mensagem e deixa responder de novo
+- Falha ao salvar o resultado deixava o aluno preso na tela; agora oferece "Tentar salvar de novo" ou ver o resultado
+- Tela inicial podia abrir com "Estudante", nível 1 e 0 simulados para quem já estava logado (o cache era limpo ao restaurar a sessão)
+- Nível e XP da tela inicial usavam outra fórmula e não batiam com Dashboard e Recompensas
+- Limite diário do plano Free passa a contar só as questões respondidas
+
+### Features
+- Resultado do simulado com revisão questão a questão (sua resposta, gabarito e explicação), desempenho por matéria, pontos ganhos, "Revisar meus erros" (trilhas) e "Explicar com o Mentor IA"
+- Resultado sobrevive a recarregar a página
+- Simulado: atalhos de teclado (A–E / 1–5 e Enter), confirmação ao sair no meio (com opção de encerrar e ver o resultado parcial), aviso ao fechar a aba
+- "Reportar erro" em cada questão; o aluno é notificado quando a equipe corrige
+- Navegação inferior no celular / app instalado (Início, Trilhas, Simulado, Ranking, Progresso)
+- Painel admin:
+  - Visão Geral nova: métrica estrela (simulados concluídos por semana, com tendência e histórico de 12 semanas), alunos ativos (dia/7d/30d), conversão para Plus, cadastros x ativos em 30 dias, matérias mais praticadas com taxa de acerto, receita do Stripe e **Saúde do sistema** (webhook do Stripe, geração de questões, falhas, qualidade do conteúdo)
+  - Banco de questões: filtros (categoria, situação, origem, Free/Plus), ordenação por taxa de erro / reportes / respostas, paginação, taxa de acerto de cada questão e editor completo (enunciado, alternativas, gabarito, explicação, categoria, tópico, dificuldade)
+  - Questões podem sair de circulação sem apagar o histórico
+  - Aba Reportes: fila de reportes dos alunos, resolver (fecha todos da mesma questão e avisa os alunos) ou descartar
+  - Abas lembradas na URL (`/admin?tab=reports`) e atalho "Painel Admin" no menu do avatar
+- Moderadores: curadoria (Premium / em circulação) e fila de reportes; conteúdo e gabarito só admin/master — regra aplicada no banco
+
+### Banco
+- Migration `20261113120000_quiz_quality_and_admin_console.sql`: `questions.is_active`, `question_reports`, RPCs `get_quiz_questions`, `report_question`, `admin_platform_overview`, `admin_list_questions`, `admin_update_question`, `admin_list_question_reports`, `admin_resolve_question_report` (todas revalidam o nível do chamador e registram em `audit_logs`)
+
 ## [1.3.1] - 2026-11-11
 
 ### Fixes
