@@ -45,11 +45,9 @@ export default function Upgrade() {
   const { tier, isPremium } = useQuestionLimits();
   const { data: subscription } = useSubscription();
   const { data: profile } = useProfile();
-  // Plus liberado pela administração (ou do admin master) não tem assinatura no Stripe:
-  // nesse caso não há o que gerenciar no portal de pagamento.
-  const hasPaidPlan = subscription?.source
-    ? subscription.source === 'stripe'
-    : (profile?.billing_tier ?? profile?.tier) === 'plus';
+  // Há assinatura paga para gerenciar no portal? Vem do plano PAGO (billing_tier), não da
+  // origem do acesso: o admin master ou quem tem Plus liberado também pode estar pagando.
+  const hasPaidPlan = (subscription?.billing_tier ?? profile?.billing_tier) === 'plus';
   const createCheckout = useCreateCheckout();
   const customerPortal = useCustomerPortal();
   const queryClient = useQueryClient();

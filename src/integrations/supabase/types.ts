@@ -1419,6 +1419,7 @@ export type Database = {
           created_at: string
           display_name: string
           email: string
+          has_premium_grant: boolean
           is_banned: boolean
           last_sign_in_at: string
           premium_grant_expires_at: string

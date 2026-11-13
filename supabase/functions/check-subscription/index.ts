@@ -72,6 +72,8 @@ serve(withCors(async (req) => {
       tier: a.tier,
       subscription_end: stripeEnt?.subscriptionEnd ?? null,
       source: a.source,
+      // Assinatura paga no Stripe, independente da origem do acesso (o master também pode pagar).
+      billing_tier: a.billing_tier,
       access_until: a.access_until,
     });
   } catch {

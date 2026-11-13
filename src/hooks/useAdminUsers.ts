@@ -32,6 +32,8 @@ export interface AdminUserRow {
   premium_grant_expires_at: string | null;
   /** Motivo da liberação (visível só para o master). */
   premium_grant_reason: string | null;
+  /** Há liberação manual vigente (mesmo que o usuário também pague a assinatura). */
+  has_premium_grant: boolean;
   total_count: number;
 }
 

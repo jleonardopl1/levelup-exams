@@ -27,6 +27,8 @@ export interface SubscriptionStatus {
   tier: 'free' | 'plus';
   subscription_end: string | null;
   source?: PremiumSource;
+  /** Plano pago no Stripe ('plus' = há assinatura para gerenciar), independente da origem do acesso. */
+  billing_tier?: 'free' | 'plus';
   /** Fim do Plus liberado pela administração (null = sem prazo). */
   access_until?: string | null;
 }

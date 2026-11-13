@@ -283,7 +283,7 @@ export function AdminUserManagement() {
                       )}
                       {isMaster && (
                         <Button variant="outline" size="sm" className="flex-1 gap-1" onClick={() => openPlusDialog(u)}>
-                          <Gift className="w-3 h-3" /> {u.premium_source === 'grant' ? 'Plus liberado' : 'Liberar Plus'}
+                          <Gift className="w-3 h-3" /> {u.has_premium_grant ? 'Plus liberado' : 'Liberar Plus'}
                         </Button>
                       )}
                       {isMaster && u.affiliate_status !== 'active' && u.affiliate_status !== 'paused' && (
@@ -445,7 +445,7 @@ export function AdminUserManagement() {
               questões premium, Mentor IA e recompensas Plus), sem cobrança.
             </DialogDescription>
           </DialogHeader>
-          {plusTarget?.premium_source === 'grant' && (
+          {plusTarget?.has_premium_grant && (
             <p className="text-xs rounded-md border border-amber-500/30 bg-amber-500/5 p-2">
               Liberado agora: {plusTarget.premium_grant_expires_at
                 ? `até ${format(parseISO(plusTarget.premium_grant_expires_at), "dd/MM/yyyy 'às' HH:mm")}`
@@ -456,7 +456,8 @@ export function AdminUserManagement() {
           )}
           {plusTarget?.premium_source === 'stripe' && (
             <p className="text-xs text-muted-foreground">
-              Este usuário já é assinante pago. A liberação garante o Plus mesmo se a assinatura for cancelada.
+              Este usuário também é assinante pago: retirar a liberação não cancela a assinatura, e a
+              liberação garante o Plus mesmo se a assinatura for cancelada.
             </p>
           )}
           <div className="space-y-3">
@@ -481,7 +482,7 @@ export function AdminUserManagement() {
             </div>
           </div>
           <DialogFooter className="gap-2 sm:gap-0">
-            {plusTarget?.premium_source === 'grant' && (
+            {plusTarget?.has_premium_grant && (
               <Button
                 variant="outline"
                 className="text-destructive sm:mr-auto"

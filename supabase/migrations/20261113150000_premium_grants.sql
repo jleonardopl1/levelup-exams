@@ -420,6 +420,7 @@ RETURNS TABLE (
   premium_source text,
   premium_grant_expires_at timestamptz,
   premium_grant_reason text,
+  has_premium_grant boolean,
   total_count bigint)
 LANGUAGE plpgsql
 STABLE
@@ -495,6 +496,7 @@ BEGIN
          e.psource,
          e.gexp,
          CASE WHEN v_is_master THEN e.greason ELSE NULL END,
+         (e.gid IS NOT NULL),
          count(*) OVER ()
   FROM enriched e
   WHERE CASE p_filter
