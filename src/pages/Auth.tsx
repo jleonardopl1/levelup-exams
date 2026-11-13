@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { toast } from 'sonner';
 import { Mail, Lock, User, Github, MailCheck, ArrowLeft } from 'lucide-react';
 import { passwordErrorMessage } from '@/lib/authErrors';
+import { takeAfterLogin } from '@/lib/afterLogin';
 import heroPattern from '@/assets/hero-pattern.png';
 import ProfileCompletionModal from '@/components/ProfileCompletionModal';
 import { supabase } from '@/integrations/supabase/client';
@@ -91,7 +92,7 @@ export default function Auth() {
         if (profile && !profile.avatar_url) {
           setShowProfileModal(true);
         } else if (profile) {
-          navigate('/');
+          navigate(takeAfterLogin('/'), { replace: true });
         }
       }
     };
@@ -190,7 +191,7 @@ export default function Auth() {
 
   const handleProfileComplete = () => {
     setShowProfileModal(false);
-    navigate('/');
+    navigate(takeAfterLogin('/'), { replace: true });
   };
 
   return (

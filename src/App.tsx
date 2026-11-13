@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ReferralCapture } from "@/components/ReferralCapture";
 import { OAuthReturnHandler } from "@/components/OAuthReturnHandler";
+import { RequireAuth } from "@/components/RequireAuth";
 import { useSubscriptionSync } from "@/hooks/useSubscription";
 import Index from "./pages/Index";
 
@@ -69,21 +70,21 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
-              <Route path="/quiz" element={<Quiz />} />
-              <Route path="/result" element={<Result />} />
-              <Route path="/ranking" element={<Ranking />} />
+              <Route path="/quiz" element={<RequireAuth><Quiz /></RequireAuth>} />
+              <Route path="/result" element={<RequireAuth><Result /></RequireAuth>} />
+              <Route path="/ranking" element={<RequireAuth><Ranking /></RequireAuth>} />
               <Route path="/upgrade" element={<Upgrade />} />
-              <Route path="/mentor" element={<Mentor />} />
+              <Route path="/mentor" element={<RequireAuth><Mentor /></RequireAuth>} />
               <Route path="/faq" element={<FAQ />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/rewards" element={<Rewards />} />
-              <Route path="/achievements" element={<Achievements />} />
-              <Route path="/admin" element={<Admin />} />
-              <Route path="/affiliate" element={<Affiliate />} />
-              <Route path="/configuracoes" element={<Settings />} />
+              <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
+              <Route path="/rewards" element={<RequireAuth><Rewards /></RequireAuth>} />
+              <Route path="/achievements" element={<RequireAuth><Achievements /></RequireAuth>} />
+              <Route path="/admin" element={<RequireAuth><Admin /></RequireAuth>} />
+              <Route path="/affiliate" element={<RequireAuth><Affiliate /></RequireAuth>} />
+              <Route path="/configuracoes" element={<RequireAuth><Settings /></RequireAuth>} />
               <Route path="/redefinir-senha" element={<ResetPassword />} />
-              <Route path="/trilhas" element={<Trilhas />} />
-              <Route path="/trilhas/:slug" element={<Trilha />} />
+              <Route path="/trilhas" element={<RequireAuth><Trilhas /></RequireAuth>} />
+              <Route path="/trilhas/:slug" element={<RequireAuth><Trilha /></RequireAuth>} />
               <Route path="/instalar" element={<InstallApp />} />
               <Route path="/privacidade" element={<Privacy />} />
               <Route path="/termos" element={<Terms />} />
