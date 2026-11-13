@@ -19,6 +19,7 @@ import { StreakReminderBanner } from '@/components/StreakReminderToggle';
 import { CareerCategorySelector } from '@/components/CareerCategorySelector';
 import { FeaturedTrackCard } from '@/components/FeaturedTrackCard';
 import { SiteFooter } from '@/components/SiteFooter';
+import { takeAfterLogin } from '@/lib/afterLogin';
 
 export default function Index() {
   const { user, loading: authLoading } = useAuth();
@@ -40,6 +41,11 @@ export default function Index() {
   useEffect(() => {
     if (!authLoading && !user) {
       navigate('/auth');
+    } else if (!authLoading && user) {
+      // Volta do login com Google/Apple/Microsoft (sempre cai em "/"): leva para a página
+      // que o visitante tentou abrir antes de entrar, se houver.
+      const target = takeAfterLogin('');
+      if (target && target !== '/') navigate(target, { replace: true });
     }
   }, [user, authLoading, navigate]);
 
