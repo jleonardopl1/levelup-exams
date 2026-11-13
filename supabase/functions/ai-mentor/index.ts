@@ -88,12 +88,13 @@ serve(withCors(async (req) => {
       return jsonResponse({ error: "Muitas requisições. Aguarde um momento." }, 429, { "Retry-After": "60" });
     }
 
-    const { data: profile, error: profileError } = await supabase
-      .from("profiles").select("tier").eq("user_id", user.id).single();
-    if (profileError) {
+    // Plano efetivo calculado na hora (assinatura paga OU Plus liberado pela administração,
+    // inclusive o fim do prazo de uma cortesia).
+    const { data: tier, error: tierError } = await supabase.rpc("get_user_tier", { p_user_id: user.id });
+    if (tierError) {
       return jsonResponse({ error: "Erro ao verificar perfil" }, 500);
     }
-    if (profile?.tier !== "plus") {
+    if (tier !== "plus") {
       await logAuditEvent(supabase, "ACCESS_DENIED", user.id, null, clientIp, userAgent, false, "Non-plus user");
       return jsonResponse({ error: "O Mentor IA é exclusivo para assinantes Plus!" }, 403);
     }

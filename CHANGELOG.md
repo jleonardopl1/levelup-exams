@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.5.0] - 2026-11-13
+
+### Features
+- Admin master com **Plus permanente** (todas as funcionalidades pagas), sem assinatura
+- Painel admin → Usuários: **Liberar Plus** para qualquer usuário (7 dias a 1 ano, ou sem prazo), com motivo, substituição e retirada; selo com a origem do Plus (assinante, liberado até dd/mm, permanente) e filtro "Plus liberado"
+- Tela de planos e Configurações mostram quando o Plus foi liberado pela equipe (sem botão de portal de pagamento)
+
+### Banco
+- Migration `20261113150000_premium_grants.sql`: `profiles.billing_tier` (plano pago) separado de `profiles.tier` (plano efetivo), tabela `premium_grants`, trigger `sync_profile_effective_tier`, RPCs `admin_grant_premium`, `admin_revoke_premium`, `get_premium_access`, job horário `expire-premium-grants`; `get_user_tier`, `admin_list_users`, `admin_platform_overview` e `get_affiliate_dashboard` atualizados (cortesia não conta como receita nem como indicado ativo)
+- Edge Functions `check-subscription`, `stripe-webhook`, `ai-mentor` e `admin-metrics` passam a gravar/ler o plano pago em `billing_tier` (versões antigas continuam compatíveis durante a publicação)
+
 ## [1.4.0] - 2026-11-13
 
 ### Fixes

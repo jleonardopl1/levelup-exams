@@ -19,10 +19,18 @@ async function functionError(error: unknown): Promise<Error & { code?: string }>
   return err;
 }
 
+/** Origem do Plus: assinatura paga, liberação pela administração ou conta do admin master. */
+export type PremiumSource = 'stripe' | 'grant' | 'master' | null;
+
 export interface SubscriptionStatus {
   subscribed: boolean;
   tier: 'free' | 'plus';
   subscription_end: string | null;
+  source?: PremiumSource;
+  /** Plano pago no Stripe ('plus' = há assinatura para gerenciar), independente da origem do acesso. */
+  billing_tier?: 'free' | 'plus';
+  /** Fim do Plus liberado pela administração (null = sem prazo). */
+  access_until?: string | null;
 }
 
 export function useSubscription() {

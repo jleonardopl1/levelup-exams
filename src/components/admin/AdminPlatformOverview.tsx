@@ -167,7 +167,7 @@ export function AdminPlatformOverview({ onOpenReports }: { onOpenReports?: () =>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <Kpi label="Usuários" value={num(users.total)} hint={`+${num(users.new_7d)} nos últimos 7 dias`} icon={Users} />
         <Kpi label="Ativos hoje / 7d / 30d" value={`${num(users.active_1d)} / ${num(users.active_7d)} / ${num(users.active_30d)}`} hint={`Engajamento diário: ${stickiness}% dos ativos do mês`} icon={Activity} tone="text-blue-500" />
-        <Kpi label="Assinantes Plus" value={num(users.plus)} hint={`Conversão: ${conversion}% da base`} icon={Crown} tone="text-amber-500" />
+        <Kpi label="Assinantes Plus" value={num(users.plus)} hint={`Conversão: ${conversion}% da base${users.plus_granted ? ` · +${num(users.plus_granted)} liberado(s)` : ''}`} icon={Crown} tone="text-amber-500" />
         <Kpi label="Novos (30 dias)" value={num(users.new_30d)} hint={users.banned > 0 ? `${users.banned} banido(s) ativo(s)` : undefined} icon={UserPlus} tone="text-emerald-500" />
       </div>
 

@@ -28,7 +28,8 @@ serve(withCors(async (req) => {
       await Promise.all([
         supabase.from("profiles").select("id", { count: "exact", head: true }),
         supabase.from("quiz_results").select("id", { count: "exact", head: true }),
-        supabase.from("profiles").select("id", { count: "exact", head: true }).neq("tier", "free"),
+        // Só assinaturas pagas: Plus liberado pela administração não é receita.
+        supabase.from("profiles").select("id", { count: "exact", head: true }).eq("billing_tier", "plus"),
         supabase.from("questions").select("id", { count: "exact", head: true }),
       ]);
 

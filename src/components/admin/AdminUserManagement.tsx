@@ -15,13 +15,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import {
-  Ban, ChevronDown, ChevronLeft, ChevronRight, Crown, Handshake, Info, Loader2, RefreshCw, Search,
+  Ban, ChevronDown, ChevronLeft, ChevronRight, Crown, Gift, Handshake, Info, Loader2, RefreshCw, Search,
   Shield, ShieldCheck, UserCog,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ACCESS_LEVEL_LABELS, useAccess, type AccessLevel } from '@/hooks/useAccess';
 import {
-  USERS_PAGE_SIZE, useAdminUsers, useBanUser, useSetAccessLevel, useUnbanUser,
+  USERS_PAGE_SIZE, useAdminUsers, useBanUser, useGrantPremium, useRevokePremium, useSetAccessLevel, useUnbanUser,
   type AdminUserRow, type ManageableLevel, type UserFilter,
 } from '@/hooks/useAdminUsers';
 import { AFFILIATE_STATUS_LABELS } from '@/hooks/useAffiliates';
@@ -45,9 +45,36 @@ const FILTERS: { value: UserFilter; label: string }[] = [
   { value: 'all', label: 'Todos' },
   { value: 'staff', label: 'Equipe' },
   { value: 'affiliates', label: 'Afiliados' },
-  { value: 'plus', label: 'Assinantes Plus' },
+  { value: 'plus', label: 'Plus (todos)' },
+  { value: 'granted', label: 'Plus liberado' },
   { value: 'banned', label: 'Banidos' },
 ];
+
+// Duração da liberação do Plus ('none' = sem prazo).
+const GRANT_DURATIONS: { value: string; label: string }[] = [
+  { value: '7', label: '7 dias' },
+  { value: '30', label: '30 dias' },
+  { value: '90', label: '90 dias' },
+  { value: '180', label: '6 meses' },
+  { value: '365', label: '1 ano' },
+  { value: 'none', label: 'Sem prazo' },
+];
+
+function PlusBadge({ u }: { u: AdminUserRow }) {
+  if (u.tier !== 'plus' || !u.premium_source) return null;
+  const label = u.premium_source === 'master'
+    ? 'Plus permanente'
+    : u.premium_source === 'grant'
+      ? (u.premium_grant_expires_at
+        ? `Plus liberado até ${format(parseISO(u.premium_grant_expires_at), 'dd/MM/yy')}`
+        : 'Plus liberado · sem prazo')
+      : 'Plus · assinante';
+  return (
+    <Badge variant="outline" className="text-[10px] gap-1 bg-amber-500/10 text-amber-600 border-amber-500/30">
+      {u.premium_source === 'grant' ? <Gift className="w-3 h-3" /> : <Crown className="w-3 h-3" />} {label}
+    </Badge>
+  );
+}
 
 const LevelIcon = ({ level, className }: { level: AccessLevel; className?: string }) => {
   const Icon = level === 'master' ? Crown : level === 'admin' ? ShieldCheck : level === 'moderator' ? Shield : UserCog;
@@ -108,6 +135,10 @@ export function AdminUserManagement() {
 
   const [affiliatePrefill, setAffiliatePrefill] = useState<AddAffiliatePrefill | null>(null);
 
+  const [plusTarget, setPlusTarget] = useState<AdminUserRow | null>(null);
+  const [plusDuration, setPlusDuration] = useState('30');
+  const [plusReason, setPlusReason] = useState('');
+
   useEffect(() => {
     const t = setTimeout(() => { setDebouncedSearch(search.trim()); setPage(0); }, 300);
     return () => clearTimeout(t);
@@ -117,6 +148,8 @@ export function AdminUserManagement() {
   const setAccessLevel = useSetAccessLevel();
   const banUser = useBanUser();
   const unbanUser = useUnbanUser();
+  const grantPremium = useGrantPremium();
+  const revokePremium = useRevokePremium();
 
   const rows = data?.rows ?? [];
   const total = data?.total ?? 0;
@@ -135,6 +168,12 @@ export function AdminUserManagement() {
     setBanType('temporary');
     setBanDays('7');
     setBanReason('');
+  };
+
+  const openPlusDialog = (u: AdminUserRow) => {
+    setPlusTarget(u);
+    setPlusDuration('30');
+    setPlusReason('');
   };
 
   const nameOf = (u: AdminUserRow) => u.display_name || (isMaster && u.email) || 'Usuário sem nome';
@@ -199,9 +238,7 @@ export function AdminUserManagement() {
                           <LevelIcon level={u.access_level} className="w-3 h-3" />
                           {ACCESS_LEVEL_LABELS[u.access_level]}
                         </Badge>
-                        {u.tier === 'plus' && (
-                          <Badge variant="outline" className="text-[10px] bg-amber-500/10 text-amber-600 border-amber-500/30">Plus</Badge>
-                        )}
+                        <PlusBadge u={u} />
                         {u.affiliate_status && (
                           <Badge variant="outline" className="text-[10px] gap-1">
                             <Handshake className="w-3 h-3" /> {u.affiliate_code} · {AFFILIATE_STATUS_LABELS[u.affiliate_status]}
@@ -242,6 +279,11 @@ export function AdminUserManagement() {
                       {isMaster && (
                         <Button variant="outline" size="sm" className="flex-1 gap-1" onClick={() => openLevelDialog(u)}>
                           <UserCog className="w-3 h-3" /> Nível de acesso
+                        </Button>
+                      )}
+                      {isMaster && (
+                        <Button variant="outline" size="sm" className="flex-1 gap-1" onClick={() => openPlusDialog(u)}>
+                          <Gift className="w-3 h-3" /> {u.has_premium_grant ? 'Plus liberado' : 'Liberar Plus'}
                         </Button>
                       )}
                       {isMaster && u.affiliate_status !== 'active' && u.affiliate_status !== 'paused' && (
@@ -388,6 +430,84 @@ export function AdminUserManagement() {
               )}
             >
               {banUser.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />} Banir
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Liberar Plus (master) */}
+      <Dialog open={!!plusTarget} onOpenChange={(o) => !o && setPlusTarget(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2"><Gift className="w-5 h-5 text-amber-500" /> Liberar Plus</DialogTitle>
+            <DialogDescription>
+              {plusTarget ? nameOf(plusTarget) : ''} terá todas as funcionalidades do plano pago (questões ilimitadas,
+              questões premium, Mentor IA e recompensas Plus), sem cobrança.
+            </DialogDescription>
+          </DialogHeader>
+          {plusTarget?.has_premium_grant && (
+            <p className="text-xs rounded-md border border-amber-500/30 bg-amber-500/5 p-2">
+              Liberado agora: {plusTarget.premium_grant_expires_at
+                ? `até ${format(parseISO(plusTarget.premium_grant_expires_at), "dd/MM/yyyy 'às' HH:mm")}`
+                : 'sem prazo'}
+              {plusTarget.premium_grant_reason && ` · ${plusTarget.premium_grant_reason}`}.
+              Uma nova liberação substitui a atual.
+            </p>
+          )}
+          {plusTarget?.premium_source === 'stripe' && (
+            <p className="text-xs text-muted-foreground">
+              Este usuário também é assinante pago: retirar a liberação não cancela a assinatura, e a
+              liberação garante o Plus mesmo se a assinatura for cancelada.
+            </p>
+          )}
+          <div className="space-y-3">
+            <div className="space-y-1.5">
+              <Label>Duração</Label>
+              <Select value={plusDuration} onValueChange={setPlusDuration}>
+                <SelectTrigger aria-label="Duração da liberação"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {GRANT_DURATIONS.map((d) => <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="plus-reason">Motivo (registrado na auditoria)</Label>
+              <Textarea
+                id="plus-reason"
+                value={plusReason}
+                maxLength={500}
+                placeholder="Ex.: cortesia, parceria, teste, suporte"
+                onChange={(e) => setPlusReason(e.target.value)}
+              />
+            </div>
+          </div>
+          <DialogFooter className="gap-2 sm:gap-0">
+            {plusTarget?.has_premium_grant && (
+              <Button
+                variant="outline"
+                className="text-destructive sm:mr-auto"
+                disabled={revokePremium.isPending}
+                onClick={() => plusTarget && revokePremium.mutate(
+                  { userId: plusTarget.user_id, reason: plusReason },
+                  { onSuccess: () => setPlusTarget(null) },
+                )}
+              >
+                {revokePremium.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />} Retirar liberação
+              </Button>
+            )}
+            <Button variant="outline" onClick={() => setPlusTarget(null)}>Cancelar</Button>
+            <Button
+              disabled={grantPremium.isPending}
+              onClick={() => plusTarget && grantPremium.mutate(
+                {
+                  userId: plusTarget.user_id,
+                  days: plusDuration === 'none' ? null : Number(plusDuration),
+                  reason: plusReason,
+                },
+                { onSuccess: () => setPlusTarget(null) },
+              )}
+            >
+              {grantPremium.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />} Liberar Plus
             </Button>
           </DialogFooter>
         </DialogContent>

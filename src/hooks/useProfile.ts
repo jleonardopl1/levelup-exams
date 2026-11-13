@@ -7,7 +7,10 @@ export interface Profile {
   user_id: string;
   display_name: string | null;
   avatar_url: string | null;
+  /** Plano efetivo: 'plus' se pago OU liberado pela administração. */
   tier: string;
+  /** Plano pago no Stripe (cortesias não contam). */
+  billing_tier?: string;
   total_quizzes: number;
   total_correct: number;
   total_questions: number;

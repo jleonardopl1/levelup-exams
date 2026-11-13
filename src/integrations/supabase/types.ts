@@ -322,6 +322,7 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          billing_tier: string
           created_at: string
           display_name: string | null
           id: string
@@ -336,6 +337,7 @@ export type Database = {
         }
         Insert: {
           avatar_url?: string | null
+          billing_tier?: string
           created_at?: string
           display_name?: string | null
           id?: string
@@ -350,6 +352,7 @@ export type Database = {
         }
         Update: {
           avatar_url?: string | null
+          billing_tier?: string
           created_at?: string
           display_name?: string | null
           id?: string
@@ -1416,8 +1419,12 @@ export type Database = {
           created_at: string
           display_name: string
           email: string
+          has_premium_grant: boolean
           is_banned: boolean
           last_sign_in_at: string
+          premium_grant_expires_at: string
+          premium_grant_reason: string
+          premium_source: string
           streak_days: number
           tier: string
           total_correct: number
@@ -1440,6 +1447,14 @@ export type Database = {
       }
       admin_remove_affiliate: {
         Args: { p_reason?: string; p_referral_code_id: string }
+        Returns: Json
+      }
+      admin_grant_premium: {
+        Args: { p_days?: number; p_reason?: string; p_user_id: string }
+        Returns: Json
+      }
+      admin_revoke_premium: {
+        Args: { p_reason?: string; p_user_id: string }
         Returns: Json
       }
       admin_set_access_level: {
@@ -1530,6 +1545,7 @@ export type Database = {
         }[]
       }
       get_user_id_by_email: { Args: { p_email: string }; Returns: string }
+      get_premium_access: { Args: { p_user_id?: string }; Returns: Json }
       get_user_tier: { Args: { p_user_id: string }; Returns: string }
       has_role: {
         Args: {

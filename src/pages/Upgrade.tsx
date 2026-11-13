@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { supabase } from '@/integrations/supabase/client';
 import { clearStoredReferralCode, getStoredReferralCode, REFERRAL_CODE_RE, storeReferralCode } from '@/hooks/useAffiliates';
 import { useQuestionLimits } from '@/hooks/useDailyUsage';
+import { useProfile } from '@/hooks/useProfile';
 import { useSubscription, useCreateCheckout, useCustomerPortal, syncSubscription, type SubscriptionPlan } from '@/hooks/useSubscription';
 import { PremiumBadge } from '@/components/PremiumBadge';
 import { toast } from 'sonner';
@@ -43,6 +44,10 @@ export default function Upgrade() {
   const stripeReturnHandled = useRef(false);
   const { tier, isPremium } = useQuestionLimits();
   const { data: subscription } = useSubscription();
+  const { data: profile } = useProfile();
+  // Há assinatura paga para gerenciar no portal? Vem do plano PAGO (billing_tier), não da
+  // origem do acesso: o admin master ou quem tem Plus liberado também pode estar pagando.
+  const hasPaidPlan = (subscription?.billing_tier ?? profile?.billing_tier) === 'plus';
   const createCheckout = useCreateCheckout();
   const customerPortal = useCustomerPortal();
   const queryClient = useQueryClient();
@@ -302,7 +307,25 @@ export default function Upgrade() {
               </Button>
             )}
 
-            {isPremium && (
+            {isPremium && !hasPaidPlan && (
+              <div className="text-center text-sm text-muted-foreground space-y-1">
+                <p className="font-medium text-foreground">
+                  {subscription?.source === 'master'
+                    ? 'Plus permanente da conta administradora.'
+                    : 'Seu acesso Plus foi liberado pela equipe LevelUp.'}
+                </p>
+                {subscription?.source === 'grant' && (
+                  <p>
+                    {subscription.access_until
+                      ? `Válido até ${new Date(subscription.access_until).toLocaleDateString('pt-BR')}.`
+                      : 'Sem prazo de validade.'}
+                  </p>
+                )}
+                <p>Todas as funcionalidades do plano estão ativas, sem cobrança.</p>
+              </div>
+            )}
+
+            {isPremium && hasPaidPlan && (
               <div className="space-y-3">
                 <div className="text-center text-sm text-muted-foreground">
                   Você já é assinante Plus!
