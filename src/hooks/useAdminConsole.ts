@@ -8,7 +8,7 @@ import { rpcErrorMessage } from '@/hooks/useAdminUsers';
 export interface PlatformOverview {
   generated_at: string;
   users: {
-    total: number; plus: number; new_7d: number; new_30d: number;
+    total: number; plus: number; plus_granted?: number; new_7d: number; new_30d: number;
     active_1d: number; active_7d: number; active_30d: number; banned: number;
   };
   quizzes: {

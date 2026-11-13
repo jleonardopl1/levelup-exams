@@ -34,11 +34,28 @@ Migration: `supabase/migrations/20261110150000_master_admin_and_affiliates.sql`
 | `get_my_access()` | qualquer usuário logado | Nível do próprio usuário (monta menus/abas) |
 | `admin_set_access_level(user, level, reason)` | master | Define admin / moderador / usuário de forma atômica |
 | `admin_ban_user(user, type, days, reason)` / `admin_unban_user(user)` | equipe | Banimento com hierarquia |
-| `admin_list_users(search, filter, limit, offset)` | equipe | Lista paginada com nível, ban e status de afiliado |
+| `admin_list_users(search, filter, limit, offset)` | equipe | Lista paginada com nível, ban, status de afiliado e origem do Plus |
 | `admin_get_settings()` / `admin_update_setting(key, value)` | admin / master | Configurações da plataforma (autoinscrição e condições padrão) |
 | `admin_list_audit_logs(search, limit)` | admin / master | Auditoria com e-mail/IP apenas para o master |
 
 A Edge Function `admin-notify` aplica os efeitos colaterais (bloqueio no Supabase Auth e e-mail ao usuário) relendo o estado do banco, sem confiar no cliente.
+
+## 1.1 Plus liberado pela administração
+
+Migration: `supabase/migrations/20261113150000_premium_grants.sql`
+
+- **Admin master**: tem o Plus **permanente** (todas as funcionalidades pagas), sem assinatura e sem poder ser revogado — mesma regra de identidade do master (e-mail confirmado).
+- **Qualquer usuário**: o master libera o Plus pelo painel em **Admin → Usuários → Liberar Plus**, por 7 dias, 30 dias, 90 dias, 6 meses, 1 ano ou sem prazo, com motivo. Uma nova liberação substitui a anterior; **Retirar liberação** encerra na hora. Filtro **Plus liberado** lista quem tem cortesia.
+- Plano pago e plano liberado ficam separados: `profiles.billing_tier` é o que o Stripe diz; `premium_grants` guarda as liberações; `profiles.tier` é o plano efetivo (pago **ou** liberado), recalculado por trigger. Quem paga e perde a cortesia continua Plus.
+- O fim do prazo vale na hora no servidor (`get_user_tier` calcula na consulta: questões premium, Mentor IA, recompensas Plus); um job horário (`expire-premium-grants`, pg_cron) atualiza `profiles.tier` para o app.
+- Receita, conversão e "indicados ativos" dos afiliados contam só `billing_tier = 'plus'` (cortesia não é venda). A Visão Geral mostra as cortesias separadas.
+- Tudo auditado (`premium_granted`, `premium_revoked`).
+
+| RPC | Quem chama | Função |
+|-----|-----------|--------|
+| `admin_grant_premium(user, days, reason)` | master | Libera o Plus (`days` nulo = sem prazo) |
+| `admin_revoke_premium(user, reason)` | master | Retira a liberação |
+| `get_premium_access(user)` | o próprio usuário / Edge Functions | Plano efetivo, origem (`stripe`, `grant`, `master`) e validade |
 
 ## 2. Programa de afiliados
 

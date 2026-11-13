@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import type { AccessLevel } from '@/hooks/useAccess';
 
-export type UserFilter = 'all' | 'staff' | 'affiliates' | 'banned' | 'plus';
+export type UserFilter = 'all' | 'staff' | 'affiliates' | 'banned' | 'plus' | 'granted';
 export type ManageableLevel = Exclude<AccessLevel, 'master'>;
 
 export interface AdminUserRow {
@@ -26,6 +26,12 @@ export interface AdminUserRow {
   affiliate_status: 'active' | 'paused' | 'removed' | null;
   affiliate_code: string | null;
   can_moderate: boolean;
+  /** 'master' (permanente), 'stripe' (pago), 'grant' (liberado pela administração) ou null. */
+  premium_source: 'master' | 'stripe' | 'grant' | null;
+  /** Fim da liberação manual (null = sem prazo ou sem liberação). */
+  premium_grant_expires_at: string | null;
+  /** Motivo da liberação (visível só para o master). */
+  premium_grant_reason: string | null;
   total_count: number;
 }
 
@@ -131,6 +137,60 @@ export function useUnbanUser() {
       await notifyAdminAction('user_unbanned', userId, userName || 'Usuário');
     },
     onSuccess: () => { invalidate(); toast.success('Banimento removido.'); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+}
+
+function useInvalidateUsersAndPlan() {
+  const queryClient = useQueryClient();
+  return () => {
+    queryClient.invalidateQueries({ queryKey: ['admin-users'] });
+    queryClient.invalidateQueries({ queryKey: ['admin-audit-logs'] });
+    queryClient.invalidateQueries({ queryKey: ['admin-platform-overview'] });
+  };
+}
+
+/** Libera o Plus (todas as funcionalidades pagas) sem cobrança. Somente o admin master. */
+export function useGrantPremium() {
+  const invalidate = useInvalidateUsersAndPlan();
+  return useMutation({
+    mutationFn: async ({ userId, days, reason }: { userId: string; days: number | null; reason?: string }) => {
+      const { data, error } = await supabase.rpc('admin_grant_premium', {
+        p_user_id: userId,
+        p_days: days ?? undefined,
+        p_reason: reason || undefined,
+      });
+      if (error) throw new Error(rpcErrorMessage(error));
+      return data as { expires_at: string | null };
+    },
+    onSuccess: (data) => {
+      invalidate();
+      toast.success(data?.expires_at
+        ? `Plus liberado até ${new Date(data.expires_at).toLocaleDateString('pt-BR')}.`
+        : 'Plus liberado sem prazo.');
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+}
+
+/** Retira o Plus liberado pela administração (assinatura paga, se houver, continua). */
+export function useRevokePremium() {
+  const invalidate = useInvalidateUsersAndPlan();
+  return useMutation({
+    mutationFn: async ({ userId, reason }: { userId: string; reason?: string }) => {
+      const { data, error } = await supabase.rpc('admin_revoke_premium', {
+        p_user_id: userId,
+        p_reason: reason || undefined,
+      });
+      if (error) throw new Error(rpcErrorMessage(error));
+      return data as { changed: boolean; tier: string };
+    },
+    onSuccess: (data) => {
+      invalidate();
+      if (!data?.changed) toast.info('Este usuário não tinha Plus liberado pela administração.');
+      else if (data.tier === 'plus') toast.success('Liberação retirada. O usuário continua Plus pela assinatura paga.');
+      else toast.success('Liberação retirada. O usuário voltou ao plano Free.');
+    },
     onError: (e: Error) => toast.error(e.message),
   });
 }

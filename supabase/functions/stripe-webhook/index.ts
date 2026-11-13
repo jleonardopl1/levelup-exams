@@ -152,9 +152,11 @@ async function syncCustomerTier(supabase: SupabaseClient, stripe: Stripe, custom
   }
 
   const { tier } = await getCustomerEntitlement(stripe, customerId);
+  // Grava só o plano PAGO: o banco soma o Plus liberado pela administração e
+  // recalcula profiles.tier (trigger sync_profile_effective_tier).
   const { error } = await supabase
     .from("profiles")
-    .update({ tier, updated_at: new Date().toISOString() })
+    .update({ billing_tier: tier, updated_at: new Date().toISOString() })
     .eq("user_id", userId);
   if (error) throw new Error("profile update failed");
 
