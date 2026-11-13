@@ -1286,6 +1286,57 @@ export type Database = {
       }
     }
     Functions: {
+      admin_list_question_reports: {
+        Args: { p_limit?: number; p_offset?: number; p_status?: string }
+        Returns: Json
+      }
+      admin_list_questions: {
+        Args: {
+          p_categoria?: string
+          p_limit?: number
+          p_offset?: number
+          p_origem?: string
+          p_premium?: boolean
+          p_search?: string
+          p_sort?: string
+          p_status?: string
+        }
+        Returns: Json
+      }
+      admin_platform_overview: { Args: never; Returns: Json }
+      admin_resolve_question_report: {
+        Args: {
+          p_apply_to_question?: boolean
+          p_note?: string
+          p_report_id: string
+          p_status: string
+        }
+        Returns: Json
+      }
+      admin_update_question: {
+        Args: { p_patch: Json; p_question_id: string }
+        Returns: Json
+      }
+      get_quiz_questions: {
+        Args: { p_categoria?: string; p_limit?: number }
+        Returns: {
+          alternativas: string[]
+          categoria: string
+          created_at: string
+          dificuldade: string
+          enunciado: string
+          id: string
+          is_premium: boolean
+          nivel: string
+          origem: string
+          subject_id: string
+          topico: string
+        }[]
+      }
+      report_question: {
+        Args: { p_details?: string; p_question_id: string; p_reason: string }
+        Returns: Json
+      }
       _access_level: { Args: { p_user_id: string }; Returns: string }
       _audit: {
         Args: { p_event: string; p_metadata: Json }

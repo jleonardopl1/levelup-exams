@@ -86,3 +86,20 @@ Afiliados ativos/pausados/removidos, receita via afiliados, comissões dos últi
 3. Publicar as Edge Functions alteradas: `admin-notify`, `create-checkout`, `stripe-webhook`.
 4. No Stripe, o webhook deve continuar recebendo `checkout.session.completed` (já incluso). A chave precisa de permissão para criar cupons (`coupons:write`), usada na primeira venda de cada percentual de desconto.
 5. Em Supabase → Authentication → URL Configuration, inclua `https://<seu-dominio>/redefinir-senha` (e a URL de preview, se usar) em **Redirect URLs**. Sem isso o link do e-mail de "Esqueci minha senha" é recusado.
+
+## 4. Console de conteúdo e métricas (v1.4.0)
+
+Migration: `supabase/migrations/20261113120000_quiz_quality_and_admin_console.sql`
+
+| Aba | Quem vê | O que faz |
+|-----|---------|-----------|
+| **Visão Geral** | admin, master | Métrica estrela (simulados concluídos por semana), alunos ativos, conversão Plus, receita Stripe, matérias mais praticadas e **Saúde do sistema** |
+| **Questões → Banco** | equipe | Busca e filtros, taxa de acerto por questão, editor completo. Moderador altera só Premium e "em circulação" |
+| **Questões → Geração com IA** | admin, master | Execuções da geração diária e disparo manual |
+| **Reportes** | equipe | Problemas apontados pelos alunos. "Resolver" fecha todos os reportes abertos da questão e notifica os alunos (a observação vai na notificação); "Descartar" não notifica |
+
+Dicas de uso:
+- Ordene o banco por **Maior taxa de erro**: questões com menos de 25% de acerto e pelo menos 5 respostas aparecem com ⚠ — costumam ter gabarito errado ou enunciado ambíguo.
+- Tirar uma questão de circulação a remove dos simulados e trilhas na hora, sem apagar as respostas já dadas.
+- Alterar o gabarito vale a partir da próxima resposta; o histórico antigo não é recalculado.
+- Se a "Saúde do sistema" mostrar o webhook do Stripe em vermelho, nenhum evento chegou: cadastre o endpoint `stripe-webhook` (veja `docs/LOGIN_PAGAMENTO_APP.md`).

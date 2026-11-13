@@ -4,6 +4,7 @@ import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable';
 import { SOCIAL_PROVIDERS, type SocialProviderId } from '@/lib/authProviders';
+import { clearQuizResult } from '@/lib/quizSession';
 
 type OAuthProvider = SocialProviderId;
 
@@ -36,13 +37,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Nunca reaproveitar respostas em cache de outra conta (ex.: dados restritos ao
   // admin master vistos por outro usuário no mesmo navegador após trocar de login).
+  // Só limpa quando uma conta logada dá lugar a outra (ou sai). Na abertura do app
+  // (sem usuário -> usuário restaurado) NÃO limpa: o clear() destruía as consultas
+  // que as telas tinham acabado de iniciar e o início ficava com "Estudante",
+  // nível 1 e 0 simulados até o aluno navegar.
   useEffect(() => {
+    if (loading) return;
     const current = user?.id ?? null;
-    if (lastUserId.current !== undefined && lastUserId.current !== current) {
+    if (lastUserId.current && lastUserId.current !== current) {
       queryClient.clear();
+      clearQuizResult();
     }
     lastUserId.current = current;
-  }, [user?.id, queryClient]);
+  }, [user?.id, loading, queryClient]);
 
   useEffect(() => {
     // Set up auth state listener FIRST
