@@ -305,7 +305,105 @@ export type Database = {
           texto?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "essay_submissions_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "study_track_modules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      exam_pass_purchases: {
+        Row: {
+          amount_cents: number | null
+          created_at: string
+          expires_at: string
+          stripe_checkout_session_id: string
+          track_id: string
+          user_id: string
+        }
+        Insert: {
+          amount_cents?: number | null
+          created_at?: string
+          expires_at: string
+          stripe_checkout_session_id: string
+          track_id: string
+          user_id: string
+        }
+        Update: {
+          amount_cents?: number | null
+          created_at?: string
+          expires_at?: string
+          stripe_checkout_session_id?: string
+          track_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "exam_pass_purchases_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "study_tracks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mock_exam_items: {
+        Row: {
+          answered_at: string | null
+          area: string
+          exam_id: string
+          is_correct: boolean | null
+          points: number
+          position: number
+          question_id: string
+          selected_index: number | null
+        }
+        Insert: {
+          answered_at?: string | null
+          area: string
+          exam_id: string
+          is_correct?: boolean | null
+          points: number
+          position: number
+          question_id: string
+          selected_index?: number | null
+        }
+        Update: {
+          answered_at?: string | null
+          area?: string
+          exam_id?: string
+          is_correct?: boolean | null
+          points?: number
+          position?: number
+          question_id?: string
+          selected_index?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mock_exam_items_exam_id_fkey"
+            columns: ["exam_id"]
+            isOneToOne: false
+            referencedRelation: "mock_exams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mock_exam_items_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mock_exam_items_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions_public"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       mock_exams: {
         Row: {
@@ -350,7 +448,15 @@ export type Database = {
           total_questions?: number
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "mock_exams_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "study_track_modules"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       notifications: {
         Row: {
@@ -406,6 +512,42 @@ export type Database = {
           updated_at?: string
           updated_by?: string | null
           value?: Json
+        }
+        Relationships: []
+      }
+      premium_grants: {
+        Row: {
+          expires_at: string | null
+          granted_at: string
+          granted_by: string | null
+          id: string
+          reason: string | null
+          revoke_reason: string | null
+          revoked_at: string | null
+          revoked_by: string | null
+          user_id: string
+        }
+        Insert: {
+          expires_at?: string | null
+          granted_at?: string
+          granted_by?: string | null
+          id?: string
+          reason?: string | null
+          revoke_reason?: string | null
+          revoked_at?: string | null
+          revoked_by?: string | null
+          user_id: string
+        }
+        Update: {
+          expires_at?: string | null
+          granted_at?: string
+          granted_by?: string | null
+          id?: string
+          reason?: string | null
+          revoke_reason?: string | null
+          revoked_at?: string | null
+          revoked_by?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -501,6 +643,102 @@ export type Database = {
           },
         ]
       }
+      question_reports: {
+        Row: {
+          created_at: string
+          details: string | null
+          id: string
+          question_id: string
+          reason: string
+          resolution_note: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          details?: string | null
+          id?: string
+          question_id: string
+          reason: string
+          resolution_note?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          details?: string | null
+          id?: string
+          question_id?: string
+          reason?: string
+          resolution_note?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "question_reports_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "question_reports_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      question_review_schedule: {
+        Row: {
+          box: number
+          due_on: string
+          lapses: number
+          question_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          box?: number
+          due_on: string
+          lapses?: number
+          question_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          box?: number
+          due_on?: string
+          lapses?: number
+          question_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "question_review_schedule_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "question_review_schedule_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       questions: {
         Row: {
           alternativas: string[]
@@ -512,11 +750,13 @@ export type Database = {
           enunciado: string
           explicacao: string | null
           id: string
+          is_active: boolean
           is_premium: boolean
           nivel: string | null
           origem: string
           subject_id: string | null
           topico: string | null
+          updated_at: string | null
         }
         Insert: {
           alternativas: string[]
@@ -528,11 +768,13 @@ export type Database = {
           enunciado: string
           explicacao?: string | null
           id?: string
+          is_active?: boolean
           is_premium?: boolean
           nivel?: string | null
           origem?: string
           subject_id?: string | null
           topico?: string | null
+          updated_at?: string | null
         }
         Update: {
           alternativas?: string[]
@@ -544,11 +786,13 @@ export type Database = {
           enunciado?: string
           explicacao?: string | null
           id?: string
+          is_active?: boolean
           is_premium?: boolean
           nivel?: string | null
           origem?: string
           subject_id?: string | null
           topico?: string | null
+          updated_at?: string | null
         }
         Relationships: [
           {
@@ -743,6 +987,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      review_daily_usage: {
+        Row: {
+          reviews_done: number
+          usage_date: string
+          user_id: string
+        }
+        Insert: {
+          reviews_done?: number
+          usage_date: string
+          user_id: string
+        }
+        Update: {
+          reviews_done?: number
+          usage_date?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       reward_catalog: {
         Row: {
@@ -1379,58 +1641,27 @@ export type Database = {
       }
     }
     Functions: {
-      admin_list_question_reports: {
-        Args: { p_limit?: number; p_offset?: number; p_status?: string }
-        Returns: Json
-      }
-      admin_list_questions: {
-        Args: {
-          p_categoria?: string
-          p_limit?: number
-          p_offset?: number
-          p_origem?: string
-          p_premium?: boolean
-          p_search?: string
-          p_sort?: string
-          p_status?: string
-        }
-        Returns: Json
-      }
-      admin_platform_overview: { Args: never; Returns: Json }
-      admin_resolve_question_report: {
-        Args: {
-          p_apply_to_question?: boolean
-          p_note?: string
-          p_report_id: string
-          p_status: string
-        }
-        Returns: Json
-      }
-      admin_update_question: {
-        Args: { p_patch: Json; p_question_id: string }
-        Returns: Json
-      }
-      get_quiz_questions: {
-        Args: { p_categoria?: string; p_limit?: number }
-        Returns: {
-          alternativas: string[]
-          categoria: string
-          created_at: string
-          dificuldade: string
-          enunciado: string
-          id: string
-          is_premium: boolean
-          nivel: string
-          origem: string
-          subject_id: string
-          topico: string
-        }[]
-      }
-      report_question: {
-        Args: { p_details?: string; p_question_id: string; p_reason: string }
-        Returns: Json
-      }
       _access_level: { Args: { p_user_id: string }; Returns: string }
+      _active_premium_grant: {
+        Args: { p_user_id: string }
+        Returns: {
+          expires_at: string | null
+          granted_at: string
+          granted_by: string | null
+          id: string
+          reason: string | null
+          revoke_reason: string | null
+          revoked_at: string | null
+          revoked_by: string | null
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "premium_grants"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       _audit: {
         Args: { p_event: string; p_metadata: Json }
         Returns: undefined
@@ -1445,6 +1676,8 @@ export type Database = {
         Returns: boolean
       }
       _display_name_from_meta: { Args: { p_meta: Json }; Returns: string }
+      _essay_used_7d: { Args: { p_user_id: string }; Returns: number }
+      _has_premium_grant: { Args: { p_user_id: string }; Returns: boolean }
       _has_role: {
         Args: {
           p_role: Database["public"]["Enums"]["app_role"]
@@ -1454,6 +1687,16 @@ export type Database = {
       }
       _is_master: { Args: { p_user_id: string }; Returns: boolean }
       _level_rank: { Args: { p_level: string }; Returns: number }
+      _premium_source: {
+        Args: { p_billing_tier: string; p_user_id: string }
+        Returns: string
+      }
+      _refresh_profile_tier: { Args: { p_user_id: string }; Returns: string }
+      _review_interval: {
+        Args: { p_box: number; p_question_id: string }
+        Returns: number
+      }
+      _today_local: { Args: never; Returns: string }
       admin_add_affiliate: {
         Args: {
           p_code?: string
@@ -1476,6 +1719,10 @@ export type Database = {
         Returns: Json
       }
       admin_get_settings: { Args: never; Returns: Json }
+      admin_grant_premium: {
+        Args: { p_days?: number; p_reason?: string; p_user_id: string }
+        Returns: Json
+      }
       admin_list_audit_logs: {
         Args: { p_limit?: number; p_search?: string }
         Returns: {
@@ -1490,6 +1737,23 @@ export type Database = {
           success: boolean
           target_name: string
         }[]
+      }
+      admin_list_question_reports: {
+        Args: { p_limit?: number; p_offset?: number; p_status?: string }
+        Returns: Json
+      }
+      admin_list_questions: {
+        Args: {
+          p_categoria?: string
+          p_limit?: number
+          p_offset?: number
+          p_origem?: string
+          p_premium?: boolean
+          p_search?: string
+          p_sort?: string
+          p_status?: string
+        }
+        Returns: Json
       }
       admin_list_users: {
         Args: {
@@ -1524,6 +1788,7 @@ export type Database = {
           user_id: string
         }[]
       }
+      admin_platform_overview: { Args: never; Returns: Json }
       admin_register_payout: {
         Args: {
           p_amount: number
@@ -1539,8 +1804,13 @@ export type Database = {
         Args: { p_reason?: string; p_referral_code_id: string }
         Returns: Json
       }
-      admin_grant_premium: {
-        Args: { p_days?: number; p_reason?: string; p_user_id: string }
+      admin_resolve_question_report: {
+        Args: {
+          p_apply_to_question?: boolean
+          p_note?: string
+          p_report_id: string
+          p_status: string
+        }
         Returns: Json
       }
       admin_revoke_premium: {
@@ -1562,12 +1832,28 @@ export type Database = {
         }
         Returns: Json
       }
+      admin_update_question: {
+        Args: { p_patch: Json; p_question_id: string }
+        Returns: Json
+      }
       admin_update_setting: {
         Args: { p_key: string; p_value: Json }
         Returns: Json
       }
       affiliate_default_terms: { Args: never; Returns: Json }
       affiliate_self_enrollment_enabled: { Args: never; Returns: boolean }
+      begin_essay_submission: {
+        Args: {
+          p_cargo: string
+          p_limit?: number
+          p_line_count: number
+          p_module_id: string
+          p_tema: string
+          p_texto: string
+          p_user_id: string
+        }
+        Returns: string
+      }
       check_rate_limit: {
         Args: {
           p_endpoint: string
@@ -1583,10 +1869,13 @@ export type Database = {
         Args: { p_limit: number; p_user_id: string }
         Returns: boolean
       }
+      expire_premium_grants: { Args: never; Returns: number }
+      finish_mock_exam: { Args: { p_exam_id: string }; Returns: Json }
       get_affiliate_dashboard: {
         Args: { p_months?: number; p_referral_code_id?: string }
         Returns: Json
       }
+      get_essay_quota: { Args: never; Returns: Json }
       get_leaderboard: {
         Args: { limit_count?: number; period?: string }
         Returns: {
@@ -1599,6 +1888,20 @@ export type Database = {
           total_questions: number
         }[]
       }
+      get_mock_exam: {
+        Args: { p_exam_id: string }
+        Returns: {
+          alternativas: string[]
+          area: string
+          enunciado: string
+          points: number
+          pos: number
+          question_id: string
+          selected_index: number
+          subject_id: string
+        }[]
+      }
+      get_mock_exam_standing: { Args: { p_exam_id: string }; Returns: Json }
       get_my_access: { Args: never; Returns: Json }
       get_practice_questions: {
         Args: {
@@ -1621,7 +1924,25 @@ export type Database = {
           topico: string
         }[]
       }
+      get_premium_access: { Args: { p_user_id?: string }; Returns: Json }
       get_question_cron_secret: { Args: never; Returns: string }
+      get_quiz_questions: {
+        Args: { p_categoria?: string; p_limit?: number }
+        Returns: {
+          alternativas: string[]
+          categoria: string
+          created_at: string
+          dificuldade: string
+          enunciado: string
+          id: string
+          is_premium: boolean
+          nivel: string
+          origem: string
+          subject_id: string
+          topico: string
+        }[]
+      }
+      get_review_queue: { Args: { p_limit?: number }; Returns: Json }
       get_track_progress: {
         Args: { p_module_id: string }
         Returns: {
@@ -1635,30 +1956,16 @@ export type Database = {
         }[]
       }
       get_user_id_by_email: { Args: { p_email: string }; Returns: string }
-      start_mock_exam: { Args: { p_cargo: string; p_module_id: string }; Returns: Json }
-      get_mock_exam: {
-        Args: { p_exam_id: string }
-        Returns: {
-          alternativas: string[]
-          area: string
-          enunciado: string
-          points: number
-          pos: number
-          question_id: string
-          selected_index: number | null
-          subject_id: string
-        }[]
-      }
-      save_mock_answer: {
-        Args: { p_exam_id: string; p_question_id: string; p_selected_index: number | null }
+      get_user_tier: { Args: { p_user_id: string }; Returns: string }
+      grant_exam_pass: {
+        Args: {
+          p_amount_cents?: number
+          p_session_id: string
+          p_track_id: string
+          p_user_id: string
+        }
         Returns: Json
       }
-      finish_mock_exam: { Args: { p_exam_id: string }; Returns: Json }
-      get_mock_exam_standing: { Args: { p_exam_id: string }; Returns: Json }
-      get_review_queue: { Args: { p_limit?: number }; Returns: Json }
-      get_essay_quota: { Args: never; Returns: Json }
-      get_premium_access: { Args: { p_user_id?: string }; Returns: Json }
-      get_user_tier: { Args: { p_user_id: string }; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1684,6 +1991,22 @@ export type Database = {
       }
       redeem_reward: {
         Args: { p_points_cost: number; p_reward_id: string; p_user_id: string }
+        Returns: Json
+      }
+      report_question: {
+        Args: { p_details?: string; p_question_id: string; p_reason: string }
+        Returns: Json
+      }
+      save_mock_answer: {
+        Args: {
+          p_exam_id: string
+          p_question_id: string
+          p_selected_index: number
+        }
+        Returns: Json
+      }
+      start_mock_exam: {
+        Args: { p_cargo: string; p_module_id: string }
         Returns: Json
       }
       track_referral_visit: { Args: { p_code: string }; Returns: undefined }
