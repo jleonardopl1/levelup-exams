@@ -1,5 +1,26 @@
 # Changelog
 
+## [1.6.0] - 2026-11-15
+
+### Features (Plus)
+- **Simulado Oficial**: a prova inteira no formato do edital (70 questões, 15/15/40), cronômetro no servidor, sem gabarito até entregar, nota com os pesos e a regra de habilitação, resultado por área e revisão; Free faz 1 a cada 30 dias
+- **Posição entre os candidatos do cargo** no resultado (Plus: posição, percentil e % habilitados; Free: metade de cima/baixo)
+- **Revisão espaçada dos erros** (1, 3, 7, 14 e 30 dias, comprimida perto da prova): card "Revisão de hoje" e `/quiz?mode=srs`; Free: 5 por dia
+- **Correção da discursiva** (`/trilhas/:slug/discursiva`): tema do cargo, nota estimada (80 conteúdo + 20 formal calculada no servidor), erros com trecho e correção, parágrafo reescrito; 3 por semana
+- **Mentor IA com contexto** do aluno (trilha, cargo, dias até a prova, último simulado, matérias fracas) e "Explicar com o Mentor IA" por questão, sem gastar as 6 perguntas do dia
+- **PDF do resultado** com explicações (quiz e Simulado Oficial)
+- **Passe Concurso**: pagamento único com Plus até 15 dias depois da prova (aparece quando `STRIPE_PRICE_EXAM_PASS` está configurado)
+- Matérias específicas de cargo passam a receber 6 questões novas por dia
+
+### Fixes
+- Planos, FAQ e modais anunciavam benefícios que não existiam (sem anúncios, acesso prioritário, Mentor ilimitado, estatísticas avançadas, PDF): agora tudo sai de `src/config/plans.ts`
+- FAQ dizia que o limite diário renova à meia-noite; renova à meia-noite UTC (21h de Brasília)
+
+### Banco
+- `20261115120000_plus_features_v1.sql`: `mock_exams`, `mock_exam_items`, `question_review_schedule`, `review_daily_usage`, `exam_pass_purchases`; RPCs `start_mock_exam`, `get_mock_exam`, `save_mock_answer`, `finish_mock_exam`, `get_mock_exam_standing`, `get_review_queue`, `grant_exam_pass`; `validate_answer` recusa questão de simulado aberto; `get_premium_access` ganha `grant_kind`
+- `20261115130000_essay_reviews.sql`: `essay_submissions`, `get_essay_quota`, `begin_essay_submission`
+- Passo a passo de implantação em `docs/PLUS_IMPLANTACAO.md`
+
 ## [1.5.0] - 2026-11-13
 
 ### Features

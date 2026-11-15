@@ -4,6 +4,8 @@ Data: 15/11/2026 · Base: código em `main` (v1.5.0), 39 migrations, trilha Câm
 
 Estrela-guia do produto: *candidatos passam nos concursos* · métrica: **simulados concluídos por semana**.
 
+> **Status (15/11/2026):** P0 e as propostas 1 a 6 foram implementadas — ver `docs/PLUS_IMPLANTACAO.md` para o que mudou, como implantar e como foi verificado. As propostas 7, 8 e 9 ficaram para depois. O SQL que estava em `docs/proposta-plus/sql/plus_features_v1.sql` virou a migration `supabase/migrations/20261115120000_plus_features_v1.sql`.
+
 ---
 
 ## 1. Resumo
@@ -53,7 +55,7 @@ Legenda de esforço: P ≤ 2 dias · M 3–5 dias · G > 1 semana (1 dev full-st
 Prova completa no formato do edital: 70 questões (15 Básicos · 15 Gerais · 40 Específicos do cargo), distribuídas igualmente entre as matérias de cada área, cronômetro da prova, **sem gabarito durante a prova**, correção no servidor com pesos (1 / 1,75), regra de aprovação (≥ 40 e não zerar área) e revisão completa ao final.
 - **Free:** 1 por mês (gancho). **Plus:** ilimitado.
 - **Por que:** ataca direto a métrica estrela; é o que o candidato mais quer na reta final ("como eu iria hoje?"); não existe hoje (o simulado atual tem 10 questões e mostra o gabarito a cada resposta).
-- **Banco:** `mock_exams`, `mock_exam_items`; RPCs `start_mock_exam`, `get_mock_exam`, `save_mock_answer`, `finish_mock_exam` (`docs/proposta-plus/sql/plus_features_v1.sql`). Prioriza questões inéditas, depois as erradas; ao finalizar grava em `user_question_attempts` (alimenta progresso da trilha e revisão espaçada). Salvar e finalizar usam o mesmo lock da linha do simulado.
+- **Banco:** `mock_exams`, `mock_exam_items`; RPCs `start_mock_exam`, `get_mock_exam`, `save_mock_answer`, `finish_mock_exam` (`supabase/migrations/20261115120000_plus_features_v1.sql`). Prioriza questões inéditas, depois as erradas; ao finalizar grava em `user_question_attempts` (alimenta progresso da trilha e revisão espaçada). Salvar e finalizar usam o mesmo lock da linha do simulado.
 - **Muda uma RPC em produção:** `validate_answer` passa a recusar questões de um simulado aberto do próprio aluno; sem isso, o gabarito vaza antes de finalizar (achado da revisão do PR). O corpo é o atual mais essa trava, e o teste confere isso.
 - **Front:** nova rota `/trilhas/:slug/simulado` (navegação livre entre questões, marcação "revisar depois", salvamento a cada resposta, retomada se fechar a aba) e tela de resultado por área.
 - **Pendências:** confirmar no edital a duração da prova e gravar `rules.duracao_minutos` (padrão provisório: 240); **subir `QUESTIONS_PER_SUBJECT_DAY` das matérias específicas para ~6 agora** por causa da profundidade do banco.
@@ -174,6 +176,6 @@ npm i --no-save @electric-sql/pglite@0.5.16
 node docs/proposta-plus/validate.mjs
 ```
 
-O script sobe um Postgres em memória com stubs do Supabase (auth, vault, cron, net), aplica as 39 migrations atuais (incluindo as 1.091 questões da trilha), aplica `docs/proposta-plus/sql/plus_features_v1.sql` e roda 45 verificações. Resultado atual: **45/45 passaram**.
+O script sobe um Postgres em memória com stubs do Supabase (auth, vault, cron, net), aplica todas as migrations (incluindo as 1.091 questões da trilha e a migration `20261115120000_plus_features_v1.sql` e a da discursiva) e roda 51 verificações. Resultado atual: **51/51 passaram**.
 
-Limites do que foi validado: RLS foi checada pelas funções `SECURITY DEFINER` (dono = superusuário no teste), não com os papéis `authenticated` reais do Supabase; a corrida entre salvar e finalizar foi verificada pela presença do mesmo `FOR UPDATE` nas duas funções, porque o PGlite tem uma conexão só (o teste de concorrência real exige um Postgres com duas sessões); o front e as Edge Functions das propostas ainda não existem. O SQL não está em `supabase/migrations/` de propósito: só vira migration depois de aprovado.
+Limites do que foi validado: RLS foi checada pelas funções `SECURITY DEFINER` (dono = superusuário no teste), não com os papéis `authenticated` reais do Supabase; a corrida entre salvar e finalizar foi verificada pela presença do mesmo `FOR UPDATE` nas duas funções, porque o PGlite tem uma conexão só (o teste de concorrência real exige um Postgres com duas sessões); o front e as Edge Functions das propostas ainda não existem. 
