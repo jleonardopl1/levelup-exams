@@ -26,7 +26,12 @@ interface AuthContextType {
 
 const PASSWORD_RESET_PATH = '/redefinir-senha';
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+// Singleton em globalThis: durante hot-reload (HMR) o módulo pode ser
+// reinstanciado enquanto consumidores ainda referenciam o contexto antigo,
+// o que derrubava a tela com "useAuth must be used within an AuthProvider".
+const AuthContext: React.Context<AuthContextType | undefined> =
+  ((globalThis as Record<string, unknown>).__levelupAuthContext as React.Context<AuthContextType | undefined>) ??
+  (((globalThis as Record<string, unknown>).__levelupAuthContext = createContext<AuthContextType | undefined>(undefined)) as React.Context<AuthContextType | undefined>);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
