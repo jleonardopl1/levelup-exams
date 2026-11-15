@@ -136,7 +136,7 @@ export function useMockExamQuestions(examId: string | undefined, enabled = true)
 
 export async function saveMockAnswer(examId: string, questionId: string, selected: number | null) {
   const { data, error } = await supabase.rpc('save_mock_answer', {
-    p_exam_id: examId, p_question_id: questionId, p_selected_index: selected,
+    p_exam_id: examId, p_question_id: questionId, p_selected_index: selected as number,
   });
   if (error) throw error;
   const res = asJson<{ success?: boolean; error?: string }>(data);
