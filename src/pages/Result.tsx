@@ -6,12 +6,14 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
   Trophy, Target, Clock, Home, RotateCcw, Star, Zap, CheckCircle2, XCircle, MinusCircle,
-  Bot, Flag, ChevronDown, AlertTriangle, BookOpenCheck,
+  Bot, Flag, ChevronDown, AlertTriangle, BookOpenCheck, FileDown,
 } from 'lucide-react';
+import { PrintableReview } from '@/components/PrintableReview';
+import { useQuestionLimits } from '@/hooks/useDailyUsage';
 import { Confetti, CelebrationGlow } from '@/components/Confetti';
 import { ReportQuestionDialog } from '@/components/ReportQuestionDialog';
 import { cn } from '@/lib/utils';
-import { buildMentorPrompt, loadQuizResult, type QuizResultState, type QuizReviewItem } from '@/lib/quizSession';
+import { loadQuizResult, type QuizResultState, type QuizReviewItem } from '@/lib/quizSession';
 
 type ReviewFilter = 'wrong' | 'all';
 
@@ -113,6 +115,7 @@ export default function Result() {
   const [showGlow, setShowGlow] = useState(false);
   const [filter, setFilter] = useState<ReviewFilter>('wrong');
   const [reportId, setReportId] = useState<string | null>(null);
+  const { isPremium } = useQuestionLimits();
 
   const score = data?.score ?? 0;
   useEffect(() => {
@@ -179,8 +182,16 @@ export default function Result() {
   ).sort((a, b) => a[1].c / a[1].t - b[1].c / b[1].t);
 
   return (
-    <div className="min-h-screen bg-background p-4 pb-12">
-      <div className="w-full max-w-2xl mx-auto space-y-6 animate-scale-in">
+    <div className="min-h-screen bg-background p-4 pb-12 print:p-0 print:bg-white">
+      <PrintableReview
+        title="Resultado do simulado"
+        summary={[
+          `${correct} de ${total} questões certas (${score}%) · tempo ${formatTime(timeSpent)}`,
+          ...byCategory.map(([cat, v]) => `${cat}: ${v.c}/${v.t}`),
+        ]}
+        items={review}
+      />
+      <div className="w-full max-w-2xl mx-auto space-y-6 animate-scale-in print:hidden">
         <div className="text-center pt-4">
           <div className="relative w-24 h-24 mx-auto mb-4">
             <div className="w-24 h-24 rounded-full gradient-accent flex items-center justify-center shadow-glow-accent animate-bounce-in">
@@ -272,6 +283,17 @@ export default function Result() {
               <RotateCcw className="w-5 h-5 mr-2" /> Novo simulado
             </Button>
           )}
+          {review.length > 0 && (
+            <Button
+              variant="outline"
+              size="lg"
+              className="w-full"
+              onClick={() => (isPremium ? window.print() : navigate('/upgrade'))}
+            >
+              <FileDown className="w-4 h-4 mr-2" />
+              {isPremium ? 'Baixar PDF com explicações' : 'PDF com explicações (Plus)'}
+            </Button>
+          )}
           <div className="grid grid-cols-2 gap-3">
             {reviewMistakesPath && wrong.length > 0 && (
               <Button variant="outline" size="lg" onClick={() => navigate(safeRetry)}>
@@ -319,7 +341,7 @@ export default function Result() {
                   item={item}
                   index={review.indexOf(item)}
                   onReport={() => setReportId(item.questionId)}
-                  onMentor={() => navigate(`/mentor?q=${encodeURIComponent(buildMentorPrompt(item))}`)}
+                  onMentor={() => navigate(`/mentor?questao=${item.questionId}`)}
                 />
               ))
             )}

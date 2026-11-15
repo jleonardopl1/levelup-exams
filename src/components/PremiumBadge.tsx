@@ -1,5 +1,6 @@
 import { Crown, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { PLUS_BENEFITS } from '@/config/plans';
 
 interface PremiumBadgeProps {
   tier: string;
@@ -75,22 +76,12 @@ export function UpgradeCard({ onUpgrade }: UpgradeCardProps) {
         </div>
         
         <ul className="space-y-2 mb-4 text-sm text-white/90">
-          <li className="flex items-center gap-2">
-            <Crown className="w-4 h-4 text-amber-300" />
-            Questões ilimitadas
-          </li>
-          <li className="flex items-center gap-2">
-            <Crown className="w-4 h-4 text-amber-300" />
-            Explicações em PDF
-          </li>
-          <li className="flex items-center gap-2">
-            <Crown className="w-4 h-4 text-amber-300" />
-            Estatísticas avançadas
-          </li>
-          <li className="flex items-center gap-2">
-            <Crown className="w-4 h-4 text-amber-300" />
-            Questões exclusivas
-          </li>
+          {PLUS_BENEFITS.slice(0, 4).map((b) => (
+            <li key={b.text} className="flex items-center gap-2">
+              <Crown className="w-4 h-4 text-amber-300 shrink-0" />
+              {b.text}
+            </li>
+          ))}
         </ul>
         
         <button

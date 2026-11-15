@@ -2,40 +2,19 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Crown, Check, Sparkles, Zap, BarChart3, FileText, Lock, Bot, Settings, Loader2, Ticket, X } from 'lucide-react';
+import { ArrowLeft, Crown, Check, Sparkles, Lock, Settings, Loader2, Ticket, X, CalendarCheck } from 'lucide-react';
+import { FREE_BENEFITS, PLUS_BENEFITS, PRICES } from '@/config/plans';
 import { Input } from '@/components/ui/input';
 import { supabase } from '@/integrations/supabase/client';
 import { clearStoredReferralCode, getStoredReferralCode, REFERRAL_CODE_RE, storeReferralCode } from '@/hooks/useAffiliates';
 import { useQuestionLimits } from '@/hooks/useDailyUsage';
 import { useProfile } from '@/hooks/useProfile';
-import { useSubscription, useCreateCheckout, useCustomerPortal, syncSubscription, type SubscriptionPlan } from '@/hooks/useSubscription';
+import { useSubscription, useCreateCheckout, useCustomerPortal, useExamPassOffer, syncSubscription, type SubscriptionPlan } from '@/hooks/useSubscription';
 import { PremiumBadge } from '@/components/PremiumBadge';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import { useQueryClient } from '@tanstack/react-query';
 
-const features = {
-  free: [
-    { icon: Check, text: '30 questões por dia', included: true },
-    { icon: Check, text: 'Categorias básicas', included: true },
-    { icon: Check, text: 'Ranking global', included: true },
-    { icon: Lock, text: 'Questões ilimitadas', included: false },
-    { icon: Lock, text: 'Explicações em PDF', included: false },
-    { icon: Lock, text: 'Estatísticas avançadas', included: false },
-    { icon: Lock, text: 'Questões premium', included: false },
-    { icon: Lock, text: 'Mentor IA (6 perguntas/dia)', included: false },
-  ],
-  plus: [
-    { icon: Zap, text: 'Questões ilimitadas', included: true },
-    { icon: Check, text: 'Todas as categorias', included: true },
-    { icon: Check, text: 'Ranking global', included: true },
-    { icon: FileText, text: 'Explicações em PDF', included: true },
-    { icon: BarChart3, text: 'Estatísticas avançadas', included: true },
-    { icon: Sparkles, text: 'Questões premium exclusivas', included: true },
-    { icon: Bot, text: 'Mentor IA (6 perguntas/dia)', included: true },
-    { icon: Crown, text: 'Acesso prioritário', included: true },
-  ],
-};
 
 export default function Upgrade() {
   const navigate = useNavigate();
@@ -49,6 +28,10 @@ export default function Upgrade() {
   // origem do acesso: o admin master ou quem tem Plus liberado também pode estar pagando.
   const hasPaidPlan = (subscription?.billing_tier ?? profile?.billing_tier) === 'plus';
   const createCheckout = useCreateCheckout();
+  const { data: examPass } = useExamPassOffer(!!user && !isPremium);
+  const fmtDay = (iso: string) => new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  const fmtMoney = (cents: number, currency = 'BRL') =>
+    (cents / 100).toLocaleString('pt-BR', { style: 'currency', currency });
   const customerPortal = useCustomerPortal();
   const queryClient = useQueryClient();
   const [referralInput, setReferralInput] = useState(() => getStoredReferralCode() ?? '');
@@ -242,12 +225,16 @@ export default function Upgrade() {
           </CardHeader>
           <CardContent>
             <ul className="space-y-3">
-              {features.free.map((feature, i) => (
-                <li key={i} className="flex items-center gap-3">
-                  <feature.icon className={`w-5 h-5 ${feature.included ? 'text-primary' : 'text-muted-foreground'}`} />
-                  <span className={feature.included ? '' : 'text-muted-foreground'}>{feature.text}</span>
+              {FREE_BENEFITS.map((feature) => (
+                <li key={feature.text} className="flex items-center gap-3">
+                  <Check className="w-5 h-5 text-primary shrink-0" />
+                  <span>{feature.text}</span>
                 </li>
               ))}
+              <li className="flex items-center gap-3 text-muted-foreground">
+                <Lock className="w-5 h-5 shrink-0" />
+                <span>Mentor IA, correção da discursiva e PDF são do Plus</span>
+              </li>
             </ul>
           </CardContent>
         </Card>
@@ -275,16 +262,16 @@ export default function Upgrade() {
                 <Crown className="w-5 h-5 text-amber-500" />
               </span>
               <div className="text-right">
-                <span className="text-2xl font-bold">R$ 19,90</span>
+                <span className="text-2xl font-bold">{PRICES.monthly}</span>
                 <span className="text-sm text-muted-foreground">/mês</span>
               </div>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <ul className="space-y-3">
-              {features.plus.map((feature, i) => (
-                <li key={i} className="flex items-center gap-3">
-                  <feature.icon className="w-5 h-5 text-amber-500" />
+              {PLUS_BENEFITS.map((feature) => (
+                <li key={feature.text} className="flex items-center gap-3">
+                  <feature.icon className="w-5 h-5 text-amber-500 shrink-0" />
                   <span>{feature.text}</span>
                 </li>
               ))}
@@ -312,7 +299,9 @@ export default function Upgrade() {
                 <p className="font-medium text-foreground">
                   {subscription?.source === 'master'
                     ? 'Plus permanente da conta administradora.'
-                    : 'Seu acesso Plus foi liberado pela equipe LevelUp.'}
+                    : subscription?.grant_kind === 'exam_pass'
+                      ? 'Seu Passe Concurso está ativo.'
+                      : 'Seu acesso Plus foi liberado pela equipe LevelUp.'}
                 </p>
                 {subscription?.source === 'grant' && (
                   <p>
@@ -321,7 +310,11 @@ export default function Upgrade() {
                       : 'Sem prazo de validade.'}
                   </p>
                 )}
-                <p>Todas as funcionalidades do plano estão ativas, sem cobrança.</p>
+                <p>
+                  {subscription?.grant_kind === 'exam_pass'
+                    ? 'Pagamento único: não há renovação automática.'
+                    : 'Todas as funcionalidades do plano estão ativas, sem cobrança.'}
+                </p>
               </div>
             )}
 
@@ -354,6 +347,35 @@ export default function Upgrade() {
           </CardContent>
         </Card>
 
+        {/* Passe Concurso (pagamento único até a prova) */}
+        {!isPremium && examPass?.available && examPass.amount_cents && examPass.track && examPass.access_until && (
+          <Card variant="default" className="relative border-primary/40">
+            <div className="absolute -top-3 right-4 px-3 py-1 bg-primary text-primary-foreground text-xs font-bold rounded-full">
+              SEM RENOVAÇÃO
+            </div>
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center justify-between gap-2">
+                <span className="flex items-center gap-2">
+                  Passe Concurso
+                  <CalendarCheck className="w-5 h-5 text-primary" />
+                </span>
+                <span className="text-2xl font-bold">{fmtMoney(examPass.amount_cents, examPass.currency)}</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <p className="text-sm text-muted-foreground">
+                Todo o Plus até {fmtDay(examPass.access_until)}: a prova de {examPass.track.shortName} em{' '}
+                {fmtDay(`${examPass.track.examDate}T12:00:00`)} e mais 15 dias para conferir o gabarito.
+                Pagamento único, sem assinatura para cancelar.
+              </p>
+              <Button variant="outline" size="lg" className="w-full" onClick={() => handleSubscribe('exam_pass')} disabled={isLoading}>
+                {isLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+                Comprar Passe Concurso
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Annual Plan */}
         {!isPremium && (
           <Card variant="default" className="relative">
@@ -367,14 +389,14 @@ export default function Upgrade() {
                   <Crown className="w-5 h-5 text-amber-500" />
                 </span>
                 <div className="text-right">
-                  <span className="text-2xl font-bold">R$ 159,90</span>
+                  <span className="text-2xl font-bold">{PRICES.annual}</span>
                   <span className="text-sm text-muted-foreground">/ano</span>
                 </div>
               </CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground mb-4">
-                Equivale a R$ 13,32/mês. Todos os benefícios do Plus com desconto especial.
+                Equivale a {PRICES.annualPerMonth}/mês. Todos os benefícios do Plus com desconto especial.
               </p>
               <Button 
                 variant="outline" 

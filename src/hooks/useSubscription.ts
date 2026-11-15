@@ -8,7 +8,7 @@ import { useEffect } from 'react';
  * Planos de assinatura. O app envia só o NOME do plano; o servidor (create-checkout)
  * escolhe o preço certo do Stripe e confere a periodicidade antes de cobrar.
  */
-export type SubscriptionPlan = 'monthly' | 'annual';
+export type SubscriptionPlan = 'monthly' | 'annual' | 'exam_pass';
 
 /** Extrai a mensagem real de erro de uma Edge Function (o corpo traz o motivo). */
 async function functionError(error: unknown): Promise<Error & { code?: string }> {
@@ -31,6 +31,35 @@ export interface SubscriptionStatus {
   billing_tier?: 'free' | 'plus';
   /** Fim do Plus liberado pela administração (null = sem prazo). */
   access_until?: string | null;
+  /** Plus liberado: Passe Concurso comprado ('exam_pass') ou cortesia da equipe ('staff'). */
+  grant_kind?: 'exam_pass' | 'staff' | null;
+}
+
+export interface ExamPassOffer {
+  available: boolean;
+  amount_cents?: number;
+  currency?: string;
+  track?: { id: string; shortName: string; examDate: string };
+  access_until?: string;
+}
+
+/** Passe Concurso: preço e validade vêm do servidor (Stripe + data da prova). */
+export function useExamPassOffer(enabled: boolean) {
+  const { session } = useAuth();
+  return useQuery({
+    queryKey: ['exam-pass-offer', session?.user?.id],
+    enabled: enabled && !!session,
+    staleTime: 10 * 60 * 1000,
+    retry: false,
+    queryFn: async (): Promise<ExamPassOffer> => {
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
+        body: { plan: 'exam_pass', preview: true },
+        headers: { Authorization: `Bearer ${session!.access_token}` },
+      });
+      if (error || !data) return { available: false };
+      return data as ExamPassOffer;
+    },
+  });
 }
 
 export function useSubscription() {

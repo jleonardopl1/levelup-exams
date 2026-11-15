@@ -31,6 +31,37 @@ function resolvePlan(body: { plan?: unknown; priceId?: unknown } | null): "month
   if (typeof body?.priceId === "string") return PRICE_TO_PLAN.get(body.priceId) ?? null;
   return null;
 }
+/**
+ * Passe Concurso: pagamento único (mode=payment) que libera o Plus até 15 dias depois da
+ * prova da trilha. Só aparece se STRIPE_PRICE_EXAM_PASS apontar para um preço avulso ativo.
+ * Quem libera o acesso é o stripe-webhook (grant_exam_pass), nunca esta função.
+ */
+const EXAM_PASS_PRICE = (Deno.env.get("STRIPE_PRICE_EXAM_PASS") ?? "").trim();
+const EXAM_PASS_EXTRA_DAYS = 15;
+
+async function examPassOffer(stripe: NonNullable<ReturnType<typeof getStripe>>, supabase: SupabaseClient, trackId: unknown) {
+  if (!EXAM_PASS_PRICE) return null;
+  const price = await stripe.prices.retrieve(EXAM_PASS_PRICE).catch(() => null);
+  if (!price || !price.active || price.type !== "one_time" || !price.unit_amount) return null;
+
+  const today = new Date(Date.now() - 4 * 3600 * 1000).toISOString().slice(0, 10); // Cuiabá
+  let query = supabase.from("study_tracks").select("id, short_name, exam_date")
+    .eq("is_active", true).gte("exam_date", today).order("exam_date", { ascending: true }).limit(1);
+  if (typeof trackId === "string" && /^[0-9a-f-]{36}$/i.test(trackId)) query = query.eq("id", trackId);
+  const { data: track } = await query.maybeSingle();
+  if (!track?.exam_date) return null;
+
+  const until = new Date(`${track.exam_date}T00:00:00-04:00`);
+  until.setUTCDate(until.getUTCDate() + EXAM_PASS_EXTRA_DAYS);
+  return {
+    priceId: EXAM_PASS_PRICE,
+    amountCents: price.unit_amount as number,
+    currency: (price.currency as string).toUpperCase(),
+    track: { id: track.id as string, shortName: track.short_name as string, examDate: track.exam_date as string },
+    accessUntil: until.toISOString(),
+  };
+}
+
 const RATE_LIMIT_WINDOW_MS = 60000;
 const RATE_LIMIT_MAX_REQUESTS = 5;
 const REFERRAL_CODE_RE = /^[A-Z0-9]{4,20}$/;
@@ -115,7 +146,72 @@ serve(withCors(async (req) => {
       return jsonResponse({ error: "Confirme seu e-mail antes de assinar." }, 403);
     }
 
-    const body = await readJson<{ plan?: unknown; priceId?: unknown; referralCode?: unknown }>(req, 4 * 1024);
+    const body = await readJson<{ plan?: unknown; priceId?: unknown; referralCode?: unknown; trackId?: unknown; preview?: unknown }>(req, 4 * 1024);
+
+    if (body?.plan === "exam_pass") {
+      const offer = await examPassOffer(stripe, supabase, body.trackId);
+      if (body.preview === true) {
+        return jsonResponse(offer
+          ? { available: true, amount_cents: offer.amountCents, currency: offer.currency, track: offer.track, access_until: offer.accessUntil }
+          : { available: false });
+      }
+      if (!offer) return jsonResponse({ error: "Passe Concurso indisponível no momento." }, 503);
+
+      const referral = await resolveReferral(supabase, body?.referralCode, user.id);
+      if (referral && "error" in referral) {
+        return jsonResponse({ error: `${referral.error}. Remova o código para continuar.`, code: "referral_invalid" }, 400);
+      }
+
+      let customer = await findCustomerForUser(stripe, user);
+      if (customer) {
+        const ent = await getCustomerEntitlement(stripe, customer.id);
+        if (ent.tier === "plus") return jsonResponse({ error: "Você já possui uma assinatura ativa." }, 409);
+        if (customer.metadata?.supabase_user_id !== user.id) {
+          customer = await stripe.customers.update(customer.id, { metadata: { supabase_user_id: user.id } });
+        }
+      } else {
+        customer = await stripe.customers.create({ email: user.email, metadata: { supabase_user_id: user.id } });
+      }
+      // Já tem Plus liberado por mais tempo que o passe? Não cobra à toa.
+      const { data: access } = await supabase.rpc("get_premium_access", { p_user_id: user.id });
+      const a = access as { source?: string | null; access_until?: string | null } | null;
+      const grantEnd = a?.access_until ? new Date(a.access_until).getTime() : null;
+      if (a?.source === "master" || (a?.source === "grant" && (grantEnd === null || grantEnd >= new Date(offer.accessUntil).getTime()))) {
+        return jsonResponse({ error: "Seu Plus já vale até depois da prova." }, 409);
+      }
+
+      const siteUrl = getSiteUrl();
+      const discounts = referral && referral.discount > 0
+        ? [{ coupon: await ensureReferralCoupon(stripe, referral.discount) }]
+        : undefined;
+      const meta: Record<string, string> = {
+        supabase_user_id: user.id,
+        plan: "exam_pass",
+        track_id: offer.track.id,
+        ...(referral ? { referral_code_id: referral.id } : {}),
+      };
+      const session = await stripe.checkout.sessions.create({
+        customer: customer.id,
+        client_reference_id: user.id,
+        line_items: [{ price: offer.priceId, quantity: 1 }],
+        mode: "payment",
+        payment_intent_data: { metadata: meta },
+        metadata: meta,
+        ...(discounts ? { discounts } : { allow_promotion_codes: false }),
+        success_url: `${siteUrl}/upgrade?success=true`,
+        cancel_url: `${siteUrl}/upgrade?canceled=true`,
+      }, { idempotencyKey: `exam-pass:${user.id}:${offer.track.id}:${referral?.id ?? "none"}:${Math.floor(Date.now() / 60000)}` });
+
+      await logAuditEvent(supabase, "CHECKOUT_CREATED", user.id, null, clientIp, userAgent, true, null, {
+        plan: "exam_pass",
+        price_id: offer.priceId,
+        track_id: offer.track.id,
+        livemode: session.livemode,
+        ...(referral ? { referral_code_id: referral.id } : {}),
+      });
+      return jsonResponse({ url: session.url });
+    }
+
     const plan = resolvePlan(body);
     if (!plan) {
       await logAuditEvent(supabase, "CHECKOUT_INVALID_PRICE", user.id, null, clientIp, userAgent, false, "Invalid plan");

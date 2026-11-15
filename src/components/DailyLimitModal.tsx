@@ -8,6 +8,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Crown, Clock, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { LIMITS, PLUS_BENEFITS } from '@/config/plans';
 
 interface DailyLimitModalProps {
   open: boolean;
@@ -31,7 +32,7 @@ export function DailyLimitModal({ open, onOpenChange }: DailyLimitModalProps) {
           </div>
           <DialogTitle className="text-xl">Limite Diário Atingido</DialogTitle>
           <DialogDescription className="text-base">
-            Você usou todas as suas 30 questões gratuitas de hoje. Volte amanhã ou faça upgrade para continuar estudando!
+            Você usou todas as suas {LIMITS.freeQuestionsPerDay} questões gratuitas de hoje. Volte amanhã ou faça upgrade para continuar estudando!
           </DialogDescription>
         </DialogHeader>
 
@@ -42,22 +43,12 @@ export function DailyLimitModal({ open, onOpenChange }: DailyLimitModalProps) {
               <span className="font-bold">Benefícios do Plus</span>
             </div>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li className="flex items-center gap-2">
-                <Crown className="w-4 h-4 text-amber-500" />
-                Questões ilimitadas todos os dias
-              </li>
-              <li className="flex items-center gap-2">
-                <Crown className="w-4 h-4 text-amber-500" />
-                Explicações detalhadas em PDF
-              </li>
-              <li className="flex items-center gap-2">
-                <Crown className="w-4 h-4 text-amber-500" />
-                Estatísticas avançadas de desempenho
-              </li>
-              <li className="flex items-center gap-2">
-                <Crown className="w-4 h-4 text-amber-500" />
-                Questões exclusivas premium
-              </li>
+              {PLUS_BENEFITS.slice(0, 4).map((b) => (
+                <li key={b.text} className="flex items-center gap-2">
+                  <Crown className="w-4 h-4 text-amber-500 shrink-0" />
+                  {b.text}
+                </li>
+              ))}
             </ul>
           </div>
 

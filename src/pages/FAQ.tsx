@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, HelpCircle, Send, Mail } from 'lucide-react';
+import { PLUS_BENEFITS_SENTENCE } from '@/config/plans';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -22,11 +23,11 @@ const faqItems = [
   },
   {
     question: "Como gerar o PDF com as Explicações?",
-    answer: "Após concluir um simulado, usuários Plus podem acessar a opção 'Exportar PDF' na tela de resultados. O documento inclui todas as questões, suas respostas corretas e explicações detalhadas geradas por nossa IA, perfeito para revisar offline."
+    answer: "Após concluir um simulado, assinantes Plus tocam em 'Baixar PDF' na tela de resultado e escolhem 'Salvar como PDF' na janela de impressão. O documento traz cada questão, a sua resposta, o gabarito e a explicação, para revisar offline."
   },
   {
     question: "Quais as vantagens do plano Plus?",
-    answer: "O plano Plus oferece: questões ilimitadas por dia, acesso ao Mentor IA para tirar dúvidas, explicações detalhadas geradas por IA, estatísticas avançadas de desempenho, questões exclusivas e premium, exportação de PDFs com explicações, e experiência sem anúncios."
+    answer: PLUS_BENEFITS_SENTENCE
   },
   {
     question: "Quem somos nós?",
@@ -50,11 +51,11 @@ const faqItems = [
   },
   {
     question: "Como funciona o limite diário de questões?",
-    answer: "Usuários do plano gratuito podem responder até 30 questões por dia. Este limite é renovado à meia-noite. Para estudar sem limites, considere assinar o plano Plus e tenha acesso ilimitado a todo nosso conteúdo."
+    answer: "Usuários do plano gratuito podem responder até 30 questões por dia. O limite é renovado à meia-noite UTC (21h no horário de Brasília). No Plus não há limite diário de questões."
   },
   {
     question: "Como acompanhar meu progresso?",
-    answer: "Na tela inicial você encontra suas estatísticas principais: número de simulados, taxa de precisão e sequência de dias estudando. Usuários Plus têm acesso a estatísticas avançadas com gráficos de evolução, análise por categoria e comparação de desempenho ao longo do tempo."
+    answer: "Na tela inicial e no Dashboard você vê número de simulados, taxa de acerto e sequência de dias estudando. Na trilha do seu concurso aparecem o acerto por matéria, a projeção de nota com os pesos do edital e, depois de um Simulado Oficial, sua nota por área e sua posição entre os candidatos do mesmo cargo."
   }
 ];
 

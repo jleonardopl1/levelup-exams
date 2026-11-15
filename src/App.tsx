@@ -28,6 +28,8 @@ const Settings = lazy(() => import("./pages/Settings"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const Trilhas = lazy(() => import("./pages/Trilhas"));
 const Trilha = lazy(() => import("./pages/Trilha"));
+const SimuladoOficial = lazy(() => import("./pages/SimuladoOficial"));
+const Discursiva = lazy(() => import("./pages/Discursiva"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const InstallApp = lazy(() => import("./pages/InstallApp"));
 const Privacy = lazy(() => import("./pages/Privacy"));
@@ -85,6 +87,9 @@ const App = () => (
               <Route path="/redefinir-senha" element={<ResetPassword />} />
               <Route path="/trilhas" element={<RequireAuth><Trilhas /></RequireAuth>} />
               <Route path="/trilhas/:slug" element={<RequireAuth><Trilha /></RequireAuth>} />
+              <Route path="/trilhas/:slug/simulado" element={<RequireAuth><SimuladoOficial /></RequireAuth>} />
+              <Route path="/trilhas/:slug/simulado/:examId" element={<RequireAuth><SimuladoOficial /></RequireAuth>} />
+              <Route path="/trilhas/:slug/discursiva" element={<RequireAuth><Discursiva /></RequireAuth>} />
               <Route path="/instalar" element={<InstallApp />} />
               <Route path="/privacidade" element={<Privacy />} />
               <Route path="/termos" element={<Terms />} />

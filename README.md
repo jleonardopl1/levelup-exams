@@ -17,11 +17,11 @@ Plataforma gamificada de estudos para concursos publicos, vestibulares e ENEM.
 - Sistema de quizzes com validacao server-side
 - Gamificacao: pontos, niveis, conquistas, ranking
 - Desafios diarios e recompensas
-- Mentor IA para duvidas de estudo (Plus)
 - Sistema de assinaturas (Free/Plus) via Stripe
 - Painel administrativo com niveis de acesso (Admin Master, Administrador, Moderador)
 - Programa de afiliados gerenciado pelo Admin Master, com dashboard de KPIs (ver `docs/ADMIN_E_AFILIADOS.md`)
 - Trilhas de estudo por concurso com questoes novas toda semana (ver `docs/TRILHAS.md`)
+- Plus: Simulado Oficial no formato do edital com posicao entre candidatos, revisao espacada dos erros, correcao da discursiva, Mentor IA com contexto e Passe Concurso (ver `docs/PLUS_IMPLANTACAO.md`)
 
 ## Setup Local
 
