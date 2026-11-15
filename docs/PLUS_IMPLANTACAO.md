@@ -22,6 +22,7 @@ A lista de benefícios de Planos, FAQ e modais agora sai de `src/config/plans.ts
    - `20261115120000_plus_features_v1.sql` — Simulado Oficial, posição, revisão espaçada, Passe Concurso, `grant_kind` em `get_premium_access`, meta semanal das específicas = 42.
      **Redefine `validate_answer`** (RPC em produção) com uma única checagem nova: questão de Simulado Oficial aberto do próprio aluno não é corrigida (senão o gabarito vazaria durante a prova).
    - `20261115130000_essay_reviews.sql` — tabela `essay_submissions`, cota semanal atômica.
+   - `20261115140000_plus_internal_grants.sql` — tira de `authenticated` o EXECUTE das funções internas (`grant_exam_pass`, `begin_essay_submission` e auxiliares), que o Supabase concede por padrão.
 2. **Edge Functions** (no Lovable Cloud a publicação é automática): `essay-review` (nova), `ai-mentor`, `create-checkout`, `stripe-webhook`, `check-subscription`, `generate-track-questions`.
 3. **Passe Concurso (opcional)** — sem isso a opção simplesmente não aparece em Planos:
    - no Stripe, criar um **preço avulso** (one-time) no valor escolhido;
@@ -38,6 +39,22 @@ A lista de benefícios de Planos, FAQ e modais agora sai de `src/config/plans.ts
 - Teste de navegador (build de produção, Supabase simulado na rede): fluxo completo do Simulado Oficial como Plus e como Free, revisão, Mentor por questão, discursiva, Planos com o Passe Concurso.
 
 Não verificado: chamadas reais ao modelo (tema e correção da discursiva, contexto do Mentor) e um pagamento real do Passe no Stripe — precisam de teste no ambiente de staging/produção. A corrida entre "salvar resposta" e "entregar prova" é protegida pelo mesmo `FOR UPDATE` nas duas funções, mas só foi verificada pela presença da trava (o banco de teste tem uma conexão).
+
+## Implantação em produção (15/11/2026)
+
+| Passo | Como | Resultado |
+|---|---|---|
+| Código no `main` | PR #19 mesclado (`d1cc708`); a Lovable sincronizou | ok |
+| Migrations 20261115120000, 130000 e 140000 | aplicadas no banco do Lovable Cloud, cada uma numa transação, e registradas em `supabase_migrations.schema_migrations` (mesmo padrão das anteriores) | ok |
+| Teste real no banco de produção | fluxo completo com um aluno gratuito temporário, numa transação desfeita no fim (nada ficou gravado): 70 questões (40 específicas), gabarito bloqueado durante a prova, nota 85 com Básicos zerados = não habilitado, 2º simulado do mês bloqueado, 15 erros agendados para o dia seguinte, cota da discursiva 0/3, aluno sem acesso a `grant_exam_pass` | ok |
+| Front-end | publicado pela Lovable; `levelupexams.com.br` serve a versão nova | ok |
+| Edge Functions | publicadas pelo agente da Lovable (`essay-review` nova + 5 alteradas); `essay-review` responde 401 sem login | ok |
+| API | as RPCs novas existem e recusam chamadas anônimas (42501) | ok |
+| Teste de navegador no site publicado | 27/27 (login e dados simulados na rede) | ok |
+
+Ao publicar as funções, o agente da Lovable fez 3 commits no `main`: `deno.lock`, `types.ts` regerado a partir do banco real (com um cast em `saveMockAnswer`) e o `AuthContext` como singleton para o hot-reload do editor. Os três foram revisados: não mudam o comportamento em produção.
+
+Ainda pendente (depende de você): criar o preço avulso do Passe Concurso no Stripe e o secret `STRIPE_PRICE_EXAM_PASS`; até lá a opção não aparece em Planos. Também falta conferir a duração da prova no edital. Não foram testados com usuário real: as chamadas à IA (tema e correção da discursiva, contexto do Mentor) e um pagamento no Stripe.
 
 ## Ficou para depois
 

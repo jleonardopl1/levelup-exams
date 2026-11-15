@@ -19,6 +19,7 @@
 ### Banco
 - `20261115120000_plus_features_v1.sql`: `mock_exams`, `mock_exam_items`, `question_review_schedule`, `review_daily_usage`, `exam_pass_purchases`; RPCs `start_mock_exam`, `get_mock_exam`, `save_mock_answer`, `finish_mock_exam`, `get_mock_exam_standing`, `get_review_queue`, `grant_exam_pass`; `validate_answer` recusa questão de simulado aberto; `get_premium_access` ganha `grant_kind`
 - `20261115130000_essay_reviews.sql`: `essay_submissions`, `get_essay_quota`, `begin_essay_submission`
+- `20261115140000_plus_internal_grants.sql`: funções internas sem EXECUTE para `authenticated`
 - Passo a passo de implantação em `docs/PLUS_IMPLANTACAO.md`
 
 ## [1.5.0] - 2026-11-13
