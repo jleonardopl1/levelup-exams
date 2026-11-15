@@ -172,7 +172,10 @@ RETURNS jsonb
 LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
 DECLARE v_exam public.mock_exams;
 BEGIN
-  SELECT * INTO v_exam FROM public.mock_exams WHERE id = p_exam_id AND user_id = auth.uid();
+  -- Mesmo lock de finish_mock_exam: salvar e finalizar ficam em fila. Sem ele, um
+  -- salvamento em voo podia gravar a resposta depois que a nota já foi calculada.
+  SELECT * INTO v_exam FROM public.mock_exams WHERE id = p_exam_id AND user_id = auth.uid()
+  FOR UPDATE;
   IF v_exam.id IS NULL THEN RETURN jsonb_build_object('error', 'not_found'); END IF;
   IF v_exam.finished_at IS NOT NULL THEN RETURN jsonb_build_object('error', 'finished'); END IF;
   IF now() > v_exam.deadline + interval '30 seconds' THEN RETURN jsonb_build_object('error', 'time_up'); END IF;
@@ -249,6 +252,79 @@ BEGIN
 END;
 $$;
 
+-- validate_answer (já em produção) devolve gabarito e explicação de qualquer questão.
+-- Sem esta trava, o aluno consultaria as questões do simulado em andamento antes de
+-- finalizar. Corpo idêntico ao de 20261110130000_study_tracks.sql + a checagem marcada.
+CREATE OR REPLACE FUNCTION public.validate_answer(p_question_id uuid, p_selected_index integer)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_user_id uuid := auth.uid();
+  v_correct integer;
+  v_explicacao text;
+  v_premium boolean;
+  v_count integer;
+  v_rate_limit constant integer := 60;
+  v_window constant interval := interval '1 minute';
+BEGIN
+  IF v_user_id IS NULL THEN
+    RETURN jsonb_build_object('error', 'Not authenticated');
+  END IF;
+
+  IF p_selected_index IS NULL OR p_selected_index < 0 OR p_selected_index > 10 THEN
+    RETURN jsonb_build_object('error', 'Invalid answer');
+  END IF;
+
+  INSERT INTO public.rate_limits AS rl (identifier, endpoint, request_count, window_start)
+  VALUES (v_user_id::text, 'validate_answer', 1, now())
+  ON CONFLICT (identifier, endpoint) DO UPDATE SET
+    request_count = CASE WHEN rl.window_start > now() - v_window THEN rl.request_count + 1 ELSE 1 END,
+    window_start  = CASE WHEN rl.window_start > now() - v_window THEN rl.window_start ELSE now() END,
+    updated_at = now()
+  RETURNING request_count INTO v_count;
+
+  IF v_count > v_rate_limit THEN
+    RETURN jsonb_build_object('error', 'Rate limit exceeded. Please wait before trying again.');
+  END IF;
+
+  -- NOVO: questão de um Simulado Oficial ainda aberto do próprio aluno não é corrigida
+  -- aqui (nem vira tentativa); o gabarito só sai por finish_mock_exam.
+  IF EXISTS (
+    SELECT 1 FROM public.mock_exam_items i
+    JOIN public.mock_exams e ON e.id = i.exam_id
+    WHERE i.question_id = p_question_id AND e.user_id = v_user_id AND e.finished_at IS NULL
+  ) THEN
+    RETURN jsonb_build_object('error', 'Question is part of an exam in progress');
+  END IF;
+
+  SELECT correta, explicacao, is_premium INTO v_correct, v_explicacao, v_premium
+  FROM public.questions WHERE id = p_question_id;
+
+  IF v_correct IS NULL THEN
+    RETURN jsonb_build_object('error', 'Question not found');
+  END IF;
+
+  IF v_premium AND public.get_user_tier(v_user_id) <> 'plus'
+     AND NOT public.has_role(v_user_id, 'admin') THEN
+    RETURN jsonb_build_object('error', 'Question not found');
+  END IF;
+
+  INSERT INTO public.user_question_attempts (user_id, question_id, selected_index, is_correct)
+  VALUES (v_user_id, p_question_id, p_selected_index, p_selected_index = v_correct);
+
+  RETURN jsonb_build_object(
+    'is_correct', p_selected_index = v_correct,
+    'correct_index', v_correct,
+    'explicacao', v_explicacao
+  );
+END;
+$$;
+REVOKE ALL ON FUNCTION public.validate_answer(uuid, integer) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.validate_answer(uuid, integer) TO authenticated;
+
 -- =============================================================================
 -- B. POSIÇÃO ENTRE OS CANDIDATOS DO MESMO CARGO
 --    Melhor nota de cada aluno nos últimos 60 dias. Só aparece com >= 20 alunos
@@ -307,6 +383,17 @@ DROP POLICY IF EXISTS "own review schedule" ON public.question_review_schedule;
 CREATE POLICY "own review schedule" ON public.question_review_schedule FOR SELECT TO authenticated
   USING (user_id = auth.uid());
 
+-- Revisões vencidas respondidas por dia (qualquer caminho: fila, trilha, quiz, simulado).
+-- É o que limita o Free a 5 por DIA; sem isso, cada nova chamada da fila trazia mais 5.
+CREATE TABLE IF NOT EXISTS public.review_daily_usage (
+  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  usage_date date NOT NULL,
+  reviews_done integer NOT NULL DEFAULT 0,
+  PRIMARY KEY (user_id, usage_date)
+);
+ALTER TABLE public.review_daily_usage ENABLE ROW LEVEL SECURITY;
+REVOKE ALL ON public.review_daily_usage FROM anon, authenticated;
+
 CREATE OR REPLACE FUNCTION public._review_interval(p_box smallint, p_question_id uuid)
 RETURNS integer LANGUAGE sql STABLE SET search_path = public AS $$
   SELECT CASE
@@ -330,6 +417,14 @@ DECLARE v_row public.question_review_schedule;
 BEGIN
   SELECT * INTO v_row FROM public.question_review_schedule
   WHERE user_id = NEW.user_id AND question_id = NEW.question_id;
+
+  -- Respondeu uma revisão vencida (certo ou errado): conta na cota do dia.
+  IF v_row.user_id IS NOT NULL AND v_row.due_on <= public._today_local() THEN
+    INSERT INTO public.review_daily_usage (user_id, usage_date, reviews_done)
+    VALUES (NEW.user_id, public._today_local(), 1)
+    ON CONFLICT (user_id, usage_date)
+    DO UPDATE SET reviews_done = public.review_daily_usage.reviews_done + 1;
+  END IF;
 
   IF NOT NEW.is_correct THEN
     INSERT INTO public.question_review_schedule (user_id, question_id, box, due_on, lapses)
@@ -367,13 +462,20 @@ DECLARE
   v_uid uuid := auth.uid();
   v_plus boolean := public.get_user_tier(auth.uid()) = 'plus';
   v_limit integer;
+  v_done integer;
+  v_free_daily constant integer := 5;
 BEGIN
   IF v_uid IS NULL THEN RETURN jsonb_build_object('error', 'not_authenticated'); END IF;
-  v_limit := CASE WHEN v_plus THEN least(greatest(p_limit, 1), 100) ELSE least(greatest(p_limit, 1), 5) END;
+  SELECT COALESCE(max(reviews_done), 0) INTO v_done FROM public.review_daily_usage
+  WHERE user_id = v_uid AND usage_date = public._today_local();
+  v_limit := CASE WHEN v_plus THEN least(greatest(p_limit, 1), 100)
+                  ELSE greatest(0, least(greatest(p_limit, 1), v_free_daily - v_done)) END;
   RETURN jsonb_build_object(
     'due_total', (SELECT count(*) FROM public.question_review_schedule
                   WHERE user_id = v_uid AND due_on <= public._today_local()),
+    'done_today', v_done,
     'limited', NOT v_plus,
+    'free_remaining_today', CASE WHEN v_plus THEN NULL ELSE greatest(0, v_free_daily - v_done) END,
     'question_ids', COALESCE((SELECT jsonb_agg(question_id) FROM (
         SELECT r.question_id FROM public.question_review_schedule r
         JOIN public.questions q ON q.id = r.question_id AND q.is_active

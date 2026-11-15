@@ -37,7 +37,8 @@ WHERE a.created_at >= now() - interval '14 days'
 GROUP BY 1;
 
 -- H5. Tamanho da fila de revisão que existiria hoje (erros cuja última resposta foi errada).
-SELECT count(*) AS questoes_para_revisar, count(DISTINCT user_id) AS alunos,
+--     (uma linha por aluno no subselect: soma n para questões, conta linhas para alunos)
+SELECT COALESCE(sum(n), 0) AS questoes_para_revisar, count(*) AS alunos,
        round(avg(n), 1) AS media_por_aluno
 FROM (
   SELECT user_id, count(*) AS n FROM (

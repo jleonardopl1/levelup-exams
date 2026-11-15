@@ -59,7 +59,15 @@ for (const f of fs.readdirSync(migDir).filter((x) => x.endsWith('.sql')).sort())
   try { await db.exec(clean(fs.readFileSync(path.join(migDir, f), 'utf8'))); }
   catch (e) { failures++; console.log(`FAIL  migration ${f}: ${e.message}`); }
 }
+const fnSrc = async (name) => (await one(`SELECT prosrc FROM pg_proc WHERE proname = $1 AND pronamespace = 'public'::regnamespace`, [name])).prosrc;
+const validateAnswerBefore = await fnSrc('validate_answer');
 await db.exec(fs.readFileSync(path.join(here, 'sql/plus_features_v1.sql'), 'utf8'));
+// A proposta redefine validate_answer: o corpo novo tem que ser o de produção + só a trava nova.
+const norm = (s) => s.replace(/\s+/g, ' ').trim();
+const validateAnswerAfter = await fnSrc('validate_answer');
+const withoutNewBlock = validateAnswerAfter.replace(/\n\s*-- NOVO:[\s\S]*?END IF;\n/, '\n');
+check(validateAnswerAfter !== validateAnswerBefore && norm(withoutNewBlock) === norm(validateAnswerBefore),
+  'validate_answer = versão de produção + apenas a trava do simulado aberto');
 console.log('migrations atuais + proposta aplicadas');
 
 // ---------- Fixtures ----------
@@ -134,6 +142,25 @@ const overlap = (await one(`SELECT count(*)::int n FROM mock_exam_items a JOIN m
 console.log(`INFO  questões repetidas entre o 1º e o 2º simulado do mesmo aluno: ${overlap}/70 (segundo prioriza erradas; sem resposta = errada)`);
 await rpc(`SELECT finish_mock_exam($1)`, [p2.exam_id]);
 
+// Gabarito não vaza por validate_answer enquanto o simulado está aberto.
+const p3 = await rpc(`SELECT start_mock_exam($1, $2)`, [medio.id, cargo]);
+const p3q = (await db.query(`SELECT question_id FROM get_mock_exam($1) LIMIT 1`, [p3.exam_id])).rows[0].question_id;
+const attemptsBefore = (await one(`SELECT count(*)::int n FROM user_question_attempts WHERE user_id=$1 AND question_id=$2`, [plus, p3q])).n;
+const leak = await rpc(`SELECT validate_answer($1, 0)`, [p3q]);
+check(leak.error && leak.correct_index === undefined && leak.explicacao === undefined,
+  `validate_answer recusa questão do simulado aberto (${leak.error})`);
+check((await one(`SELECT count(*)::int n FROM user_question_attempts WHERE user_id=$1 AND question_id=$2`, [plus, p3q])).n === attemptsBefore,
+  'a consulta recusada não vira tentativa');
+await rpc(`SELECT finish_mock_exam($1)`, [p3.exam_id]);
+check((await rpc(`SELECT validate_answer($1, 0)`, [p3q])).correct_index !== undefined, 'depois de finalizar, validate_answer volta a corrigir');
+
+// Salvar e finalizar usam o mesmo lock. O PGlite tem uma conexão só, então a corrida em si
+// não é reproduzível aqui: verificamos que a trava existe nas duas funções.
+const saveSrc = await fnSrc('save_mock_answer');
+const finishSrc = await fnSrc('finish_mock_exam');
+check(/FROM public\.mock_exams[^;]*FOR UPDATE/.test(saveSrc) && /FROM public\.mock_exams[\s\S]*?FOR UPDATE/.test(finishSrc),
+  'save_mock_answer e finish_mock_exam travam a mesma linha (FOR UPDATE) — corrida real só testável em Postgres com 2 conexões');
+
 // ---------- C. Revisão espaçada ----------
 await as(free);
 const sched = await one(`SELECT count(*)::int n, min(due_on - _today_local())::int d FROM question_review_schedule WHERE user_id=$1`, [free]);
@@ -161,6 +188,22 @@ await db.query(`UPDATE study_tracks SET exam_date = $2 WHERE id=$1`, [medio.trac
 await rpc(`SELECT validate_answer($1, $2)`, [qid, (right + 1) % 4]);
 row = await one(`SELECT box, lapses FROM question_review_schedule WHERE user_id=$1 AND question_id=$2`, [free, qid]);
 check(row.box === 1 && row.lapses === 2, 'errar de novo volta para a caixa 1 e conta o lapso');
+
+// O limite Free é por DIA: até aqui o aluno respondeu 2 revisões vencidas.
+q = await rpc(`SELECT get_review_queue(20)`);
+check(q.done_today === 2 && q.question_ids.length === 3 && q.free_remaining_today === 3,
+  `Free: depois de 2 revisões, restam 3 hoje (veio ${q.question_ids.length})`);
+for (const id of q.question_ids) {
+  const c = (await one(`SELECT correta FROM questions WHERE id=$1`, [id])).correta;
+  await rpc(`SELECT validate_answer($1, $2)`, [id, c]);
+}
+q = await rpc(`SELECT get_review_queue(20)`);
+check(q.question_ids.length === 0 && q.free_remaining_today === 0 && q.due_total > 0,
+  `Free: pedir de novo no mesmo dia não traz mais (vencidas ainda: ${q.due_total})`);
+await as(plus);
+const qp = await rpc(`SELECT get_review_queue(20)`);
+check(qp.limited === false && qp.free_remaining_today === null, 'Plus: fila sem limite diário');
+await as(free);
 
 // ---------- B. Posição entre candidatos ----------
 await as(free);
@@ -194,6 +237,16 @@ for (const block of metricSql) {
   try { await db.exec(block); check(true, `consulta ${name} executa`); }
   catch (e) { check(false, `consulta ${name}: ${e.message}`); }
 }
+
+// H5 confere com uma contagem independente (cada par aluno+questão cuja última resposta foi errada).
+const h5 = (await db.query(metricSql.find((b) => b.startsWith('-- H5')))).rows[0];
+const truth = await one(`
+  SELECT count(*)::int AS questoes, count(DISTINCT user_id)::int AS alunos FROM (
+    SELECT user_id, is_correct, row_number() OVER (PARTITION BY user_id, question_id ORDER BY created_at DESC, id DESC) rn
+    FROM user_question_attempts) x
+  WHERE rn = 1 AND NOT is_correct`);
+check(Number(h5.questoes_para_revisar) === truth.questoes && Number(h5.alunos) === truth.alunos && truth.questoes > truth.alunos,
+  `H5 soma questões, não alunos (${h5.questoes_para_revisar} questões de ${h5.alunos} alunos)`);
 
 console.log(failures ? `\n${failures} FALHA(S)` : '\nTodos os testes passaram');
 process.exit(failures ? 1 : 0);
