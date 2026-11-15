@@ -11,6 +11,10 @@ export interface TrackRules {
   titulos?: string;
   desempate?: string;
   cronograma?: { data: string; evento: string }[];
+  /** Duração da prova objetiva (Simulado Oficial). Padrão no servidor: 240. */
+  duracao_minutos?: number;
+  /** Nota mínima para habilitação (0–100). Padrão no servidor: 40. */
+  nota_minima?: number;
 }
 
 export interface StudyTrack {

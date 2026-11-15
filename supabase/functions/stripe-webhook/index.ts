@@ -83,7 +83,9 @@ serve(async (req) => {
     }
 
     if (event.type === "checkout.session.completed" || event.type === "checkout.session.async_payment_succeeded") {
-      await recordReferralConversion(supabase, event.data.object as Stripe.Checkout.Session);
+      const session = event.data.object as Stripe.Checkout.Session;
+      await grantExamPass(supabase, session);
+      await recordReferralConversion(supabase, session);
     }
 
     // Nao confia no tipo/ordem do evento: recalcula o direito a partir do estado atual no Stripe.
@@ -135,6 +137,30 @@ async function recordReferralConversion(supabase: SupabaseClient, session: Strip
   });
   if (error) throw new Error("referral conversion failed");
   log("Referral conversion", { referralCodeId, result: data });
+}
+
+/**
+ * Passe Concurso (pagamento único): libera o Plus até a prova + 15 dias. Os dados vêm do
+ * metadata gravado pelo create-checkout (servidor) num evento com assinatura verificada.
+ * grant_exam_pass é idempotente pela sessão do Stripe.
+ */
+async function grantExamPass(supabase: SupabaseClient, session: Stripe.Checkout.Session) {
+  if (session.mode !== "payment" || session.metadata?.plan !== "exam_pass") return;
+  if (session.payment_status !== "paid" && session.payment_status !== "no_payment_required") return;
+  const userId = session.metadata?.supabase_user_id ?? session.client_reference_id;
+  const trackId = session.metadata?.track_id;
+  if (!userId || !trackId || !UUID_RE.test(userId) || !UUID_RE.test(trackId)) {
+    log("Exam pass without valid metadata", { session: session.id });
+    return;
+  }
+  const { data, error } = await supabase.rpc("grant_exam_pass", {
+    p_user_id: userId,
+    p_track_id: trackId,
+    p_session_id: session.id,
+    p_amount_cents: session.amount_total ?? null,
+  });
+  if (error || (data as { error?: string } | null)?.error) throw new Error("exam pass grant failed");
+  await audit(supabase, "EXAM_PASS_GRANTED", userId, { session_id: session.id, track_id: trackId, result: data });
 }
 
 async function syncCustomerTier(supabase: SupabaseClient, stripe: Stripe, customerId: string) {

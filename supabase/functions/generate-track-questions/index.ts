@@ -22,7 +22,8 @@
  * Variaveis: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, LOVABLE_API_KEY,
  *            opcionais QUESTION_CRON_SECRET (sem ela, o segredo e lido do Vault pela
  *            RPC get_question_cron_secret), QUESTION_MODEL, QUESTION_REVIEW_MODEL,
- *            QUESTIONS_PER_SUBJECT_DAY.
+ *            QUESTIONS_PER_SUBJECT_DAY (minimo por materia; study_track_subjects.weekly_target/7
+ *            pode elevar a meta de uma materia, ate 10 por dia).
  */
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
@@ -59,6 +60,8 @@ interface SubjectContext {
   banca: string;
   trackName: string;
   grounded: boolean;
+  /** Questoes por dia: maior entre QUESTIONS_PER_SUBJECT_DAY e weekly_target/7 da materia. */
+  dailyTarget: number;
   modules: { nivel: Nivel; name: string; syllabus: string; cargo: string | null; area: string }[];
 }
 
@@ -397,9 +400,13 @@ serve(withCors(async (req) => {
       banca: track.banca,
       trackName: track.name,
       grounded: false,
+      dailyTarget: perDay,
       modules: [],
     };
     ctx.grounded = ctx.grounded || r.ai_grounded_only;
+    // weekly_target alto (ex.: especificas do cargo, que precisam de 40 por Simulado Oficial)
+    // aumenta a meta diaria daquela materia; nunca abaixo do minimo global nem acima de 10.
+    ctx.dailyTarget = Math.min(10, Math.max(ctx.dailyTarget, Math.ceil(r.weekly_target / 7)));
     ctx.modules.push({ nivel: mod.nivel, name: mod.name, syllabus: r.syllabus ?? "", cargo: r.cargo, area: r.area });
     contexts.set(r.subject_id, ctx);
   }
@@ -414,7 +421,7 @@ serve(withCors(async (req) => {
       .eq("subject_id", ctx.subjectId)
       .eq("origem", "ia_diaria")
       .gte("created_at", dayStart);
-    const missing = perDay - (count ?? 0);
+    const missing = ctx.dailyTarget - (count ?? 0);
     if (missing > 0) pending.push({ ctx, missing });
   }
   pending.sort((a, b) => b.missing - a.missing || Math.random() - 0.5);

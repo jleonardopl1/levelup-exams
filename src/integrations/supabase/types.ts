@@ -262,6 +262,96 @@ export type Database = {
         }
         Relationships: []
       }
+      essay_submissions: {
+        Row: {
+          cargo: string
+          created_at: string
+          error: string | null
+          feedback: Json | null
+          id: string
+          line_count: number
+          module_id: string
+          score: number | null
+          status: string
+          tema: string
+          texto: string
+          user_id: string
+        }
+        Insert: {
+          cargo: string
+          created_at?: string
+          error?: string | null
+          feedback?: Json | null
+          id?: string
+          line_count: number
+          module_id: string
+          score?: number | null
+          status?: string
+          tema: string
+          texto: string
+          user_id: string
+        }
+        Update: {
+          cargo?: string
+          created_at?: string
+          error?: string | null
+          feedback?: Json | null
+          id?: string
+          line_count?: number
+          module_id?: string
+          score?: number | null
+          status?: string
+          tema?: string
+          texto?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      mock_exams: {
+        Row: {
+          approved: boolean | null
+          area_scores: Json | null
+          cargo: string
+          correct_answers: number | null
+          deadline: string
+          finished_at: string | null
+          id: string
+          module_id: string
+          score: number | null
+          started_at: string
+          total_questions: number
+          user_id: string
+        }
+        Insert: {
+          approved?: boolean | null
+          area_scores?: Json | null
+          cargo: string
+          correct_answers?: number | null
+          deadline: string
+          finished_at?: string | null
+          id?: string
+          module_id: string
+          score?: number | null
+          started_at?: string
+          total_questions?: number
+          user_id: string
+        }
+        Update: {
+          approved?: boolean | null
+          area_scores?: Json | null
+          cargo?: string
+          correct_answers?: number | null
+          deadline?: string
+          finished_at?: string | null
+          id?: string
+          module_id?: string
+          score?: number | null
+          started_at?: string
+          total_questions?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           created_at: string
@@ -1545,6 +1635,28 @@ export type Database = {
         }[]
       }
       get_user_id_by_email: { Args: { p_email: string }; Returns: string }
+      start_mock_exam: { Args: { p_cargo: string; p_module_id: string }; Returns: Json }
+      get_mock_exam: {
+        Args: { p_exam_id: string }
+        Returns: {
+          alternativas: string[]
+          area: string
+          enunciado: string
+          points: number
+          pos: number
+          question_id: string
+          selected_index: number | null
+          subject_id: string
+        }[]
+      }
+      save_mock_answer: {
+        Args: { p_exam_id: string; p_question_id: string; p_selected_index: number | null }
+        Returns: Json
+      }
+      finish_mock_exam: { Args: { p_exam_id: string }; Returns: Json }
+      get_mock_exam_standing: { Args: { p_exam_id: string }; Returns: Json }
+      get_review_queue: { Args: { p_limit?: number }; Returns: Json }
+      get_essay_quota: { Args: never; Returns: Json }
       get_premium_access: { Args: { p_user_id?: string }; Returns: Json }
       get_user_tier: { Args: { p_user_id: string }; Returns: string }
       has_role: {

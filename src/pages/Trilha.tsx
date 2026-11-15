@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { AppHeader } from '@/components/AppHeader';
@@ -10,22 +10,18 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import {
-  ArrowLeft, CalendarClock, Target, RotateCcw, Sparkles, Play, FileText, Bot,
-  Gauge, AlertTriangle, CheckCircle2, ExternalLink, ListChecks,
+  ArrowLeft, CalendarClock, Target, RotateCcw, Sparkles, Play, FileText,
+  Gauge, AlertTriangle, CheckCircle2, ExternalLink, ListChecks, ClipboardCheck, PenLine,
 } from 'lucide-react';
 import {
   daysUntil, useStudyTrack, useTrackProgress,
   type SubjectProgress, type TrackModule, type TrackSubject,
 } from '@/hooks/useStudyTracks';
+import { useTrackSelection } from '@/lib/trackPrefs';
+import { ReviewTodayCard } from '@/components/ReviewTodayCard';
 
 const PASS_MARK = 40;
 
-function readPref(key: string): string | null {
-  try { return localStorage.getItem(key); } catch { return null; }
-}
-function writePref(key: string, value: string) {
-  try { localStorage.setItem(key, value); } catch { /* armazenamento indisponivel */ }
-}
 
 function accuracyOf(p?: SubjectProgress): number | null {
   if (!p || p.answered === 0) return null;
@@ -53,12 +49,8 @@ export default function Trilha() {
   const { user, loading: authLoading } = useAuth();
   const { data, isLoading } = useStudyTrack(slug);
 
-  const [moduleSlug, setModuleSlug] = useState<string | null>(() => readPref(`trilha:${slug}:modulo`));
   const modules = data?.modules ?? [];
-  const module = modules.find((m) => m.slug === moduleSlug) ?? modules[0];
-
-  const [cargo, setCargo] = useState<string | null>(() => readPref(`trilha:${slug}:cargo`));
-  const cargoValid = module && cargo && module.cargos.includes(cargo) ? cargo : module?.cargos[0] ?? null;
+  const { module, cargo: cargoValid, setModule, setCargo } = useTrackSelection(slug, modules);
 
   const { data: progress } = useTrackProgress(module?.id);
 
@@ -178,7 +170,7 @@ export default function Trilha() {
         {/* Nível */}
         <Tabs
           value={module.slug}
-          onValueChange={(v) => { setModuleSlug(v); writePref(`trilha:${slug}:modulo`, v); }}
+          onValueChange={setModule}
         >
           <TabsList className="grid w-full grid-cols-2">
             {modules.map((m) => (
@@ -194,7 +186,7 @@ export default function Trilha() {
           <label className="text-sm font-medium" htmlFor="cargo">Seu cargo</label>
           <Select
             value={cargoValid ?? undefined}
-            onValueChange={(v) => { setCargo(v); writePref(`trilha:${slug}:cargo`, v); }}
+            onValueChange={setCargo}
           >
             <SelectTrigger id="cargo"><SelectValue placeholder="Selecione o cargo" /></SelectTrigger>
             <SelectContent>
@@ -218,6 +210,22 @@ export default function Trilha() {
             <p className="text-[11px] text-muted-foreground leading-tight">novas nesta semana</p>
           </CardContent></Card>
         </div>
+
+        <ReviewTodayCard />
+
+        {/* Simulado Oficial */}
+        <Card variant="elevated" className="border-primary/30">
+          <CardContent className="p-4 flex items-center gap-3">
+            <ClipboardCheck className="w-8 h-8 text-primary shrink-0" />
+            <div className="flex-1 min-w-0">
+              <p className="font-semibold text-sm">Simulado Oficial</p>
+              <p className="text-xs text-muted-foreground">
+                A prova inteira no formato do edital, com nota por área e sua posição entre os candidatos do cargo.
+              </p>
+            </div>
+            <Button asChild size="sm"><Link to={`/trilhas/${track.slug}/simulado`}>Fazer</Link></Button>
+          </CardContent>
+        </Card>
 
         {/* Prioridades */}
         {priority.length > 0 && (
@@ -360,12 +368,12 @@ export default function Trilha() {
 
         <Card>
           <CardContent className="p-4 flex items-center gap-3">
-            <Bot className="w-8 h-8 text-primary shrink-0" />
+            <PenLine className="w-8 h-8 text-primary shrink-0" />
             <div className="flex-1 min-w-0">
-              <p className="font-semibold text-sm">Treine a discursiva com o Mentor IA</p>
-              <p className="text-xs text-muted-foreground">Peça um tema do seu cargo e envie sua resposta (20 a 30 linhas) para correção.</p>
+              <p className="font-semibold text-sm">Treine a discursiva</p>
+              <p className="text-xs text-muted-foreground">Tema do seu cargo e correção com os critérios da banca: nota de conteúdo, erros de português e o que faltou.</p>
             </div>
-            <Button asChild size="sm" variant="outline"><Link to="/mentor">Abrir</Link></Button>
+            <Button asChild size="sm" variant="outline"><Link to={`/trilhas/${track.slug}/discursiva`}>Abrir</Link></Button>
           </CardContent>
         </Card>
       </div>

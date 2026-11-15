@@ -24,8 +24,14 @@ const Mentor = () => {
   const { user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [searchParams, setSearchParams] = useSearchParams();
-  // "Explicar com o Mentor IA" (tela de resultado) chega com a questão em ?q=.
+  // "Explicar com o Mentor IA" chega com o id da questão em ?questao= (o servidor busca
+  // enunciado, gabarito e explicação). ?q= ainda preenche a caixa de texto (links antigos).
   const [input, setInput] = useState(() => (searchParams.get("q") ?? "").slice(0, 2000));
+  const [questionId] = useState<string | null>(() => {
+    const id = searchParams.get("questao");
+    return id && /^[0-9a-f-]{36}$/i.test(id) ? id : null;
+  });
+  const autoExplainRef = useRef(false);
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
@@ -33,9 +39,17 @@ const Mentor = () => {
   const { questionsUsed, dailyLimit, questionsRemaining, hasReachedLimit, isPremium, isLoading: limitsLoading } = useAIMentorLimits();
 
   useEffect(() => {
-    if (searchParams.has("q")) setSearchParams({}, { replace: true });
+    if (searchParams.has("q") || searchParams.has("questao")) setSearchParams({}, { replace: true });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Pede a explicação assim que a tela abre (não gasta as perguntas do dia).
+  useEffect(() => {
+    if (!questionId || autoExplainRef.current || limitsLoading || !isPremium) return;
+    autoExplainRef.current = true;
+    void sendMessage("Explique esta questão: por que o gabarito está certo e onde eu errei?", true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [questionId, limitsLoading, isPremium]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -43,8 +57,9 @@ const Mentor = () => {
     }
   }, [messages]);
 
-  const sendMessage = async () => {
-    if (!input.trim() || isLoading) return;
+  const sendMessage = async (preset?: string, isExplanation = false) => {
+    const text = (preset ?? input).trim();
+    if (!text || isLoading) return;
 
     // Client-side checks for UX only - server validates everything
     if (!isPremium) {
@@ -53,14 +68,14 @@ const Mentor = () => {
       return;
     }
 
-    if (hasReachedLimit) {
+    if (hasReachedLimit && !isExplanation) {
       toast.error("Você atingiu o limite diário de perguntas ao Mentor IA.");
       return;
     }
 
-    const userMessage: Message = { role: "user", content: input.trim() };
+    const userMessage: Message = { role: "user", content: text };
     setMessages((prev) => [...prev, userMessage]);
-    setInput("");
+    if (!preset) setInput("");
     setIsLoading(true);
 
     let assistantContent = "";
@@ -80,7 +95,9 @@ const Mentor = () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
         },
-        body: JSON.stringify({ messages: [...messages, userMessage] }),
+        // Na conversa sobre uma questão, o id segue em todas as mensagens para o servidor
+        // reinserir o enunciado e o gabarito no contexto.
+        body: JSON.stringify({ messages: [...messages, userMessage], ...(questionId ? { question_id: questionId } : {}) }),
       });
 
       // Handle server-side errors
@@ -96,6 +113,11 @@ const Mentor = () => {
         if (response.status === 403) {
           toast.error(errorMessage);
           navigate("/upgrade");
+          return;
+        }
+        if (response.status === 409) {
+          toast.error(errorMessage);
+          setMessages((prev) => prev.slice(0, -1));
           return;
         }
         if (response.status === 429) {
@@ -307,7 +329,7 @@ const Mentor = () => {
                     disabled={isLoading}
                   />
                   <Button
-                    onClick={sendMessage}
+                    onClick={() => void sendMessage()}
                     disabled={!input.trim() || isLoading}
                     size="icon"
                     className="h-[60px] w-[60px]"

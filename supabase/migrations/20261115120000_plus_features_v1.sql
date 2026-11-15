@@ -1,15 +1,17 @@
 -- =============================================================================
--- PROPOSTA (rascunho validado) — Funcionalidades Plus v1
--- Ver docs/PROPOSTA_PLUS.md. NÃO está em supabase/migrations/ de propósito:
--- só vira migration depois de aprovado (copiar para supabase/migrations/<timestamp>_plus_features_v1.sql).
---
--- Validado em Postgres (PGlite) sobre as 39 migrations atuais + seed da trilha
--- (scripts/validate-proposta-plus.mjs).
+-- Funcionalidades Plus v1 (docs/PROPOSTA_PLUS.md)
 --
 --   A. Simulado Oficial: prova completa no formato do edital, nota ponderada no servidor
 --   B. Posição entre candidatos do mesmo cargo (percentil)
 --   C. Revisão espaçada dos erros (Leitner, comprimida pela data da prova)
 --   D. Passe Concurso: Plus avulso até a data da prova (reaproveita premium_grants)
+--   E. Mais questões novas por dia nas matérias específicas de cargo
+--
+-- ATENÇÃO: redefine public.validate_answer (RPC já em produção) acrescentando uma
+-- única checagem — questão de Simulado Oficial aberto do próprio aluno não é corrigida.
+--
+-- Testado por docs/proposta-plus/validate.mjs (Postgres em memória com todas as
+-- migrations + seed da trilha).
 -- =============================================================================
 
 -- Data "do aluno": a trilha atual é de Cuiabá e a geração diária já usa este fuso.
@@ -355,7 +357,12 @@ BEGIN
   IF v_n < v_min_n THEN
     RETURN jsonb_build_object('enough_data', false, 'candidates', v_n, 'needed', v_min_n);
   END IF;
-  RETURN jsonb_build_object('enough_data', true, 'candidates', v_n, 'position', v_better + 1,
+  -- Free: só se está na metade de cima. Posição, percentil e habilitados são do Plus.
+  IF public.get_user_tier(v_exam.user_id) <> 'plus' THEN
+    RETURN jsonb_build_object('enough_data', true, 'candidates', v_n, 'detail', false,
+      'above_median', (v_better + 1) <= ceil(v_n / 2.0));
+  END IF;
+  RETURN jsonb_build_object('enough_data', true, 'candidates', v_n, 'detail', true, 'position', v_better + 1,
     'percentile', round(100.0 * (v_n - v_better - 1) / greatest(v_n - 1, 1)),
     'approved_share', round(100.0 * v_approved / v_n));
 END;
@@ -536,6 +543,46 @@ BEGIN
 END;
 $$;
 
+-- Situação do Plus: igual à de 20261113150000_premium_grants.sql + 'grant_kind', que
+-- separa o Passe Concurso ('exam_pass') do Plus liberado pela equipe ('staff').
+CREATE OR REPLACE FUNCTION public.get_premium_access(p_user_id uuid DEFAULT NULL)
+RETURNS jsonb
+LANGUAGE plpgsql
+STABLE
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_uid uuid := COALESCE(p_user_id, auth.uid());
+  v_billing text;
+  v_grant public.premium_grants;
+  v_source text;
+BEGIN
+  IF v_uid IS NULL OR NOT (v_uid = auth.uid() OR auth.role() = 'service_role') THEN
+    RAISE EXCEPTION 'Acesso negado' USING ERRCODE = '42501';
+  END IF;
+  SELECT COALESCE(billing_tier, 'free') INTO v_billing FROM public.profiles WHERE user_id = v_uid;
+  v_billing := COALESCE(v_billing, 'free');
+  v_source := public._premium_source(v_uid, v_billing);
+  v_grant := public._active_premium_grant(v_uid);
+  RETURN jsonb_build_object(
+    'tier', CASE WHEN v_source IS NULL THEN 'free' ELSE 'plus' END,
+    'billing_tier', v_billing,
+    'source', v_source,
+    -- Fim do acesso por cortesia (NULL = sem prazo ou nao se aplica).
+    'access_until', CASE WHEN v_source = 'grant' THEN v_grant.expires_at END,
+    'granted_at', CASE WHEN v_source = 'grant' THEN v_grant.granted_at END,
+    'grant_kind', CASE WHEN v_source = 'grant' THEN
+      CASE WHEN EXISTS (SELECT 1 FROM public.exam_pass_purchases p
+                        WHERE p.user_id = v_uid AND p.expires_at = v_grant.expires_at)
+           THEN 'exam_pass' ELSE 'staff' END
+    END
+  );
+END;
+$$;
+REVOKE ALL ON FUNCTION public.get_premium_access(uuid) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.get_premium_access(uuid) TO authenticated, service_role;
+
 -- Permissões
 REVOKE ALL ON FUNCTION public.start_mock_exam(uuid, text), public.get_mock_exam(uuid),
   public.save_mock_answer(uuid, uuid, integer), public.finish_mock_exam(uuid),
@@ -546,3 +593,13 @@ GRANT EXECUTE ON FUNCTION public.start_mock_exam(uuid, text), public.get_mock_ex
   public.save_mock_answer(uuid, uuid, integer), public.finish_mock_exam(uuid),
   public.get_mock_exam_standing(uuid), public.get_review_queue(integer) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.grant_exam_pass(uuid, uuid, text, integer) TO service_role;
+
+-- =============================================================================
+-- E. GERAÇÃO DIÁRIA DAS ESPECÍFICAS
+--    Cada Simulado Oficial usa 40 questões específicas e o banco tem 51–63 por cargo
+--    (1,3 a 1,6 simulados inéditos). generate-track-questions passa a usar
+--    weekly_target/7 como meta diária da matéria: 42/semana = 6 por dia.
+-- =============================================================================
+UPDATE public.study_track_subjects
+SET weekly_target = 42
+WHERE area = 'Conhecimentos Específicos' AND cargo IS NOT NULL AND weekly_target < 42;

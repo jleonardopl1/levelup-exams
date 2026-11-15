@@ -61,14 +61,3 @@ export function clearQuizResult() {
     /* ignore */
   }
 }
-
-/** Monta a pergunta para o Mentor IA explicar uma questão. */
-export function buildMentorPrompt(item: QuizReviewItem): string {
-  const letter = (i: number | null) => (i === null || i < 0 ? '—' : String.fromCharCode(65 + i));
-  const alts = item.alternativas.map((a, i) => `${letter(i)}) ${a}`).join('\n');
-  const marked = item.selected === null ? 'Não respondi' : `Marquei ${letter(item.selected)}`;
-  const text =
-    `Me explique esta questão de ${item.categoria}:\n\n${item.enunciado}\n\n${alts}\n\n` +
-    `${marked} e o gabarito é ${letter(item.correctIndex)}. Por que essa é a correta e onde errei?`;
-  return text.slice(0, 1800);
-}

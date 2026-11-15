@@ -33,7 +33,7 @@ export default function Quiz() {
   const nivelParam = searchParams.get('nivel');
   const nivel = nivelParam === 'medio' || nivelParam === 'superior' ? nivelParam : undefined;
   const modeParam = searchParams.get('mode');
-  const mode: PracticeMode = modeParam === 'review' || modeParam === 'new' || modeParam === 'weekly' ? modeParam : 'smart';
+  const mode: PracticeMode = modeParam === 'review' || modeParam === 'new' || modeParam === 'weekly' || modeParam === 'srs' ? modeParam : 'smart';
   const trilha = searchParams.get('trilha');
   const backPath = trilha && /^[a-z0-9-]{1,80}$/.test(trilha) ? `/trilhas/${trilha}` : '/';
   const { user, loading: authLoading } = useAuth();
@@ -303,10 +303,14 @@ export default function Quiz() {
       <div className="min-h-screen flex flex-col items-center justify-center gap-4 p-6 text-center">
         <CheckCircle className="w-12 h-12 text-success" />
         <p className="font-semibold text-lg">
-          {mode === 'review' ? 'Nenhum erro para revisar nesta matéria.' : 'Nenhuma questão disponível para este filtro.'}
+          {mode === 'review' ? 'Nenhum erro para revisar nesta matéria.'
+            : mode === 'srs' ? 'Revisão de hoje concluída.'
+            : 'Nenhuma questão disponível para este filtro.'}
         </p>
         <p className="text-sm text-muted-foreground">
-          {mode === 'review' ? 'Continue praticando: as questões que você errar aparecerão aqui.' : 'Tente outro modo ou volte mais tarde.'}
+          {mode === 'review' ? 'Continue praticando: as questões que você errar aparecerão aqui.'
+            : mode === 'srs' ? 'Os erros voltam em 1, 3, 7, 14 e 30 dias. No plano gratuito são 5 revisões por dia.'
+            : 'Tente outro modo ou volte mais tarde.'}
         </p>
         <Button variant="outline" onClick={() => navigate(backPath)}>Voltar</Button>
       </div>

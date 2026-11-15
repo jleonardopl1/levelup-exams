@@ -1,6 +1,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Crown, Check, Sparkles, Zap, BookOpen, MessageSquare } from 'lucide-react';
+import { Crown, Check } from 'lucide-react';
+import { PLUS_BENEFITS, PRICES } from '@/config/plans';
 import { useNavigate } from 'react-router-dom';
 
 interface PremiumUpsellModalProps {
@@ -33,13 +34,8 @@ export function PremiumUpsellModal({
 
   const message = contextMessages[triggerContext];
 
-  const features = [
-    { icon: BookOpen, text: 'Questões ilimitadas por dia', highlight: true },
-    { icon: Sparkles, text: 'Acesso a questões exclusivas premium' },
-    { icon: MessageSquare, text: 'Mentor IA ilimitado' },
-    { icon: Zap, text: 'Estatísticas avançadas' },
-    { icon: Crown, text: 'Sem anúncios' },
-  ];
+  // Os destaques primeiro, no máximo 5 linhas (o modal é pequeno).
+  const features = [...PLUS_BENEFITS].sort((a, b) => Number(!!b.highlight) - Number(!!a.highlight)).slice(0, 5);
 
   const handleUpgrade = () => {
     onOpenChange(false);
@@ -67,9 +63,9 @@ export function PremiumUpsellModal({
         <div className="space-y-4 py-4">
           {/* Features List */}
           <div className="space-y-3">
-            {features.map((feature, index) => (
+            {features.map((feature) => (
               <div 
-                key={index} 
+                key={feature.text} 
                 className={`flex items-center gap-3 p-3 rounded-xl transition-all ${
                   feature.highlight 
                     ? 'bg-gradient-to-r from-amber-500/10 to-yellow-400/10 border border-amber-500/20' 
@@ -97,7 +93,7 @@ export function PremiumUpsellModal({
           <div className="text-center p-4 rounded-xl bg-gradient-to-r from-primary/5 to-accent/5 border border-primary/10">
             <p className="text-xs text-muted-foreground mb-1">A partir de</p>
             <p className="text-2xl font-bold text-primary">
-              R$ 19,90<span className="text-sm font-normal text-muted-foreground">/mês</span>
+              {PRICES.monthly}<span className="text-sm font-normal text-muted-foreground">/mês</span>
             </p>
             <p className="text-xs text-success mt-1">Cancele quando quiser</p>
           </div>

@@ -1,8 +1,8 @@
 // Valida a proposta SQL contra o schema real.
 //   1. sobe um Postgres em memória (PGlite) com stubs mínimos do Supabase (auth, vault, cron, net);
-//   2. aplica TODAS as migrations de supabase/migrations (inclui o seed de 1.091 questões da trilha);
-//   3. aplica docs/proposta-plus/sql/plus_features_v1.sql;
-//   4. roda testes de fumaça com asserções.
+//   2. aplica TODAS as migrations de supabase/migrations (inclui o seed de 1.091 questões da
+//      trilha e 20261115120000_plus_features_v1.sql);
+//   3. roda testes de fumaça com asserções sobre as funcionalidades Plus.
 //
 // Uso (na raiz do repo):
 //   npm i --no-save @electric-sql/pglite@0.5.16
@@ -55,20 +55,21 @@ const rpc = async (sql, params = []) => Object.values(await one(sql, params))[0]
 
 await db.exec(STUBS);
 const migDir = path.join(repo, 'supabase/migrations');
+const PLUS_MIGRATION = '20261115120000_plus_features_v1.sql';
+const fnSrc = async (name) => (await one(`SELECT prosrc FROM pg_proc WHERE proname = $1 AND pronamespace = 'public'::regnamespace`, [name])).prosrc;
+let validateAnswerBefore = null;
 for (const f of fs.readdirSync(migDir).filter((x) => x.endsWith('.sql')).sort()) {
+  if (f === PLUS_MIGRATION) validateAnswerBefore = await fnSrc('validate_answer');
   try { await db.exec(clean(fs.readFileSync(path.join(migDir, f), 'utf8'))); }
   catch (e) { failures++; console.log(`FAIL  migration ${f}: ${e.message}`); }
 }
-const fnSrc = async (name) => (await one(`SELECT prosrc FROM pg_proc WHERE proname = $1 AND pronamespace = 'public'::regnamespace`, [name])).prosrc;
-const validateAnswerBefore = await fnSrc('validate_answer');
-await db.exec(fs.readFileSync(path.join(here, 'sql/plus_features_v1.sql'), 'utf8'));
-// A proposta redefine validate_answer: o corpo novo tem que ser o de produção + só a trava nova.
+// A migration Plus redefine validate_answer: o corpo novo tem que ser o anterior + só a trava nova.
 const norm = (s) => s.replace(/\s+/g, ' ').trim();
 const validateAnswerAfter = await fnSrc('validate_answer');
 const withoutNewBlock = validateAnswerAfter.replace(/\n\s*-- NOVO:[\s\S]*?END IF;\n/, '\n');
 check(validateAnswerAfter !== validateAnswerBefore && norm(withoutNewBlock) === norm(validateAnswerBefore),
-  'validate_answer = versão de produção + apenas a trava do simulado aberto');
-console.log('migrations atuais + proposta aplicadas');
+  'validate_answer = versão anterior + apenas a trava do simulado aberto');
+console.log('todas as migrations aplicadas (inclui Plus v1)');
 
 // ---------- Fixtures ----------
 const mkUser = async (email) => (await one(`INSERT INTO auth.users(email) VALUES ($1) RETURNING id`, [email])).id;
@@ -133,6 +134,10 @@ const pass = await rpc(`SELECT grant_exam_pass($1, $2, 'cs_test_1', 4990)`, [plu
 check(pass.success === true, `Passe Concurso concede Plus até ${pass.expires_at}`);
 check((await rpc(`SELECT grant_exam_pass($1, $2, 'cs_test_1', 4990)`, [plus, medio.track_id])).duplicate === true, 'webhook repetido não duplica (idempotente)');
 check((await one(`SELECT tier FROM profiles WHERE user_id=$1`, [plus])).tier === 'plus', 'perfil vira Plus (profiles.tier)');
+await as(plus);
+const access = await rpc(`SELECT get_premium_access()`);
+check(access.source === 'grant' && access.grant_kind === 'exam_pass' && !!access.access_until, 'get_premium_access identifica o Passe Concurso');
+await as(null, 'service_role');
 await as(plus);
 const p1 = await rpc(`SELECT start_mock_exam($1, $2)`, [medio.id, cargo]);
 await rpc(`SELECT finish_mock_exam($1)`, [p1.exam_id]);
@@ -216,8 +221,41 @@ for (let i = 0; i < 25; i++) {
                   VALUES ($1,$2,$3, now(), now(), $4, $5, 70)`, [u, medio.id, cargo, 30 + i * 2.5, 30 + i * 2.5 >= 40]);
 }
 await as(free);
+const stFree = await rpc(`SELECT get_mock_exam_standing($1)`, [exam]);
+check(stFree.enough_data && stFree.detail === false && stFree.above_median === true && stFree.position === undefined,
+  'Free: só vê se está na metade de cima (sem posição)');
+// O mesmo simulado visto como Plus: o aluno ganha um Passe e passa a ver a posição.
+await as(null, 'service_role');
+await rpc(`SELECT grant_exam_pass($1, $2, 'cs_test_free_upgrade', 4990)`, [free, medio.track_id]);
+await as(free);
 const st = await rpc(`SELECT get_mock_exam_standing($1)`, [exam]);
-check(st.enough_data && st.candidates === 27 && st.position === 3, `posição entre candidatos: ${st.position}º de ${st.candidates} (percentil ${st.percentile})`);
+check(st.enough_data && st.detail === true && st.candidates === 27 && st.position === 3, `Plus: posição entre candidatos ${st.position}º de ${st.candidates} (percentil ${st.percentile})`);
+
+// ---------- Discursiva: cota semanal ----------
+const longText = 'A transparência na administração pública municipal exige publicidade ativa dos atos. '.repeat(5);
+await as(null, 'authenticated');
+let forbidden = false;
+try { await rpc(`SELECT begin_essay_submission($1,$2,$3,'Tema de teste da discursiva',$4,25)`, [plus, medio.id, cargo, longText]); }
+catch { forbidden = true; }
+check(forbidden, 'begin_essay_submission recusa chamada de cliente');
+await as(null, 'service_role');
+const ids = [];
+for (let i = 0; i < 4; i++) ids.push(await rpc(`SELECT begin_essay_submission($1,$2,$3,'Tema de teste da discursiva',$4,25)`, [plus, medio.id, cargo, longText]));
+check(ids.slice(0, 3).every(Boolean) && ids[3] === null, 'discursiva: 3 por semana, a 4ª é recusada');
+await db.query(`UPDATE essay_submissions SET status='error' WHERE id=$1`, [ids[0]]);
+check(!!(await rpc(`SELECT begin_essay_submission($1,$2,$3,'Tema de teste da discursiva',$4,25)`, [plus, medio.id, cargo, longText])),
+  'correção que deu erro devolve a vaga');
+await as(plus);
+const eq = await rpc(`SELECT get_essay_quota()`);
+check(eq.plus === true && eq.used === 3 && eq.remaining === 0 && !!eq.next_slot_at, `get_essay_quota: ${eq.used}/${eq.limit}, próxima vaga informada`);
+
+// ---------- E. Geração das específicas ----------
+const wt = (await db.query(`SELECT area, cargo IS NOT NULL AS por_cargo, min(weekly_target)::int mn, max(weekly_target)::int mx
+  FROM study_track_subjects GROUP BY 1, 2 ORDER BY 1, 2`)).rows;
+const espec = wt.find((r) => r.area === 'Conhecimentos Específicos' && r.por_cargo);
+const others = wt.filter((r) => !(r.area === 'Conhecimentos Específicos' && r.por_cargo));
+check(espec?.mn === 42 && others.every((r) => r.mx < 42),
+  `meta semanal: específicas de cargo = 42 (6/dia), demais inalteradas (${others.map((r) => r.mx).join(', ')})`);
 
 // ---------- Profundidade do banco (quantos simulados distintos cabem) ----------
 console.log('\nProfundidade do banco de Específicas (40 por simulado):');
