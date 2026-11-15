@@ -14,18 +14,44 @@ import { findCustomerForUser, getCustomerEntitlement, getStripe } from "../_shar
 
 /**
  * Planos -> preços do Stripe, definidos NO SERVIDOR (o app só envia "monthly" ou "annual").
- * Para trocar de ambiente (teste -> produção) basta mudar os secrets, sem tocar no código:
- *   STRIPE_PRICE_MONTHLY / STRIPE_PRICE_ANNUAL
- * Padrões = preços atuais (conferidos no Stripe em 11/11/2026):
- *   price_1SdkMf... = "Plus - Mensal" R$ 19,90/mês | price_1SdkO4... = "Plus Anual" R$ 159,90/ano
+ * Ordem de resolução do preço (a primeira que existir vence):
+ *   1. secrets STRIPE_PRICE_MONTHLY / STRIPE_PRICE_ANNUAL (forçar um preço específico);
+ *   2. lookup_key no Stripe: "levelup_plus_monthly" / "levelup_plus_annual" — criados na
+ *      conta de PRODUÇÃO em 15/11/2026; assim a troca teste -> produção só exige a chave;
+ *   3. preços da conta de TESTE (sandbox) conferidos em 11/11/2026.
+ * Em qualquer caso, a periodicidade e o status do preço são conferidos antes de cobrar.
  */
-const PLAN_PRICES: Record<"monthly" | "annual", { priceId: string; interval: "month" | "year" }> = {
-  monthly: { priceId: (Deno.env.get("STRIPE_PRICE_MONTHLY") ?? "price_1SdkMfFQ1QkvCgEAnMRl3MXq").trim(), interval: "month" },
-  annual: { priceId: (Deno.env.get("STRIPE_PRICE_ANNUAL") ?? "price_1SdkO4FQ1QkvCgEAJsa9KbIE").trim(), interval: "year" },
+type Plan = "monthly" | "annual";
+const PLAN_PRICES: Record<Plan, { envPriceId: string | null; lookupKey: string; legacyPriceId: string; interval: "month" | "year" }> = {
+  monthly: {
+    envPriceId: Deno.env.get("STRIPE_PRICE_MONTHLY")?.trim() || null,
+    lookupKey: "levelup_plus_monthly",
+    legacyPriceId: "price_1SdkMfFQ1QkvCgEAnMRl3MXq",
+    interval: "month",
+  },
+  annual: {
+    envPriceId: Deno.env.get("STRIPE_PRICE_ANNUAL")?.trim() || null,
+    lookupKey: "levelup_plus_annual",
+    legacyPriceId: "price_1SdkO4FQ1QkvCgEAJsa9KbIE",
+    interval: "year",
+  },
 };
-const PRICE_TO_PLAN = new Map(Object.entries(PLAN_PRICES).map(([plan, p]) => [p.priceId, plan as "monthly" | "annual"]));
+const PRICE_TO_PLAN = new Map<string, Plan>(
+  (Object.entries(PLAN_PRICES) as [Plan, (typeof PLAN_PRICES)[Plan]][]).flatMap(([plan, p]) =>
+    [p.envPriceId, p.legacyPriceId].filter((id): id is string => !!id).map((id) => [id, plan] as [string, Plan])
+  ),
+);
 
-function resolvePlan(body: { plan?: unknown; priceId?: unknown } | null): "monthly" | "annual" | null {
+/** Devolve o preço ativo do plano (ver ordem acima) ou null. */
+async function resolvePrice(stripe: NonNullable<ReturnType<typeof getStripe>>, plan: Plan) {
+  const cfg = PLAN_PRICES[plan];
+  if (cfg.envPriceId) return await stripe.prices.retrieve(cfg.envPriceId).catch(() => null);
+  const byKey = await stripe.prices.list({ lookup_keys: [cfg.lookupKey], active: true, limit: 1 }).catch(() => null);
+  if (byKey?.data?.[0]) return byKey.data[0];
+  return await stripe.prices.retrieve(cfg.legacyPriceId).catch(() => null);
+}
+
+function resolvePlan(body: { plan?: unknown; priceId?: unknown } | null): Plan | null {
   if (body?.plan === "monthly" || body?.plan === "annual") return body.plan;
   // Compatibilidade com versões antigas do app que ainda enviam o ID do preço.
   if (typeof body?.priceId === "string") return PRICE_TO_PLAN.get(body.priceId) ?? null;
@@ -121,16 +147,17 @@ serve(withCors(async (req) => {
       await logAuditEvent(supabase, "CHECKOUT_INVALID_PRICE", user.id, null, clientIp, userAgent, false, "Invalid plan");
       return jsonResponse({ error: "Plano inválido" }, 400);
     }
-    const { priceId, interval } = PLAN_PRICES[plan];
+    const { interval } = PLAN_PRICES[plan];
 
     // Trava de segurança: o preço tem que estar ativo e ter a periodicidade do plano
     // escolhido. Evita cobrar o anual de quem escolheu o mensal (erro que já aconteceu).
-    const price = await stripe.prices.retrieve(priceId).catch(() => null);
+    const price = await resolvePrice(stripe, plan);
     if (!price || !price.active || price.recurring?.interval !== interval) {
       await logAuditEvent(supabase, "CHECKOUT_PRICE_MISCONFIGURED", user.id, null, clientIp, userAgent, false,
-        `plan=${plan} price=${priceId} interval=${price?.recurring?.interval ?? "none"} active=${price?.active ?? "missing"}`);
+        `plan=${plan} price=${price?.id ?? "missing"} interval=${price?.recurring?.interval ?? "none"} active=${price?.active ?? "missing"}`);
       return jsonResponse({ error: "Plano temporariamente indisponível. Tente novamente mais tarde." }, 503);
     }
+    const priceId = price.id;
 
     const referral = await resolveReferral(supabase, body?.referralCode, user.id);
     if (referral && "error" in referral) {

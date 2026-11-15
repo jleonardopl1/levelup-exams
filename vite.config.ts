@@ -41,7 +41,8 @@ export default defineConfig(({ mode }) => ({
           vendor: ["react", "react-dom", "react-router-dom"],
           supabase: ["@supabase/supabase-js"],
           ui: ["@radix-ui/react-dialog", "@radix-ui/react-dropdown-menu", "@radix-ui/react-tabs", "@radix-ui/react-tooltip"],
-          charts: ["recharts"],
+          // recharts NÃO entra aqui: num chunk manual ele era pré-carregado (modulepreload)
+          // em todas as páginas (~108 KB gzip) e só é usado no painel admin e de afiliados.
           query: ["@tanstack/react-query"],
         },
       },

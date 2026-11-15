@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.5.1] - 2026-11-15
+
+### Pagamentos
+- Stripe de produção preparado: produto "LevelUp Exams Plus", preços mensal (R$ 19,90) e anual (R$ 159,90) com `lookup_key`, e portal do cliente padrão
+- `create-checkout` encontra o preço pelo `lookup_key` quando não há secret de preço: trocar a chave de teste pela de produção basta
+- Passos que faltam para cobrar (verificação da conta, webhook, secrets): `docs/REVISAO_2026-11-15.md`, seção 2
+
+### Performance
+- Gráficos (`recharts`, ~108 KB gzip) deixam de ser pré-carregados em todas as páginas
+
+### Docs
+- `docs/REVISAO_2026-11-15.md`: revisão de arquitetura, segurança, UI/UX, autenticação e pagamentos, com ações por agente
+
 ## [1.5.0] - 2026-11-13
 
 ### Features
