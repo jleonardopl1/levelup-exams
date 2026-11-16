@@ -12,7 +12,8 @@
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc --noEmit",
     "preview": "vite preview",
-    "build:trilhas": "node scripts/build-track-seed.mjs camara-cuiaba-2026"
+    "build:trilhas": "node scripts/build-track-seed.mjs camara-cuiaba-2026",
+    "test:edge": "DENO_NO_PACKAGE_JSON=1 deno test --allow-env --no-lock supabase/functions/"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
