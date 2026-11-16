@@ -25,7 +25,8 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
   Elaborador → portão determinístico → Solucionador cego ∥ Revisor → Árbitro nas divergências →
   lições por matéria. Interruptor de segurança: secret `QUESTION_PIPELINE=classic`.
 - **D4** (herdada) — Nada aplicado em **banco remoto** nem em secrets de produção sem aprovação do
-  dono. A migration `20261116120000_ai_runtime_observability.sql` está pronta e **aguarda aplicação**.
+  dono. Em 2026-11-16 o dono aprovou e a migration `20261116120000` foi aplicada e as funções
+  `generate-track-questions`, `essay-review` e `ai-mentor` publicadas (via agente do Lovable).
 - **D5** (pendente — dono) — Estratégia de lojas: Capacitor (recomendado) vs. TWA só Android;
   cobrança dentro do app nas lojas (IAP) vs. link externo. Ver `docs/ARQUITETURA_MULTIAGENTE.md` §6.
 - **D6** (pendente — dono) — Garantia de idade e supervisão parental exigidas pelo **ECA Digital**
@@ -36,6 +37,20 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
 ---
 
 ## Armadilhas conhecidas
+
+- 🚨 **`gateway 402` = saldo de IA do workspace do Lovable esgotado.** Em 2026-11-16, das 05:10 às
+  08:50 UTC, 67 execuções da geração falharam com 402 (0 questões inseridas). Com 402, Mentor e
+  discursiva também param. Solução: recarregar o saldo de Cloud & IA no Lovable. O cliente
+  `_shared/ai` não repete chamadas em 402 (não desperdiça). Alerta automático: backlog P1.
+- ☁️ **Produção é Lovable Cloud** (`rxsovhyimflzvxggppal`). Migrations e publicação de funções
+  passam pelo agente do Lovable; o merge no GitHub **não** publica as funções sozinho. O projeto
+  "LevelUP Exams" que aparece no MCP do Supabase (`cdiyhbellqqgjwrdhgmf`) é antigo e está pausado.
+- 🧩 **A ferramenta de migration do Lovable grava cópia em `drizzle/`**, cria `drizzle.config.ts`,
+  adiciona `drizzle-kit`/`drizzle-orm`/`postgres` e regenera `types.ts`. É infraestrutura da
+  plataforma: não apagar. Depois disso, ressincronize o `package-lock.json` (`npm install --package-lock-only`).
+- 🕳️ **Migration sem arquivo:** produção tem `20261115140000 plus_internal_grants`, aplicada pelo
+  Lovable, sem arquivo em `supabase/migrations/` e sem o SQL guardado no banco. Recriar o banco só a
+  partir do repositório perderia o que ela fez — investigar (backlog P1).
 
 - 📦 **Lockfile oficial é `bun.lockb`** (o do Lovable). O `package-lock.json` ficou para trás quando
   o Lovable adicionou os plugins de dev; foi sincronizado em 2026-11-16. A CI usa `bun install --frozen-lockfile`.
@@ -60,7 +75,7 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
 <!-- Detalhe, justificativa e referências: docs/ARQUITETURA_MULTIAGENTE.md §10 -->
 
 - **P0 — fazer já (dono aprova):**
-  1. Aplicar a migration `20261116120000` e publicar `generate-track-questions`, `essay-review`, `ai-mentor`.
+  1. **Recarregar o saldo de IA do Lovable** (402 desde 16/11 05:10 UTC) — sem isso, nenhuma IA funciona.
   2. Acompanhar 7 dias de `ai_runs` (taxa de disputa, aprovação, custo) antes de ajustar modelos.
   3. ECA Digital: inventário de dados de menores, base legal, verificação de idade e supervisão (D6).
 - **P1 — próximas 2–4 semanas:**
@@ -68,7 +83,9 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
   5. Harness de testes do front (Vitest + Testing Library) para `lib/` e hooks críticos (`tester`).
   6. Painel admin: custo/latência por agente (de `ai_runs`) e curadoria de `ai_lessons`.
   7. Reportes de alunos resolvidos como "gabarito errado" viram lições (fonte `aluno`, cercadas).
-  8. Observabilidade: Sentry (front + funções) e alertas da geração de questões.
+  8. Observabilidade: Sentry (front + funções) e **alerta** quando a geração ou o gateway falham
+     (ex.: aviso ao admin em erro 402 ou em N falhas seguidas).
+  8a. Reconstituir `20261115140000_plus_internal_grants` (comparar o schema de produção com o das migrations).
 - **P2 — próximos 1–3 meses:**
   9. Revisão espaçada FSRS no lugar das caixas fixas (1/3/7/14/30) (`cientista-aprendizagem`).
   10. Calibração TRI (3PL) das questões com as respostas reais → nota estimada estilo ENEM.
@@ -80,6 +97,21 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
 
 ## Handoff mais recente
 <!-- Sempre o topo = o mais recente. Template: docs/colaboracao/handoff-template.md -->
+
+### 2026-11-16 · implantação em produção (`coordenador` + `supabase-db` + `edge-functions` + `reviewer`)
+- **Objetivo:** implantar o PR #21 com aprovação do dono.
+- **O que mudou:** PR #21 mesclado (`9d10578`); pelo MCP do Lovable, o agente do Lovable aplicou a
+  migration `20261116120000` (SQL idêntico ao arquivo, registrada no histórico) e publicou as três
+  funções; ele também commitou `b0aedfc` (cópia em `drizzle/`, deps do drizzle, `types.ts`).
+  Este handoff, a doc de implantação e o `package-lock.json` foram atualizados em seguida.
+- **Testado em produção (só leitura):** `ai_runs`/`ai_lessons` com RLS e 3 políticas; `anon` e
+  `authenticated` sem acesso indevido; só `service_role` executa `record_ai_lessons`; job
+  `purge-ai-runs` agendado. CI verde em `9d10578` e `b0aedfc`.
+- **Não testado:** execução real da fábrica nova — a IA está bloqueada por `gateway 402` (saldo
+  esgotado desde 05:10 UTC, antes da implantação).
+- **Bloqueios:** recarga do saldo de IA no Lovable (só o dono).
+- **Próximo passo:** depois da recarga, conferir `ai_runs` na próxima janela do cron (05h–08h50 UTC)
+  ou disparar a geração pelo painel admin.
 
 ### 2026-11-16 · fundação multiagente (`coordenador` + `engenheiro-ia` + `supabase-db` + `reviewer` + `documentation-writer`)
 - **Objetivo:** analisar AgroDecision, TradingAgents e o ecossistema `multi-agent-systems`;

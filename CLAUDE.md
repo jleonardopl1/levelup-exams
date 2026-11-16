@@ -61,7 +61,11 @@ Plataforma gamificada de estudos para concursos públicos, vestibulares e ENEM (
 - typecheck: `bun run typecheck` · lint: `bun run lint` · build: `bun run build`
 - testes das Edge Functions: `bun run test:edge` (requer Deno 2)
 - seed das trilhas: `bun run build:trilhas`
-- migrations: `supabase db push` (remoto exige aprovação do dono) · deploy de função: `supabase functions deploy <nome>`
+- **produção = Lovable Cloud** (`rxsovhyimflzvxggppal`): migrations e publicação de Edge Functions
+  passam pelo **agente do Lovable** (editor ou MCP do Lovable), sempre com aprovação do dono; o MCP
+  do Supabase da conta do dono não alcança esse projeto. Código vindo do GitHub **não** publica as
+  funções sozinho. Consultas de leitura em produção: MCP do Lovable (`query_database`, só `SELECT`).
+- fora do Lovable: `supabase db push` · `supabase functions deploy <nome>`
 - CI (`.github/workflows/ci.yml`): typecheck + lint + build + testes Deno + `deno check` de todas as funções
 
 ## Segurança (resumo)
