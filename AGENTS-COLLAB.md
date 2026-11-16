@@ -109,6 +109,8 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
   17. Fonte "Querido Diário" no Radar para órgãos com site em JavaScript; IBGE para municípios por UF.
   18. Eventos tipados (AG-UI) no streaming do Mentor quando ele ganhar ferramentas (P2.11).
   19. Auditoria de UI das telas de estudo com Impeccable (`critique`/`audit`) pelo `designer`.
+  20. RPC que agregue o domínio por tópico no banco (hoje o front lê as 1.000 respostas mais
+      recentes de cada matéria — teto `max_rows` do PostgREST; tópico sem resposta nesse recorte some).
 - **P3 — 3–12 meses:** B2B (cursinhos/escolas multi-tenant), simulados adaptativos (CAT), MCP público de conteúdo.
 
 ---

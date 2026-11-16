@@ -265,6 +265,9 @@ export default function Quiz() {
       const target = e.target as HTMLElement | null;
       if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) return;
       if (e.metaKey || e.ctrlKey || e.altKey) return;
+      // Enter num botão ou link focado (Ouvir, Parar, Reportar erro) aciona o próprio controle,
+      // não o atalho de confirmar. As alternativas (role="radio") continuam confirmando com Enter.
+      if (e.key === 'Enter' && target?.closest('a, button:not([role="radio"]), [role="button"]')) return;
       const total = currentQuestion?.alternativas.length ?? 0;
       const key = e.key.toLowerCase();
       let idx = -1;

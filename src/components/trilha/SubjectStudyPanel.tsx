@@ -80,6 +80,7 @@ export function SubjectStudyPanel({ trackSlug, subject, mastery }: Props) {
             <p className="text-xs text-muted-foreground">
               Conta suas 5 últimas respostas de cada tópico, com mais peso para as recentes. Com 1 ou 2 respostas o
               domínio fica limitado a 50% e 80%, e repetir a mesma questão logo depois de ver a explicação não conta.
+              Usa suas 1.000 respostas mais recentes da matéria.
             </p>
           </AccordionContent>
         </AccordionItem>
