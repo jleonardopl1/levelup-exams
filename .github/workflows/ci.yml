@@ -1,7 +1,7 @@
 name: CI
 
 # Portão de qualidade (rules/common/testing.md). Roda em todo PR para a main e em push na main.
-#  - app: typecheck + lint + build do front (lockfile oficial: bun.lockb, o mesmo do Lovable)
+#  - app: typecheck + lint + testes unitários (node --test) + build do front (lockfile oficial: bun.lockb)
 #  - edge-functions: testes Deno + deno check de todas as Edge Functions
 on:
   pull_request:
@@ -18,7 +18,7 @@ concurrency:
 
 jobs:
   app:
-    name: App (typecheck · lint · build)
+    name: App (typecheck · lint · testes · build)
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -28,6 +28,11 @@ jobs:
         with:
           bun-version: 1.4.4
 
+      - uses: actions/setup-node@v4
+        with:
+          # Node 22.18+ roda TypeScript direto (type stripping) nos testes unitários.
+          node-version: 22
+
       - name: Instalar dependências (lockfile congelado)
         run: bun install --frozen-lockfile
 
@@ -36,6 +41,9 @@ jobs:
 
       - name: Lint
         run: bun run lint
+
+      - name: Testes unitários (lógica pura do front e guardrails dos agentes)
+        run: bun run test:unit
 
       - name: Build
         run: bun run build

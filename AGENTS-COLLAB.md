@@ -35,6 +35,12 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
   evidência literal da fonte oficial; retificação, regressão de fase e verificador indisponível
   vão para revisão humana; rascunho de trilha só é publicado por admin. Migration
   `20261117120000_radar_concursos.sql` **aguarda aplicação** (D4).
+- **D9** (2026-11-17, dono + Claude Code) — Referências externas entram pelo filtro da
+  estrela-guia e do stack: só vira código o que ajuda o candidato ou protege quem estuda/os agentes,
+  com teste; o resto vai para backlog com motivo (`docs/REFERENCIAS_REPOSITORIOS.md`). Convenções
+  que não podem falhar ficam também em código (`.claude/hooks/guardrails.mjs`).
+- **D10** (pendente — dono) — Abrir o Radar (`/radar/:slug`) sem login como página de entrada por
+  concurso (SEO e aquisição). Exige política de leitura para `anon` nas tabelas publicadas do Radar.
 - **D7** (pendente — dono) — Correção dupla independente da discursiva (modelo INEP: 2 corretores,
   3º na discrepância) dobra o custo por correção. Ver §5.5.
 
@@ -59,7 +65,16 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
   painel precisa de outra URL (página do órgão, diário oficial). O coletor não executa JS.
 - 🧩 **Tabelas do Radar ainda não estão em `types.ts`**: o front usa `radarDb` (cliente sem tipos)
   em `src/hooks/useRadar.ts`. Depois de aplicar a migration, regerar os tipos e trocar por `supabase`.
-- 🔐 **`auth-email-hook` e `.lovable/` são gerenciados pelo Lovable** — não editar à mão.
+- 🔐 **`auth-email-hook` e `.lovable/` são gerenciados pelo Lovable** — não editar à mão (o hook de
+  guardrails bloqueia).
+- 🧪 **`tsc --noEmit` no tsconfig raiz não checa nada** (`"files": []` + referências). O
+  `bun run typecheck` agora usa `-p tsconfig.app.json` e `-p tsconfig.node.json`; não volte.
+- 🔤 **`normalize('NFKC')` troca "º" por "o"** ("1º" vira "1o"). Para texto exibido ou falado use
+  NFC; NFKC só para comparar/deduplicar.
+- 💬 **O Mentor mostra texto puro** (sem renderizar Markdown): o prompt pede texto simples. Se um
+  dia renderizar Markdown, sanitize (saída de modelo em sink HTML é risco do OWASP LLM).
+- 🦕 **Sessões na nuvem podem vir sem Deno**: baixe o binário de `dl.deno.land` para rodar
+  `bun run test:edge`. `bun run test:unit` precisa de Node 22.18+ (TypeScript sem flag).
 - 🕛 **O limite diário do Free renova à meia-noite UTC** (21h de Brasília), não à meia-noite local.
 - 💳 **Stripe:** confirmar em produção o endpoint do webhook registrado e o segredo de assinatura
   (o diagnóstico de `.lovable/plan.md` encontrou preços em modo de teste e nenhum webhook).
@@ -86,12 +101,40 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
   10. Calibração TRI (3PL) das questões com as respostas reais → nota estimada estilo ENEM.
   11. Mentor socrático com ferramentas (progresso, fila de revisão) e cache de explicações por questão.
   12. App nas lojas (D5): Capacitor + push nativo + offline das trilhas.
+- **Das referências (`docs/REFERENCIAS_REPOSITORIOS.md`):**
+  13. Revisão por estabilidade/recuperabilidade (DeepTutor) — spec pronta no fim do relatório (refina o P2.9).
+  14. Edital verticalizado sincronizado entre aparelhos (tabela com RLS) e links de lei seca por item.
+  15. Questões com texto-base comum (freeCodeCamp `questionSets.context`) para Português.
+  16. Exportar caderno de erros para o Anki (RPC só com questões já respondidas).
+  17. Fonte "Querido Diário" no Radar para órgãos com site em JavaScript; IBGE para municípios por UF.
+  18. Eventos tipados (AG-UI) no streaming do Mentor quando ele ganhar ferramentas (P2.11).
+  19. Auditoria de UI das telas de estudo com Impeccable (`critique`/`audit`) pelo `designer`.
+  20. RPC que agregue o domínio por tópico no banco (hoje o front lê as 1.000 respostas mais
+      recentes de cada matéria — teto `max_rows` do PostgREST; tópico sem resposta nesse recorte some).
 - **P3 — 3–12 meses:** B2B (cursinhos/escolas multi-tenant), simulados adaptativos (CAT), MCP público de conteúdo.
 
 ---
 
 ## Handoff mais recente
 <!-- Sempre o topo = o mais recente. Template: docs/colaboracao/handoff-template.md -->
+
+### 2026-11-17 · Referências externas: 32 repositórios (Claude Code, nas faixas de `frontend`, `engenheiro-ia`, `tester`, `security-reviewer` e `documentation-writer`)
+- **Objetivo:** investigar os repositórios indicados pelo dono e incorporar o que melhora o app e o processo.
+- **O que mudou:** relatório `docs/REFERENCIAS_REPOSITORIOS.md`; domínio por tópico (`src/lib/mastery.ts`,
+  `useTopicMastery`) e edital verticalizado (`src/lib/edital.ts`, `useEditalState`) no painel
+  `components/trilha/SubjectStudyPanel.tsx` da trilha; leitura em voz alta (`src/lib/speech.ts`,
+  `useSpeech`, `SpeakButton`) no quiz; Mentor com modos direto/socrático (`ai-mentor/prompt.ts`,
+  `mentor@2026-11-17`) e seletor na tela; portão de questões (termos absolutos, comando negativo;
+  `elaborador@2026-11-17`); SEO (`src/lib/seo.ts`, `useSeo`, sitemap, robots); guardrails
+  (`.claude/hooks/guardrails.mjs` + `settings.json`); `security-reviewer`, `tester`,
+  `rules/common/writing.md`, `rules/common/ai-agents.md`; `typecheck` que de fato checa; CI com `test:unit`.
+- **Testado:** `bun run typecheck` ✅ · `bun run lint` ✅ (0 erros; 45 avisos antigos) · `bun run test:unit` ✅
+  62/62 · `bun run test:edge` ✅ 76/76 · `deno check` ✅ todas as funções · `bun run build` ✅ ·
+  parser do edital rodado contra as 26 ementas reais da trilha ✅.
+- **Não testado:** voz no navegador real e chamadas reais ao gateway de IA (sem `LOVABLE_API_KEY`);
+  nenhuma migration nova nesta entrega.
+- **Bloqueios:** D10 (Radar público) é decisão do dono.
+- **Próximo passo:** P0 do backlog continua prioritário; depois itens 13–19.
 
 ### 2026-11-17 · Radar de Concursos (Claude Code, nas faixas de `engenheiro-ia`, `supabase-db`, `frontend` e `documentation-writer`)
 - **Objetivo:** grupo de agentes (master → coordenador por área → especialistas) para pesquisar e
