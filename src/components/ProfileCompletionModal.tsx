@@ -51,8 +51,9 @@ export default function ProfileCompletionModal({ open, onComplete }: ProfileComp
 
       toast.success('Perfil criado com sucesso!');
       onComplete();
-    } catch (error: any) {
-      toast.error(error.message || 'Erro ao criar perfil');
+    } catch (error: unknown) {
+      const message = (error as { message?: unknown } | null)?.message;
+      toast.error((typeof message === 'string' && message) || 'Erro ao criar perfil');
     } finally {
       setLoading(false);
     }
