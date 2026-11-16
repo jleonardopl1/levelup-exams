@@ -57,6 +57,10 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
 - 🕸️ **Radar: páginas montadas por JavaScript chegam vazias ao coletor** (Cebraspe, portal da
   Selecon) e a Fundatec tem anti-robô — semeadas desligadas. Fonte com "página sem texto" no
   painel precisa de outra URL (página do órgão, diário oficial). O coletor não executa JS.
+- 🗝️ **A ferramenta de migration do agente do Lovable recusa SQL que lê o Vault**
+  ("Agent access to secrets is not allowed"), como o bloco de agendamento do pg_cron. A migration
+  do Radar foi aplicada em partes pela consulta SQL do Lovable (`query_database`), com o mesmo
+  conteúdo do arquivo. Em migrations futuras, deixe o agendamento num arquivo separado.
 - 🧩 **Tabelas do Radar ainda não estão em `types.ts`**: o front usa `radarDb` (cliente sem tipos)
   em `src/hooks/useRadar.ts`. Depois de aplicar a migration, regerar os tipos e trocar por `supabase`.
 - 🔐 **`auth-email-hook` e `.lovable/` são gerenciados pelo Lovable** — não editar à mão.
@@ -73,8 +77,8 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
   1. Aplicar a migration `20261116120000` e publicar `generate-track-questions`, `essay-review`, `ai-mentor`.
   2. Acompanhar 7 dias de `ai_runs` (taxa de disputa, aprovação, custo) antes de ajustar modelos.
   3. ECA Digital: inventário de dados de menores, base legal, verificação de idade e supervisão (D6).
-  4. Aplicar `20261117120000_radar_concursos.sql`, publicar `radar-concursos` e rodar Admin → Radar →
-     Verificar agora; ampliar as fontes (órgãos e diários oficiais por área) com o `curador-conteudo`.
+  4. Radar: regerar `types.ts` no Lovable, publicar o site e acompanhar a primeira execução
+     (`radar_runs`); ampliar as fontes (órgãos e diários oficiais por área) com o `curador-conteudo`.
 - **P1 — próximas 2–4 semanas:**
   4. Auditar questões `ia_diaria` publicadas: explicação com letras e gabarito (rodar o Solucionador cego em lote).
   5. Harness de testes do front (Vitest + Testing Library) para `lib/` e hooks críticos (`tester`).
@@ -92,6 +96,19 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
 
 ## Handoff mais recente
 <!-- Sempre o topo = o mais recente. Template: docs/colaboracao/handoff-template.md -->
+
+### 2026-11-16 · Implantação do Radar (Claude Code, a pedido do dono)
+- **Feito:** PR #23 mesclado (`9cb0e25`); funções `radar-concursos` e `generate-track-questions`
+  publicadas pelo agente do Lovable; migration `20261117120000` aplicada no Lovable Cloud em 4
+  partes via `query_database` (o agente recusou o bloco do Vault).
+- **Conferido no banco:** 11 áreas, 8 fontes (5 ativas), concurso `camara-cuiaba-2026` publicado
+  e ligado à trilha, 6 RPCs, 11 políticas, RLS em todas as tabelas `radar_*`, job
+  `radar-concursos` (`17 */3 * * *`) ativo, segredos `project_url` e `question_cron_secret` presentes.
+  A função responde 401 sem autorização (o handler roda; `verify_jwt = false` vale).
+- **Pendente:** regerar `types.ts` (o gerador é do Lovable e os créditos do agente acabaram; o front
+  funciona sem, via `radarDb`); publicar o site (o `/radar` só aparece em produção depois disso);
+  o agente do Lovable relatou "erros de compilação no preview" sem dizer o arquivo — `typecheck` e
+  `build` da `main` passam localmente.
 
 ### 2026-11-17 · Radar de Concursos (Claude Code, nas faixas de `engenheiro-ia`, `supabase-db`, `frontend` e `documentation-writer`)
 - **Objetivo:** grupo de agentes (master → coordenador por área → especialistas) para pesquisar e
