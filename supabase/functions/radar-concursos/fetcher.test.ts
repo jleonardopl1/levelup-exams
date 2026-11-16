@@ -91,3 +91,25 @@ Deno.test("fetchPage: redirecionamento para host interno é recusado; PDF só ge
   assertEquals(pdf.text, "");
   assertEquals(pdf.hash.length, 64);
 });
+
+Deno.test("robots.txt redirecionado para destino interno não é seguido", async () => {
+  const calls: string[] = [];
+  const modes: (string | undefined)[] = [];
+  const fetchFn = ((input: string | URL | Request, init?: RequestInit) => {
+    const url = typeof input === "string" ? input : input instanceof URL ? input.toString() : input.url;
+    calls.push(url);
+    // O fetch real seguiria o 302 sozinho com redirect "follow": exigimos "manual" sempre.
+    modes.push(init?.redirect);
+    if (url === "https://banca.org.br/robots.txt") {
+      return Promise.resolve(new Response(null, { status: 302, headers: { location: "http://127.0.0.1:8080/segredo" } }));
+    }
+    if (url === "https://banca.org.br/concursos") {
+      return Promise.resolve(new Response("<p>Concursos abertos</p>", { headers: { "content-type": "text/html" } }));
+    }
+    return Promise.resolve(new Response("x", { status: 404 }));
+  }) as typeof fetch;
+  const page = await fetchPage("https://banca.org.br/concursos", { fetchFn });
+  assert(page.text.includes("Concursos abertos"));
+  assertEquals(calls, ["https://banca.org.br/robots.txt", "https://banca.org.br/concursos"]);
+  assertEquals(modes, ["manual", "manual"]);
+});

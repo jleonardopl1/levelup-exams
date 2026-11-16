@@ -204,3 +204,32 @@ Deno.test("monitor: conteúdo da página vai cercado (defesa contra injeção de
   assert(user.includes("<<<INICIO_TRECHO_NOVO_DA_FONTE>>>"));
   assertEquals(user.match(/<<<FIM_TRECHO_NOVO_DA_FONTE>>>/g)?.length, 1);
 });
+
+Deno.test("edição nova do mesmo órgão não herda o concurso antigo (seguidores e trilha)", async () => {
+  const old: ConcursoRecord = {
+    id: "c0", slug: "policia-federal-2021", orgao: "Polícia Federal", nome: "Polícia Federal 2021", status: "homologado",
+    area_id: "a-pol", is_published: true, track_id: "t-old",
+  };
+  const { llm } = fakeLlm({ batedor: SCOUT, coordenador: COORD, "analista-edital": EXTRACT, verificador: VERIFY_ALL });
+  const { outcomes } = await runMonitor(llm, {
+    pages: [CHANGED], areas: AREAS, existingByArea: new Map([["policial", [old]]]),
+  }, MODELS, config());
+  const pf = outcomes.find((o) => o.orgao === "Polícia Federal")!;
+  assertEquals(pf.existing, null);
+  assertEquals(pf.consolidation?.kind, "novo");
+});
+
+Deno.test("concurso fora do orçamento marca a fonte como pendente (snapshot não avança)", async () => {
+  const { llm } = fakeLlm({ batedor: SCOUT, coordenador: COORD, "analista-edital": EXTRACT, verificador: VERIFY_ALL });
+  const { stats } = await runMonitor(llm, { pages: [CHANGED], areas: AREAS, existingByArea: new Map() }, MODELS, config({ maxExtractions: 1 }));
+  assertEquals(stats.unfinishedSources, ["s1"]);
+  const full = await runMonitor(llm, { pages: [CHANGED], areas: AREAS, existingByArea: new Map() }, MODELS, config());
+  assertEquals(full.stats.unfinishedSources, []);
+});
+
+Deno.test("extração com falha também deixa a fonte pendente", async () => {
+  const { llm } = fakeLlm({ batedor: SCOUT, coordenador: COORD, "analista-edital": new Error("timeout") });
+  const { stats } = await runMonitor(llm, { pages: [CHANGED], areas: AREAS, existingByArea: new Map() }, MODELS, config());
+  assertEquals(stats.extractionsFailed, 2);
+  assertEquals(stats.unfinishedSources, ["s1"]);
+});

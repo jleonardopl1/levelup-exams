@@ -233,21 +233,55 @@ function decodeBody(bytes: Uint8Array, contentType: string): string {
   }
 }
 
+/**
+ * GET com redirecionamentos MANUAIS: cada destino passa por safeUrl (https público, sem IP,
+ * sem host interno, porta padrão). Vale para a página e para o robots.txt.
+ */
+async function safeFetch(start: URL, fetchFn: typeof fetch, accept: string, timeoutMs: number): Promise<{ res: Response; url: URL }> {
+  let url = start;
+  for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
+    let res: Response;
+    try {
+      res = await fetchFn(url.toString(), {
+        headers: { "User-Agent": USER_AGENT, Accept: accept },
+        redirect: "manual",
+        signal: AbortSignal.timeout(timeoutMs),
+      });
+    } catch (e) {
+      const name = e instanceof Error ? e.name : "";
+      throw new FetchError(name === "TimeoutError" || name === "AbortError" ? "tempo esgotado" : "falha de rede");
+    }
+    if (res.status >= 300 && res.status < 400) {
+      const loc = res.headers.get("location");
+      await res.body?.cancel().catch(() => {});
+      let next: URL | null = null;
+      try {
+        next = loc ? safeUrl(new URL(loc, url).toString()) : null;
+      } catch { /* location inválido */ }
+      if (!next) throw new FetchError("redirecionamento não permitido");
+      url = next;
+      continue;
+    }
+    return { res, url };
+  }
+  throw new FetchError("redirecionamentos demais");
+}
+
 async function robotsFor(url: URL, opts: FetchOptions): Promise<string[]> {
   const cache = opts.robotsCache ?? new Map<string, string[]>();
   const cached = cache.get(url.host);
   if (cached) return cached;
   let rules: string[] = [];
   try {
-    const res = await (opts.fetchFn ?? fetch)(`https://${url.host}/robots.txt`, {
-      headers: { "User-Agent": USER_AGENT },
-      redirect: "follow",
-      signal: AbortSignal.timeout(8_000),
-    });
-    if (res.ok) rules = parseRobots(new TextDecoder().decode((await readCapped(res)).slice(0, 200_000)));
-    else await res.body?.cancel().catch(() => {});
+    const robotsUrl = safeUrl(`https://${url.host}/robots.txt`);
+    if (robotsUrl) {
+      const { res } = await safeFetch(robotsUrl, opts.fetchFn ?? fetch, "text/plain,*/*;q=0.5", 8_000);
+      if (res.ok) rules = parseRobots(new TextDecoder().decode((await readCapped(res)).slice(0, 200_000)));
+      else await res.body?.cancel().catch(() => {});
+    }
   } catch {
-    // robots.txt inacessível = sem restrições declaradas.
+    // robots.txt inacessível (ou redirecionado para destino proibido) = sem regras declaradas;
+    // a página em si continua sujeita a safeUrl e aos redirecionamentos conferidos.
   }
   cache.set(url.host, rules);
   return rules;
@@ -258,34 +292,13 @@ export async function fetchPage(rawUrl: string, opts: FetchOptions = {}): Promis
   const fetchFn = opts.fetchFn ?? fetch;
   const initial = safeUrl(rawUrl);
   if (!initial) throw new FetchError("URL não permitida");
-  let url: URL = initial;
 
-  const rules = await robotsFor(url, opts);
-  if (!isAllowed(rules, url.pathname + url.search)) throw new FetchError("bloqueado pelo robots.txt");
+  const rules = await robotsFor(initial, opts);
+  if (!isAllowed(rules, initial.pathname + initial.search)) throw new FetchError("bloqueado pelo robots.txt");
 
-  let res: Response | null = null;
-  for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
-    try {
-      res = await fetchFn(url.toString(), {
-        headers: { "User-Agent": USER_AGENT, Accept: "text/html,application/xhtml+xml,text/plain;q=0.9,*/*;q=0.5" },
-        redirect: "manual",
-        signal: AbortSignal.timeout(opts.timeoutMs ?? DEFAULT_TIMEOUT_MS),
-      });
-    } catch (e) {
-      const name = e instanceof Error ? e.name : "";
-      throw new FetchError(name === "TimeoutError" || name === "AbortError" ? "tempo esgotado" : "falha de rede");
-    }
-    if (res.status >= 300 && res.status < 400) {
-      const loc = res.headers.get("location");
-      await res.body?.cancel().catch(() => {});
-      const next = loc ? safeUrl(new URL(loc, url).toString()) : null;
-      if (!next) throw new FetchError("redirecionamento não permitido");
-      url = next;
-      continue;
-    }
-    break;
-  }
-  if (!res || (res.status >= 300 && res.status < 400)) throw new FetchError("redirecionamentos demais");
+  const { res, url } = await safeFetch(
+    initial, fetchFn, "text/html,application/xhtml+xml,text/plain;q=0.9,*/*;q=0.5", opts.timeoutMs ?? DEFAULT_TIMEOUT_MS,
+  );
   if (!res.ok) {
     await res.body?.cancel().catch(() => {});
     throw new FetchError(`HTTP ${res.status}`);

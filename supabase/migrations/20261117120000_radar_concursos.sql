@@ -55,6 +55,8 @@ CREATE TABLE IF NOT EXISTS public.radar_sources (
   last_text text,
   last_status text,
   consecutive_failures integer NOT NULL DEFAULT 0,
+  -- Execuções seguidas em que o trecho novo não foi todo processado (o snapshot não avança).
+  pending_retries integer NOT NULL DEFAULT 0,
   created_at timestamptz NOT NULL DEFAULT now()
 );
 
@@ -379,6 +381,15 @@ BEGIN
     link_oficial      = CASE WHEN p ? 'link_oficial' THEN p->>'link_oficial' ELSE c.link_oficial END,
     last_update_at    = now()
   WHERE c.id = p_concurso_id;
+
+  -- Data da prova é uma só: a trilha ligada (contagem regressiva, destaque, Passe Concurso)
+  -- acompanha a data aprovada no radar, na mesma transação.
+  IF p ? 'data_prova' AND nullif(p->>'data_prova', '') IS NOT NULL THEN
+    UPDATE public.study_tracks t
+      SET exam_date = (p->>'data_prova')::date
+      FROM public.radar_concursos c
+      WHERE c.id = p_concurso_id AND t.id = c.track_id;
+  END IF;
 END;
 $$;
 

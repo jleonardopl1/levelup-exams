@@ -90,6 +90,11 @@ export interface MonitorStats {
   degraded: string[];
   /** Fontes cuja triagem falhou: o snapshot delas não avança (nova tentativa na próxima execução). */
   scoutFailed: string[];
+  /**
+   * Fontes com concurso que ficou sem análise (fora do orçamento, sem tempo ou extração com
+   * falha): o snapshot também não avança, senão o aviso se perderia no próximo diff.
+   */
+  unfinishedSources: string[];
 }
 
 const MIN_STAGE_MS = 20_000;
@@ -118,12 +123,33 @@ export function isSourceDue(
   return now - Date.parse(s.last_checked_at) >= hours * 3_600_000;
 }
 
-const keyOf = (orgao: string, uf: string | null) => `${norm(orgao)}|${uf ?? ""}`;
+/** Anos (2000–2099) citados num texto: identificam a edição do concurso. */
+export function yearsIn(text: string): Set<string> {
+  return new Set(text.match(/\b20\d{2}\b/g) ?? []);
+}
 
-/** Concurso já acompanhado com o mesmo órgão (e UF, quando ambas existem)? */
-export function findExisting(existing: ConcursoRecord[], orgao: string, uf: string | null): ConcursoRecord | null {
+const FINISHED = new Set(["resultado_final", "homologado", "cancelado"]);
+
+/**
+ * O candidato é a MESMA edição do concurso acompanhado? Um órgão abre concursos
+ * diferentes ao longo dos anos: anos citados que não batem, ou concurso já encerrado sem
+ * o mesmo ano no texto, indicam edição nova (que não pode herdar seguidores nem trilha).
+ */
+export function sameEdition(existing: ConcursoRecord, hint: string): boolean {
+  const mine = yearsIn(`${existing.slug} ${existing.nome}`);
+  const theirs = yearsIn(hint);
+  const shared = [...theirs].some((y) => mine.has(y));
+  if (mine.size && theirs.size && !shared) return false;
+  if (FINISHED.has(existing.status) && !shared) return false;
+  return true;
+}
+
+const keyOf = (c: Candidate) => `${norm(c.orgao)}|${c.uf ?? ""}|${[...yearsIn(`${c.resumo} ${c.trecho}`)].sort().join(",")}`;
+
+/** Concurso já acompanhado: mesmo órgão, mesma UF (quando ambas existem) e mesma edição. */
+export function findExisting(existing: ConcursoRecord[], orgao: string, uf: string | null, hint = ""): ConcursoRecord | null {
   const o = norm(orgao);
-  return existing.find((e) => norm(e.orgao) === o && (!uf || !e.uf || e.uf === uf)) ?? null;
+  return existing.find((e) => norm(e.orgao) === o && (!uf || !e.uf || e.uf === uf) && sameEdition(e, hint)) ?? null;
 }
 
 interface AreaItem {
@@ -139,7 +165,7 @@ export async function runMonitor(
 ): Promise<{ outcomes: ConcursoOutcome[]; stats: MonitorStats }> {
   const stats: MonitorStats = {
     pages: input.pages.length, candidates: 0, candidatesDiscarded: 0, selected: 0, ignoredByCoordinators: 0,
-    skippedForBudget: 0, extractionsFailed: 0, verifierUnavailable: 0, claimsRejected: 0, degraded: [], scoutFailed: [],
+    skippedForBudget: 0, extractionsFailed: 0, verifierUnavailable: 0, claimsRejected: 0, degraded: [], scoutFailed: [], unfinishedSources: [],
   };
   const areaBySlug = new Map(input.areas.map((a) => [a.slug, a]));
   const areaSlugs = new Set(areaBySlug.keys());
@@ -184,8 +210,8 @@ export async function runMonitor(
   const byArea = new Map<string, AreaItem[]>();
   for (const item of scouted.flat()) {
     const list = byArea.get(item.candidate.area) ?? [];
-    const k = keyOf(item.candidate.orgao, item.candidate.uf);
-    if (!list.some((x) => keyOf(x.candidate.orgao, x.candidate.uf) === k)) list.push(item);
+    const k = keyOf(item.candidate);
+    if (!list.some((x) => keyOf(x.candidate) === k)) list.push(item);
     byArea.set(item.candidate.area, list);
   }
 
@@ -222,8 +248,9 @@ export async function runMonitor(
       }
       const item = items[d.indice];
       // A deduplicação final é em código: "novo" com órgão já acompanhado vira atualização.
-      const match = (d.slug ? existing.find((e) => e.slug === d.slug) : null) ??
-        findExisting(existing, item.candidate.orgao, item.candidate.uf);
+      const hint = `${item.candidate.resumo} ${item.candidate.trecho}`;
+      const chosen = d.slug ? existing.find((e) => e.slug === d.slug && sameEdition(e, hint)) ?? null : null;
+      const match = chosen ?? findExisting(existing, item.candidate.orgao, item.candidate.uf, hint);
       out.push({ ...item, area, decision: d, existing: match });
     }
     return out;
@@ -236,11 +263,14 @@ export async function runMonitor(
   const selected = queue.slice(0, config.maxExtractions);
   stats.skippedForBudget += queue.length - selected.length;
   stats.selected = selected.length;
+  const unfinished = new Set<string>();
+  for (const s of queue.slice(config.maxExtractions)) unfinished.add(s.page.sourceId);
 
   let detailBudget = config.maxDetailFetches;
   const outcomes = await pool(selected, 3, async (s): Promise<ConcursoOutcome | null> => {
     if (timeLeft() < MIN_STAGE_MS) {
       stats.skippedForBudget++;
+      unfinished.add(s.page.sourceId);
       return null;
     }
     let sourceText = windowAround(s.page.page.text, s.candidate.trecho, 6_000);
@@ -268,6 +298,7 @@ export async function runMonitor(
       })).data;
     } catch {
       stats.extractionsFailed++;
+      unfinished.add(s.page.sourceId);
       return null;
     }
 
@@ -330,5 +361,6 @@ export async function runMonitor(
     };
   });
 
+  stats.unfinishedSources = [...unfinished];
   return { outcomes: outcomes.filter((o): o is ConcursoOutcome => o !== null), stats };
 }

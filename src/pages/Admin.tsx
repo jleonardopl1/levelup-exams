@@ -64,7 +64,7 @@ export default function Admin() {
   const adminOnly: MainTab[] = ['overview', 'affiliates', 'radar', 'audit'];
   const requested = params.get('tab') as MainTab | null;
   const tab: MainTab = requested && (isAdmin || !adminOnly.includes(requested))
-    && ['overview', 'users', 'affiliates', 'questions', 'reports', 'audit'].includes(requested)
+    && ['overview', 'users', 'affiliates', 'questions', 'reports', 'radar', 'audit'].includes(requested)
     ? requested
     : (isAdmin ? 'overview' : 'reports');
   const questionsView: QuestionsView = params.get('view') === 'generation' && isAdmin ? 'generation' : 'bank';

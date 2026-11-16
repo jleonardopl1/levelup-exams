@@ -42,7 +42,9 @@ Saúde, TI, Militares, ENEM e Vestibulares). Nova área = nova linha; o coordena
 2. **Diff** — só as linhas novas desde a última visita vão para o Batedor (barato e focado).
 3. **Batedor** por fonte que mudou → candidatos. Portão: o trecho citado precisa existir na página.
 4. **Coordenador** de cada área com candidatos (em paralelo). A deduplicação final é em código:
-   "novo" com o mesmo órgão/UF de um concurso acompanhado vira atualização.
+   "novo" com o mesmo órgão/UF **e a mesma edição** de um concurso acompanhado vira atualização.
+   Anos que não batem, ou concurso antigo já encerrado, indicam edição nova (não herda
+   seguidores nem trilha).
 5. **Fila do master** — prioridade do coordenador × peso da área; corta em `RADAR_MAX_EXTRACTIONS`.
 6. Por concurso: baixa a página de detalhe (se o link estiver na fonte; até
    `RADAR_MAX_DETAIL_FETCHES`), **Analista de edital** → **portão determinístico**
@@ -59,6 +61,13 @@ Saúde, TI, Militares, ENEM e Vestibulares). Nova área = nova linha; o coordena
    acompanham. Edital na rua + relevância ≥ 40 + sem trilha = **sugerido para trilha**.
 
 Telemetria de cada chamada em `ai_runs` (só metadados) e resumo de cada execução em `radar_runs`.
+
+O retrato da página (`last_hash`/`last_text`) só avança quando todo o trecho novo foi processado
+(triagem, análise de cada concurso e gravação). Se algo ficou para trás (orçamento, prazo,
+falha), a fonte é reprocessada na execução seguinte, até 3 vezes (`pending_retries`); depois
+avança e o descarte fica em `radar_runs.details.sources_given_up`. Concurso novo que vai para
+revisão nasce só com a identificação: os fatos ficam no patch da atualização pendente e só
+entram no registro na aprovação. Data da prova aprovada atualiza também a trilha ligada.
 
 ## Nova trilha a partir do edital
 

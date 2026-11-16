@@ -36,6 +36,8 @@ import type { Area, ConcursoRecord, FetchedPage } from "./types.ts";
 const DEFAULT_MODEL = "google/gemini-2.5-flash";
 const DEFAULT_STRONG_MODEL = "google/gemini-2.5-pro";
 const SNAPSHOT_MAX = 200_000;
+/** Quantas execuções seguidas uma fonte com trabalho pendente espera antes de avançar. */
+const MAX_DEFERRALS = 3;
 const CONCURSO_COLUMNS =
   "id, slug, area_id, nome, orgao, banca, esfera, uf, municipio, status, cargos, vagas, salario_max, escolaridade, inscricoes_inicio, inscricoes_fim, data_prova, link_oficial, is_published, track_id";
 
@@ -52,6 +54,7 @@ interface SourceRow {
   last_hash: string | null;
   last_text: string | null;
   consecutive_failures: number;
+  pending_retries: number;
 }
 
 const intEnv = (name: string, fallback: number, min: number, max: number) =>
@@ -76,6 +79,23 @@ async function uniqueSlug(supabase: Supa, base: string): Promise<string> {
   return options.find((s) => !taken.has(s)) ?? `${root.slice(0, 70)}-${crypto.randomUUID().slice(0, 6)}`;
 }
 
+/** JSON com chaves ordenadas (comparação estável de patches). */
+function stableJson(v: unknown): string {
+  if (Array.isArray(v)) return `[${v.map(stableJson).join(",")}]`;
+  if (v && typeof v === "object") {
+    return `{${Object.keys(v as Record<string, unknown>).sort()
+      .map((k) => `${JSON.stringify(k)}:${stableJson((v as Record<string, unknown>)[k])}`).join(",")}}`;
+  }
+  return JSON.stringify(v);
+}
+
+async function samePendingExists(supabase: Supa, concursoId: string, patch: unknown): Promise<boolean> {
+  const { data } = await supabase.from("radar_updates").select("patch")
+    .eq("concurso_id", concursoId).eq("review_status", "pendente").limit(20);
+  const target = stableJson(patch);
+  return (data ?? []).some((r: { patch: unknown }) => stableJson(r.patch) === target);
+}
+
 /** Grava um resultado consolidado. Retorna o que aconteceu (para o resumo da execução). */
 async function persistOutcome(
   supabase: Supa,
@@ -93,7 +113,10 @@ async function persistOutcome(
       area_id: areaIdBySlug.get(o.areaSlug) ?? null,
       nome: o.nome,
       orgao: o.orgao,
-      ...c.patch,
+      // Fato não aprovado não entra no registro canônico: em revisão, o concurso nasce só
+      // com a identificação e os fatos ficam no patch da atualização pendente (aplicado
+      // por radar_review_update na aprovação; descartado na rejeição).
+      ...(c.needsReview ? {} : c.patch),
       is_published: !c.needsReview,
       source_id: o.sourceId,
     }).select("id").single();
@@ -101,6 +124,10 @@ async function persistOutcome(
     concursoId = data.id;
   } else {
     concursoId = o.existing.id;
+    if (c.needsReview && await samePendingExists(supabase, concursoId, c.patch)) {
+      // A mesma mudança já espera revisão (página reprocessada): não duplica a fila.
+      return { result: "nada", concursoId };
+    }
     if (!c.needsReview) {
       const { error } = await supabase.rpc("radar_apply_patch", { p_concurso_id: concursoId, p: c.patch });
       if (error) throw new Error(`patch: ${error.message}`);
@@ -159,7 +186,7 @@ async function monitor(supabase: Supa, apiKey: string, trigger: "cron" | "admin"
   const [{ data: areaRows }, { data: sourceRows }, { data: concursoRows }] = await Promise.all([
     supabase.from("radar_areas").select("id, slug, name, focus, priority").eq("is_active", true),
     supabase.from("radar_sources")
-      .select("id, name, url, area_id, check_interval_hours, last_checked_at, last_hash, last_text, consecutive_failures")
+      .select("id, name, url, area_id, check_interval_hours, last_checked_at, last_hash, last_text, consecutive_failures, pending_retries")
       .eq("is_active", true).order("last_checked_at", { ascending: true, nullsFirst: true }).limit(200),
     supabase.from("radar_concursos").select(CONCURSO_COLUMNS).order("last_update_at", { ascending: false }).limit(2000),
   ]);
@@ -248,6 +275,7 @@ async function monitor(supabase: Supa, apiKey: string, trigger: "cron" | "admin"
   // 3. Persistência e avisos.
   let published = 0, pending = 0;
   const touched = new Set<string>();
+  const persistFailed = new Set<string>();
   for (const o of outcomes) {
     try {
       const r = await persistOutcome(supabase, o, areaIdBySlug);
@@ -256,6 +284,7 @@ async function monitor(supabase: Supa, apiKey: string, trigger: "cron" | "admin"
       if (r.concursoId) touched.add(r.concursoId);
     } catch (e) {
       errors++;
+      persistFailed.add(o.sourceId);
       console.error("radar-concursos: persistência", (e instanceof Error ? e.message : "erro").slice(0, 200));
     }
   }
@@ -276,8 +305,12 @@ async function monitor(supabase: Supa, apiKey: string, trigger: "cron" | "admin"
 
   await refreshRelevance(supabase, [...touched]);
 
-  // 4. Snapshots: só avançam as fontes processadas (triagem com falha tenta de novo depois).
-  const failed = new Set(stats?.scoutFailed ?? []);
+  // 4. Snapshots: só avançam as fontes cujo trecho novo foi TODO processado (triagem,
+  // análise de cada concurso e gravação). Com trabalho pendente, a fonte é reprocessada na
+  // próxima execução — no máximo MAX_DEFERRALS vezes, para um item problemático não travar
+  // a fonte para sempre (aí avança e o descarte fica registrado em radar_runs).
+  const failed = new Set([...(stats?.scoutFailed ?? []), ...(stats?.unfinishedSources ?? []), ...persistFailed]);
+  const givenUp: string[] = [];
   const nowIso = new Date().toISOString();
   for (const f of fetched) {
     if (!f.page) continue;
@@ -290,12 +323,16 @@ async function monitor(supabase: Supa, apiKey: string, trigger: "cron" | "admin"
       continue;
     }
     const isChanged = f.page.hash !== f.source.last_hash;
-    const advance = isChanged && !failed.has(f.source.id);
+    const deferred = isChanged && failed.has(f.source.id) && (f.source.pending_retries ?? 0) < MAX_DEFERRALS;
+    if (isChanged && failed.has(f.source.id) && !deferred) givenUp.push(f.source.name);
     await supabase.from("radar_sources").update({
       last_checked_at: nowIso,
-      last_status: failed.has(f.source.id) ? "triagem adiada" : "ok",
+      last_status: deferred ? `trabalho pendente (${(f.source.pending_retries ?? 0) + 1}/${MAX_DEFERRALS})` : "ok",
       consecutive_failures: 0,
-      ...(advance ? { last_hash: f.page.hash, last_text: f.page.binary ? null : f.page.text.slice(0, SNAPSHOT_MAX), last_changed_at: nowIso } : {}),
+      pending_retries: deferred ? (f.source.pending_retries ?? 0) + 1 : 0,
+      ...(isChanged && !deferred
+        ? { last_hash: f.page.hash, last_text: f.page.binary ? null : f.page.text.slice(0, SNAPSHOT_MAX), last_changed_at: nowIso }
+        : {}),
     }).eq("id", f.source.id);
   }
 
@@ -311,7 +348,7 @@ async function monitor(supabase: Supa, apiKey: string, trigger: "cron" | "admin"
   await supabase.from("radar_runs").update({
     ...summary,
     finished_at: new Date().toISOString(),
-    details: { stats, elapsed_ms: Date.now() - startedAt },
+    details: { stats, sources_given_up: givenUp, elapsed_ms: Date.now() - startedAt },
   }).eq("id", run.id);
 
   return jsonResponse({ run_id: run.id, ...summary, degraded: stats?.degraded ?? [], elapsed_ms: Date.now() - startedAt });
