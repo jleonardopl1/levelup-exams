@@ -48,12 +48,14 @@ O script valida tudo (4 alternativas distintas, gabarito, explicação, mínimo 
 
 ## Questões novas toda semana
 
-A Edge Function `generate-track-questions` publica **3 questões novas por matéria por dia** (21 por semana, acima do mínimo de 15). Para cada matéria ela:
+A Edge Function `generate-track-questions` publica **3 questões novas por matéria por dia** (21 por semana, acima do mínimo de 15) com uma **fábrica multiagente** (detalhes em `docs/ARQUITETURA_MULTIAGENTE.md` §5.3). Para cada matéria ela:
 
-1. monta o contexto: conteúdo do edital por nível, tópicos menos explorados, últimos enunciados (para não repetir) e uma base de fatos já verificados;
-2. gera as questões no padrão da banca;
-3. faz um **segundo passe revisor**, que reprova gabarito duvidoso, mais de uma resposta defensável ou dado inventado;
-4. valida, embaralha, deduplica e grava com `origem = 'ia_diaria'`.
+1. monta o contexto: conteúdo do edital por nível, tópicos menos explorados, últimos enunciados (para não repetir), uma base de fatos já verificados e as **lições** da matéria (erros já reprovados antes);
+2. o **Elaborador** gera as questões no padrão da banca;
+3. um **portão determinístico** barra falhas clássicas (pista de tamanho, "todas/nenhuma", gabarito copiado no enunciado);
+4. em paralelo, o **Solucionador cego** resolve sem ver o gabarito e o **Revisor técnico** reprova gabarito duvidoso, mais de uma resposta defensável ou dado inventado;
+5. se eles divergirem, o **Árbitro** decide (só mantém se confirmar o mesmo gabarito);
+6. valida, embaralha (sem embaralhar quando a explicação cita letras), deduplica e grava com `origem = 'ia_diaria'`; as reprovações viram lições (`ai_lessons`) e cada chamada é medida em `ai_runs`.
 
 Na **Legislação municipal** (`ai_grounded_only = true`), a geração só pode usar os fatos já verificados das explicações autorais, o que impede artigos ou prazos inventados.
 
@@ -64,7 +66,7 @@ O agendamento (`pg_cron` + `pg_net`) roda a cada 10 minutos entre 01h e 04h50 (h
 1. **Migrations**: `supabase db push` (aplica `20261110130000_study_tracks.sql`, a trilha, o agendamento e o segredo do agendador no Vault).
 2. **Segredos das Edge Functions** (Dashboard → Edge Functions → Secrets):
    - `LOVABLE_API_KEY`: já usado pelo Mentor IA;
-   - opcionais: `QUESTION_MODEL` (padrão `google/gemini-2.5-pro`), `QUESTION_REVIEW_MODEL`, `QUESTIONS_PER_SUBJECT_DAY` (padrão 3);
+   - opcionais: `QUESTION_MODEL` (padrão `google/gemini-2.5-pro`), `QUESTION_REVIEW_MODEL`, `QUESTION_SOLVER_MODELS` (padrão `google/gemini-2.5-flash`; lista separada por vírgula), `QUESTION_ARBITER_MODEL`, `QUESTION_MAX_ARBITRATIONS` (padrão 3), `QUESTION_PIPELINE` (`classic` desliga solucionador e árbitro), `QUESTIONS_PER_SUBJECT_DAY` (padrão 3);
    - `QUESTION_CRON_SECRET` **não é mais necessário**: a migration `20261110140000_question_cron_secret_vault.sql` gera o segredo dentro do Vault e a função o lê de lá (RPC `get_question_cron_secret`, só `service_role`). Se a variável existir, ela tem prioridade e precisa ser igual ao segredo `question_cron_secret` do Vault.
 3. **Publicar a função**: `supabase functions deploy generate-track-questions` (no Lovable Cloud, a publicação das funções é automática).
 4. **Vault** (SQL Editor, uma vez por projeto), para o agendador saber o endereço do projeto:

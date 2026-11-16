@@ -41,7 +41,10 @@ export default defineConfig(({ mode }) => ({
           vendor: ["react", "react-dom", "react-router-dom"],
           supabase: ["@supabase/supabase-js"],
           ui: ["@radix-ui/react-dialog", "@radix-ui/react-dropdown-menu", "@radix-ui/react-tabs", "@radix-ui/react-tooltip"],
-          charts: ["recharts"],
+          // recharts NÃO entra aqui: num chunk manual ele levava junto utilitários usados pelo
+          // app inteiro (ex.: clsx) e o index.html pré-carregava ~105 kB gzip de gráficos em
+          // toda página. Sem a entrada, ele vira um chunk sob demanda das telas com gráfico
+          // (painel admin e de afiliado).
           query: ["@tanstack/react-query"],
         },
       },

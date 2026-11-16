@@ -10,6 +10,8 @@ import {
   requireUser,
   UUID_RE,
 } from "../_shared/utils.ts";
+import { modelFromEnv } from "../_shared/ai/llm.ts";
+import { createTelemetry } from "../_shared/ai/telemetry.ts";
 
 const DAILY_LIMIT = 6;
 const RATE_LIMIT_WINDOW_MS = 60000;
@@ -21,6 +23,8 @@ const UPSTREAM_TIMEOUT_MS = 60000;
 // "Explicar esta questão" (1ª mensagem com question_id) tem cota própria e não gasta as 6 perguntas.
 const EXPLAIN_DAILY_LIMIT = 20;
 const DAY_MS = 24 * 60 * 60 * 1000;
+const DEFAULT_MODEL = "google/gemini-2.5-flash";
+const PROMPT_VERSION = "mentor@2026-11-16";
 
 const SYSTEM_PROMPT = `Você é o Mentor IA do LevelUp Exams, um especialista em educação focado em ajudar estudantes a se prepararem para vestibulares, ENEM e concursos públicos.
 
@@ -274,16 +278,33 @@ serve(withCors(async (req) => {
       with_context: !!studentContext,
     });
 
+    const model = modelFromEnv("MENTOR_MODEL", DEFAULT_MODEL);
+    const startedAt = Date.now();
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model,
         messages: [...system, ...messages],
         stream: true,
       }),
       signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
     });
+
+    // Telemetria (só metadados): latência até o início da resposta em streaming.
+    const telemetry = createTelemetry("ai-mentor");
+    telemetry.record({
+      agent: isExplanation ? "mentor-explicacao" : "mentor",
+      model,
+      promptVersion: PROMPT_VERSION,
+      status: response.ok && response.body ? "ok" : "error",
+      attempts: 1,
+      latencyMs: Date.now() - startedAt,
+      inputTokens: null,
+      outputTokens: null,
+      ...(response.ok ? {} : { error: `gateway ${response.status}` }),
+    }, { metadata: { streaming: true, with_context: !!studentContext, messages_count: messages.length } });
+    await telemetry.flush(supabase);
 
     if (!response.ok || !response.body) {
       const status = response.status;

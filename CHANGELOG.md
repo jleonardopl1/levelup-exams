@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.7.0] - 2026-11-16
+
+### Features (IA multiagente)
+- **Fábrica de questões multiagente**: Elaborador → portão determinístico (pista de tamanho, "todas/nenhuma", gabarito no enunciado) → **Solucionador cego** (resolve sem ver o gabarito) em paralelo com o Revisor técnico → **Árbitro** só nas divergências; respeita o prazo de 140 s do agendador e reprova o que não deu tempo de arbitrar
+- **Memória de lições por matéria**: o que o revisor, o árbitro e o portão reprovam volta ao prompt do Elaborador (`ai_lessons`, desativável pela equipe)
+- **Camada de IA compartilhada** (`_shared/ai`): saída estruturada validada, novas tentativas com backoff só em erro temporário, prazo global, telemetria de metadados (`ai_runs`) e cercas contra injeção de prompt
+- Correção da discursiva no cliente compartilhado (nova tentativa em falha temporária; texto do aluno cercado); Mentor com modelo configurável (`MENTOR_MODEL`) e telemetria
+- Governança AGENTS-COLLAB: 17 agentes por faixa (`.claude/agents/`), `rules/`, `CLAUDE.md`, `AGENTS.md`, `AGENTS-COLLAB.md`, CI e templates de PR/issue
+
+### Fixes
+- Explicação que cita alternativa por letra deixava de bater depois do embaralhamento: o Elaborador não cita letras e a publicação não embaralha quando a explicação cita
+- Gráficos (recharts, ~105 kB gzip) eram pré-carregados em toda página: JavaScript inicial caiu de 328 para 226 kB gzip
+- Lint voltou a passar (9 erros); `package-lock.json` sincronizado com o `package.json`
+
+### Banco
+- `20261116120000_ai_runtime_observability.sql`: `ai_runs` (telemetria, retenção de 90 dias via pg_cron), `ai_lessons`, RPCs `record_ai_lessons` e `purge_old_ai_runs` (só `service_role`); leitura só para administradores
+
 ## [1.6.0] - 2026-11-15
 
 ### Features (Plus)
