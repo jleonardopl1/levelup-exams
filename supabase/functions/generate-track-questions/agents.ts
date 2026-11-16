@@ -17,7 +17,7 @@ import { letter, validateQuestion } from "./quality.ts";
 import type { ArbiterVerdict, GeneratedQuestion, ReviewVerdict, SolverVote, SubjectContext } from "./types.ts";
 
 export const PROMPT_VERSIONS = {
-  elaborador: "elaborador@2026-11-16",
+  elaborador: "elaborador@2026-11-17",
   solucionador: "solucionador@2026-11-16",
   revisor: "revisor@2026-11-16",
   arbitro: "arbitro@2026-11-16",
@@ -102,7 +102,8 @@ Regras obrigatórias:
 - Conteúdo estritamente dentro da ementa do edital informada e de acordo com a legislação, a jurisprudência e o entendimento técnico VIGENTES em ${today}.
 - Nunca invente números de artigos, prazos, percentuais ou nomes. Se não tiver certeza absoluta de um dado, não o use.
 - A explicação deve citar o fundamento (artigo, norma, conceito ou cálculo) e dizer por que as demais alternativas estão erradas, referindo-se a elas pelo CONTEÚDO — nunca pela letra (as alternativas serão embaralhadas).
-- Sem pistas: a alternativa correta não pode ser sistematicamente a mais longa nem repetir palavras do enunciado; os distratores devem ter tamanho e estrutura semelhantes.
+- Sem pistas: a alternativa correta não pode ser sistematicamente a mais longa nem repetir palavras do enunciado; os distratores devem ter tamanho e estrutura semelhantes; termos absolutos (sempre, nunca, exclusivamente, em qualquer hipótese) não podem aparecer só nas alternativas erradas.
+- Comando negativo em caixa alta: "assinale a alternativa INCORRETA", "EXCETO", "que NÃO".
 - Português formal, norma-padrão, sem marcas de formatação.
 - Não repita nem parafraseie questões já existentes listadas pelo usuário.
 ${UNTRUSTED_RULE}`;

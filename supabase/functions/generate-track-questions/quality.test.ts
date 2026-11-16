@@ -1,5 +1,5 @@
 import { assert, assertEquals } from "https://deno.land/std@0.190.0/testing/asserts.ts";
-import { arbiterKeeps, citesOptionLetters, decide, itemFlaws, shuffleAlternatives, validateQuestion } from "./quality.ts";
+import { arbiterKeeps, citesOptionLetters, decide, emphasizeNegativeCommand, itemFlaws, shuffleAlternatives, validateQuestion } from "./quality.ts";
 import { groupLessons, normalizeLesson } from "./lessons.ts";
 import type { GeneratedQuestion, ReviewVerdict, SolverVote } from "./types.ts";
 
@@ -104,4 +104,39 @@ Deno.test("lições: normaliza, descarta genéricas/letras e agrupa sem repetir"
   assertEquals(g.get("revisor")?.length, 1);
   assertEquals(g.get("arbitro")?.length, 1);
   assertEquals(g.has("validador"), false);
+});
+
+Deno.test("emphasizeNegativeCommand: destaca só o comando negativo", () => {
+  assertEquals(
+    emphasizeNegativeCommand("Assinale a alternativa incorreta sobre o processo legislativo."),
+    "Assinale a alternativa INCORRETA sobre o processo legislativo.",
+  );
+  assertEquals(emphasizeNegativeCommand("São afirmações falsas:"), "São afirmações FALSAS:");
+  assertEquals(emphasizeNegativeCommand("Todas são competências do Prefeito, exceto:"), "Todas são competências do Prefeito, EXCETO:");
+  assertEquals(emphasizeNegativeCommand("Indique a opção que não apresenta erro de regência."), "Indique a opção que NÃO apresenta erro de regência.");
+  // Fora do comando, nada muda.
+  const plain = "O servidor não poderá acumular cargos; a conduta incorreta gera processo. Falsamente acusado, recorreu.";
+  assertEquals(emphasizeNegativeCommand(plain), plain);
+});
+
+Deno.test("validateQuestion aplica o destaque do comando negativo", () => {
+  const q = validateQuestion({ ...Q, enunciado: "Sobre a Constituição, assinale a alternativa incorreta quanto aos princípios." });
+  assertEquals(q?.enunciado, "Sobre a Constituição, assinale a alternativa INCORRETA quanto aos princípios.");
+});
+
+Deno.test("itemFlaws: termos absolutos só nos distratores", () => {
+  const cue: GeneratedQuestion = {
+    ...Q,
+    alternativas: [
+      "é permitido, atendendo à finalidade pública",
+      "é proibido em qualquer hipótese",
+      "depende sempre de consentimento escrito",
+      "só pode ocorrer com autorização judicial",
+    ],
+    correta: 0,
+  };
+  assert(itemFlaws(cue).some((f) => f.includes("Termos absolutos")));
+  // Um distrator absoluto só não é pista; e a correta também absoluta desfaz o padrão.
+  assertEquals(itemFlaws({ ...cue, alternativas: [cue.alternativas[0], "é proibido", cue.alternativas[2], "exige lei"] }).filter((f) => f.includes("absolutos")), []);
+  assertEquals(itemFlaws({ ...cue, alternativas: ["é sempre permitido", ...cue.alternativas.slice(1)] }).filter((f) => f.includes("absolutos")), []);
 });
