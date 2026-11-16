@@ -102,7 +102,7 @@ export function useRadarConcursos() {
         .order('relevance', { ascending: false })
         .limit(300);
       if (error) throw error;
-      return (data ?? []) as RadarConcurso[];
+      return (data ?? []) as unknown as RadarConcurso[];
     },
   });
 }
@@ -123,12 +123,12 @@ export function useRadarConcurso(slug: string | undefined) {
       const { data: updates, error: updError } = await radarDb
         .from('radar_updates')
         .select('id, concurso_id, kind, severity, title, summary, changes, evidence_url, created_at')
-        .eq('concurso_id', (concurso as RadarConcurso).id)
+        .eq('concurso_id', (concurso as unknown as RadarConcurso).id)
         .eq('review_status', 'publicada')
         .order('created_at', { ascending: false })
         .limit(50);
       if (updError) throw updError;
-      return { concurso: concurso as RadarConcurso, updates: (updates ?? []) as RadarUpdate[] };
+      return { concurso: concurso as unknown as RadarConcurso, updates: (updates ?? []) as RadarUpdate[] };
     },
   });
 }
@@ -153,11 +153,11 @@ export function useTrackRadar(trackId: string | undefined) {
       const { data: updates } = await radarDb
         .from('radar_updates')
         .select('id, concurso_id, kind, severity, title, summary, changes, evidence_url, created_at')
-        .eq('concurso_id', (concurso as RadarConcurso).id)
+        .eq('concurso_id', (concurso as unknown as RadarConcurso).id)
         .eq('review_status', 'publicada')
         .order('created_at', { ascending: false })
         .limit(3);
-      return { concurso: concurso as RadarConcurso, updates: (updates ?? []) as RadarUpdate[] };
+      return { concurso: concurso as unknown as RadarConcurso, updates: (updates ?? []) as RadarUpdate[] };
     },
   });
 }
