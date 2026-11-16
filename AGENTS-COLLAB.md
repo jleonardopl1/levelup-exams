@@ -61,6 +61,8 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
   ("Agent access to secrets is not allowed"), como o bloco de agendamento do pg_cron. A migration
   do Radar foi aplicada em partes pela consulta SQL do Lovable (`query_database`), com o mesmo
   conteúdo do arquivo. Em migrations futuras, deixe o agendamento num arquivo separado.
+- 🚫 **`public.has_role` não é executável por `anon`**: política com `TO anon` não pode chamá-la
+  (a consulta anônima falha com 42501). Faça uma política por papel.
 - 🧩 **Tabelas do Radar ainda não estão em `types.ts`**: o front usa `radarDb` (cliente sem tipos)
   em `src/hooks/useRadar.ts`. Depois de aplicar a migration, regerar os tipos e trocar por `supabase`.
 - 🔐 **`auth-email-hook` e `.lovable/` são gerenciados pelo Lovable** — não editar à mão.
@@ -77,7 +79,7 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
   1. Aplicar a migration `20261116120000` e publicar `generate-track-questions`, `essay-review`, `ai-mentor`.
   2. Acompanhar 7 dias de `ai_runs` (taxa de disputa, aprovação, custo) antes de ajustar modelos.
   3. ECA Digital: inventário de dados de menores, base legal, verificação de idade e supervisão (D6).
-  4. Radar: regerar `types.ts` no Lovable, publicar o site e acompanhar a primeira execução
+  4. Radar: regerar `types.ts` no Lovable e acompanhar a primeira execução
      (`radar_runs`); ampliar as fontes (órgãos e diários oficiais por área) com o `curador-conteudo`.
 - **P1 — próximas 2–4 semanas:**
   4. Auditar questões `ia_diaria` publicadas: explicação com letras e gabarito (rodar o Solucionador cego em lote).
@@ -105,8 +107,12 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
   e ligado à trilha, 6 RPCs, 11 políticas, RLS em todas as tabelas `radar_*`, job
   `radar-concursos` (`17 */3 * * *`) ativo, segredos `project_url` e `question_cron_secret` presentes.
   A função responde 401 sem autorização (o handler roda; `verify_jwt = false` vale).
+- **Site publicado** (a pedido do dono): `levelupexams.com.br` serve `/radar` e `/radar/:slug`.
+- **Corrigido em produção:** as políticas de leitura chamavam `has_role` também para `anon`, que
+  não tem EXECUTE nela → visitante recebia erro. Migration `20261117120100_radar_policies_anon.sql`
+  (aplicada via `query_database`) separa as políticas de `anon` e `authenticated`.
 - **Pendente:** regerar `types.ts` (o gerador é do Lovable e os créditos do agente acabaram; o front
-  funciona sem, via `radarDb`); publicar o site (o `/radar` só aparece em produção depois disso);
+  funciona sem, via `radarDb`);
   o agente do Lovable relatou "erros de compilação no preview" sem dizer o arquivo — `typecheck` e
   `build` da `main` passam localmente.
 
