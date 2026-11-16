@@ -59,10 +59,13 @@ Plataforma gamificada de estudos para concursos públicos, vestibulares e ENEM (
 
 - instalar: `bun install` · dev: `bun run dev` (http://localhost:8080)
 - typecheck: `bun run typecheck` · lint: `bun run lint` · build: `bun run build`
+- testes unitários (lógica pura do front + guardrails): `bun run test:unit` (`node --test`, Node 22.18+)
 - testes das Edge Functions: `bun run test:edge` (requer Deno 2)
 - seed das trilhas: `bun run build:trilhas`
 - migrations: `supabase db push` (remoto exige aprovação do dono) · deploy de função: `supabase functions deploy <nome>`
-- CI (`.github/workflows/ci.yml`): typecheck + lint + build + testes Deno + `deno check` de todas as funções
+- CI (`.github/workflows/ci.yml`): typecheck + lint + testes unitários + build + testes Deno + `deno check` de todas as funções
+- **Guardrails:** `.claude/hooks/guardrails.mjs` (PreToolUse) aplica em código as convenções acima
+  (force-push, main, banco remoto, deploy, secrets, arquivos do Lovable). Mudou uma convenção? Mude o hook e o teste.
 
 ## Segurança (resumo)
 
@@ -93,7 +96,9 @@ Plataforma gamificada de estudos para concursos públicos, vestibulares e ENEM (
   Modelos por papel: `QUESTION_MODEL`, `QUESTION_REVIEW_MODEL`, `QUESTION_SOLVER_MODELS`,
   `QUESTION_ARBITER_MODEL`; `QUESTION_PIPELINE=classic` desliga solucionador/árbitro.
 - Mentor (`ai-mentor`, streaming, `MENTOR_MODEL`) e discursiva (`essay-review`, `ESSAY_MODEL`)
-  usam a mesma camada (telemetria; a discursiva também usa o cliente com prazo).
+  usam a mesma camada (telemetria; a discursiva também usa o cliente com prazo). O prompt do
+  Mentor fica em `ai-mentor/prompt.ts` (modos `direto`/`socratico`, texto simples sem Markdown,
+  regras de `rules/common/writing.md`); `mode` ausente = `direto`.
 
 ## Schema (resumo)
 
@@ -112,6 +117,15 @@ Plataforma gamificada de estudos para concursos públicos, vestibulares e ENEM (
 `ai-mentor` · `essay-review` · `generate-track-questions` (cron) · `radar-concursos` (cron) · `create-checkout` · `customer-portal` ·
 `check-subscription` · `stripe-webhook` · `admin-metrics` · `admin-notify` · `send-contact` · `auth-email-hook` (gerenciada pelo Lovable).
 Utilidades em `_shared/` (CORS por lista de origens, auth, rate limit atômico, auditoria, IA).
+
+## Aprendizagem (lógica pura em `src/lib`, testada com `node --test`)
+
+- `mastery.ts` — domínio por tópico (DeepTutor): recência das 5 últimas respostas, teto 50%/80%
+  com 1/2 respostas, repetição da mesma questão em < 6 h não conta. Lê `user_question_attempts`
+  do próprio aluno (`useTopicMastery`), nunca o gabarito.
+- `edital.ts` — edital verticalizado (itens numerados do `syllabus`, estado teoria/revisão no aparelho).
+- `speech.ts` — leitura em voz alta (Web Speech API, pt-BR) · `seo.ts` — JSON-LD e metadados.
+- Referências externas avaliadas e o que foi adotado: `docs/REFERENCIAS_REPOSITORIOS.md`.
 
 ## Foco atual
 
