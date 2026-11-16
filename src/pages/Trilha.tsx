@@ -19,6 +19,7 @@ import {
 } from '@/hooks/useStudyTracks';
 import { useTrackSelection } from '@/lib/trackPrefs';
 import { ReviewTodayCard } from '@/components/ReviewTodayCard';
+import { TrackRadarCard } from '@/components/radar/TrackRadarCard';
 
 const PASS_MARK = 40;
 
@@ -212,6 +213,8 @@ export default function Trilha() {
         </div>
 
         <ReviewTodayCard />
+
+        <TrackRadarCard trackId={track.id} />
 
         {/* Simulado Oficial */}
         <Card variant="elevated" className="border-primary/30">

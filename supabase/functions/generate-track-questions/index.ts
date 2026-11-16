@@ -113,6 +113,11 @@ async function processSubject(
   for (const r of topicRows ?? []) topicCount.set(r.topico, (topicCount.get(r.topico) ?? 0) + 1);
   const topics = [...topicCount.entries()].sort((a, b) => a[1] - b[1]).map(([t, n]) => `${t} (${n})`);
   const allFacts = (factRows ?? []).map((r: { explicacao: string }) => r.explicacao);
+  // Legislação local só pode ser gerada a partir de fatos verificados. Sem base
+  // (ex.: trilha nova publicada pelo Radar de Concursos), não gera nada — falha fechada.
+  if (ctx.grounded && allFacts.length < 10) {
+    throw new Error("legislação local sem fatos verificados suficientes (cadastre questões autorais)");
+  }
   // Amostra aleatória de fatos para variar o foco a cada dia.
   const facts = allFacts.sort(() => Math.random() - 0.5).slice(0, ctx.grounded ? 60 : 15);
 
