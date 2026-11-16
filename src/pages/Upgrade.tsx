@@ -14,10 +14,16 @@ import { PremiumBadge } from '@/components/PremiumBadge';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import { useQueryClient } from '@tanstack/react-query';
+import { useSeo } from '@/hooks/useSeo';
 
 
 export default function Upgrade() {
   const navigate = useNavigate();
+  useSeo({
+    title: 'Plano Plus e Passe Concurso',
+    description: 'Compare o plano gratuito e o Plus do LevelUp Exams: questões e Simulados Oficiais ilimitados, revisão espaçada de todos os erros, correção da discursiva e Mentor IA.',
+    path: '/upgrade',
+  });
   const [searchParams] = useSearchParams();
   const { user, session } = useAuth();
   const stripeReturnHandled = useRef(false);

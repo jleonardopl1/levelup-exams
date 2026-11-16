@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { detectPlatform, isInAppBrowser, isIosNonSafari, useInstallPrompt, type Platform } from '@/lib/pwa';
 import { siteUrl } from '@/config/site';
+import { useSeo } from '@/hooks/useSeo';
 
 const APP_URL = siteUrl('').replace(/\/$/, '');
 
@@ -31,6 +32,11 @@ function Step({ n, children }: { n: number; children: React.ReactNode }) {
 
 export default function InstallApp() {
   const navigate = useNavigate();
+  useSeo({
+    title: 'Instalar o app no celular',
+    description: 'Instale o LevelUp Exams no Android ou no iPhone direto do navegador, sem loja: acesso rápido, tela cheia e estudo mesmo com internet fraca.',
+    path: '/instalar',
+  });
   const detected = useMemo(() => detectPlatform(), []);
   const [tab, setTab] = useState<Platform>(detected);
   const { canPrompt, installed, promptInstall } = useInstallPrompt();
