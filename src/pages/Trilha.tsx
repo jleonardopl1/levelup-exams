@@ -19,6 +19,7 @@ import {
 } from '@/hooks/useStudyTracks';
 import { useTrackSelection } from '@/lib/trackPrefs';
 import { ReviewTodayCard } from '@/components/ReviewTodayCard';
+import { TrackRadarCard } from '@/components/radar/TrackRadarCard';
 
 const PASS_MARK = 40;
 
@@ -116,7 +117,9 @@ export default function Trilha() {
     navigate(`/quiz?${params.toString()}`);
   };
 
-  const areas = module.structure.map((a) => a.area);
+  // Áreas do quadro de provas + áreas de matérias fora dele (ex.: trilha nova do Radar cujo
+  // edital não trouxe o quadro): nenhuma matéria fica escondida por falta de peso.
+  const areas = [...new Set([...module.structure.map((a) => a.area), ...visibleSubjects.map((s) => s.area)])];
 
   return (
     <div className="min-h-screen bg-background pb-12">
@@ -157,7 +160,9 @@ export default function Trilha() {
                 <span className="text-base font-medium text-primary-foreground/80">/100</span>
               </p>
               <p className="text-xs text-primary-foreground/80 mt-1">
-                {score.covered === 0
+                {module.structure.length === 0
+                  ? 'Quadro de provas não informado no edital'
+                  : score.covered === 0
                   ? 'Responda questões para calcular'
                   : score.covered < 100
                     ? `com base em ${score.covered} dos 100 pontos`
@@ -213,6 +218,8 @@ export default function Trilha() {
 
         <ReviewTodayCard />
 
+        <TrackRadarCard trackId={track.id} />
+
         {/* Simulado Oficial */}
         <Card variant="elevated" className="border-primary/30">
           <CardContent className="p-4 flex items-center gap-3">
@@ -258,7 +265,7 @@ export default function Trilha() {
 
         {/* Matérias por área */}
         {areas.map((areaName) => {
-          const area = score.areas.find((a) => a.area === areaName)!;
+          const area = score.areas.find((a) => a.area === areaName);
           const subjects = visibleSubjects.filter((s) => s.area === areaName);
           if (!subjects.length) return null;
           return (
@@ -266,11 +273,15 @@ export default function Trilha() {
               <div className="flex items-end justify-between gap-2">
                 <div>
                   <h2 className="font-display font-bold text-lg">{areaName}</h2>
-                  <p className="text-xs text-muted-foreground">
-                    {area.questoes} questões × {area.pontos_por_questao.toLocaleString('pt-BR')} ponto = {area.max} pontos · não pode zerar
-                  </p>
+                  {area ? (
+                    <p className="text-xs text-muted-foreground">
+                      {area.questoes} questões × {area.pontos_por_questao.toLocaleString('pt-BR')} ponto = {area.max} pontos · não pode zerar
+                    </p>
+                  ) : (
+                    <p className="text-xs text-muted-foreground">Peso na prova ainda não informado no edital</p>
+                  )}
                 </div>
-                {area.acc !== null && (
+                {area && area.acc !== null && (
                   <Badge variant="secondary" className="shrink-0 whitespace-nowrap">{Math.round(area.acc * 100)}% de acerto</Badge>
                 )}
               </div>

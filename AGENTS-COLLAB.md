@@ -30,6 +30,11 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
   cobrança dentro do app nas lojas (IAP) vs. link externo. Ver `docs/ARQUITETURA_MULTIAGENTE.md` §6.
 - **D6** (pendente — dono) — Garantia de idade e supervisão parental exigidas pelo **ECA Digital**
   (Lei 15.211/2025, em vigor desde 17/03/2026) para alunos menores. Ver §7.2.
+- **D8** (2026-11-17, dono + Claude Code) — **Radar de Concursos** é um grupo de agentes
+  hierárquico (gerente master em código → coordenador por área → especialistas). Fato só com
+  evidência literal da fonte oficial; retificação, regressão de fase e verificador indisponível
+  vão para revisão humana; rascunho de trilha só é publicado por admin. Migration
+  `20261117120000_radar_concursos.sql` **aguarda aplicação** (D4).
 - **D7** (pendente — dono) — Correção dupla independente da discursiva (modelo INEP: 2 corretores,
   3º na discrepância) dobra o custo por correção. Ver §5.5.
 
@@ -49,6 +54,11 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
   Questões `ia_diaria` antigas podem ter esse defeito — auditar (backlog P1).
 - 🧾 **Telemetria e lições são "best effort"**: sem a migration aplicada, as funções seguem
   funcionando e só registram aviso no log. Não conclua que "a IA não roda" por falta de linhas em `ai_runs`.
+- 🕸️ **Radar: páginas montadas por JavaScript chegam vazias ao coletor** (Cebraspe, portal da
+  Selecon) e a Fundatec tem anti-robô — semeadas desligadas. Fonte com "página sem texto" no
+  painel precisa de outra URL (página do órgão, diário oficial). O coletor não executa JS.
+- 🧩 **Tabelas do Radar ainda não estão em `types.ts`**: o front usa `radarDb` (cliente sem tipos)
+  em `src/hooks/useRadar.ts`. Depois de aplicar a migration, regerar os tipos e trocar por `supabase`.
 - 🔐 **`auth-email-hook` e `.lovable/` são gerenciados pelo Lovable** — não editar à mão.
 - 🕛 **O limite diário do Free renova à meia-noite UTC** (21h de Brasília), não à meia-noite local.
 - 💳 **Stripe:** confirmar em produção o endpoint do webhook registrado e o segredo de assinatura
@@ -63,6 +73,8 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
   1. Aplicar a migration `20261116120000` e publicar `generate-track-questions`, `essay-review`, `ai-mentor`.
   2. Acompanhar 7 dias de `ai_runs` (taxa de disputa, aprovação, custo) antes de ajustar modelos.
   3. ECA Digital: inventário de dados de menores, base legal, verificação de idade e supervisão (D6).
+  4. Aplicar `20261117120000_radar_concursos.sql`, publicar `radar-concursos` e rodar Admin → Radar →
+     Verificar agora; ampliar as fontes (órgãos e diários oficiais por área) com o `curador-conteudo`.
 - **P1 — próximas 2–4 semanas:**
   4. Auditar questões `ia_diaria` publicadas: explicação com letras e gabarito (rodar o Solucionador cego em lote).
   5. Harness de testes do front (Vitest + Testing Library) para `lib/` e hooks críticos (`tester`).
@@ -80,6 +92,23 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
 
 ## Handoff mais recente
 <!-- Sempre o topo = o mais recente. Template: docs/colaboracao/handoff-template.md -->
+
+### 2026-11-17 · Radar de Concursos (Claude Code, nas faixas de `engenheiro-ia`, `supabase-db`, `frontend` e `documentation-writer`)
+- **Objetivo:** grupo de agentes (master → coordenador por área → especialistas) para pesquisar e
+  monitorar concursos com edital previsto/publicado, manter o aluno avisado e criar trilhas novas.
+- **O que mudou:** Edge Function `radar-concursos` (`fetcher.ts` coletor seguro + diff, `agents.ts`
+  6 papéis, `evidence.ts` portão e consolidação, `scoring.ts` relevância, `pipeline.ts` orquestração,
+  `tracks.ts` rascunho de trilha); migration `20261117120000` (7 tabelas, RLS, RPCs, sementes, cron
+  a cada 3 h); páginas `/radar` e `/radar/:slug`, cartão na trilha, atalho em Trilhas, notificação
+  clicável, aba Admin → Radar; guarda em `generate-track-questions` para legislação local sem fatos;
+  `docs/RADAR_CONCURSOS.md`.
+- **Testado:** `bun run typecheck` ✅ · `bun run lint` ✅ (0 erros; 48 avisos antigos) · `bun run build` ✅ ·
+  `deno test` ✅ 65/65 (35 novos) · `deno check` ✅ 12/12 funções · migration no PGlite ✅ (2×, RLS,
+  RPCs, fan-out sem duplicar, publicação de trilha, limite de follows) · coletor contra as fontes reais ✅
+  (5 com texto; 3 dinâmicas/anti-robô semeadas desligadas).
+- **Não testado:** chamadas reais ao gateway de IA (sem `LOVABLE_API_KEY` nesta sessão) e publicação no Supabase.
+- **Bloqueios:** aplicação da migration e deploy dependem do dono (D4).
+- **Próximo passo:** P0.4 do backlog; depois, fontes por área e banco autoral inicial das trilhas novas.
 
 ### 2026-11-16 · fundação multiagente (`coordenador` + `engenheiro-ia` + `supabase-db` + `reviewer` + `documentation-writer`)
 - **Objetivo:** analisar AgroDecision, TradingAgents e o ecossistema `multi-agent-systems`;

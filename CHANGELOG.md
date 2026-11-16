@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.8.0] - 2026-11-17
+
+### Features (Radar de Concursos)
+- **Radar de Concursos** (`/radar`, `/radar/:slug`): concursos previstos, autorizados e com edital na rua, por relevância (abrangência, vagas, salário, fase e interesse dos alunos), com filtros por área e abrangência, busca e linha do tempo de atualizações com "antes → depois" e link da fonte oficial
+- **Acompanhar** concurso ou área/carreira: aviso no app quando muda a fase, as datas, as vagas ou sai retificação; concurso novo na área acompanhada também avisa; notificação leva direto ao concurso
+- **Grupo de agentes** (`radar-concursos`, a cada 3 h): gerente master em código → coordenador por área (11 áreas) → Batedor, Analista de edital (cada valor com evidência literal), Verificador independente (outro modelo), Analista de banca e Arquiteto de trilha
+- **Portão determinístico de evidência**: data e número precisam aparecer no trecho citado, que precisa existir na fonte; link precisa estar na página; datas coerentes; retificação, fase que volta atrás e verificador indisponível vão para revisão humana
+- **Coletor seguro**: só https público, sem IP/host interno, redirecionamentos conferidos, limites de tamanho/tempo, respeita robots.txt; só o trecho novo da página vai para a IA
+- **Novas trilhas a partir do edital**: rascunho com módulos, quadro de provas, matérias e ementas conferidas no edital; o admin revisa e publica com um clique e a fábrica de questões começa a gerar para as matérias
+- Cartão "Radar do edital" na trilha e atalho em Trilhas; aba **Radar** no Admin (execuções, revisão, rascunhos, fontes)
+
+### Fixes
+- `generate-track-questions` recusa matéria de legislação local sem fatos verificados (antes geraria a partir de base vazia)
+
+### Banco
+- `20261117120000_radar_concursos.sql`: `radar_areas`, `radar_sources`, `radar_concursos`, `radar_updates`, `radar_follows` (limite de 100 por aluno), `radar_track_drafts`, `radar_runs`; RPCs `radar_fanout_update`, `radar_apply_patch`, `radar_follower_counts` (só `service_role`), `radar_review_update` e `radar_publish_track_draft` (admin); sementes de áreas e fontes; agendamento `radar-concursos`
+- Guia em `docs/RADAR_CONCURSOS.md`
+
 ## [1.7.0] - 2026-11-16
 
 ### Features (IA multiagente)

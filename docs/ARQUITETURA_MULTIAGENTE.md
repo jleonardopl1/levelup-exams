@@ -319,6 +319,16 @@ aprovação = `inserted/requested`; `acceptedDegraded > 0` indica solucionador f
 p95 por agente; tokens por questão publicada. Meta de produto: reportes "gabarito errado" por mil
 respostas de questões `ia_diaria` ≤ os das autorais.
 
+### 5.3.1 Radar de Concursos (implementado em 2026-11-17)
+
+Orquestrador–trabalhadores **hierárquico**: gerente master em código (orçamento, fila,
+consolidação, avisos) → um coordenador por área (`radar_areas`) → especialistas (Batedor,
+Analista de edital, Verificador de outro modelo, Analista de banca, Arquiteto de trilha). Só o
+trecho novo de cada fonte vai para a IA; cada fato precisa de evidência literal conferida em
+código e de confirmação do verificador; o que é arriscado (retificação, fase que volta atrás,
+verificador fora) vai para revisão humana. Rascunho de trilha só vira trilha com aprovação do
+admin. Detalhes em `docs/RADAR_CONCURSOS.md`.
+
 ### 5.4 Mentor IA (próximo passo)
 1. **Tutor socrático**: perguntar antes de entregar, adaptar ao nível; avaliação pedagógica com
    rubrica inspirada no LearnLM (não revelar cedo, corrigir equívoco, incentivar metacognição).

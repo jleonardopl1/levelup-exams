@@ -81,6 +81,12 @@ Plataforma gamificada de estudos para concursos públicos, vestibulares e ENEM (
 - `telemetry.ts` — grava em `ai_runs` só metadados (agente, modelo, versão do prompt, tentativas,
   latência, tokens). Nunca conteúdo. Retenção de 90 dias (pg_cron).
 - `guardrails.ts` — `fenceUntrusted` + `UNTRUSTED_RULE` (OWASP LLM01).
+- **Radar de Concursos** (`radar-concursos`, `docs/RADAR_CONCURSOS.md`): gerente master em código →
+  coordenador por área (`radar_areas`) → Batedor, Analista de edital, Verificador (outro modelo),
+  Analista de banca e Arquiteto de trilha. Fato só com evidência literal da fonte oficial, conferida
+  em código (`evidence.ts`); retificação, regressão de fase e verificador indisponível → revisão humana.
+  Rascunho de trilha só vira trilha com aprovação do admin. Modelos: `RADAR_MODEL`,
+  `RADAR_VERIFIER_MODEL`, `RADAR_TRACK_MODEL`.
 - **Fábrica de questões** (`generate-track-questions`): Elaborador → portão determinístico →
   Solucionador(es) **cego(s)** ∥ Revisor técnico → consenso → Árbitro só nas divergências →
   publicação; reprovações viram **lições** por matéria (`ai_lessons`) que voltam ao Elaborador.
@@ -99,17 +105,19 @@ Plataforma gamificada de estudos para concursos públicos, vestibulares e ENEM (
 - Gamificação: `achievements`, `user_achievements`, `daily_challenges`, `user_daily_challenges`, `user_rewards`, `reward_catalog`, `user_redemptions`, `user_milestones`, `notifications`
 - Afiliados e billing: `referral_codes`, `referral_uses`, `referral_link_visits`, `affiliate_payouts`, `stripe_webhook_events`, `platform_settings`
 - IA: `ai_runs` (telemetria), `ai_lessons` (memória de lições) — migration `20261116120000`
+- Radar: `radar_areas`, `radar_sources`, `radar_concursos`, `radar_updates`, `radar_follows`, `radar_track_drafts`, `radar_runs` — migration `20261117120000`
 
 ## Edge Functions
 
-`ai-mentor` · `essay-review` · `generate-track-questions` (cron) · `create-checkout` · `customer-portal` ·
+`ai-mentor` · `essay-review` · `generate-track-questions` (cron) · `radar-concursos` (cron) · `create-checkout` · `customer-portal` ·
 `check-subscription` · `stripe-webhook` · `admin-metrics` · `admin-notify` · `send-contact` · `auth-email-hook` (gerenciada pelo Lovable).
 Utilidades em `_shared/` (CORS por lista de origens, auth, rate limit atômico, auditoria, IA).
 
 ## Foco atual
 
 Fundação multiagente (2026-11-16): governança AGENTS-COLLAB, CI, camada de IA compartilhada e
-fábrica de questões multiagente. Próximos passos e backlog priorizado em `AGENTS-COLLAB.md` e
+fábrica de questões multiagente. Radar de Concursos (2026-11-17): monitoramento de editais e
+novas trilhas por um grupo de agentes hierárquico. Próximos passos e backlog priorizado em `AGENTS-COLLAB.md` e
 `docs/ARQUITETURA_MULTIAGENTE.md` §10.
 
 ## Fora de escopo
