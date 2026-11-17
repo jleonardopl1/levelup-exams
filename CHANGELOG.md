@@ -1,5 +1,10 @@
 # Changelog
 
+## [Não lançado]
+
+- A equipe passa a usar o [plano de integração operacional](docs/INTEGRACAO_OPERACIONAL.md)
+  para conferir vendas e acessos do Plus e do Passe, avaliar o Mentor de revisão e decidir quando ampliar o piloto.
+
 ## [1.9.0] - 2026-11-17
 
 Incorporações da investigação de 32 repositórios de referência (`docs/REFERENCIAS_REPOSITORIOS.md`).
