@@ -25,7 +25,7 @@ import { SpeakButton } from '@/components/SpeakButton';
 import { useSpeech } from '@/hooks/useSpeech';
 import { questionSpeechText, speakable } from '@/lib/speech';
 
-const QUIZ_SECONDS = 600; // 10 minutos
+const QUIZ_SECONDS = 600;
 
 type Answer = { questionId: string; selected: number; correct: boolean; correctIndex: number; explicacao: string | null };
 
@@ -61,16 +61,12 @@ export default function Quiz() {
   const [confirmExit, setConfirmExit] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
 
-  // Refs: o cronômetro e o atalho de teclado leem o estado mais recente sem
-  // depender de closures antigas (antes, o fim por tempo calculava a nota com
-  // a lista de respostas vazia e o aluno recebia 0%).
   const answersRef = useRef<Answer[]>([]);
   const timeLeftRef = useRef(QUIZ_SECONDS);
   const finishingRef = useRef(false);
   const streakRef = useRef(0);
   const maxStreakRef = useRef(0);
   const pendingResultRef = useRef<QuizResultState | null>(null);
-  // O limite diário é cobrado uma única vez, mesmo se o aluno repetir "Tentar salvar".
   const usageRecordedRef = useRef(false);
 
   useEffect(() => { answersRef.current = answers; }, [answers]);
@@ -89,7 +85,6 @@ export default function Quiz() {
     if (currentQuestion?.is_premium && !isPremium) setShowUpsellModal(true);
   }, [currentIndex, currentQuestion?.is_premium, isPremium]);
 
-  // Leitura em voz alta: muda de questão, para de ler.
   const { isSupported: canSpeak, speakingId, speak, stop: stopSpeech } = useSpeech();
   useEffect(() => { stopSpeech(); }, [currentIndex, stopSpeech]);
 
@@ -129,7 +124,6 @@ export default function Quiz() {
     try {
       const answered = answersRef.current.length;
       if (!isPremium && answered > 0 && !usageRecordedRef.current) {
-        // Só conta no limite diário o que o aluno realmente respondeu.
         await incrementUsage.mutateAsync(answered).then(
           () => { usageRecordedRef.current = true; },
           () => undefined,
@@ -158,7 +152,7 @@ export default function Quiz() {
       });
       pointsEarned = rewards.pointsEarned;
     } catch {
-      /* recompensas não devem impedir o aluno de ver o resultado */
+      /* recompensas não impedem a visualização do resultado */
     }
 
     const final = { ...result, pointsEarned, saved: true, userId: user?.id };
@@ -175,7 +169,6 @@ export default function Quiz() {
   const finishRef = useRef(finishQuiz);
   useEffect(() => { finishRef.current = finishQuiz; }, [finishQuiz]);
 
-  // Cronômetro
   useEffect(() => {
     if (phase !== 'playing' || !questions || questions.length === 0) return;
     const timer = setInterval(() => {
@@ -191,7 +184,6 @@ export default function Quiz() {
     return () => clearInterval(timer);
   }, [phase, questions]);
 
-  // Aviso ao fechar/recarregar a aba no meio do simulado
   useEffect(() => {
     if (phase !== 'playing' || answers.length === 0) return;
     const handler = (e: BeforeUnloadEvent) => { e.preventDefault(); e.returnValue = ''; };
@@ -254,7 +246,6 @@ export default function Quiz() {
     else navigate(backPath);
   };
 
-  // Atalhos: 1-6 / A-F escolhem a alternativa, Enter confirma / avança.
   const handleConfirmRef = useRef(handleConfirm);
   const handleNextRef = useRef(handleNext);
   handleConfirmRef.current = handleConfirm;
@@ -265,8 +256,6 @@ export default function Quiz() {
       const target = e.target as HTMLElement | null;
       if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) return;
       if (e.metaKey || e.ctrlKey || e.altKey) return;
-      // Enter num botão ou link focado (Ouvir, Parar, Reportar erro) aciona o próprio controle,
-      // não o atalho de confirmar. As alternativas (role="radio") continuam confirmando com Enter.
       if (e.key === 'Enter' && target?.closest('a, button:not([role="radio"]), [role="button"]')) return;
       const total = currentQuestion?.alternativas.length ?? 0;
       const key = e.key.toLowerCase();
@@ -373,7 +362,6 @@ export default function Quiz() {
 
   return (
     <div className="min-h-screen bg-background p-4 max-w-3xl mx-auto">
-      {/* Header */}
       <div className="flex items-center gap-4 mb-6">
         <Button variant="ghost" size="icon" onClick={handleBack} aria-label="Sair do simulado">
           <ArrowLeft className="w-5 h-5" />
@@ -381,10 +369,7 @@ export default function Quiz() {
         <div className="flex-1">
           <Progress value={progress} variant="gradient" size="sm" aria-label={`Questão ${currentIndex + 1} de ${questions.length}`} />
         </div>
-        <div
-          className={cn('flex items-center gap-1 text-sm font-medium tabular-nums', timeLeft < 60 && 'text-destructive animate-pulse')}
-          aria-label={`Tempo restante ${formatTime(timeLeft)}`}
-        >
+        <div className={cn('flex items-center gap-1 text-sm font-medium tabular-nums', timeLeft < 60 && 'text-destructive animate-pulse')} aria-label={`Tempo restante ${formatTime(timeLeft)}`}>
           <Clock className="w-4 h-4 text-primary" />
           <span>{formatTime(timeLeft)}</span>
         </div>
@@ -404,18 +389,12 @@ export default function Quiz() {
               onStop={stopSpeech}
             />
           )}
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 text-xs text-muted-foreground"
-            onClick={() => setReportOpen(true)}
-          >
+          <Button variant="ghost" size="sm" className="h-8 text-xs text-muted-foreground" onClick={() => setReportOpen(true)}>
             <Flag className="w-3.5 h-3.5 mr-1" /> Reportar erro
           </Button>
         </div>
       </div>
 
-      {/* Question */}
       <Card variant="elevated" className="mb-6">
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-2">
@@ -430,13 +409,11 @@ export default function Quiz() {
         </CardContent>
       </Card>
 
-      {/* Options */}
       <div className="space-y-3 mb-6" role="radiogroup" aria-label="Alternativas">
         {currentQuestion?.alternativas.map((alt, index) => {
           const isSelected = selectedAnswer === index;
           const isCorrect = showResult && validationResult && index === validationResult.correct_index;
           const isWrong = showResult && isSelected && validationResult && index !== validationResult.correct_index;
-
           return (
             <button
               key={index}
@@ -470,18 +447,15 @@ export default function Quiz() {
         })}
       </div>
 
-      {/* Feedback + explanation */}
       {showResult && validationResult && (
         <Card variant="glass" className="mb-6 animate-slide-up" aria-live="polite">
           <CardContent className="p-4">
             <p className={cn('text-sm font-semibold mb-1', validationResult.is_correct ? 'text-success' : 'text-destructive')}>
               {validationResult.is_correct
-                ? 'Resposta correta!'
+                ? 'Resposta correta!' 
                 : `Resposta incorreta. Gabarito: ${String.fromCharCode(65 + validationResult.correct_index)}`}
             </p>
-            {validationResult.explicacao && (
-              <p className="text-sm text-muted-foreground">{validationResult.explicacao}</p>
-            )}
+            {validationResult.explicacao && <p className="text-sm text-muted-foreground">{validationResult.explicacao}</p>}
             {canSpeak && validationResult.explicacao && currentQuestion && (
               <SpeakButton
                 what="explicação"
@@ -495,7 +469,6 @@ export default function Quiz() {
         </Card>
       )}
 
-      {/* Action Button */}
       <Button
         variant={showResult ? 'gradient-success' : 'hero'}
         size="xl"
@@ -517,8 +490,7 @@ export default function Quiz() {
           <AlertDialogHeader>
             <AlertDialogTitle>Sair do simulado?</AlertDialogTitle>
             <AlertDialogDescription>
-              Você respondeu {answers.length} de {questions.length} questões. Pode encerrar agora e ver o
-              resultado parcial, ou sair sem salvar.
+              Você respondeu {answers.length} de {questions.length} questões. Pode encerrar agora e ver o resultado parcial, ou sair sem salvar.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="gap-2">
@@ -534,7 +506,6 @@ export default function Quiz() {
       <ReportQuestionDialog questionId={currentQuestion?.id ?? null} open={reportOpen} onOpenChange={setReportOpen} />
       <DailyLimitModal open={showLimitModal} onOpenChange={setShowLimitModal} />
       <PremiumUpsellModal open={showUpsellModal} onOpenChange={setShowUpsellModal} triggerContext="question" />
-
       <Confetti isActive={showConfetti} onComplete={() => setShowConfetti(false)} />
       <CelebrationGlow isActive={showGlow} />
     </div>

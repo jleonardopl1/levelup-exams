@@ -7,7 +7,7 @@
  * - /assets/* (arquivos com hash do build): cache primeiro — nunca mudam de conteúdo.
  * - Rotas de login do Lovable (/~oauth/...) e qualquer /~ são ignoradas.
  */
-const VERSION = 'v1';
+const VERSION = 'v2';
 const MAX_ASSETS = 400; // limite de arquivos guardados (publicações antigas saem primeiro)
 const SHELL_CACHE = `levelup-shell-${VERSION}`;
 const ASSET_CACHE = `levelup-assets-${VERSION}`;
@@ -103,7 +103,10 @@ self.addEventListener('fetch', (event) => {
   if (url.pathname.startsWith('/assets/')) {
     event.respondWith(
       caches.match(request).then((cached) => cached || fetch(request).then((response) => {
-        if (response.ok) {
+        // Nunca guardar a pagina HTML (fallback do servidor para arquivo inexistente) no
+        // lugar de um JS/CSS: isso deixaria a tela quebrada ate limpar os dados do site.
+        const type = response.headers.get('content-type') || '';
+        if (response.ok && !type.includes('text/html')) {
           const copy = response.clone();
           caches.open(ASSET_CACHE).then((cache) => cache.put(request, copy)).catch(() => undefined);
         }

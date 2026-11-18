@@ -17,7 +17,7 @@
  *     "q": "enunciado", "a": ["A","B","C","D"], "c": 0, "e": "explicação", "fixa": false }
  */
 import { createHash } from "node:crypto";
-import { readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -48,6 +48,30 @@ function seededShuffle(n, seedHex) {
 const errors = [];
 const subjects = [];
 const seenHashes = new Map();
+
+// Valida uma questao no formato compacto e devolve-a com alternativas embaralhadas e hash.
+function prepareQuestion(q, where) {
+  if (!q.q || q.q.length < 15) errors.push(`${where}: enunciado vazio/curto`);
+  if (!Array.isArray(q.a) || q.a.length !== 4) errors.push(`${where}: precisa de 4 alternativas`);
+  else if (new Set(q.a.map(norm)).size !== 4) errors.push(`${where}: alternativas repetidas`);
+  if (!Number.isInteger(q.c) || q.c < 0 || q.c > 3) errors.push(`${where}: gabarito invalido`);
+  if (!q.e || q.e.length < 20) errors.push(`${where}: explicacao ausente/curta`);
+  if (q.n && !["medio", "superior"].includes(q.n)) errors.push(`${where}: nivel invalido`);
+  if (!["Fácil", "Médio", "Difícil"].includes(q.d)) errors.push(`${where}: dificuldade invalida`);
+  if (!q.a || q.a.length !== 4) return null;
+  const hash = contentHash(q.q, q.a);
+  if (seenHashes.has(hash)) errors.push(`${where}: duplicada de ${seenHashes.get(hash)}`);
+  seenHashes.set(hash, where);
+  let alternativas = q.a;
+  let correta = q.c;
+  const fixed = q.fixa || q.a.some((alt) => NO_SHUFFLE.test(alt));
+  if (!fixed) {
+    const order = seededShuffle(4, hash);
+    alternativas = order.map((k) => q.a[k]);
+    correta = order.indexOf(q.c);
+  }
+  return { ...q, alternativas, correta, hash };
+}
 const questionFiles = readdirSync(join(dir, "questions")).filter((f) => f.endsWith(".json")).sort();
 
 for (const file of questionFiles) {
@@ -56,27 +80,8 @@ for (const file of questionFiles) {
   if (!meta) { errors.push(`${file}: materia ${data.slug} nao declarada em track.json`); continue; }
   const questions = [];
   data.questions.forEach((q, i) => {
-    const where = `${file}#${i + 1}`;
-    if (!q.q || q.q.length < 15) errors.push(`${where}: enunciado vazio/curto`);
-    if (!Array.isArray(q.a) || q.a.length !== 4) errors.push(`${where}: precisa de 4 alternativas`);
-    else if (new Set(q.a.map(norm)).size !== 4) errors.push(`${where}: alternativas repetidas`);
-    if (!Number.isInteger(q.c) || q.c < 0 || q.c > 3) errors.push(`${where}: gabarito invalido`);
-    if (!q.e || q.e.length < 20) errors.push(`${where}: explicacao ausente/curta`);
-    if (q.n && !["medio", "superior"].includes(q.n)) errors.push(`${where}: nivel invalido`);
-    if (!["Fácil", "Médio", "Difícil"].includes(q.d)) errors.push(`${where}: dificuldade invalida`);
-    if (!q.a || q.a.length !== 4) return;
-    const hash = contentHash(q.q, q.a);
-    if (seenHashes.has(hash)) errors.push(`${where}: duplicada de ${seenHashes.get(hash)}`);
-    seenHashes.set(hash, where);
-    let alternativas = q.a;
-    let correta = q.c;
-    const fixed = q.fixa || q.a.some((alt) => NO_SHUFFLE.test(alt));
-    if (!fixed) {
-      const order = seededShuffle(4, hash);
-      alternativas = order.map((k) => q.a[k]);
-      correta = order.indexOf(q.c);
-    }
-    questions.push({ ...q, alternativas, correta, hash });
+    const r = prepareQuestion(q, `${file}#${i + 1}`);
+    if (r) questions.push(r);
   });
   subjects.push({ meta, questions });
 }
@@ -91,6 +96,27 @@ for (const s of track.subjects) {
       if (usable < track.min_questions_per_subject)
         errors.push(`${s.slug} (${mod.slug}): ${usable} questoes < minimo ${track.min_questions_per_subject}`);
     }
+  }
+}
+
+// Lotes diarios (content/trilhas/<slug>/diarias/AAAA-MM-DD.json): cada lote vira uma
+// migration propria, porque a migration principal ja foi aplicada e nao roda de novo.
+const dailyDir = join(dir, "diarias");
+const dailyBatches = [];
+if (existsSync(dailyDir)) {
+  for (const file of readdirSync(dailyDir).filter((f) => f.endsWith(".json")).sort()) {
+    const data = JSON.parse(readFileSync(join(dailyDir, file), "utf8"));
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(data.date || "")) { errors.push(`diarias/${file}: campo date invalido`); continue; }
+    const items = [];
+    data.questions.forEach((q, i) => {
+      const meta = track.subjects.find((s) => s.slug === q.s);
+      if (!meta) { errors.push(`diarias/${file}#${i + 1}: materia ${q.s} nao declarada em track.json`); return; }
+      const r = prepareQuestion(q, `diarias/${file}#${i + 1}`);
+      if (r) items.push({ meta, q: r });
+    });
+    const stamp = data.date.replace(/-/g, "");
+    const migration = data.migration_file || `${stamp}120000_${slug.replace(/-/g, "_")}_diarias_${stamp}.sql`;
+    dailyBatches.push({ file, date: data.date, items, migration });
   }
 }
 
@@ -147,18 +173,20 @@ ON CONFLICT (module_id, subject_id) DO UPDATE SET area = EXCLUDED.area, cargo = 
   lines.push("");
 });
 
-let total = 0;
-for (const { meta, questions } of subjects) {
-  lines.push(`-- ${meta.name}: ${questions.length} questoes`);
-  for (const q of questions) {
-    total++;
-    lines.push(`INSERT INTO public.questions (enunciado, alternativas, correta, categoria, dificuldade, explicacao, subject_id, is_premium, topico, origem, nivel, content_hash)
+const questionInsert = (meta, q) => `INSERT INTO public.questions (enunciado, alternativas, correta, categoria, dificuldade, explicacao, subject_id, is_premium, topico, origem, nivel, content_hash)
 SELECT ${sql(q.q)}, ${sqlArr(q.alternativas)}, ${q.correta}, ${sql(meta.name)}, ${sql(q.d)}, ${sql(q.e)}, s.id, false, ${sql(q.t)}, ${sql(q.o || "autoral")}, ${sql(q.n || null)}, ${sql(q.hash)}
 FROM public.subjects s WHERE s.slug = ${sql(meta.slug)}
 ON CONFLICT (content_hash) DO UPDATE SET
   alternativas = EXCLUDED.alternativas, correta = EXCLUDED.correta, categoria = EXCLUDED.categoria,
   dificuldade = EXCLUDED.dificuldade, explicacao = EXCLUDED.explicacao, topico = EXCLUDED.topico, nivel = EXCLUDED.nivel
-WHERE questions.origem = 'autoral';`);
+WHERE questions.origem = 'autoral';`;
+
+let total = 0;
+for (const { meta, questions } of subjects) {
+  lines.push(`-- ${meta.name}: ${questions.length} questoes`);
+  for (const q of questions) {
+    total++;
+    lines.push(questionInsert(meta, q));
   }
   lines.push("");
 }
@@ -167,6 +195,21 @@ writeFileSync(out, lines.join("\n") + "\n");
 
 const dist = [0, 0, 0, 0];
 subjects.forEach(({ questions }) => questions.forEach((q) => dist[q.correta]++));
+
+for (const b of dailyBatches) {
+  const dl = [
+    `-- GERADO por scripts/build-track-seed.mjs a partir de content/trilhas/${slug}/diarias/${b.file}. NAO EDITE A MAO.`,
+    `-- Lote diario de ${b.date}: ${b.items.length} questoes autorais. Idempotente (content_hash).`,
+    "",
+  ];
+  for (const { meta, q } of b.items) dl.push(questionInsert(meta, q));
+  writeFileSync(join(root, "supabase", "migrations", b.migration), dl.join("\n") + "\n");
+  const bySubject = {};
+  b.items.forEach(({ meta, q }) => { bySubject[meta.slug] = (bySubject[meta.slug] || 0) + 1; dist[q.correta]++; });
+  console.log(`Lote ${b.date}: ${b.items.length} questoes -> ${b.migration}`);
+  console.log("  " + Object.entries(bySubject).map(([k, v]) => `${k}=${v}`).join(" "));
+}
+
 console.log(`OK: ${subjects.length} materias, ${total} questoes -> ${out}`);
 console.log(`Distribuicao do gabarito A/B/C/D: ${dist.join(" / ")}`);
 for (const { meta, questions } of subjects) {

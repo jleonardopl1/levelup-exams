@@ -1,63 +1,19 @@
 # Changelog
 
-## [1.5.1] - 2026-11-15
+## [1.3.1] - 2026-11-11 (revisão diária)
 
-### Pagamentos
-- Stripe de produção preparado: produto "LevelUp Exams Plus", preços mensal (R$ 19,90) e anual (R$ 159,90) com `lookup_key`, e portal do cliente padrão
-- `create-checkout` encontra o preço pelo `lookup_key` quando não há secret de preço: trocar a chave de teste pela de produção basta
-- Passos que faltam para cobrar (verificação da conta, webhook, secrets): `docs/REVISAO_2026-11-15.md`, seção 2
-
-### Performance
-- Gráficos (`recharts`, ~108 KB gzip) deixam de ser pré-carregados em todas as páginas
-
-### Docs
-- `docs/REVISAO_2026-11-15.md`: revisão de arquitetura, segurança, UI/UX, autenticação e pagamentos, com ações por agente
-
-## [1.5.0] - 2026-11-13
-
-### Features
-- Admin master com **Plus permanente** (todas as funcionalidades pagas), sem assinatura
-- Painel admin → Usuários: **Liberar Plus** para qualquer usuário (7 dias a 1 ano, ou sem prazo), com motivo, substituição e retirada; selo com a origem do Plus (assinante, liberado até dd/mm, permanente) e filtro "Plus liberado"
-- Tela de planos e Configurações mostram quando o Plus foi liberado pela equipe (sem botão de portal de pagamento)
-
-### Banco
-- Migration `20261113150000_premium_grants.sql`: `profiles.billing_tier` (plano pago) separado de `profiles.tier` (plano efetivo), tabela `premium_grants`, trigger `sync_profile_effective_tier`, RPCs `admin_grant_premium`, `admin_revoke_premium`, `get_premium_access`, job horário `expire-premium-grants`; `get_user_tier`, `admin_list_users`, `admin_platform_overview` e `get_affiliate_dashboard` atualizados (cortesia não conta como receita nem como indicado ativo)
-- Edge Functions `check-subscription`, `stripe-webhook`, `ai-mentor` e `admin-metrics` passam a gravar/ler o plano pago em `billing_tier` (versões antigas continuam compatíveis durante a publicação)
-
-## [1.4.0] - 2026-11-13
+### Conteúdo
+- +50 questões autorais na trilha da Câmara de Cuiabá 2026, distribuídas pelo peso de cada matéria no edital (Legislação 6, Português 5, Raciocínio Lógico 4, Informática 3, História e Geografia de MT 3, Técnico e Analista Legislativo 3 cada, demais matérias 1–2)
+- Lotes diários em `content/trilhas/<slug>/diarias/AAAA-MM-DD.json`; o script gera uma migration própria por lote (a migration principal já foi aplicada e não roda de novo)
 
 ### Fixes
-- Simulado geral ("Iniciar Simulado" e categorias) trazia sempre as mesmas 10 questões: agora prioriza as inéditas, depois as erradas, em ordem aleatória (RPC `get_quiz_questions`)
-- Fim do simulado por tempo esgotado calculava a nota com a lista de respostas vazia (o aluno recebia 0%)
-- Erro de validação da resposta (limite de requisições, conexão) contava como resposta errada sem aviso; agora mostra a mensagem e deixa responder de novo
-- Falha ao salvar o resultado deixava o aluno preso na tela; agora oferece "Tentar salvar de novo" ou ver o resultado
-- Tela inicial podia abrir com "Estudante", nível 1 e 0 simulados para quem já estava logado (o cache era limpo ao restaurar a sessão)
-- Nível e XP da tela inicial usavam outra fórmula e não batiam com Dashboard e Recompensas
-- Limite diário do plano Free passa a contar só as questões respondidas
-
-### Features
-- Resultado do simulado com revisão questão a questão (sua resposta, gabarito e explicação), desempenho por matéria, pontos ganhos, "Revisar meus erros" (trilhas) e "Explicar com o Mentor IA"
-- Resultado sobrevive a recarregar a página
-- Simulado: atalhos de teclado (A–E / 1–5 e Enter), confirmação ao sair no meio (com opção de encerrar e ver o resultado parcial), aviso ao fechar a aba
-- "Reportar erro" em cada questão; o aluno é notificado quando a equipe corrige
-- Navegação inferior no celular / app instalado (Início, Trilhas, Simulado, Ranking, Progresso)
-- Painel admin:
-  - Visão Geral nova: métrica estrela (simulados concluídos por semana, com tendência e histórico de 12 semanas), alunos ativos (dia/7d/30d), conversão para Plus, cadastros x ativos em 30 dias, matérias mais praticadas com taxa de acerto, receita do Stripe e **Saúde do sistema** (webhook do Stripe, geração de questões, falhas, qualidade do conteúdo)
-  - Banco de questões: filtros (categoria, situação, origem, Free/Plus), ordenação por taxa de erro / reportes / respostas, paginação, taxa de acerto de cada questão e editor completo (enunciado, alternativas, gabarito, explicação, categoria, tópico, dificuldade)
-  - Questões podem sair de circulação sem apagar o histórico
-  - Aba Reportes: fila de reportes dos alunos, resolver (fecha todos da mesma questão e avisa os alunos) ou descartar
-  - Abas lembradas na URL (`/admin?tab=reports`) e atalho "Painel Admin" no menu do avatar
-- Moderadores: curadoria (Premium / em circulação) e fila de reportes; conteúdo e gabarito só admin/master — regra aplicada no banco
-
-### Banco
-- Migration `20261113120000_quiz_quality_and_admin_console.sql`: `questions.is_active`, `question_reports`, RPCs `get_quiz_questions`, `report_question`, `admin_platform_overview`, `admin_list_questions`, `admin_update_question`, `admin_list_question_reports`, `admin_resolve_question_report` (todas revalidam o nível do chamador e registram em `audit_logs`)
-
-## [1.3.1] - 2026-11-11
-
-### Fixes
-- Assinatura: os preços Mensal e Anual estavam trocados (o botão Mensal cobrava R$ 159,90/ano). O app envia só o plano; o servidor escolhe o preço e confere a periodicidade no Stripe antes de criar o checkout
-- Preços configuráveis por secret (`STRIPE_PRICE_MONTHLY`, `STRIPE_PRICE_ANNUAL`) para trocar de teste para produção sem mudar código
-
+- Quiz: ao acabar o tempo, o aluno recebia nota 0 (o cronômetro chamava uma versão antiga da função de encerrar)
+- Quiz: o último acerto era contado em dobro (10 de 10 virava 110%)
+- Quiz: falha de rede ao salvar não prende mais o aluno na última questão; erro ao conferir resposta ou carregar questões agora aparece com opção de tentar de novo
+- Tela branca após nova publicação: as telas recarregam uma vez sozinhas e há tela de erro com botão de recarregar
+- App instalado: o cache nunca guarda uma página HTML no lugar de um arquivo JS/CSS
+- Login e demais telas não baixam mais a biblioteca de gráficos (~100 KB a menos no celular)
+- Página 404 em português; som de conquista não esgota mais o áudio no iPhone
 
 ## [1.3.0] - 2026-11-10
 
