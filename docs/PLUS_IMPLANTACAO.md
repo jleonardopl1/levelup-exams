@@ -39,6 +39,22 @@ A lista de benefícios de Planos, FAQ e modais agora sai de `src/config/plans.ts
 
 Não verificado: chamadas reais ao modelo (tema e correção da discursiva, contexto do Mentor) e um pagamento real do Passe no Stripe — precisam de teste no ambiente de staging/produção. A corrida entre "salvar resposta" e "entregar prova" é protegida pelo mesmo `FOR UPDATE` nas duas funções, mas só foi verificada pela presença da trava (o banco de teste tem uma conexão).
 
+## Implantação em produção (15/11/2026)
+
+| Passo | Como | Resultado |
+|---|---|---|
+| Código no `main` | PR #19 mesclado (`d1cc708`); a Lovable sincronizou | ok |
+| Migrations 20261115120000, 130000 e 140000 | aplicadas no banco do Lovable Cloud, cada uma numa transação, e registradas em `supabase_migrations.schema_migrations` (mesmo padrão das anteriores) | ok |
+| Teste real no banco de produção | fluxo completo com um aluno gratuito temporário, numa transação desfeita no fim (nada ficou gravado): 70 questões (40 específicas), gabarito bloqueado durante a prova, nota 85 com Básicos zerados = não habilitado, 2º simulado do mês bloqueado, 15 erros agendados para o dia seguinte, cota da discursiva 0/3, aluno sem acesso a `grant_exam_pass` | ok |
+| Front-end | publicado pela Lovable; `levelupexams.com.br` serve a versão nova | ok |
+| Edge Functions | publicadas pelo agente da Lovable (`essay-review` nova + 5 alteradas); `essay-review` responde 401 sem login | ok |
+| API | as RPCs novas existem e recusam chamadas anônimas (42501) | ok |
+| Teste de navegador no site publicado | 27/27 (login e dados simulados na rede) | ok |
+
+Ao publicar as funções, o agente da Lovable fez 3 commits no `main`: `deno.lock`, `types.ts` regerado a partir do banco real (com um cast em `saveMockAnswer`) e o `AuthContext` como singleton para o hot-reload do editor. Os três foram revisados: não mudam o comportamento em produção.
+
+Ainda pendente (depende de você): criar o preço avulso do Passe Concurso no Stripe e o secret `STRIPE_PRICE_EXAM_PASS`; até lá a opção não aparece em Planos. Também falta conferir a duração da prova no edital. Não foram testados com usuário real: as chamadas à IA (tema e correção da discursiva, contexto do Mentor) e um pagamento no Stripe.
+
 ## Ficou para depois
 
 - **Plano até a prova** (proposta 7) e **estatísticas avançadas** (proposta 9, depende de gravar o tempo por questão).
