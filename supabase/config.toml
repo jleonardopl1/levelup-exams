@@ -15,9 +15,13 @@ project_id = "rxsovhyimflzvxggppal"
     verify_jwt = false
   [functions.customer-portal]
     verify_jwt = false
+  [functions.essay-review]
+    verify_jwt = false
   [functions.generate-track-questions]
     verify_jwt = false
   [functions.send-contact]
     verify_jwt = false
   [functions.stripe-webhook]
+    verify_jwt = false
+  [functions.radar-concursos]
     verify_jwt = false

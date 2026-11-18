@@ -158,9 +158,11 @@ export default function Auth() {
         toast.success('Conta criada com sucesso!');
         // Profile modal will be shown via useEffect when user state updates
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Handle specific Supabase auth errors with user-friendly messages
-      const errorMessage = error.message?.toLowerCase() || '';
+      const rawMessage = (error as { message?: unknown } | null)?.message;
+      const message = typeof rawMessage === 'string' ? rawMessage : '';
+      const errorMessage = message.toLowerCase();
       if (errorMessage.includes('user already registered') || errorMessage.includes('already exists')) {
         toast.error('Este email já está cadastrado. Tente fazer login.');
       } else if (errorMessage.includes('invalid login credentials')) {
@@ -168,7 +170,7 @@ export default function Auth() {
       } else if (errorMessage.includes('email not confirmed')) {
         toast.error('Por favor, confirme seu email antes de fazer login.');
       } else {
-        toast.error(error.message || 'Ocorreu um erro. Tente novamente.');
+        toast.error(message || 'Ocorreu um erro. Tente novamente.');
       }
     } finally {
       setLoading(false);

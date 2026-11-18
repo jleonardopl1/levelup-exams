@@ -12,6 +12,7 @@ type PremiumAccess = {
   billing_tier: "free" | "plus";
   source: "master" | "stripe" | "grant" | null;
   access_until: string | null;
+  grant_kind?: "exam_pass" | "staff" | null;
 };
 
 serve(withCors(async (req) => {
@@ -75,6 +76,8 @@ serve(withCors(async (req) => {
       // Assinatura paga no Stripe, independente da origem do acesso (o master também pode pagar).
       billing_tier: a.billing_tier,
       access_until: a.access_until,
+      // Plus liberado: Passe Concurso comprado ou cortesia da equipe.
+      grant_kind: a.grant_kind ?? null,
     });
   } catch {
     console.error("[CHECK-SUBSCRIPTION] error");

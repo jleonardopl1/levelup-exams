@@ -18,6 +18,7 @@ import { RecentAchievementsCard } from '@/components/RecentAchievementsCard';
 import { StreakReminderBanner } from '@/components/StreakReminderToggle';
 import { CareerCategorySelector } from '@/components/CareerCategorySelector';
 import { FeaturedTrackCard } from '@/components/FeaturedTrackCard';
+import { ReviewTodayCard } from '@/components/ReviewTodayCard';
 import { SiteFooter } from '@/components/SiteFooter';
 import { takeAfterLogin } from '@/lib/afterLogin';
 
@@ -281,6 +282,9 @@ export default function Index() {
 
         {/* Trilha do concurso em destaque */}
         <FeaturedTrackCard />
+
+        {/* Revisão espaçada: só aparece com erros vencidos hoje */}
+        <ReviewTodayCard />
 
         {/* Usage Meter for Free Users */}
         {!isPremium && (

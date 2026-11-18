@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { AppHeader } from '@/components/AppHeader';
@@ -8,24 +8,23 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import {
-  ArrowLeft, CalendarClock, Target, RotateCcw, Sparkles, Play, FileText, Bot,
-  Gauge, AlertTriangle, CheckCircle2, ExternalLink, ListChecks,
+  ArrowLeft, CalendarClock, Target, RotateCcw, Sparkles, Play,
+  Gauge, AlertTriangle, CheckCircle2, ExternalLink, ListChecks, ClipboardCheck, PenLine,
 } from 'lucide-react';
 import {
   daysUntil, useStudyTrack, useTrackProgress,
   type SubjectProgress, type TrackModule, type TrackSubject,
 } from '@/hooks/useStudyTracks';
+import { useTrackSelection } from '@/lib/trackPrefs';
+import { ReviewTodayCard } from '@/components/ReviewTodayCard';
+import { TrackRadarCard } from '@/components/radar/TrackRadarCard';
+import { MasteryTag, SubjectStudyPanel } from '@/components/trilha/SubjectStudyPanel';
+import { useTopicMastery } from '@/hooks/useTopicMastery';
+import { subjectMastery } from '@/lib/mastery';
 
 const PASS_MARK = 40;
 
-function readPref(key: string): string | null {
-  try { return localStorage.getItem(key); } catch { return null; }
-}
-function writePref(key: string, value: string) {
-  try { localStorage.setItem(key, value); } catch { /* armazenamento indisponivel */ }
-}
 
 function accuracyOf(p?: SubjectProgress): number | null {
   if (!p || p.answered === 0) return null;
@@ -53,12 +52,8 @@ export default function Trilha() {
   const { user, loading: authLoading } = useAuth();
   const { data, isLoading } = useStudyTrack(slug);
 
-  const [moduleSlug, setModuleSlug] = useState<string | null>(() => readPref(`trilha:${slug}:modulo`));
   const modules = data?.modules ?? [];
-  const module = modules.find((m) => m.slug === moduleSlug) ?? modules[0];
-
-  const [cargo, setCargo] = useState<string | null>(() => readPref(`trilha:${slug}:cargo`));
-  const cargoValid = module && cargo && module.cargos.includes(cargo) ? cargo : module?.cargos[0] ?? null;
+  const { module, cargo: cargoValid, setModule, setCargo } = useTrackSelection(slug, modules);
 
   const { data: progress } = useTrackProgress(module?.id);
 
@@ -69,6 +64,12 @@ export default function Trilha() {
   const visibleSubjects = useMemo(
     () => (module?.subjects ?? []).filter((s) => !s.cargo || s.cargo === cargoValid),
     [module, cargoValid],
+  );
+
+  const { data: topicMastery } = useTopicMastery(visibleSubjects.map((s) => s.subject_id));
+  const masteryBySubject = useMemo(
+    () => new Map(visibleSubjects.map((s) => [s.subject_id, subjectMastery(s.subject_id, topicMastery ?? [])])),
+    [visibleSubjects, topicMastery],
   );
 
   if (isLoading || authLoading) {
@@ -124,7 +125,9 @@ export default function Trilha() {
     navigate(`/quiz?${params.toString()}`);
   };
 
-  const areas = module.structure.map((a) => a.area);
+  // Áreas do quadro de provas + áreas de matérias fora dele (ex.: trilha nova do Radar cujo
+  // edital não trouxe o quadro): nenhuma matéria fica escondida por falta de peso.
+  const areas = [...new Set([...module.structure.map((a) => a.area), ...visibleSubjects.map((s) => s.area)])];
 
   return (
     <div className="min-h-screen bg-background pb-12">
@@ -165,7 +168,9 @@ export default function Trilha() {
                 <span className="text-base font-medium text-primary-foreground/80">/100</span>
               </p>
               <p className="text-xs text-primary-foreground/80 mt-1">
-                {score.covered === 0
+                {module.structure.length === 0
+                  ? 'Quadro de provas não informado no edital'
+                  : score.covered === 0
                   ? 'Responda questões para calcular'
                   : score.covered < 100
                     ? `com base em ${score.covered} dos 100 pontos`
@@ -178,7 +183,7 @@ export default function Trilha() {
         {/* Nível */}
         <Tabs
           value={module.slug}
-          onValueChange={(v) => { setModuleSlug(v); writePref(`trilha:${slug}:modulo`, v); }}
+          onValueChange={setModule}
         >
           <TabsList className="grid w-full grid-cols-2">
             {modules.map((m) => (
@@ -194,7 +199,7 @@ export default function Trilha() {
           <label className="text-sm font-medium" htmlFor="cargo">Seu cargo</label>
           <Select
             value={cargoValid ?? undefined}
-            onValueChange={(v) => { setCargo(v); writePref(`trilha:${slug}:cargo`, v); }}
+            onValueChange={setCargo}
           >
             <SelectTrigger id="cargo"><SelectValue placeholder="Selecione o cargo" /></SelectTrigger>
             <SelectContent>
@@ -218,6 +223,24 @@ export default function Trilha() {
             <p className="text-[11px] text-muted-foreground leading-tight">novas nesta semana</p>
           </CardContent></Card>
         </div>
+
+        <ReviewTodayCard />
+
+        <TrackRadarCard trackId={track.id} />
+
+        {/* Simulado Oficial */}
+        <Card variant="elevated" className="border-primary/30">
+          <CardContent className="p-4 flex items-center gap-3">
+            <ClipboardCheck className="w-8 h-8 text-primary shrink-0" />
+            <div className="flex-1 min-w-0">
+              <p className="font-semibold text-sm">Simulado Oficial</p>
+              <p className="text-xs text-muted-foreground">
+                A prova inteira no formato do edital, com nota por área e sua posição entre os candidatos do cargo.
+              </p>
+            </div>
+            <Button asChild size="sm"><Link to={`/trilhas/${track.slug}/simulado`}>Fazer</Link></Button>
+          </CardContent>
+        </Card>
 
         {/* Prioridades */}
         {priority.length > 0 && (
@@ -250,7 +273,7 @@ export default function Trilha() {
 
         {/* Matérias por área */}
         {areas.map((areaName) => {
-          const area = score.areas.find((a) => a.area === areaName)!;
+          const area = score.areas.find((a) => a.area === areaName);
           const subjects = visibleSubjects.filter((s) => s.area === areaName);
           if (!subjects.length) return null;
           return (
@@ -258,11 +281,15 @@ export default function Trilha() {
               <div className="flex items-end justify-between gap-2">
                 <div>
                   <h2 className="font-display font-bold text-lg">{areaName}</h2>
-                  <p className="text-xs text-muted-foreground">
-                    {area.questoes} questões × {area.pontos_por_questao.toLocaleString('pt-BR')} ponto = {area.max} pontos · não pode zerar
-                  </p>
+                  {area ? (
+                    <p className="text-xs text-muted-foreground">
+                      {area.questoes} questões × {area.pontos_por_questao.toLocaleString('pt-BR')} ponto = {area.max} pontos · não pode zerar
+                    </p>
+                  ) : (
+                    <p className="text-xs text-muted-foreground">Peso na prova ainda não informado no edital</p>
+                  )}
                 </div>
-                {area.acc !== null && (
+                {area && area.acc !== null && (
                   <Badge variant="secondary" className="shrink-0 whitespace-nowrap">{Math.round(area.acc * 100)}% de acerto</Badge>
                 )}
               </div>
@@ -280,6 +307,7 @@ export default function Trilha() {
                           <p className="text-xs text-muted-foreground mt-0.5">
                             {p ? `${p.answered} de ${p.total_questions} questões` : 'Carregando progresso…'}
                             {acc !== null && ` · ${Math.round(acc * 100)}% de acerto`}
+                            <MasteryTag mastery={masteryBySubject.get(s.subject_id)} />
                           </p>
                         </div>
                         {acc !== null && (acc >= 0.7
@@ -303,23 +331,7 @@ export default function Trilha() {
                         )}
                       </div>
 
-                      {(s.syllabus || s.study_tips) && (
-                        <Accordion type="single" collapsible>
-                          <AccordionItem value="edital" className="border-b-0">
-                            <AccordionTrigger className="py-1 text-sm text-primary hover:no-underline">
-                              <span className="flex items-center gap-1.5"><FileText className="w-4 h-4" /> Conteúdo do edital e dicas</span>
-                            </AccordionTrigger>
-                            <AccordionContent className="space-y-2 text-sm">
-                              {s.syllabus && <p className="text-muted-foreground whitespace-pre-line">{s.syllabus}</p>}
-                              {s.study_tips && (
-                                <p className="rounded-lg bg-primary/5 border border-primary/15 p-3">
-                                  <span className="font-medium">Como a banca cobra: </span>{s.study_tips}
-                                </p>
-                              )}
-                            </AccordionContent>
-                          </AccordionItem>
-                        </Accordion>
-                      )}
+                      <SubjectStudyPanel trackSlug={track.slug} subject={s} mastery={masteryBySubject.get(s.subject_id)} />
                     </CardContent>
                   </Card>
                 );
@@ -360,12 +372,12 @@ export default function Trilha() {
 
         <Card>
           <CardContent className="p-4 flex items-center gap-3">
-            <Bot className="w-8 h-8 text-primary shrink-0" />
+            <PenLine className="w-8 h-8 text-primary shrink-0" />
             <div className="flex-1 min-w-0">
-              <p className="font-semibold text-sm">Treine a discursiva com o Mentor IA</p>
-              <p className="text-xs text-muted-foreground">Peça um tema do seu cargo e envie sua resposta (20 a 30 linhas) para correção.</p>
+              <p className="font-semibold text-sm">Treine a discursiva</p>
+              <p className="text-xs text-muted-foreground">Tema do seu cargo e correção com os critérios da banca: nota de conteúdo, erros de português e o que faltou.</p>
             </div>
-            <Button asChild size="sm" variant="outline"><Link to="/mentor">Abrir</Link></Button>
+            <Button asChild size="sm" variant="outline"><Link to={`/trilhas/${track.slug}/discursiva`}>Abrir</Link></Button>
           </CardContent>
         </Card>
       </div>

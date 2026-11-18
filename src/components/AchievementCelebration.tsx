@@ -79,7 +79,7 @@ export function AchievementCelebration({ achievement, open, onClose }: Achieveme
   const playSound = () => {
     try {
       // Create audio context for celebration sound
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const audioContext = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
       
       // Play a series of notes for celebration
       const playNote = (frequency: number, startTime: number, duration: number) => {
