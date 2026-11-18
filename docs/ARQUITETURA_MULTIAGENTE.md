@@ -471,11 +471,19 @@ agente pelo nome. No Lovable e em outras ferramentas, o `AGENTS.md` aponta o cam
 
 ## 11. Implantação deste PR
 
-1. **Migration:** aplicar `20261116120000_ai_runtime_observability.sql` (`supabase db push` ou SQL
-   Editor). É idempotente; cria `ai_runs`, `ai_lessons`, `record_ai_lessons`, `purge_old_ai_runs`
-   e o job `purge-ai-runs` (se houver pg_cron).
-2. **Funções:** publicar `generate-track-questions`, `essay-review` e `ai-mentor`. A ordem com a
-   migration não importa — sem as tabelas, telemetria e lições só avisam no log.
+> **Status (16/11/2026):** implantado. PR mesclado (`9d10578`); migration aplicada e registrada
+> como `20261116120000 / ai_runtime_observability`; as três funções publicadas pelo agente do
+> Lovable. Produção é **Lovable Cloud** (`rxsovhyimflzvxggppal`): migrations e publicação de funções
+> passam pelo agente do Lovable (no editor ou pelo MCP do Lovable) — o MCP do Supabase da conta do
+> dono não alcança esse projeto, e as funções **não** são publicadas sozinhas a partir do GitHub.
+
+1. **Migration:** pedir ao agente do Lovable que aplique `20261116120000_ai_runtime_observability.sql`
+   exatamente como está. É idempotente; cria `ai_runs`, `ai_lessons`, `record_ai_lessons`,
+   `purge_old_ai_runs` e o job `purge-ai-runs` (se houver pg_cron). A ferramenta do Lovable também
+   grava uma cópia em `drizzle/` e regenera `types.ts` — é esperado.
+2. **Funções:** pedir ao agente do Lovable que publique `generate-track-questions`, `essay-review` e
+   `ai-mentor` com o código da `main`. A ordem com a migration não importa — sem as tabelas,
+   telemetria e lições só avisam no log.
 3. **Secrets opcionais:** `QUESTION_SOLVER_MODELS` (recomendado: um modelo de outra família
    disponível no gateway, separado por vírgula de um segundo, se quiser dois votos),
    `QUESTION_REVIEW_MODEL` diferente de `QUESTION_MODEL`, `QUESTION_ARBITER_MODEL`, `MENTOR_MODEL`.

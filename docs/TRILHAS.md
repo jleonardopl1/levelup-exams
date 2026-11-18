@@ -68,7 +68,7 @@ O agendamento (`pg_cron` + `pg_net`) roda a cada 10 minutos entre 01h e 04h50 (h
    - `LOVABLE_API_KEY`: já usado pelo Mentor IA;
    - opcionais: `QUESTION_MODEL` (padrão `google/gemini-2.5-pro`), `QUESTION_REVIEW_MODEL`, `QUESTION_SOLVER_MODELS` (padrão `google/gemini-2.5-flash`; lista separada por vírgula), `QUESTION_ARBITER_MODEL`, `QUESTION_MAX_ARBITRATIONS` (padrão 3), `QUESTION_PIPELINE` (`classic` desliga solucionador e árbitro), `QUESTIONS_PER_SUBJECT_DAY` (padrão 3);
    - `QUESTION_CRON_SECRET` **não é mais necessário**: a migration `20261110140000_question_cron_secret_vault.sql` gera o segredo dentro do Vault e a função o lê de lá (RPC `get_question_cron_secret`, só `service_role`). Se a variável existir, ela tem prioridade e precisa ser igual ao segredo `question_cron_secret` do Vault.
-3. **Publicar a função**: `supabase functions deploy generate-track-questions` (no Lovable Cloud, a publicação das funções é automática).
+3. **Publicar a função**: `supabase functions deploy generate-track-questions`; no Lovable Cloud, peça ao agente do Lovable que publique a função com o código da `main` (código vindo do GitHub não é publicado sozinho).
 4. **Vault** (SQL Editor, uma vez por projeto), para o agendador saber o endereço do projeto:
    ```sql
    select vault.create_secret('https://<project-ref>.supabase.co', 'project_url');

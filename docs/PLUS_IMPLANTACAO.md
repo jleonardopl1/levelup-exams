@@ -22,7 +22,7 @@ A lista de benefícios de Planos, FAQ e modais agora sai de `src/config/plans.ts
    - `20261115120000_plus_features_v1.sql` — Simulado Oficial, posição, revisão espaçada, Passe Concurso, `grant_kind` em `get_premium_access`, meta semanal das específicas = 42.
      **Redefine `validate_answer`** (RPC em produção) com uma única checagem nova: questão de Simulado Oficial aberto do próprio aluno não é corrigida (senão o gabarito vazaria durante a prova).
    - `20261115130000_essay_reviews.sql` — tabela `essay_submissions`, cota semanal atômica.
-2. **Edge Functions** (no Lovable Cloud a publicação é automática): `essay-review` (nova), `ai-mentor`, `create-checkout`, `stripe-webhook`, `check-subscription`, `generate-track-questions`.
+2. **Edge Functions** (no Lovable Cloud, peça ao agente do Lovable que publique a partir da `main`): `essay-review` (nova), `ai-mentor`, `create-checkout`, `stripe-webhook`, `check-subscription`, `generate-track-questions`.
 3. **Passe Concurso (opcional)** — sem isso a opção simplesmente não aparece em Planos:
    - no Stripe, criar um **preço avulso** (one-time) no valor escolhido;
    - secret `STRIPE_PRICE_EXAM_PASS` = id desse preço;

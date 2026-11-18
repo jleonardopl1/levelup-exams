@@ -51,6 +51,20 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
 
 ## Armadilhas conhecidas
 
+- 🚨 **`gateway 402` = saldo de IA do workspace do Lovable esgotado.** Em 2026-11-16, das 05:10 às
+  08:50 UTC, 67 execuções da geração falharam com 402 (0 questões inseridas). Com 402, Mentor e
+  discursiva também param. Solução: recarregar o saldo de Cloud & IA no Lovable. O cliente
+  `_shared/ai` não repete chamadas em 402 (não desperdiça). Alerta automático: backlog P1.
+- ☁️ **Produção é Lovable Cloud** (`rxsovhyimflzvxggppal`). Migrations e publicação de funções
+  passam pelo agente do Lovable; o merge no GitHub **não** publica as funções sozinho. O projeto
+  "LevelUP Exams" que aparece no MCP do Supabase (`cdiyhbellqqgjwrdhgmf`) é antigo e está pausado.
+- 🧩 **A ferramenta de migration do Lovable grava cópia em `drizzle/`**, cria `drizzle.config.ts`,
+  adiciona `drizzle-kit`/`drizzle-orm`/`postgres` e regenera `types.ts`. É infraestrutura da
+  plataforma: não apagar. Depois disso, ressincronize o `package-lock.json` (`npm install --package-lock-only`).
+- 🕳️ **Migration sem arquivo:** produção tem `20261115140000 plus_internal_grants`, aplicada pelo
+  Lovable, sem arquivo em `supabase/migrations/` e sem o SQL guardado no banco. Recriar o banco só a
+  partir do repositório perderia o que ela fez — investigar (backlog P1).
+
 - 📦 **Lockfile oficial é `bun.lockb`** (o do Lovable). O `package-lock.json` ficou para trás quando
   o Lovable adicionou os plugins de dev; foi sincronizado em 2026-11-16. A CI usa `bun install --frozen-lockfile`.
 - 🦕 **`deno check` precisa de `DENO_NO_PACKAGE_JSON=1`** (o `package.json` da raiz é do front);
@@ -111,7 +125,9 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
   5. Harness de testes do front (Vitest + Testing Library) para `lib/` e hooks críticos (`tester`).
   6. Painel admin: custo/latência por agente (de `ai_runs`) e curadoria de `ai_lessons`.
   7. Reportes de alunos resolvidos como "gabarito errado" viram lições (fonte `aluno`, cercadas).
-  8. Observabilidade: Sentry (front + funções) e alertas da geração de questões.
+  8. Observabilidade: Sentry (front + funções) e **alerta** quando a geração ou o gateway falham
+     (ex.: aviso ao admin em erro 402 ou em N falhas seguidas).
+  8a. Reconstituir `20261115140000_plus_internal_grants` (comparar o schema de produção com o das migrations).
 - **P2 — próximos 1–3 meses:**
   9. Revisão espaçada FSRS no lugar das caixas fixas (1/3/7/14/30) (`cientista-aprendizagem`).
   10. Calibração TRI (3PL) das questões com as respostas reais → nota estimada estilo ENEM.
