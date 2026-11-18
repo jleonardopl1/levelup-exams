@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { AppHeader } from '@/components/AppHeader';
 import { Card, CardContent } from '@/components/ui/card';
-import { CalendarClock, ChevronRight, Map as MapIcon } from 'lucide-react';
+import { CalendarClock, ChevronRight, Map as MapIcon, Radar } from 'lucide-react';
 import { daysUntil, useStudyTracks } from '@/hooks/useStudyTracks';
 
 export default function Trilhas() {
@@ -26,6 +26,19 @@ export default function Trilhas() {
         <p className="text-sm text-muted-foreground">
           Estudo direcionado pelo edital: matérias, pesos, questões no padrão da banca e novas questões toda semana.
         </p>
+
+        <Link to="/radar" className="block">
+          <Card variant="interactive" className="border-primary/30">
+            <CardContent className="p-4 flex items-center gap-3">
+              <Radar className="w-7 h-7 text-primary shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold">Radar de concursos</p>
+                <p className="text-sm text-muted-foreground">Editais previstos e abertos, com aviso de inscrições, datas e retificações.</p>
+              </div>
+              <ChevronRight className="w-5 h-5 text-muted-foreground shrink-0" />
+            </CardContent>
+          </Card>
+        </Link>
 
         {isLoading && <div className="h-28 rounded-2xl bg-muted/50 animate-pulse" />}
 

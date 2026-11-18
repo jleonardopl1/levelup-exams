@@ -11,15 +11,16 @@ import { AdminQuestionGeneration } from '@/components/admin/AdminQuestionGenerat
 import { AdminAffiliates } from '@/components/admin/AdminAffiliates';
 import { AdminQuestionBank } from '@/components/admin/AdminQuestionBank';
 import { AdminQuestionReports } from '@/components/admin/AdminQuestionReports';
+import { AdminRadar } from '@/components/admin/AdminRadar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
-  Shield, BookOpen, Users, Crown, BarChart3, FileText, Handshake, Flag, Sparkles,
+  Shield, BookOpen, Users, Crown, BarChart3, FileText, Handshake, Flag, Sparkles, Radar,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-type MainTab = 'overview' | 'users' | 'affiliates' | 'questions' | 'reports' | 'audit';
+type MainTab = 'overview' | 'users' | 'affiliates' | 'questions' | 'reports' | 'radar' | 'audit';
 type QuestionsView = 'bank' | 'generation';
 
 export default function Admin() {
@@ -60,10 +61,10 @@ export default function Admin() {
     );
   }
 
-  const adminOnly: MainTab[] = ['overview', 'affiliates', 'audit'];
+  const adminOnly: MainTab[] = ['overview', 'affiliates', 'radar', 'audit'];
   const requested = params.get('tab') as MainTab | null;
   const tab: MainTab = requested && (isAdmin || !adminOnly.includes(requested))
-    && ['overview', 'users', 'affiliates', 'questions', 'reports', 'audit'].includes(requested)
+    && ['overview', 'users', 'affiliates', 'questions', 'reports', 'radar', 'audit'].includes(requested)
     ? requested
     : (isAdmin ? 'overview' : 'reports');
   const questionsView: QuestionsView = params.get('view') === 'generation' && isAdmin ? 'generation' : 'bank';
@@ -126,6 +127,11 @@ export default function Admin() {
                 )}
               </TabsTrigger>
               {isAdmin && (
+                <TabsTrigger value="radar" className="gap-1.5 text-xs sm:text-sm">
+                  <Radar className="w-4 h-4" /> Radar
+                </TabsTrigger>
+              )}
+              {isAdmin && (
                 <TabsTrigger value="audit" className="gap-1.5 text-xs sm:text-sm">
                   <FileText className="w-4 h-4" /> Auditoria
                 </TabsTrigger>
@@ -172,6 +178,12 @@ export default function Admin() {
           <TabsContent value="reports">
             <AdminQuestionReports canEditContent={isAdmin} />
           </TabsContent>
+
+          {isAdmin && (
+            <TabsContent value="radar">
+              <AdminRadar />
+            </TabsContent>
+          )}
 
           {isAdmin && (
             <TabsContent value="audit">

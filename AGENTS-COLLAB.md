@@ -25,14 +25,27 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
   Elaborador → portão determinístico → Solucionador cego ∥ Revisor → Árbitro nas divergências →
   lições por matéria. Interruptor de segurança: secret `QUESTION_PIPELINE=classic`.
 - **D4** (herdada) — Nada aplicado em **banco remoto** nem em secrets de produção sem aprovação do
-  dono. Em 2026-11-16 o dono aprovou e a migration `20261116120000` foi aplicada e as funções
-  `generate-track-questions`, `essay-review` e `ai-mentor` publicadas (via agente do Lovable).
+  dono. Para a migration `20261116120000_ai_runtime_observability.sql`, conferir o histórico do ambiente (P0.1).
 - **D5** (pendente — dono) — Estratégia de lojas: Capacitor (recomendado) vs. TWA só Android;
   cobrança dentro do app nas lojas (IAP) vs. link externo. Ver `docs/ARQUITETURA_MULTIAGENTE.md` §6.
 - **D6** (pendente — dono) — Garantia de idade e supervisão parental exigidas pelo **ECA Digital**
   (Lei 15.211/2025, em vigor desde 17/03/2026) para alunos menores. Ver §7.2.
+- **D8** (2026-11-17, dono + Claude Code) — **Radar de Concursos** é um grupo de agentes
+  hierárquico (gerente master em código → coordenador por área → especialistas). Fato só com
+  evidência literal da fonte oficial; retificação, regressão de fase e verificador indisponível
+  vão para revisão humana; rascunho de trilha só é publicado por admin. Conferir no ambiente a
+  implantação de `20261117120000_radar_concursos.sql` (D4, P0.4).
+- **D9** (2026-11-17, dono + Claude Code) — Referências externas entram pelo filtro da
+  estrela-guia e do stack: só vira código o que ajuda o candidato ou protege quem estuda/os agentes,
+  com teste; o resto vai para backlog com motivo (`docs/REFERENCIAS_REPOSITORIOS.md`). Convenções
+  que não podem falhar ficam também em código (`.claude/hooks/guardrails.mjs`).
+- **D10** (pendente — dono) — Abrir o Radar (`/radar/:slug`) sem login como página de entrada por
+  concurso (SEO e aquisição). Exige política de leitura para `anon` nas tabelas publicadas do Radar.
 - **D7** (pendente — dono) — Correção dupla independente da discursiva (modelo INEP: 2 corretores,
   3º na discrepância) dobra o custo por correção. Ver §5.5.
+- **D11** (2026-11-17, dono) — Priorizar a conciliação de pagamento, acesso e comissão do Plus e do
+  Passe Concurso e o piloto de leitura da revisão e do desempenho do próprio aluno no Mentor.
+  As fases seguintes têm prazos estimados e critérios de avanço no [plano de integração operacional](docs/INTEGRACAO_OPERACIONAL.md).
 
 ---
 
@@ -64,10 +77,34 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
   Questões `ia_diaria` antigas podem ter esse defeito — auditar (backlog P1).
 - 🧾 **Telemetria e lições são "best effort"**: sem a migration aplicada, as funções seguem
   funcionando e só registram aviso no log. Não conclua que "a IA não roda" por falta de linhas em `ai_runs`.
-- 🔐 **`auth-email-hook` e `.lovable/` são gerenciados pelo Lovable** — não editar à mão.
+- 🕸️ **Radar: páginas montadas por JavaScript chegam vazias ao coletor** (Cebraspe, portal da
+  Selecon) e a Fundatec tem anti-robô — semeadas desligadas. Fonte com "página sem texto" no
+  painel precisa de outra URL (página do órgão, diário oficial). O coletor não executa JS.
+- 🗝️ **A ferramenta de migration do agente do Lovable recusa SQL que lê o Vault**
+  ("Agent access to secrets is not allowed"), como o bloco de agendamento do pg_cron. A migration
+  do Radar foi aplicada em partes pela consulta SQL do Lovable (`query_database`), com o mesmo
+  conteúdo do arquivo. Em migrations futuras, deixe o agendamento num arquivo separado.
+- 🚫 **`public.has_role` não é executável por `anon`**: política com `TO anon` não pode chamá-la
+  (a consulta anônima falha com 42501). Faça uma política por papel.
+- 🧩 **Tabelas do Radar ainda não estão em `types.ts`**: o front usa `radarDb` (cliente sem tipos)
+  em `src/hooks/useRadar.ts`. Depois de aplicar a migration, regerar os tipos e trocar por `supabase`.
+- 🔐 **`auth-email-hook` e `.lovable/` são gerenciados pelo Lovable** — não editar à mão (o hook de
+  guardrails bloqueia).
+- 🧪 **`tsc --noEmit` no tsconfig raiz não checa nada** (`"files": []` + referências). O
+  `bun run typecheck` agora usa `-p tsconfig.app.json` e `-p tsconfig.node.json`; não volte.
+- 🔤 **`normalize('NFKC')` troca "º" por "o"** ("1º" vira "1o"). Para texto exibido ou falado use
+  NFC; NFKC só para comparar/deduplicar.
+- 💬 **O Mentor mostra texto puro** (sem renderizar Markdown): o prompt pede texto simples. Se um
+  dia renderizar Markdown, sanitize (saída de modelo em sink HTML é risco do OWASP LLM).
+- 🦕 **Sessões na nuvem podem vir sem Deno**: baixe o binário de `dl.deno.land` para rodar
+  `bun run test:edge`. `bun run test:unit` precisa de Node 22.18+ (TypeScript sem flag).
 - 🕛 **O limite diário do Free renova à meia-noite UTC** (21h de Brasília), não à meia-noite local.
 - 💳 **Stripe:** confirmar em produção o endpoint do webhook registrado e o segredo de assinatura
-  (o diagnóstico de `.lovable/plan.md` encontrou preços em modo de teste e nenhum webhook).
+  antes de planejar a ativação. O [PR #18](https://github.com/jleonardopl1/levelup-exams/pull/18) registra pendências no momento do diagnóstico.
+- **Registros de implantação em branches diferentes:** os PRs [#20](https://github.com/jleonardopl1/levelup-exams/pull/20),
+  [#22](https://github.com/jleonardopl1/levelup-exams/pull/22) e [#24](https://github.com/jleonardopl1/levelup-exams/pull/24)
+  relatam implantações de Plus, IA e Radar. O #22 também registra um erro 402 do gateway em 16/11.
+  Confrontar esses relatos com o histórico de migrations, versões publicadas e saúde atual do serviço.
 
 ---
 
@@ -75,9 +112,14 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
 <!-- Detalhe, justificativa e referências: docs/ARQUITETURA_MULTIAGENTE.md §10 -->
 
 - **P0 — fazer já (dono aprova):**
-  1. **Recarregar o saldo de IA do Lovable** (402 desde 16/11 05:10 UTC) — sem isso, nenhuma IA funciona.
+  1. Conferir a migration `20261116120000` e as versões publicadas de `generate-track-questions`, `essay-review` e `ai-mentor`.
+     Identificar o que falta e confirmar com o dono antes de aplicar uma migration ou alterar secrets (D4).
   2. Acompanhar 7 dias de `ai_runs` (taxa de disputa, aprovação, custo) antes de ajustar modelos.
   3. ECA Digital: inventário de dados de menores, base legal, verificação de idade e supervisão (D6).
+  4. Conferir a migration `20261117120000_radar_concursos.sql` e a publicação de `radar-concursos` (D4).
+     Depois de confirmadas, rodar Admin → Radar → Verificar agora e ampliar as fontes com o `curador-conteudo`.
+  5. `pagamentos` e Financeiro acompanham em homologação uma compra de Plus e uma de Passe, do
+     checkout ao acesso e à comissão aplicável, e registram as divergências (D11).
 - **P1 — próximas 2–4 semanas:**
   4. Auditar questões `ia_diaria` publicadas: explicação com letras e gabarito (rodar o Solucionador cego em lote).
   5. Harness de testes do front (Vitest + Testing Library) para `lib/` e hooks críticos (`tester`).
@@ -89,8 +131,18 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
 - **P2 — próximos 1–3 meses:**
   9. Revisão espaçada FSRS no lugar das caixas fixas (1/3/7/14/30) (`cientista-aprendizagem`).
   10. Calibração TRI (3PL) das questões com as respostas reais → nota estimada estilo ENEM.
-  11. Mentor socrático com ferramentas (progresso, fila de revisão) e cache de explicações por questão.
+  11. Mentor socrático com ferramentas (progresso, fila de revisão) e cache de explicações por questão. O piloto de leitura segue D11.
   12. App nas lojas (D5): Capacitor + push nativo + offline das trilhas.
+- **Das referências (`docs/REFERENCIAS_REPOSITORIOS.md`):**
+  13. Revisão por estabilidade/recuperabilidade (DeepTutor) — spec pronta no fim do relatório (refina o P2.9).
+  14. Edital verticalizado sincronizado entre aparelhos (tabela com RLS) e links de lei seca por item.
+  15. Questões com texto-base comum (freeCodeCamp `questionSets.context`) para Português.
+  16. Exportar caderno de erros para o Anki (RPC só com questões já respondidas).
+  17. Fonte "Querido Diário" no Radar para órgãos com site em JavaScript; IBGE para municípios por UF.
+  18. Eventos tipados (AG-UI) no streaming do Mentor quando ele ganhar ferramentas (P2.11).
+  19. Auditoria de UI das telas de estudo com Impeccable (`critique`/`audit`) pelo `designer`.
+  20. RPC que agregue o domínio por tópico no banco (hoje o front lê as 1.000 respostas mais
+      recentes de cada matéria — teto `max_rows` do PostgREST; tópico sem resposta nesse recorte some).
 - **P3 — 3–12 meses:** B2B (cursinhos/escolas multi-tenant), simulados adaptativos (CAT), MCP público de conteúdo.
 
 ---
@@ -98,34 +150,48 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
 ## Handoff mais recente
 <!-- Sempre o topo = o mais recente. Template: docs/colaboracao/handoff-template.md -->
 
-### 2026-11-16 · implantação em produção (`coordenador` + `supabase-db` + `edge-functions` + `reviewer`)
-- **Objetivo:** implantar o PR #21 com aprovação do dono.
-- **O que mudou:** PR #21 mesclado (`9d10578`); pelo MCP do Lovable, o agente do Lovable aplicou a
-  migration `20261116120000` (SQL idêntico ao arquivo, registrada no histórico) e publicou as três
-  funções; ele também commitou `b0aedfc` (cópia em `drizzle/`, deps do drizzle, `types.ts`).
-  Este handoff, a doc de implantação e o `package-lock.json` foram atualizados em seguida.
-- **Testado em produção (só leitura):** `ai_runs`/`ai_lessons` com RLS e 3 políticas; `anon` e
-  `authenticated` sem acesso indevido; só `service_role` executa `record_ai_lessons`; job
-  `purge-ai-runs` agendado. CI verde em `9d10578` e `b0aedfc`.
-- **Não testado:** execução real da fábrica nova — a IA está bloqueada por `gateway 402` (saldo
-  esgotado desde 05:10 UTC, antes da implantação).
-- **Bloqueios:** recarga do saldo de IA no Lovable (só o dono).
-- **Próximo passo:** depois da recarga, conferir `ai_runs` na próxima janela do cron (05h–08h50 UTC)
-  ou disparar a geração pelo painel admin.
+### 2026-11-17 · Integração operacional do Plus, Passe e Mentor
 
-### 2026-11-16 · fundação multiagente (`coordenador` + `engenheiro-ia` + `supabase-db` + `reviewer` + `documentation-writer`)
-- **Objetivo:** analisar AgroDecision, TradingAgents e o ecossistema `multi-agent-systems`;
-  pesquisar referências mundiais; estruturar o LevelUp como sistema multiagente robusto.
-- **O que mudou:** relatório `docs/ARQUITETURA_MULTIAGENTE.md`; governança (`CLAUDE.md`,
-  `AGENTS.md`, este arquivo, `.claude/agents/` com 17 agentes, `rules/`, `docs/colaboracao/`,
-  `CONTRIBUTING.md`, CI e templates); camada `_shared/ai` (cliente, telemetria, guardrails);
-  `generate-track-questions` reescrita como pipeline multiagente com memória de lições;
-  `essay-review` no cliente compartilhado (texto do aluno cercado); `ai-mentor` com `MENTOR_MODEL`
-  e telemetria; migration `20261116120000` (ai_runs, ai_lessons, RPC, retenção); 9 erros de lint
-  corrigidos; `package-lock.json` sincronizado.
-- **Testado:** `bun run typecheck` ✅ · `bun run lint` ✅ (0 erros; 48 avisos antigos) ·
-  `bun run build` ✅ · `deno test` ✅ 30/30 · `deno check` ✅ 11/11 funções · migration
-  executada em Postgres em memória (PGlite) ✅ (idempotente, RPC, privilégios, retenção).
-- **Não testado:** chamadas reais ao gateway de IA e publicação no Supabase (sem credenciais nesta sessão).
-- **Bloqueios:** aplicação da migration e deploy das funções dependem do dono (D4).
-- **Próximo passo:** P0 do backlog.
+- **Objetivo e decisão:** registrar a prioridade D11 e os responsáveis por cada etapa.
+- **O que mudou:** roteiro de homologação, permissões e critérios de aceite em `docs/INTEGRACAO_OPERACIONAL.md`.
+- **Verificação local:** typecheck e build passaram, lint com 0 erros e 45 avisos prévios,
+  testes unitários 62/62, Edge 76/76 e tipos das 12 funções conferidos no Deno.
+- **Pendências de ambiente:** a base `9a2afbb` e os relatos de implantação orientam a conferência.
+  O histórico do ambiente e os testes de homologação indicarão quais etapas operacionais estão concluídas.
+- **Próximo passo:** `supabase-db` e `edge-functions` conferem as versões de IA, Plus e Radar.
+  Com o ambiente identificado, `pagamentos` e Financeiro executam P0.5.
+
+### 2026-11-17 · Referências externas: 32 repositórios (Claude Code, nas faixas de `frontend`, `engenheiro-ia`, `tester`, `security-reviewer` e `documentation-writer`)
+- **Objetivo:** investigar os repositórios indicados pelo dono e incorporar o que melhora o app e o processo.
+- **O que mudou:** relatório `docs/REFERENCIAS_REPOSITORIOS.md`; domínio por tópico (`src/lib/mastery.ts`,
+  `useTopicMastery`) e edital verticalizado (`src/lib/edital.ts`, `useEditalState`) no painel
+  `components/trilha/SubjectStudyPanel.tsx` da trilha; leitura em voz alta (`src/lib/speech.ts`,
+  `useSpeech`, `SpeakButton`) no quiz; Mentor com modos direto/socrático (`ai-mentor/prompt.ts`,
+  `mentor@2026-11-17`) e seletor na tela; portão de questões (termos absolutos, comando negativo;
+  `elaborador@2026-11-17`); SEO (`src/lib/seo.ts`, `useSeo`, sitemap, robots); guardrails
+  (`.claude/hooks/guardrails.mjs` + `settings.json`); `security-reviewer`, `tester`,
+  `rules/common/writing.md`, `rules/common/ai-agents.md`; `typecheck` que de fato checa; CI com `test:unit`.
+- **Testado:** `bun run typecheck` ✅ · `bun run lint` ✅ (0 erros; 45 avisos antigos) · `bun run test:unit` ✅
+  62/62 · `bun run test:edge` ✅ 76/76 · `deno check` ✅ todas as funções · `bun run build` ✅ ·
+  parser do edital rodado contra as 26 ementas reais da trilha ✅.
+- **Não testado:** voz no navegador real e chamadas reais ao gateway de IA (sem `LOVABLE_API_KEY`);
+  nenhuma migration nova nesta entrega.
+- **Bloqueios:** D10 (Radar público) é decisão do dono.
+- **Próximo passo:** P0 do backlog continua prioritário; depois itens 13–19.
+
+### 2026-11-17 · Radar de Concursos (Claude Code, nas faixas de `engenheiro-ia`, `supabase-db`, `frontend` e `documentation-writer`)
+- **Objetivo:** grupo de agentes (master → coordenador por área → especialistas) para pesquisar e
+  monitorar concursos com edital previsto/publicado, manter o aluno avisado e criar trilhas novas.
+- **O que mudou:** Edge Function `radar-concursos` (`fetcher.ts` coletor seguro + diff, `agents.ts`
+  6 papéis, `evidence.ts` portão e consolidação, `scoring.ts` relevância, `pipeline.ts` orquestração,
+  `tracks.ts` rascunho de trilha); migration `20261117120000` (7 tabelas, RLS, RPCs, sementes, cron
+  a cada 3 h); páginas `/radar` e `/radar/:slug`, cartão na trilha, atalho em Trilhas, notificação
+  clicável, aba Admin → Radar; guarda em `generate-track-questions` para legislação local sem fatos;
+  `docs/RADAR_CONCURSOS.md`.
+- **Testado:** `bun run typecheck` ✅ · `bun run lint` ✅ (0 erros; 48 avisos antigos) · `bun run build` ✅ ·
+  `deno test` ✅ 65/65 (35 novos) · `deno check` ✅ 12/12 funções · migration no PGlite ✅ (2×, RLS,
+  RPCs, fan-out sem duplicar, publicação de trilha, limite de follows) · coletor contra as fontes reais ✅
+  (5 com texto; 3 dinâmicas/anti-robô semeadas desligadas).
+- **Não testado:** chamadas reais ao gateway de IA (sem `LOVABLE_API_KEY` nesta sessão) e publicação no Supabase.
+- **Bloqueios:** aplicação da migration e deploy dependem do dono (D4).
+- **Próximo passo:** P0.4 do backlog; depois, fontes por área e banco autoral inicial das trilhas novas.

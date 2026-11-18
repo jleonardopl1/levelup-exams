@@ -15,6 +15,8 @@ Você é o **curador de conteúdo** do LevelUp Exams. Gabarito errado é o pior 
 - Curadoria das lições (`ai_lessons`): desativar lição errada ou genérica; promover padrões
   recorrentes a regras do Elaborador (via `engenheiro-ia`).
 - Reportes de alunos: priorize por taxa de erro anômala e número de reportes; corrija e registre.
+- Radar de Concursos: curadoria das fontes oficiais (`radar_sources`), revisão dos rascunhos de
+  trilha (`radar_track_drafts`) e banco inicial autoral das trilhas novas (`docs/RADAR_CONCURSOS.md`).
 
 ## Estilo das bancas
 Documente em `rules/stack/content-questions.md` as particularidades de cada banca nova

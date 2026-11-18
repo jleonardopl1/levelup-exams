@@ -1,10 +1,25 @@
-import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { BookOpenCheck, Route as RouteIcon, Trophy, Sparkles } from 'lucide-react';
 import Logo from '@/components/Logo';
 import { Button } from '@/components/ui/button';
 import { SiteFooter } from '@/components/SiteFooter';
-import { SITE } from '@/config/site';
+import { SITE, siteUrl } from '@/config/site';
+import { useSeo } from '@/hooks/useSeo';
+import { organizationJsonLd, webApplicationJsonLd } from '@/lib/seo';
+
+const ABOUT_DESCRIPTION =
+  'Plataforma gamificada de estudos para concursos públicos: trilhas por edital, simulados no formato da banca, revisão espaçada dos erros e Mentor com IA.';
+
+const ABOUT_JSONLD = [
+  organizationJsonLd({
+    name: SITE.name,
+    url: siteUrl('/'),
+    logo: siteUrl('/icon-512.png'),
+    description: ABOUT_DESCRIPTION,
+    email: SITE.contactEmail,
+  }),
+  webApplicationJsonLd({ name: SITE.name, url: siteUrl('/'), logo: siteUrl('/icon-512.png'), description: ABOUT_DESCRIPTION }),
+];
 
 const FEATURES = [
   {
@@ -35,9 +50,12 @@ const FEATURES = [
  * nome exato "LevelUp Exams", explicar o propósito do app e ligar à Política de Privacidade.
  */
 export default function About() {
-  useEffect(() => {
-    document.title = `${SITE.name} — Estudos gamificados para concursos públicos`;
-  }, []);
+  useSeo({
+    title: `${SITE.name} — Estudos gamificados para concursos públicos`,
+    description: ABOUT_DESCRIPTION,
+    path: '/sobre',
+    jsonLd: ABOUT_JSONLD,
+  });
 
   return (
     <div className="min-h-screen bg-background flex flex-col">

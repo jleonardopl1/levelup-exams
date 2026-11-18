@@ -59,14 +59,13 @@ Plataforma gamificada de estudos para concursos públicos, vestibulares e ENEM (
 
 - instalar: `bun install` · dev: `bun run dev` (http://localhost:8080)
 - typecheck: `bun run typecheck` · lint: `bun run lint` · build: `bun run build`
+- testes unitários (lógica pura do front + guardrails): `bun run test:unit` (`node --test`, Node 22.18+)
 - testes das Edge Functions: `bun run test:edge` (requer Deno 2)
 - seed das trilhas: `bun run build:trilhas`
-- **produção = Lovable Cloud** (`rxsovhyimflzvxggppal`): migrations e publicação de Edge Functions
-  passam pelo **agente do Lovable** (editor ou MCP do Lovable), sempre com aprovação do dono; o MCP
-  do Supabase da conta do dono não alcança esse projeto. Código vindo do GitHub **não** publica as
-  funções sozinho. Consultas de leitura em produção: MCP do Lovable (`query_database`, só `SELECT`).
-- fora do Lovable: `supabase db push` · `supabase functions deploy <nome>`
-- CI (`.github/workflows/ci.yml`): typecheck + lint + build + testes Deno + `deno check` de todas as funções
+- migrations: `supabase db push` (remoto exige aprovação do dono) · deploy de função: `supabase functions deploy <nome>`
+- CI (`.github/workflows/ci.yml`): typecheck + lint + testes unitários + build + testes Deno + `deno check` de todas as funções
+- **Guardrails:** `.claude/hooks/guardrails.mjs` (PreToolUse) aplica em código as convenções acima
+  (force-push, main, banco remoto, deploy, secrets, arquivos do Lovable). Mudou uma convenção? Mude o hook e o teste.
 
 ## Segurança (resumo)
 
@@ -85,13 +84,21 @@ Plataforma gamificada de estudos para concursos públicos, vestibulares e ENEM (
 - `telemetry.ts` — grava em `ai_runs` só metadados (agente, modelo, versão do prompt, tentativas,
   latência, tokens). Nunca conteúdo. Retenção de 90 dias (pg_cron).
 - `guardrails.ts` — `fenceUntrusted` + `UNTRUSTED_RULE` (OWASP LLM01).
+- **Radar de Concursos** (`radar-concursos`, `docs/RADAR_CONCURSOS.md`): gerente master em código →
+  coordenador por área (`radar_areas`) → Batedor, Analista de edital, Verificador (outro modelo),
+  Analista de banca e Arquiteto de trilha. Fato só com evidência literal da fonte oficial, conferida
+  em código (`evidence.ts`); retificação, regressão de fase e verificador indisponível → revisão humana.
+  Rascunho de trilha só vira trilha com aprovação do admin. Modelos: `RADAR_MODEL`,
+  `RADAR_VERIFIER_MODEL`, `RADAR_TRACK_MODEL`.
 - **Fábrica de questões** (`generate-track-questions`): Elaborador → portão determinístico →
   Solucionador(es) **cego(s)** ∥ Revisor técnico → consenso → Árbitro só nas divergências →
   publicação; reprovações viram **lições** por matéria (`ai_lessons`) que voltam ao Elaborador.
   Modelos por papel: `QUESTION_MODEL`, `QUESTION_REVIEW_MODEL`, `QUESTION_SOLVER_MODELS`,
   `QUESTION_ARBITER_MODEL`; `QUESTION_PIPELINE=classic` desliga solucionador/árbitro.
 - Mentor (`ai-mentor`, streaming, `MENTOR_MODEL`) e discursiva (`essay-review`, `ESSAY_MODEL`)
-  usam a mesma camada (telemetria; a discursiva também usa o cliente com prazo).
+  usam a mesma camada (telemetria; a discursiva também usa o cliente com prazo). O prompt do
+  Mentor fica em `ai-mentor/prompt.ts` (modos `direto`/`socratico`, texto simples sem Markdown,
+  regras de `rules/common/writing.md`); `mode` ausente = `direto`.
 
 ## Schema (resumo)
 
@@ -103,17 +110,28 @@ Plataforma gamificada de estudos para concursos públicos, vestibulares e ENEM (
 - Gamificação: `achievements`, `user_achievements`, `daily_challenges`, `user_daily_challenges`, `user_rewards`, `reward_catalog`, `user_redemptions`, `user_milestones`, `notifications`
 - Afiliados e billing: `referral_codes`, `referral_uses`, `referral_link_visits`, `affiliate_payouts`, `stripe_webhook_events`, `platform_settings`
 - IA: `ai_runs` (telemetria), `ai_lessons` (memória de lições) — migration `20261116120000`
+- Radar: `radar_areas`, `radar_sources`, `radar_concursos`, `radar_updates`, `radar_follows`, `radar_track_drafts`, `radar_runs` — migration `20261117120000`
 
 ## Edge Functions
 
-`ai-mentor` · `essay-review` · `generate-track-questions` (cron) · `create-checkout` · `customer-portal` ·
+`ai-mentor` · `essay-review` · `generate-track-questions` (cron) · `radar-concursos` (cron) · `create-checkout` · `customer-portal` ·
 `check-subscription` · `stripe-webhook` · `admin-metrics` · `admin-notify` · `send-contact` · `auth-email-hook` (gerenciada pelo Lovable).
 Utilidades em `_shared/` (CORS por lista de origens, auth, rate limit atômico, auditoria, IA).
+
+## Aprendizagem (lógica pura em `src/lib`, testada com `node --test`)
+
+- `mastery.ts` — domínio por tópico (DeepTutor): recência das 5 últimas respostas, teto 50%/80%
+  com 1/2 respostas, repetição da mesma questão em < 6 h não conta. Lê `user_question_attempts`
+  do próprio aluno (`useTopicMastery`), nunca o gabarito.
+- `edital.ts` — edital verticalizado (itens numerados do `syllabus`, estado teoria/revisão no aparelho).
+- `speech.ts` — leitura em voz alta (Web Speech API, pt-BR) · `seo.ts` — JSON-LD e metadados.
+- Referências externas avaliadas e o que foi adotado: `docs/REFERENCIAS_REPOSITORIOS.md`.
 
 ## Foco atual
 
 Fundação multiagente (2026-11-16): governança AGENTS-COLLAB, CI, camada de IA compartilhada e
-fábrica de questões multiagente. Próximos passos e backlog priorizado em `AGENTS-COLLAB.md` e
+fábrica de questões multiagente. Radar de Concursos (2026-11-17): monitoramento de editais e
+novas trilhas por um grupo de agentes hierárquico. Próximos passos e backlog priorizado em `AGENTS-COLLAB.md` e
 `docs/ARQUITETURA_MULTIAGENTE.md` §10.
 
 ## Fora de escopo
