@@ -8,8 +8,11 @@ import { useProcessQuizRewards } from '@/hooks/useQuizRewards';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { ArrowLeft, Clock, CheckCircle, XCircle, Loader2, WifiOff } from 'lucide-react';
-import { toast } from 'sonner';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
+  AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { ArrowLeft, Clock, CheckCircle, XCircle, Loader2, Flag, RotateCcw, Keyboard } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { DailyLimitModal } from '@/components/DailyLimitModal';
@@ -22,7 +25,7 @@ import { SpeakButton } from '@/components/SpeakButton';
 import { useSpeech } from '@/hooks/useSpeech';
 import { questionSpeechText, speakable } from '@/lib/speech';
 
-const QUIZ_SECONDS = 600; // 10 minutos
+const QUIZ_SECONDS = 600;
 
 type Answer = { questionId: string; selected: number; correct: boolean; correctIndex: number; explicacao: string | null };
 
@@ -58,16 +61,12 @@ export default function Quiz() {
   const [confirmExit, setConfirmExit] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
 
-  // Refs: o cronômetro e o atalho de teclado leem o estado mais recente sem
-  // depender de closures antigas (antes, o fim por tempo calculava a nota com
-  // a lista de respostas vazia e o aluno recebia 0%).
   const answersRef = useRef<Answer[]>([]);
   const timeLeftRef = useRef(QUIZ_SECONDS);
   const finishingRef = useRef(false);
   const streakRef = useRef(0);
   const maxStreakRef = useRef(0);
   const pendingResultRef = useRef<QuizResultState | null>(null);
-  // O limite diário é cobrado uma única vez, mesmo se o aluno repetir "Tentar salvar".
   const usageRecordedRef = useRef(false);
 
   useEffect(() => { answersRef.current = answers; }, [answers]);
@@ -86,18 +85,105 @@ export default function Quiz() {
     if (currentQuestion?.is_premium && !isPremium) setShowUpsellModal(true);
   }, [currentIndex, currentQuestion?.is_premium, isPremium]);
 
-  // O cronometro so decrementa. Encerrar o quiz fica num efeito separado que usa a versao
-  // mais recente de finishQuiz (via ref): antes, o intervalo chamava uma copia antiga,
-  // de quando ainda nao havia respostas, e o aluno recebia nota 0 ao acabar o tempo.
+  const { isSupported: canSpeak, speakingId, speak, stop: stopSpeech } = useSpeech();
+  useEffect(() => { stopSpeech(); }, [currentIndex, stopSpeech]);
+
+  const buildResult = useCallback((timedOut: boolean): QuizResultState => {
+    const list = questions ?? [];
+    const byId = new Map(answersRef.current.map((a) => [a.questionId, a]));
+    const review: QuizReviewItem[] = list.map((q) => {
+      const a = byId.get(q.id);
+      return {
+        questionId: q.id,
+        enunciado: q.enunciado,
+        alternativas: q.alternativas,
+        categoria: q.categoria,
+        topico: q.topico ?? null,
+        selected: a ? a.selected : null,
+        correctIndex: a ? a.correctIndex : null,
+        correct: a?.correct ?? false,
+        explicacao: a?.explicacao ?? null,
+      };
+    });
+    const correct = review.filter((r) => r.correct).length;
+    const total = list.length;
+    return {
+      score: total > 0 ? Math.round((correct / total) * 100) : 0,
+      correct,
+      total,
+      timeSpent: QUIZ_SECONDS - timeLeftRef.current,
+      backPath,
+      retry: `${location.pathname}${location.search}`,
+      timedOut,
+      review,
+    };
+  }, [questions, backPath, location.pathname, location.search]);
+
+  const persistAndShow = useCallback(async (result: QuizResultState) => {
+    setPhase('saving');
+    try {
+      const answered = answersRef.current.length;
+      if (!isPremium && answered > 0 && !usageRecordedRef.current) {
+        await incrementUsage.mutateAsync(answered).then(
+          () => { usageRecordedRef.current = true; },
+          () => undefined,
+        );
+      }
+      await submitQuiz.mutateAsync({
+        score: result.score,
+        correctAnswers: result.correct,
+        totalQuestions: result.total,
+        timeSpentSeconds: result.timeSpent,
+        categoria: categoria || 'Todas',
+      });
+    } catch {
+      pendingResultRef.current = result;
+      setPhase('save_error');
+      return;
+    }
+
+    let pointsEarned = 0;
+    try {
+      const rewards = await processRewards({
+        correctAnswers: result.correct,
+        totalQuestions: result.total,
+        timeSpentSeconds: result.timeSpent,
+        consecutiveCorrect: maxStreakRef.current,
+      });
+      pointsEarned = rewards.pointsEarned;
+    } catch {
+      /* recompensas não impedem a visualização do resultado */
+    }
+
+    const final = { ...result, pointsEarned, saved: true, userId: user?.id };
+    saveQuizResult(final);
+    navigate('/result', { state: final, replace: true });
+  }, [categoria, incrementUsage, isPremium, navigate, processRewards, submitQuiz, user?.id]);
+
+  const finishQuiz = useCallback((timedOut = false) => {
+    if (finishingRef.current || !questions || questions.length === 0) return;
+    finishingRef.current = true;
+    void persistAndShow(buildResult(timedOut));
+  }, [buildResult, persistAndShow, questions]);
+
+  const finishRef = useRef(finishQuiz);
+  useEffect(() => { finishRef.current = finishQuiz; }, [finishQuiz]);
+
   useEffect(() => {
     if (phase !== 'playing' || !questions || questions.length === 0) return;
     const timer = setInterval(() => {
-      setTimeLeft((prev) => (prev <= 1 ? 0 : prev - 1));
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          timeLeftRef.current = 0;
+          setTimeout(() => finishRef.current(true), 0);
+          return 0;
+        }
+        return prev - 1;
+      });
     }, 1000);
     return () => clearInterval(timer);
   }, [phase, questions]);
 
-  // Aviso ao fechar/recarregar a aba no meio do simulado
   useEffect(() => {
     if (phase !== 'playing' || answers.length === 0) return;
     const handler = (e: BeforeUnloadEvent) => { e.preventDefault(); e.returnValue = ''; };
@@ -138,10 +224,7 @@ export default function Quiz() {
       }
       setShowResult(true);
     } catch (error) {
-      console.error('Failed to validate answer:', error);
-      toast.error('Não foi possível conferir sua resposta', {
-        description: 'Verifique sua conexão e toque em Confirmar de novo.',
-      });
+      toast.error((error as Error).message || 'Não foi possível validar a resposta.');
     }
   };
 
@@ -158,75 +241,39 @@ export default function Quiz() {
     }
   };
 
-  const finishingRef = useRef(false);
-  const finishQuiz = useCallback(async () => {
-    if (quizFinished || finishingRef.current) return;
-    finishingRef.current = true;
-    setQuizFinished(true);
+  const handleBack = () => {
+    if (answers.length > 0 && phase === 'playing') setConfirmExit(true);
+    else navigate(backPath);
+  };
 
-    // `answers` ja inclui a questao confirmada por ultimo (handleConfirm a adiciona antes
-    // de mostrar o resultado). Somar validationResult de novo contava o ultimo acerto em dobro.
-    const correctCount = answers.filter(a => a.correct).length;
-    const total = questions?.length || 0;
-    const score = total > 0 ? Math.round((correctCount / total) * 100) : 0;
-    const timeSpent = 600 - timeLeft;
-
-    try {
-      // Increment usage for free users
-      if (!isPremium) {
-        await incrementUsage.mutateAsync(total);
+  const handleConfirmRef = useRef(handleConfirm);
+  const handleNextRef = useRef(handleNext);
+  handleConfirmRef.current = handleConfirm;
+  handleNextRef.current = handleNext;
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (phase !== 'playing' || reportOpen || confirmExit || showLimitModal || showUpsellModal) return;
+      const target = e.target as HTMLElement | null;
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      if (e.key === 'Enter' && target?.closest('a, button:not([role="radio"]), [role="button"]')) return;
+      const total = currentQuestion?.alternativas.length ?? 0;
+      const key = e.key.toLowerCase();
+      let idx = -1;
+      if (/^[1-6]$/.test(key)) idx = Number(key) - 1;
+      else if (/^[a-f]$/.test(key)) idx = key.charCodeAt(0) - 97;
+      if (idx >= 0 && idx < total) {
+        e.preventDefault();
+        handleSelect(idx);
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (showResult) handleNextRef.current();
+        else void handleConfirmRef.current();
       }
-
-      // Submit quiz result
-      await submitQuiz.mutateAsync({
-        score,
-        correctAnswers: correctCount,
-        totalQuestions: total,
-        timeSpentSeconds: timeSpent,
-        categoria: categoria || 'Todas',
-      });
-
-      // Process rewards and achievements
-      await processRewards({
-        correctAnswers: correctCount,
-        totalQuestions: total,
-        timeSpentSeconds: timeSpent,
-        consecutiveCorrect: maxStreakRef.current,
-      });
-    } catch (error) {
-      // Rede instavel no celular: nao prender o aluno na ultima questao.
-      console.error('Failed to save quiz result:', error);
-      toast.error('Não foi possível salvar este resultado', {
-        description: 'Sua nota aparece abaixo, mas pode não entrar no histórico e no ranking.',
-      });
-    }
-
-    navigate('/result', { 
-      state: { score, correct: correctCount, total, timeSpent, backPath, retry: `${location.pathname}${location.search}` } 
-    });
-  }, [answers, navigate, questions, quizFinished, submitQuiz, timeLeft, categoria, isPremium, incrementUsage, processRewards, backPath, location.pathname, location.search]);
-
-  const finishRef = useRef(finishQuiz);
-  useEffect(() => {
-    finishRef.current = finishQuiz;
-  }, [finishQuiz]);
-  useEffect(() => {
-    if (timeLeft === 0) finishRef.current();
-  }, [timeLeft]);
-
-  if (isError) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4 p-6 text-center">
-        <WifiOff className="w-12 h-12 text-muted-foreground" />
-        <p className="font-semibold text-lg">Não foi possível carregar as questões.</p>
-        <p className="text-sm text-muted-foreground">Verifique sua conexão com a internet e tente de novo.</p>
-        <div className="flex gap-3">
-          <Button onClick={() => refetch()}>Tentar de novo</Button>
-          <Button variant="outline" onClick={() => navigate(backPath)}>Voltar</Button>
-        </div>
-      </div>
-    );
-  }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  });
 
   if (isLoading || (!questions && !isError)) {
     return (
@@ -315,7 +362,6 @@ export default function Quiz() {
 
   return (
     <div className="min-h-screen bg-background p-4 max-w-3xl mx-auto">
-      {/* Header */}
       <div className="flex items-center gap-4 mb-6">
         <Button variant="ghost" size="icon" onClick={handleBack} aria-label="Sair do simulado">
           <ArrowLeft className="w-5 h-5" />
@@ -323,10 +369,7 @@ export default function Quiz() {
         <div className="flex-1">
           <Progress value={progress} variant="gradient" size="sm" aria-label={`Questão ${currentIndex + 1} de ${questions.length}`} />
         </div>
-        <div
-          className={cn('flex items-center gap-1 text-sm font-medium tabular-nums', timeLeft < 60 && 'text-destructive animate-pulse')}
-          aria-label={`Tempo restante ${formatTime(timeLeft)}`}
-        >
+        <div className={cn('flex items-center gap-1 text-sm font-medium tabular-nums', timeLeft < 60 && 'text-destructive animate-pulse')} aria-label={`Tempo restante ${formatTime(timeLeft)}`}>
           <Clock className="w-4 h-4 text-primary" />
           <span>{formatTime(timeLeft)}</span>
         </div>
@@ -346,18 +389,12 @@ export default function Quiz() {
               onStop={stopSpeech}
             />
           )}
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 text-xs text-muted-foreground"
-            onClick={() => setReportOpen(true)}
-          >
+          <Button variant="ghost" size="sm" className="h-8 text-xs text-muted-foreground" onClick={() => setReportOpen(true)}>
             <Flag className="w-3.5 h-3.5 mr-1" /> Reportar erro
           </Button>
         </div>
       </div>
 
-      {/* Question */}
       <Card variant="elevated" className="mb-6">
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-2">
@@ -372,13 +409,11 @@ export default function Quiz() {
         </CardContent>
       </Card>
 
-      {/* Options */}
       <div className="space-y-3 mb-6" role="radiogroup" aria-label="Alternativas">
         {currentQuestion?.alternativas.map((alt, index) => {
           const isSelected = selectedAnswer === index;
           const isCorrect = showResult && validationResult && index === validationResult.correct_index;
           const isWrong = showResult && isSelected && validationResult && index !== validationResult.correct_index;
-
           return (
             <button
               key={index}
@@ -412,18 +447,15 @@ export default function Quiz() {
         })}
       </div>
 
-      {/* Feedback + explanation */}
       {showResult && validationResult && (
         <Card variant="glass" className="mb-6 animate-slide-up" aria-live="polite">
           <CardContent className="p-4">
             <p className={cn('text-sm font-semibold mb-1', validationResult.is_correct ? 'text-success' : 'text-destructive')}>
               {validationResult.is_correct
-                ? 'Resposta correta!'
+                ? 'Resposta correta!' 
                 : `Resposta incorreta. Gabarito: ${String.fromCharCode(65 + validationResult.correct_index)}`}
             </p>
-            {validationResult.explicacao && (
-              <p className="text-sm text-muted-foreground">{validationResult.explicacao}</p>
-            )}
+            {validationResult.explicacao && <p className="text-sm text-muted-foreground">{validationResult.explicacao}</p>}
             {canSpeak && validationResult.explicacao && currentQuestion && (
               <SpeakButton
                 what="explicação"
@@ -437,7 +469,6 @@ export default function Quiz() {
         </Card>
       )}
 
-      {/* Action Button */}
       <Button
         variant={showResult ? 'gradient-success' : 'hero'}
         size="xl"
@@ -459,8 +490,7 @@ export default function Quiz() {
           <AlertDialogHeader>
             <AlertDialogTitle>Sair do simulado?</AlertDialogTitle>
             <AlertDialogDescription>
-              Você respondeu {answers.length} de {questions.length} questões. Pode encerrar agora e ver o
-              resultado parcial, ou sair sem salvar.
+              Você respondeu {answers.length} de {questions.length} questões. Pode encerrar agora e ver o resultado parcial, ou sair sem salvar.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="gap-2">
@@ -476,7 +506,6 @@ export default function Quiz() {
       <ReportQuestionDialog questionId={currentQuestion?.id ?? null} open={reportOpen} onOpenChange={setReportOpen} />
       <DailyLimitModal open={showLimitModal} onOpenChange={setShowLimitModal} />
       <PremiumUpsellModal open={showUpsellModal} onOpenChange={setShowUpsellModal} triggerContext="question" />
-
       <Confetti isActive={showConfetti} onComplete={() => setShowConfetti(false)} />
       <CelebrationGlow isActive={showGlow} />
     </div>
