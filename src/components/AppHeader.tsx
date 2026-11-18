@@ -40,6 +40,7 @@ import { NotificationCenter } from '@/components/NotificationCenter';
 import Logo from '@/components/Logo';
 import { StreakReminderToggle } from '@/components/StreakReminderToggle';
 import { getSafeDisplayName } from '@/lib/displayName';
+import { BottomNav } from '@/components/BottomNav';
 
 export function AppHeader() {
   const { user, signOut } = useAuth();
@@ -66,7 +67,7 @@ export function AppHeader() {
   const navItems = [
     { path: '/', icon: Home, label: 'Início' },
     { path: '/trilhas', icon: MapIcon, label: 'Trilhas' },
-    { path: '/quiz', icon: BookOpen, label: 'Quiz' },
+    { path: '/quiz', icon: BookOpen, label: 'Simulado' },
     { path: '/ranking', icon: Trophy, label: 'Ranking' },
     { path: '/achievements', icon: Award, label: 'Conquistas' },
     { path: '/mentor', icon: Bot, label: 'Mentor IA' },
@@ -190,6 +191,12 @@ export function AppHeader() {
                   </div>
                 </div>
                 <DropdownMenuSeparator />
+                {isStaff && (
+                  <DropdownMenuItem onClick={() => navigate('/admin')} className="text-primary font-medium">
+                    <Crown className="mr-2 h-4 w-4" />
+                    Painel Admin
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem onClick={() => navigate('/dashboard')}>
                   <LayoutDashboard className="mr-2 h-4 w-4" />
                   Dashboard
@@ -234,6 +241,8 @@ export function AppHeader() {
               size="icon"
               className="lg:hidden h-9 w-9"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label={mobileMenuOpen ? 'Fechar menu' : 'Abrir menu'}
+              aria-expanded={mobileMenuOpen}
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </Button>
@@ -316,6 +325,7 @@ export function AppHeader() {
       </header>
 
       <ShareModal open={shareModalOpen} onOpenChange={setShareModalOpen} />
+      {user && <BottomNav />}
     </>
   );
 }

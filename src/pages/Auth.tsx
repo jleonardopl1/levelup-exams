@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { toast } from 'sonner';
 import { Mail, Lock, User, Github, MailCheck, ArrowLeft } from 'lucide-react';
 import { passwordErrorMessage } from '@/lib/authErrors';
+import { takeAfterLogin } from '@/lib/afterLogin';
 import heroPattern from '@/assets/hero-pattern.png';
 import ProfileCompletionModal from '@/components/ProfileCompletionModal';
 import { supabase } from '@/integrations/supabase/client';
@@ -91,7 +92,7 @@ export default function Auth() {
         if (profile && !profile.avatar_url) {
           setShowProfileModal(true);
         } else if (profile) {
-          navigate('/');
+          navigate(takeAfterLogin('/'), { replace: true });
         }
       }
     };
@@ -157,9 +158,11 @@ export default function Auth() {
         toast.success('Conta criada com sucesso!');
         // Profile modal will be shown via useEffect when user state updates
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Handle specific Supabase auth errors with user-friendly messages
-      const errorMessage = error.message?.toLowerCase() || '';
+      const rawMessage = (error as { message?: unknown } | null)?.message;
+      const message = typeof rawMessage === 'string' ? rawMessage : '';
+      const errorMessage = message.toLowerCase();
       if (errorMessage.includes('user already registered') || errorMessage.includes('already exists')) {
         toast.error('Este email já está cadastrado. Tente fazer login.');
       } else if (errorMessage.includes('invalid login credentials')) {
@@ -167,7 +170,7 @@ export default function Auth() {
       } else if (errorMessage.includes('email not confirmed')) {
         toast.error('Por favor, confirme seu email antes de fazer login.');
       } else {
-        toast.error(error.message || 'Ocorreu um erro. Tente novamente.');
+        toast.error(message || 'Ocorreu um erro. Tente novamente.');
       }
     } finally {
       setLoading(false);
@@ -190,7 +193,7 @@ export default function Auth() {
 
   const handleProfileComplete = () => {
     setShowProfileModal(false);
-    navigate('/');
+    navigate(takeAfterLogin('/'), { replace: true });
   };
 
   return (
@@ -381,6 +384,13 @@ export default function Auth() {
           >
             <Smartphone className="w-4 h-4" /> Baixe o app no Android ou iPhone
           </Link>
+
+          <p className="text-[11px] leading-snug text-center text-muted-foreground">
+            Ao continuar, você concorda com os{' '}
+            <Link to="/termos" className="underline hover:text-primary">Termos de Uso</Link> e a{' '}
+            <Link to="/privacidade" className="underline hover:text-primary">Política de Privacidade</Link>.
+            {' '}<Link to="/sobre" className="underline hover:text-primary">Conheça o LevelUp Exams</Link>
+          </p>
         </CardContent>
       </Card>
 

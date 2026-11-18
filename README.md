@@ -9,7 +9,7 @@ Plataforma gamificada de estudos para concursos publicos, vestibulares e ENEM.
 - **State:** TanStack React Query
 - **Backend:** Supabase (PostgreSQL, Auth, Edge Functions)
 - **Pagamentos:** Stripe API
-- **IA:** Gemini 2.5 Flash (via Lovable Gateway)
+- **IA:** modelos via Lovable AI Gateway, com camada compartilhada (`supabase/functions/_shared/ai`) e fabrica multiagente de questoes
 - **Email:** Resend API
 
 ## Funcionalidades
@@ -17,11 +17,17 @@ Plataforma gamificada de estudos para concursos publicos, vestibulares e ENEM.
 - Sistema de quizzes com validacao server-side
 - Gamificacao: pontos, niveis, conquistas, ranking
 - Desafios diarios e recompensas
-- Mentor IA para duvidas de estudo (Plus)
 - Sistema de assinaturas (Free/Plus) via Stripe
 - Painel administrativo com niveis de acesso (Admin Master, Administrador, Moderador)
 - Programa de afiliados gerenciado pelo Admin Master, com dashboard de KPIs (ver `docs/ADMIN_E_AFILIADOS.md`)
 - Trilhas de estudo por concurso com questoes novas toda semana (ver `docs/TRILHAS.md`)
+- Plus: Simulado Oficial no formato do edital com posicao entre candidatos, revisao espacada dos erros, correcao da discursiva, Mentor IA com contexto e Passe Concurso (ver `docs/PLUS_IMPLANTACAO.md`)
+
+## Arquitetura multiagente e governanca
+
+- Relatorio de analise, referencias e roadmap: [`docs/ARQUITETURA_MULTIAGENTE.md`](docs/ARQUITETURA_MULTIAGENTE.md)
+- Convencoes permanentes: [`CLAUDE.md`](CLAUDE.md) · estado vivo: [`AGENTS-COLLAB.md`](AGENTS-COLLAB.md) · catalogo de agentes: [`AGENTS.md`](AGENTS.md)
+- Regras "sempre-seguir": [`rules/`](rules/) · contribuicao: [`CONTRIBUTING.md`](CONTRIBUTING.md)
 
 ## Setup Local
 
@@ -60,6 +66,9 @@ O app estara disponivel em `http://localhost:8080`.
 | `npm run lint:fix` | Corrigir problemas de lint |
 | `npm run typecheck` | Verificar tipos TypeScript |
 | `npm run preview` | Preview do build |
+| `npm run test:edge` | Testes das Edge Functions (requer Deno 2) |
+
+O lockfile oficial e o `bun.lockb` (o mesmo usado pelo Lovable): `bun install` e `bun run <script>` funcionam igual. A CI (`.github/workflows/ci.yml`) roda typecheck, lint, build e os testes das Edge Functions em todo PR.
 
 ## Estrutura do Projeto
 

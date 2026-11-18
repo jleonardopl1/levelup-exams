@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
-import { corsHeaders } from "../_shared/cors.ts";
+import { corsHeaders, withCors } from "../_shared/cors.ts";
 import {
   checkRateLimit,
   escapeHtml,
@@ -12,8 +12,8 @@ import {
 } from "../_shared/utils.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-const CONTACT_INBOX = Deno.env.get("CONTACT_INBOX") || "contato@simuladosconcursos.com.br";
-const MAIL_FROM = Deno.env.get("MAIL_FROM") || "Simulados Concursos <onboarding@resend.dev>";
+const CONTACT_INBOX = Deno.env.get("CONTACT_INBOX") || "contato@levelupexams.com.br";
+const MAIL_FROM = Deno.env.get("MAIL_FROM") || "LevelUp Exams <onboarding@resend.dev>";
 
 const RATE_LIMIT_WINDOW_MS = 300000;
 const RATE_LIMIT_MAX_REQUESTS = 3;
@@ -30,7 +30,7 @@ async function sendEmail(payload: Record<string, unknown>) {
   if (!res.ok) throw new Error(`email provider status ${res.status}`);
 }
 
-serve(async (req) => {
+serve(withCors(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   if (req.method !== "POST") return jsonResponse({ error: "Método não permitido" }, 405);
 
@@ -82,7 +82,7 @@ serve(async (req) => {
     await sendEmail({
       to: [email],
       subject: "Recebemos sua mensagem",
-      html: `<p>Olá!</p><p>Recebemos sua mensagem e responderemos em breve.</p><p>Se você não enviou esta mensagem, ignore este e-mail.</p><p>Atenciosamente,<br>Equipe Simulados Concursos</p>`,
+      html: `<p>Olá!</p><p>Recebemos sua mensagem e responderemos em breve.</p><p>Se você não enviou esta mensagem, ignore este e-mail.</p><p>Atenciosamente,<br>Equipe LevelUp Exams</p>`,
     });
 
     await logAuditEvent(supabase, "CONTACT_SENT", null, null, clientIp, userAgent, true);
@@ -92,4 +92,4 @@ serve(async (req) => {
     await logAuditEvent(supabase, "CONTACT_ERROR", null, null, clientIp, userAgent, false, "send failure");
     return jsonResponse({ error: "Não foi possível enviar sua mensagem" }, 500);
   }
-});
+}));

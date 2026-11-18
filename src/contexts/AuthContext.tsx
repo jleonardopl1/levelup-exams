@@ -4,6 +4,7 @@ import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable';
 import { SOCIAL_PROVIDERS, type SocialProviderId } from '@/lib/authProviders';
+import { clearQuizResult } from '@/lib/quizSession';
 
 type OAuthProvider = SocialProviderId;
 
@@ -25,7 +26,12 @@ interface AuthContextType {
 
 const PASSWORD_RESET_PATH = '/redefinir-senha';
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+// Singleton em globalThis: durante hot-reload (HMR) o módulo pode ser
+// reinstanciado enquanto consumidores ainda referenciam o contexto antigo,
+// o que derrubava a tela com "useAuth must be used within an AuthProvider".
+const AuthContext: React.Context<AuthContextType | undefined> =
+  ((globalThis as Record<string, unknown>).__levelupAuthContext as React.Context<AuthContextType | undefined>) ??
+  (((globalThis as Record<string, unknown>).__levelupAuthContext = createContext<AuthContextType | undefined>(undefined)) as React.Context<AuthContextType | undefined>);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -36,13 +42,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Nunca reaproveitar respostas em cache de outra conta (ex.: dados restritos ao
   // admin master vistos por outro usuário no mesmo navegador após trocar de login).
+  // Só limpa quando uma conta logada dá lugar a outra (ou sai). Na abertura do app
+  // (sem usuário -> usuário restaurado) NÃO limpa: o clear() destruía as consultas
+  // que as telas tinham acabado de iniciar e o início ficava com "Estudante",
+  // nível 1 e 0 simulados até o aluno navegar.
   useEffect(() => {
+    if (loading) return;
     const current = user?.id ?? null;
-    if (lastUserId.current !== undefined && lastUserId.current !== current) {
+    if (lastUserId.current && lastUserId.current !== current) {
       queryClient.clear();
+      clearQuizResult();
     }
     lastUserId.current = current;
-  }, [user?.id, queryClient]);
+  }, [user?.id, loading, queryClient]);
 
   useEffect(() => {
     // Set up auth state listener FIRST
@@ -97,6 +109,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         const result = await lovable.auth.signInWithOAuth(provider as 'microsoft' | 'apple' | 'google', {
           redirect_uri: `${window.location.origin}/`,
+          extraParams: config.queryParams,
         });
         if (result.error) {
           return { error: result.error instanceof Error ? result.error : new Error(String(result.error)) };

@@ -34,11 +34,28 @@ Migration: `supabase/migrations/20261110150000_master_admin_and_affiliates.sql`
 | `get_my_access()` | qualquer usuário logado | Nível do próprio usuário (monta menus/abas) |
 | `admin_set_access_level(user, level, reason)` | master | Define admin / moderador / usuário de forma atômica |
 | `admin_ban_user(user, type, days, reason)` / `admin_unban_user(user)` | equipe | Banimento com hierarquia |
-| `admin_list_users(search, filter, limit, offset)` | equipe | Lista paginada com nível, ban e status de afiliado |
+| `admin_list_users(search, filter, limit, offset)` | equipe | Lista paginada com nível, ban, status de afiliado e origem do Plus |
 | `admin_get_settings()` / `admin_update_setting(key, value)` | admin / master | Configurações da plataforma (autoinscrição e condições padrão) |
 | `admin_list_audit_logs(search, limit)` | admin / master | Auditoria com e-mail/IP apenas para o master |
 
 A Edge Function `admin-notify` aplica os efeitos colaterais (bloqueio no Supabase Auth e e-mail ao usuário) relendo o estado do banco, sem confiar no cliente.
+
+## 1.1 Plus liberado pela administração
+
+Migration: `supabase/migrations/20261113150000_premium_grants.sql`
+
+- **Admin master**: tem o Plus **permanente** (todas as funcionalidades pagas), sem assinatura e sem poder ser revogado — mesma regra de identidade do master (e-mail confirmado).
+- **Qualquer usuário**: o master libera o Plus pelo painel em **Admin → Usuários → Liberar Plus**, por 7 dias, 30 dias, 90 dias, 6 meses, 1 ano ou sem prazo, com motivo. Uma nova liberação substitui a anterior; **Retirar liberação** encerra na hora. Filtro **Plus liberado** lista quem tem cortesia.
+- Plano pago e plano liberado ficam separados: `profiles.billing_tier` é o que o Stripe diz; `premium_grants` guarda as liberações; `profiles.tier` é o plano efetivo (pago **ou** liberado), recalculado por trigger. Quem paga e perde a cortesia continua Plus.
+- O fim do prazo vale na hora no servidor (`get_user_tier` calcula na consulta: questões premium, Mentor IA, recompensas Plus); um job horário (`expire-premium-grants`, pg_cron) atualiza `profiles.tier` para o app.
+- Receita, conversão e "indicados ativos" dos afiliados contam só `billing_tier = 'plus'` (cortesia não é venda). A Visão Geral mostra as cortesias separadas.
+- Tudo auditado (`premium_granted`, `premium_revoked`).
+
+| RPC | Quem chama | Função |
+|-----|-----------|--------|
+| `admin_grant_premium(user, days, reason)` | master | Libera o Plus (`days` nulo = sem prazo) |
+| `admin_revoke_premium(user, reason)` | master | Retira a liberação |
+| `get_premium_access(user)` | o próprio usuário / Edge Functions | Plano efetivo, origem (`stripe`, `grant`, `master`) e validade |
 
 ## 2. Programa de afiliados
 
@@ -86,3 +103,20 @@ Afiliados ativos/pausados/removidos, receita via afiliados, comissões dos últi
 3. Publicar as Edge Functions alteradas: `admin-notify`, `create-checkout`, `stripe-webhook`.
 4. No Stripe, o webhook deve continuar recebendo `checkout.session.completed` (já incluso). A chave precisa de permissão para criar cupons (`coupons:write`), usada na primeira venda de cada percentual de desconto.
 5. Em Supabase → Authentication → URL Configuration, inclua `https://<seu-dominio>/redefinir-senha` (e a URL de preview, se usar) em **Redirect URLs**. Sem isso o link do e-mail de "Esqueci minha senha" é recusado.
+
+## 4. Console de conteúdo e métricas (v1.4.0)
+
+Migration: `supabase/migrations/20261113120000_quiz_quality_and_admin_console.sql`
+
+| Aba | Quem vê | O que faz |
+|-----|---------|-----------|
+| **Visão Geral** | admin, master | Métrica estrela (simulados concluídos por semana), alunos ativos, conversão Plus, receita Stripe, matérias mais praticadas e **Saúde do sistema** |
+| **Questões → Banco** | equipe | Busca e filtros, taxa de acerto por questão, editor completo. Moderador altera só Premium e "em circulação" |
+| **Questões → Geração com IA** | admin, master | Execuções da geração diária e disparo manual |
+| **Reportes** | equipe | Problemas apontados pelos alunos. "Resolver" fecha todos os reportes abertos da questão e notifica os alunos (a observação vai na notificação); "Descartar" não notifica |
+
+Dicas de uso:
+- Ordene o banco por **Maior taxa de erro**: questões com menos de 25% de acerto e pelo menos 5 respostas aparecem com ⚠ — costumam ter gabarito errado ou enunciado ambíguo.
+- Tirar uma questão de circulação a remove dos simulados e trilhas na hora, sem apagar as respostas já dadas.
+- Alterar o gabarito vale a partir da próxima resposta; o histórico antigo não é recalculado.
+- Se a "Saúde do sistema" mostrar o webhook do Stripe em vermelho, nenhum evento chegou: cadastre o endpoint `stripe-webhook` (veja `docs/LOGIN_PAGAMENTO_APP.md`).

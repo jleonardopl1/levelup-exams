@@ -186,7 +186,9 @@ function AccountSection() {
             <dd className="flex items-center gap-2 mt-0.5">
               <PremiumBadge tier={profile?.tier ?? 'free'} />
               <Button variant="link" size="sm" className="h-auto p-0" onClick={() => navigate('/upgrade')}>
-                {profile?.tier === 'plus' ? 'Gerenciar assinatura' : 'Fazer upgrade'}
+                {profile?.tier !== 'plus'
+                  ? 'Fazer upgrade'
+                  : profile?.billing_tier === 'plus' ? 'Gerenciar assinatura' : 'Ver plano'}
               </Button>
             </dd>
           </div>

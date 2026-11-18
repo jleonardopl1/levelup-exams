@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
-import { corsHeaders } from "../_shared/cors.ts";
+import { corsHeaders, withCors } from "../_shared/cors.ts";
 import {
   checkRateLimit,
   escapeHtml,
@@ -31,7 +31,7 @@ const LEVEL_LABELS: Record<string, string> = {
 
 const clip = (v: unknown, max: number) => (typeof v === "string" ? stripControlChars(v).slice(0, max) : "");
 
-serve(async (req) => {
+serve(withCors(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   if (req.method !== "POST") return jsonResponse({ error: "Método não permitido" }, 405);
 
@@ -137,4 +137,4 @@ serve(async (req) => {
     console.error("admin-notify error");
     return jsonResponse({ error: "Erro interno" }, 500);
   }
-});
+}));

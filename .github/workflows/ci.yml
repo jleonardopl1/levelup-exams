@@ -1,0 +1,76 @@
+name: CI
+
+# Portão de qualidade (rules/common/testing.md). Roda em todo PR para a main e em push na main.
+#  - app: typecheck + lint + testes unitários (node --test) + build do front (lockfile oficial: bun.lockb)
+#  - edge-functions: testes Deno + deno check de todas as Edge Functions
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  app:
+    name: App (typecheck · lint · testes · build)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.4
+
+      - uses: actions/setup-node@v4
+        with:
+          # Node 22.18+ roda TypeScript direto (type stripping) nos testes unitários.
+          node-version: 22
+
+      - name: Instalar dependências (lockfile congelado)
+        run: bun install --frozen-lockfile
+
+      - name: Typecheck
+        run: bun run typecheck
+
+      - name: Lint
+        run: bun run lint
+
+      - name: Testes unitários (lógica pura do front e guardrails dos agentes)
+        run: bun run test:unit
+
+      - name: Build
+        run: bun run build
+
+  edge-functions:
+    name: Edge Functions (testes · deno check)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      # O package.json da raiz é do front; sem isto o Deno exigiria node_modules para os tipos npm.
+      DENO_NO_PACKAGE_JSON: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Testes (camada de IA, pipeline multiagente, rubrica da discursiva)
+        run: deno test --allow-env --no-lock supabase/functions/
+
+      - name: Tipos de todas as Edge Functions
+        run: |
+          for f in supabase/functions/*/index.ts; do
+            case "$f" in */auth-email-hook/*) continue ;; esac
+            echo "deno check $f"
+            deno check --no-lock "$f"
+          done
+          # auth-email-hook tem deno.json próprio (JSX do React Email).
+          (cd supabase/functions/auth-email-hook && deno check --no-lock index.ts)

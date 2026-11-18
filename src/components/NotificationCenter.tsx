@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Bell, Trophy, Star, Zap, Gift, Check, Trash2, CheckCheck } from 'lucide-react';
+import { Bell, Trophy, Star, Zap, Gift, Check, Trash2, CheckCheck, CheckCircle2, Flag, Radar } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -19,7 +20,16 @@ const iconMap: Record<string, React.ElementType> = {
   star: Star,
   zap: Zap,
   gift: Gift,
+  check: CheckCircle2,
+  flag: Flag,
+  radar: Radar,
 };
+
+/** Link interno de uma notificação (data.link), só caminhos do próprio app. */
+function internalLink(data: unknown): string | null {
+  const link = data && typeof data === 'object' ? (data as Record<string, unknown>).link : null;
+  return typeof link === 'string' && /^\/[a-z0-9/_-]*$/i.test(link) ? link : null;
+}
 
 export function NotificationCenter() {
   const { data: notifications = [], isLoading } = useNotifications();
@@ -29,9 +39,16 @@ export function NotificationCenter() {
   const deleteNotification = useDeleteNotification();
   const [open, setOpen] = useState(false);
 
+  const navigate = useNavigate();
+
   const handleNotificationClick = (notification: Notification) => {
     if (!notification.is_read) {
       markAsRead.mutate(notification.id);
+    }
+    const link = internalLink(notification.data);
+    if (link) {
+      setOpen(false);
+      navigate(link);
     }
   };
 
@@ -45,6 +62,8 @@ export function NotificationCenter() {
       case 'achievement': return 'text-accent';
       case 'level_up': return 'text-primary';
       case 'reward': return 'text-success';
+      case 'question_report': return 'text-success';
+      case 'radar': return 'text-primary';
       default: return 'text-muted-foreground';
     }
   };

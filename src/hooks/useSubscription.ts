@@ -4,11 +4,11 @@ import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { useEffect } from 'react';
 
-// Price IDs from Stripe
-export const PRICE_IDS = {
-  monthly: 'price_1SdkO4FQ1QkvCgEAJsa9KbIE',
-  annual: 'price_1SdkMfFQ1QkvCgEAnMRl3MXq',
-} as const;
+/**
+ * Planos de assinatura. O app envia só o NOME do plano; o servidor (create-checkout)
+ * escolhe o preço certo do Stripe e confere a periodicidade antes de cobrar.
+ */
+export type SubscriptionPlan = 'monthly' | 'annual' | 'exam_pass';
 
 /** Extrai a mensagem real de erro de uma Edge Function (o corpo traz o motivo). */
 async function functionError(error: unknown): Promise<Error & { code?: string }> {
@@ -19,10 +19,47 @@ async function functionError(error: unknown): Promise<Error & { code?: string }>
   return err;
 }
 
+/** Origem do Plus: assinatura paga, liberação pela administração ou conta do admin master. */
+export type PremiumSource = 'stripe' | 'grant' | 'master' | null;
+
 export interface SubscriptionStatus {
   subscribed: boolean;
   tier: 'free' | 'plus';
   subscription_end: string | null;
+  source?: PremiumSource;
+  /** Plano pago no Stripe ('plus' = há assinatura para gerenciar), independente da origem do acesso. */
+  billing_tier?: 'free' | 'plus';
+  /** Fim do Plus liberado pela administração (null = sem prazo). */
+  access_until?: string | null;
+  /** Plus liberado: Passe Concurso comprado ('exam_pass') ou cortesia da equipe ('staff'). */
+  grant_kind?: 'exam_pass' | 'staff' | null;
+}
+
+export interface ExamPassOffer {
+  available: boolean;
+  amount_cents?: number;
+  currency?: string;
+  track?: { id: string; shortName: string; examDate: string };
+  access_until?: string;
+}
+
+/** Passe Concurso: preço e validade vêm do servidor (Stripe + data da prova). */
+export function useExamPassOffer(enabled: boolean) {
+  const { session } = useAuth();
+  return useQuery({
+    queryKey: ['exam-pass-offer', session?.user?.id],
+    enabled: enabled && !!session,
+    staleTime: 10 * 60 * 1000,
+    retry: false,
+    queryFn: async (): Promise<ExamPassOffer> => {
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
+        body: { plan: 'exam_pass', preview: true },
+        headers: { Authorization: `Bearer ${session!.access_token}` },
+      });
+      if (error || !data) return { available: false };
+      return data as ExamPassOffer;
+    },
+  });
 }
 
 export function useSubscription() {
@@ -58,13 +95,13 @@ export function useCreateCheckout() {
   const { session } = useAuth();
 
   return useMutation({
-    mutationFn: async ({ priceId, referralCode }: { priceId: string; referralCode?: string }) => {
+    mutationFn: async ({ plan, referralCode }: { plan: SubscriptionPlan; referralCode?: string }) => {
       if (!session) {
         throw new Error('Você precisa estar logado');
       }
 
       const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: referralCode ? { priceId, referralCode } : { priceId },
+        body: referralCode ? { plan, referralCode } : { plan },
         headers: {
           Authorization: `Bearer ${session.access_token}`,
         },

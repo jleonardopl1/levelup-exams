@@ -136,6 +136,9 @@ export function useSubmitQuiz() {
       queryClient.invalidateQueries({ queryKey: ['quiz-results'] });
       queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
       queryClient.invalidateQueries({ queryKey: ['profile'] });
+      // As respostas do quiz movem a fila da revisão espaçada e o progresso da trilha.
+      queryClient.invalidateQueries({ queryKey: ['review-queue'] });
+      queryClient.invalidateQueries({ queryKey: ['track-progress'] });
     },
   });
 }
