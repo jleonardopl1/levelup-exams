@@ -21,6 +21,9 @@ import { PremiumContentBadge } from '@/components/PremiumContentBadge';
 import { PremiumUpsellModal } from '@/components/PremiumUpsellModal';
 import { ReportQuestionDialog } from '@/components/ReportQuestionDialog';
 import { saveQuizResult, type QuizResultState, type QuizReviewItem } from '@/lib/quizSession';
+import { SpeakButton } from '@/components/SpeakButton';
+import { useSpeech } from '@/hooks/useSpeech';
+import { questionSpeechText, speakable } from '@/lib/speech';
 
 const QUIZ_SECONDS = 600; // 10 minutos
 
@@ -85,6 +88,10 @@ export default function Quiz() {
   useEffect(() => {
     if (currentQuestion?.is_premium && !isPremium) setShowUpsellModal(true);
   }, [currentIndex, currentQuestion?.is_premium, isPremium]);
+
+  // Leitura em voz alta: muda de questão, para de ler.
+  const { isSupported: canSpeak, speakingId, speak, stop: stopSpeech } = useSpeech();
+  useEffect(() => { stopSpeech(); }, [currentIndex, stopSpeech]);
 
   const buildResult = useCallback((timedOut: boolean): QuizResultState => {
     const list = questions ?? [];
@@ -258,6 +265,9 @@ export default function Quiz() {
       const target = e.target as HTMLElement | null;
       if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) return;
       if (e.metaKey || e.ctrlKey || e.altKey) return;
+      // Enter num botão ou link focado (Ouvir, Parar, Reportar erro) aciona o próprio controle,
+      // não o atalho de confirmar. As alternativas (role="radio") continuam confirmando com Enter.
+      if (e.key === 'Enter' && target?.closest('a, button:not([role="radio"]), [role="button"]')) return;
       const total = currentQuestion?.alternativas.length ?? 0;
       const key = e.key.toLowerCase();
       let idx = -1;
@@ -385,14 +395,24 @@ export default function Quiz() {
           Questão {currentIndex + 1} de {questions.length}
           <span className="ml-2 text-success">· {answers.filter((a) => a.correct).length} acerto(s)</span>
         </p>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-8 text-xs text-muted-foreground"
-          onClick={() => setReportOpen(true)}
-        >
-          <Flag className="w-3.5 h-3.5 mr-1" /> Reportar erro
-        </Button>
+        <div className="flex items-center">
+          {canSpeak && currentQuestion && (
+            <SpeakButton
+              what="questão"
+              speaking={speakingId === `q-${currentQuestion.id}`}
+              onSpeak={() => speak(`q-${currentQuestion.id}`, questionSpeechText(currentQuestion.enunciado, currentQuestion.alternativas))}
+              onStop={stopSpeech}
+            />
+          )}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 text-xs text-muted-foreground"
+            onClick={() => setReportOpen(true)}
+          >
+            <Flag className="w-3.5 h-3.5 mr-1" /> Reportar erro
+          </Button>
+        </div>
       </div>
 
       {/* Question */}
@@ -461,6 +481,15 @@ export default function Quiz() {
             </p>
             {validationResult.explicacao && (
               <p className="text-sm text-muted-foreground">{validationResult.explicacao}</p>
+            )}
+            {canSpeak && validationResult.explicacao && currentQuestion && (
+              <SpeakButton
+                what="explicação"
+                className="mt-1 -ml-2"
+                speaking={speakingId === `e-${currentQuestion.id}`}
+                onSpeak={() => speak(`e-${currentQuestion.id}`, speakable(validationResult.explicacao ?? ''))}
+                onStop={stopSpeech}
+              />
             )}
           </CardContent>
         </Card>

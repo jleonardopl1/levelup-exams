@@ -1,16 +1,17 @@
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
-
+# Um grupo só: um robô com grupo próprio (ex.: Googlebot) ignora as regras do "*".
+# Telas internas exigem login e não têm conteúdo para buscadores; as públicas estão no sitemap.
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /quiz
+Disallow: /result
+Disallow: /mentor
+Disallow: /ranking
+Disallow: /rewards
+Disallow: /achievements
+Disallow: /affiliate
+Disallow: /configuracoes
+Disallow: /redefinir-senha
 
 Sitemap: https://levelupexams.com.br/sitemap.xml

@@ -81,13 +81,14 @@ export function useUserRewards() {
     queryFn: async () => {
       if (!user) return null;
 
-      let { data, error } = await supabase
+      const { data: existing, error } = await supabase
         .from('user_rewards')
         .select('*')
         .eq('user_id', user.id)
         .maybeSingle();
 
       if (error) throw error;
+      let data = existing;
 
       if (!data) {
         const { data: newData, error: insertError } = await supabase

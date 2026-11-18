@@ -9,6 +9,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { useSeo } from '@/hooks/useSeo';
+import { faqPageJsonLd } from '@/lib/seo';
 import {
   Accordion,
   AccordionContent,
@@ -59,8 +61,16 @@ const faqItems = [
   }
 ];
 
+const FAQ_JSONLD = faqPageJsonLd(faqItems);
+
 export default function FAQ() {
   const navigate = useNavigate();
+  useSeo({
+    title: 'Perguntas frequentes',
+    description: 'Como funcionam as questões, o plano Plus, o Mentor IA, os níveis e o limite diário do LevelUp Exams, a plataforma de estudos para concursos públicos.',
+    path: '/faq',
+    jsonLd: FAQ_JSONLD,
+  });
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
@@ -129,7 +139,7 @@ export default function FAQ() {
       });
 
       setFormData({ name: '', email: '', message: '' });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error sending contact:', error);
       toast({
         title: "Erro ao enviar",

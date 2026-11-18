@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ArrowLeft, Send, Bot, User, Sparkles, Lock } from "lucide-react";
@@ -11,6 +11,12 @@ import { useAIMentorLimits } from "@/hooks/useAIMentorUsage";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { readPref, writePref } from "@/lib/trackPrefs";
+
+/** "direto" explica; "socratico" guia com perguntas e dicas em degraus (servidor valida). */
+type MentorMode = "direto" | "socratico";
+const MODE_KEY = "mentor:modo";
 
 type Message = {
   role: "user" | "assistant";
@@ -33,10 +39,16 @@ const Mentor = () => {
   });
   const autoExplainRef = useRef(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [mode, setModeState] = useState<MentorMode>(() => (readPref(MODE_KEY) === "socratico" ? "socratico" : "direto"));
+  const setMode = (value: string) => {
+    if (value !== "direto" && value !== "socratico") return;
+    setModeState(value);
+    writePref(MODE_KEY, value);
+  };
   const scrollRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
 
-  const { questionsUsed, dailyLimit, questionsRemaining, hasReachedLimit, isPremium, isLoading: limitsLoading } = useAIMentorLimits();
+  const { dailyLimit, questionsRemaining, hasReachedLimit, isPremium, isLoading: limitsLoading } = useAIMentorLimits();
 
   useEffect(() => {
     if (searchParams.has("q") || searchParams.has("questao")) setSearchParams({}, { replace: true });
@@ -97,7 +109,7 @@ const Mentor = () => {
         },
         // Na conversa sobre uma questão, o id segue em todas as mensagens para o servidor
         // reinserir o enunciado e o gabarito no contexto.
-        body: JSON.stringify({ messages: [...messages, userMessage], ...(questionId ? { question_id: questionId } : {}) }),
+        body: JSON.stringify({ messages: [...messages, userMessage], mode, ...(questionId ? { question_id: questionId } : {}) }),
       });
 
       // Handle server-side errors
@@ -309,7 +321,26 @@ const Mentor = () => {
             </ScrollArea>
 
             {/* Input Area */}
-            <div className="pt-4 border-t border-border mt-4">
+            <div className="pt-4 border-t border-border mt-4 space-y-3">
+              <div className="flex flex-wrap items-center gap-2">
+                <span id="mentor-mode-label" className="text-xs text-muted-foreground">Como o Mentor responde:</span>
+                <ToggleGroup
+                  type="single"
+                  size="sm"
+                  variant="outline"
+                  value={mode}
+                  onValueChange={setMode}
+                  aria-labelledby="mentor-mode-label"
+                >
+                  <ToggleGroupItem value="direto" className="text-xs h-8">Explica direto</ToggleGroupItem>
+                  <ToggleGroupItem value="socratico" className="text-xs h-8">Me guia com perguntas</ToggleGroupItem>
+                </ToggleGroup>
+              </div>
+              {mode === "socratico" && (
+                <p className="text-xs text-muted-foreground">
+                  O Mentor pergunta o que você já sabe, dá dicas aos poucos e termina com uma pergunta para você responder de memória.
+                </p>
+              )}
               {hasReachedLimit ? (
                 <Card className="bg-muted/50">
                   <CardContent className="py-4 text-center">

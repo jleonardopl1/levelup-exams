@@ -1,5 +1,70 @@
 # Changelog
 
+## [Não lançado]
+
+- A equipe passa a usar o [plano de integração operacional](docs/INTEGRACAO_OPERACIONAL.md)
+  para conferir vendas e acessos do Plus e do Passe, avaliar o Mentor de revisão e decidir quando ampliar o piloto.
+
+## [1.9.0] - 2026-11-17
+
+Incorporações da investigação de 32 repositórios de referência (`docs/REFERENCIAS_REPOSITORIOS.md`).
+
+### Features (estudo)
+- **Domínio por tópico** na trilha: cada matéria mostra o domínio (frágil → dominado) e os tópicos mais frágeis, a partir das suas respostas. Política do DeepTutor: peso maior para as respostas recentes e teto de 50%/80% com 1/2 respostas; repetir a mesma questão logo depois de ver a explicação não conta
+- **Edital verticalizado**: o conteúdo programático de cada matéria vira uma lista com "Teoria" e "Revisão" para marcar, com progresso (salvo no aparelho)
+- **Ouvir questão e explicação**: leitura em voz alta em português pelo próprio navegador, sem custo e funcionando no app instalado; lê "art.", "§", "nº" e "Lei 8.112/1990" por extenso
+- **Mentor com dois modos**: "Explica direto" ou "Me guia com perguntas" (socrático: pergunta o que você já sabe, dá dicas em degraus e termina com uma pergunta para responder de memória). Respostas em texto simples, sem os `**` que apareciam crus, e sem frases feitas de IA
+
+### Qualidade das questões
+- Portão determinístico reprova **termos absolutos só nos distratores** ("sempre", "nunca", "em qualquer hipótese"): pista para eliminar sem saber o conteúdo
+- Comando negativo sai em caixa alta, como nas bancas ("INCORRETA", "EXCETO", "que NÃO"); prompt do Elaborador `elaborador@2026-11-17`
+
+### SEO
+- Título, descrição, URL canônica, Open Graph e dados estruturados (FAQPage, Organization, WebApplication) nas páginas públicas; sitemap com `/upgrade` e `/instalar`; `robots.txt` com um grupo só (os grupos por robô ignoravam as regras do `*`) e telas internas fora do rastreio
+
+### Processo e segurança dos agentes
+- **Guardrails** (`.claude/hooks/guardrails.mjs`, hook PreToolUse): bloqueia force-push, push/commit na main, `reset --hard`, `clean -f`, `branch -D`, `--no-verify`, `supabase db push`/`functions deploy`/`secrets set` e edição de `.env`, `.lovable/`, `types.ts` e `auth-email-hook`
+- `security-reviewer` com o método da Cloudflare (cobertura, refutação independente, veredicto confirmado/precisa validar/rejeitado) e classes de ataque de IA; `rules/common/writing.md` (escrita sem "cara de IA", do humanizer); regra de memória em `rules/common/ai-agents.md`
+- Testes unitários do front com `node --test` (sem dependência nova): `bun run test:unit` na CI
+
+### Fixes
+- `bun run typecheck` não checava nada (tsconfig raiz com `"files": []`): agora checa o app e o `vite.config.ts`; 5 erros de tipo escondidos em `useRadar.ts` corrigidos
+
+## [1.8.0] - 2026-11-17
+
+### Features (Radar de Concursos)
+- **Radar de Concursos** (`/radar`, `/radar/:slug`): concursos previstos, autorizados e com edital na rua, por relevância (abrangência, vagas, salário, fase e interesse dos alunos), com filtros por área e abrangência, busca e linha do tempo de atualizações com "antes → depois" e link da fonte oficial
+- **Acompanhar** concurso ou área/carreira: aviso no app quando muda a fase, as datas, as vagas ou sai retificação; concurso novo na área acompanhada também avisa; notificação leva direto ao concurso
+- **Grupo de agentes** (`radar-concursos`, a cada 3 h): gerente master em código → coordenador por área (11 áreas) → Batedor, Analista de edital (cada valor com evidência literal), Verificador independente (outro modelo), Analista de banca e Arquiteto de trilha
+- **Portão determinístico de evidência**: data e número precisam aparecer no trecho citado, que precisa existir na fonte; link precisa estar na página; datas coerentes; retificação, fase que volta atrás e verificador indisponível vão para revisão humana
+- **Coletor seguro**: só https público, sem IP/host interno, redirecionamentos conferidos, limites de tamanho/tempo, respeita robots.txt; só o trecho novo da página vai para a IA
+- **Novas trilhas a partir do edital**: rascunho com módulos, quadro de provas, matérias e ementas conferidas no edital; o admin revisa e publica com um clique e a fábrica de questões começa a gerar para as matérias
+- Cartão "Radar do edital" na trilha e atalho em Trilhas; aba **Radar** no Admin (execuções, revisão, rascunhos, fontes)
+
+### Fixes
+- `generate-track-questions` recusa matéria de legislação local sem fatos verificados (antes geraria a partir de base vazia)
+
+### Banco
+- `20261117120000_radar_concursos.sql`: `radar_areas`, `radar_sources`, `radar_concursos`, `radar_updates`, `radar_follows` (limite de 100 por aluno), `radar_track_drafts`, `radar_runs`; RPCs `radar_fanout_update`, `radar_apply_patch`, `radar_follower_counts` (só `service_role`), `radar_review_update` e `radar_publish_track_draft` (admin); sementes de áreas e fontes; agendamento `radar-concursos`
+- Guia em `docs/RADAR_CONCURSOS.md`
+
+## [1.7.0] - 2026-11-16
+
+### Features (IA multiagente)
+- **Fábrica de questões multiagente**: Elaborador → portão determinístico (pista de tamanho, "todas/nenhuma", gabarito no enunciado) → **Solucionador cego** (resolve sem ver o gabarito) em paralelo com o Revisor técnico → **Árbitro** só nas divergências; respeita o prazo de 140 s do agendador e reprova o que não deu tempo de arbitrar
+- **Memória de lições por matéria**: o que o revisor, o árbitro e o portão reprovam volta ao prompt do Elaborador (`ai_lessons`, desativável pela equipe)
+- **Camada de IA compartilhada** (`_shared/ai`): saída estruturada validada, novas tentativas com backoff só em erro temporário, prazo global, telemetria de metadados (`ai_runs`) e cercas contra injeção de prompt
+- Correção da discursiva no cliente compartilhado (nova tentativa em falha temporária; texto do aluno cercado); Mentor com modelo configurável (`MENTOR_MODEL`) e telemetria
+- Governança AGENTS-COLLAB: 17 agentes por faixa (`.claude/agents/`), `rules/`, `CLAUDE.md`, `AGENTS.md`, `AGENTS-COLLAB.md`, CI e templates de PR/issue
+
+### Fixes
+- Explicação que cita alternativa por letra deixava de bater depois do embaralhamento: o Elaborador não cita letras e a publicação não embaralha quando a explicação cita
+- Gráficos (recharts, ~105 kB gzip) eram pré-carregados em toda página: JavaScript inicial caiu de 328 para 226 kB gzip
+- Lint voltou a passar (9 erros); `package-lock.json` sincronizado com o `package.json`
+
+### Banco
+- `20261116120000_ai_runtime_observability.sql`: `ai_runs` (telemetria, retenção de 90 dias via pg_cron), `ai_lessons`, RPCs `record_ai_lessons` e `purge_old_ai_runs` (só `service_role`); leitura só para administradores
+
 ## [1.6.0] - 2026-11-15
 
 ### Features (Plus)

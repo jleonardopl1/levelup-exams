@@ -97,6 +97,50 @@ export type Database = {
           },
         ]
       }
+      ai_lessons: {
+        Row: {
+          first_seen: string
+          hits: number
+          id: number
+          is_active: boolean
+          last_seen: string
+          lesson: string
+          lesson_hash: string
+          source: string
+          subject_id: string
+        }
+        Insert: {
+          first_seen?: string
+          hits?: number
+          id?: never
+          is_active?: boolean
+          last_seen?: string
+          lesson: string
+          lesson_hash: string
+          source: string
+          subject_id: string
+        }
+        Update: {
+          first_seen?: string
+          hits?: number
+          id?: never
+          is_active?: boolean
+          last_seen?: string
+          lesson?: string
+          lesson_hash?: string
+          source?: string
+          subject_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_lessons_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ai_mentor_usage: {
         Row: {
           created_at: string
@@ -123,6 +167,65 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      ai_runs: {
+        Row: {
+          agent: string
+          attempts: number
+          created_at: string
+          error: string | null
+          function_name: string
+          id: number
+          input_tokens: number | null
+          latency_ms: number | null
+          metadata: Json
+          model: string | null
+          output_tokens: number | null
+          prompt_version: string | null
+          status: string
+          subject_id: string | null
+        }
+        Insert: {
+          agent: string
+          attempts?: number
+          created_at?: string
+          error?: string | null
+          function_name: string
+          id?: never
+          input_tokens?: number | null
+          latency_ms?: number | null
+          metadata?: Json
+          model?: string | null
+          output_tokens?: number | null
+          prompt_version?: string | null
+          status: string
+          subject_id?: string | null
+        }
+        Update: {
+          agent?: string
+          attempts?: number
+          created_at?: string
+          error?: string | null
+          function_name?: string
+          id?: never
+          input_tokens?: number | null
+          latency_ms?: number | null
+          metadata?: Json
+          model?: string | null
+          output_tokens?: number | null
+          prompt_version?: string | null
+          status?: string
+          subject_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_runs_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       audit_logs: {
         Row: {
@@ -1980,6 +2083,11 @@ export type Database = {
       is_user_banned: { Args: { p_user_id: string }; Returns: boolean }
       level_for_points: { Args: { p_points: number }; Returns: number }
       master_admin_email: { Args: never; Returns: string }
+      purge_old_ai_runs: { Args: never; Returns: number }
+      record_ai_lessons: {
+        Args: { p_lessons: string[]; p_source: string; p_subject_id: string }
+        Returns: number
+      }
       record_referral_conversion: {
         Args: {
           p_amount: number

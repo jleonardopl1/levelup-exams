@@ -22,6 +22,7 @@ const FROM_DOMAIN = "levelupexams.com.br"
 const SITE_URL = `https://${ROOT_DOMAIN}`
 
 // Template mapping for preview mode
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
   signup: SignupEmail,
   invite: InviteEmail,

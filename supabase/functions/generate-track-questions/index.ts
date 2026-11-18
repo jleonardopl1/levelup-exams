@@ -1,42 +1,50 @@
 /**
- * generate-track-questions
+ * generate-track-questions — fábrica multiagente de questões das trilhas.
  *
- * Publica automaticamente questoes NOVAS para as materias das trilhas de estudo
- * (ex.: Camara de Cuiaba 2026). Meta: DAILY_PER_SUBJECT por materia por dia
- * (padrao 3 => 21/semana, acima do minimo de 15/semana exigido pela trilha).
+ * Publica automaticamente questões NOVAS para as matérias das trilhas de estudo
+ * (ex.: Câmara de Cuiabá 2026). Meta: DAILY_PER_SUBJECT por matéria por dia
+ * (padrão 3 => 21/semana, acima do mínimo de 15/semana exigido pela trilha).
  *
- * Fluxo por materia:
- *   1. monta o contexto (ementa do edital por nivel, topicos ja cobertos, ultimos
- *      enunciados para evitar repeticao e — nas materias "ai_grounded_only" — a base
- *      de fatos verificados extraida das explicacoes das questoes autorais);
- *   2. gera as questoes no padrao da banca (4 alternativas, 1 correta);
- *   3. um segundo passe REVISOR confere gabarito, unicidade da resposta e
- *      fundamentacao; so entram as aprovadas;
- *   4. valida, embaralha as alternativas, deduplica (content_hash) e grava com
- *      origem = 'ia_diaria'.
+ * Fluxo por matéria (detalhe em pipeline.ts e docs/ARQUITETURA_MULTIAGENTE.md §5.3):
+ *   1. monta o contexto (ementa do edital por nível, tópicos já cobertos, últimos
+ *      enunciados, fatos verificados e as LIÇÕES da matéria — reprovações anteriores);
+ *   2. Elaborador gera as candidatas no padrão da banca;
+ *   3. portão determinístico (esquema + falhas clássicas de elaboração);
+ *   4. em paralelo: Solucionador(es) CEGO(s) resolvem sem gabarito e o Revisor técnico
+ *      confere gabarito/fundamento; divergência vai para o Árbitro (modelo mais forte);
+ *   5. valida, embaralha, deduplica (content_hash) e grava com origem = 'ia_diaria';
+ *   6. grava telemetria (ai_runs) e as lições novas (ai_lessons).
  *
  * Disparo:
- *   - pg_cron (migration 20261110130200) com o cabecalho x-cron-secret; ou
- *   - administrador autenticado (botao no painel Admin).
+ *   - pg_cron (migration 20261110130200) com o cabeçalho x-cron-secret; ou
+ *   - administrador autenticado (botão no painel Admin).
  *
- * Variaveis: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, LOVABLE_API_KEY,
- *            opcionais QUESTION_CRON_SECRET (sem ela, o segredo e lido do Vault pela
- *            RPC get_question_cron_secret), QUESTION_MODEL, QUESTION_REVIEW_MODEL,
- *            QUESTIONS_PER_SUBJECT_DAY (minimo por materia; study_track_subjects.weekly_target/7
- *            pode elevar a meta de uma materia, ate 10 por dia).
+ * Variáveis: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, LOVABLE_API_KEY e opcionais:
+ *   QUESTION_CRON_SECRET  (sem ela, o segredo é lido do Vault pela RPC get_question_cron_secret)
+ *   QUESTIONS_PER_SUBJECT_DAY (mínimo por matéria; weekly_target/7 pode elevar, até 10/dia)
+ *   QUESTION_PIPELINE      "multiagent" (padrão) | "classic" (só elaborador + revisor, como antes)
+ *   QUESTION_MODEL         elaborador (padrão google/gemini-2.5-pro)
+ *   QUESTION_REVIEW_MODEL  revisor (padrão = QUESTION_MODEL)
+ *   QUESTION_SOLVER_MODELS solucionador(es) cego(s), separados por vírgula (padrão google/gemini-2.5-flash)
+ *   QUESTION_ARBITER_MODEL árbitro (padrão = QUESTION_MODEL)
+ *   QUESTION_MAX_ARBITRATIONS por matéria (padrão 3) · QUESTION_RUN_BUDGET_MS (padrão 140000)
  */
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { corsHeaders, withCors } from "../_shared/cors.ts";
 import { jsonResponse, readJson, requireAdmin } from "../_shared/utils.ts";
+import { createGatewayClient, LlmError, modelFromEnv, modelListFromEnv } from "../_shared/ai/llm.ts";
+import { createTelemetry } from "../_shared/ai/telemetry.ts";
+import { todayInCuiaba } from "./agents.ts";
+import { loadLessons, saveLessons } from "./lessons.ts";
+import { type PipelineConfig, type PipelineMode, type PipelineModels, runQualityPipeline } from "./pipeline.ts";
+import { norm, shuffleAlternatives } from "./quality.ts";
+import type { Nivel, SubjectContext } from "./types.ts";
 
-const GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
 const DEFAULT_MODEL = "google/gemini-2.5-pro";
-const UPSTREAM_TIMEOUT_MS = 65_000; // 2 chamadas sequenciais por materia, materias em paralelo
+const DEFAULT_SOLVER_MODEL = "google/gemini-2.5-flash";
 const MAX_SUBJECTS_PER_RUN = 3;
-const TIME_ZONE_OFFSET = "-04:00"; // America/Cuiaba (sem horario de verao desde 2019)
-
-type Nivel = "medio" | "superior";
+const TIME_ZONE_OFFSET = "-04:00"; // America/Cuiaba (sem horário de verão desde 2019)
 
 interface TrackSubjectRow {
   subject_id: string;
@@ -53,30 +61,8 @@ interface TrackSubjectRow {
   } | null;
 }
 
-interface SubjectContext {
-  subjectId: string;
-  name: string;
-  slug: string;
-  banca: string;
-  trackName: string;
-  grounded: boolean;
-  /** Questoes por dia: maior entre QUESTIONS_PER_SUBJECT_DAY e weekly_target/7 da materia. */
-  dailyTarget: number;
-  modules: { nivel: Nivel; name: string; syllabus: string; cargo: string | null; area: string }[];
-}
-
-interface GeneratedQuestion {
-  topico: string;
-  dificuldade: "Fácil" | "Médio" | "Difícil";
-  nivel: "ambos" | Nivel;
-  enunciado: string;
-  alternativas: string[];
-  correta: number;
-  explicacao: string;
-}
-
 // ---------------------------------------------------------------------------
-// Utilitarios
+// Utilitários
 // ---------------------------------------------------------------------------
 
 function timingSafeEqual(a: string, b: string): boolean {
@@ -88,183 +74,18 @@ function timingSafeEqual(a: string, b: string): boolean {
   return diff === 0;
 }
 
-function todayInCuiaba(): string {
-  return new Date().toLocaleDateString("en-CA", { timeZone: "America/Cuiaba" });
-}
-
-const norm = (s: string) => s.normalize("NFKC").replace(/\s+/g, " ").trim().toLowerCase();
-
-/** Mesmo algoritmo de scripts/build-track-seed.mjs (dedup entre seed e geracao). */
+/** Mesmo algoritmo de scripts/build-track-seed.mjs (dedup entre seed e geração). */
 async function contentHash(enunciado: string, alternativas: string[]): Promise<string> {
   const data = new TextEncoder().encode(norm(enunciado) + "||" + alternativas.map(norm).sort().join("|"));
   const digest = await crypto.subtle.digest("SHA-256", data);
   return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-const REFERS_TO_OTHERS = /anteriores|nenhuma das|todas as alternativas|^\s*(apenas\s+)?[IVX]+\b|\b[IVX]+\s*(,|e)\s*[IVX]+\b|^\s*[VF]\s*[-–,]\s*[VF]/i;
-
-function shuffleAlternatives(q: GeneratedQuestion): GeneratedQuestion {
-  if (q.alternativas.some((a) => REFERS_TO_OTHERS.test(a))) return q;
-  const order = [0, 1, 2, 3];
-  const rnd = new Uint32Array(4);
-  crypto.getRandomValues(rnd);
-  for (let i = 3; i > 0; i--) {
-    const j = rnd[i] % (i + 1);
-    [order[i], order[j]] = [order[j], order[i]];
-  }
-  return { ...q, alternativas: order.map((k) => q.alternativas[k]), correta: order.indexOf(q.correta) };
-}
-
-function validate(q: unknown): GeneratedQuestion | null {
-  if (!q || typeof q !== "object") return null;
-  const o = q as Record<string, unknown>;
-  const alts = o.alternativas;
-  if (typeof o.enunciado !== "string" || o.enunciado.trim().length < 20 || o.enunciado.length > 2500) return null;
-  if (!Array.isArray(alts) || alts.length !== 4) return null;
-  if (!alts.every((a) => typeof a === "string" && a.trim().length > 0 && a.length <= 600)) return null;
-  if (new Set(alts.map((a) => norm(a as string))).size !== 4) return null;
-  if (!Number.isInteger(o.correta) || (o.correta as number) < 0 || (o.correta as number) > 3) return null;
-  if (typeof o.explicacao !== "string" || o.explicacao.trim().length < 30 || o.explicacao.length > 2000) return null;
-  const dificuldade = ["Fácil", "Médio", "Difícil"].includes(o.dificuldade as string) ? o.dificuldade : "Médio";
-  const nivel = ["ambos", "medio", "superior"].includes(o.nivel as string) ? o.nivel : "ambos";
-  return {
-    topico: typeof o.topico === "string" ? o.topico.slice(0, 120) : "Geral",
-    dificuldade: dificuldade as GeneratedQuestion["dificuldade"],
-    nivel: nivel as GeneratedQuestion["nivel"],
-    enunciado: o.enunciado.trim(),
-    alternativas: (alts as string[]).map((a) => a.trim()),
-    correta: o.correta as number,
-    explicacao: o.explicacao.trim(),
-  };
-}
-
-async function callModel(apiKey: string, model: string, system: string, user: string, tool: Record<string, unknown>) {
-  const res = await fetch(GATEWAY_URL, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-    body: JSON.stringify({
-      model,
-      messages: [{ role: "system", content: system }, { role: "user", content: user }],
-      tools: [{ type: "function", function: tool }],
-      tool_choice: { type: "function", function: { name: (tool as { name: string }).name } },
-    }),
-    signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
-  });
-  if (!res.ok) throw new Error(`gateway ${res.status}`);
-  const data = await res.json();
-  const args = data?.choices?.[0]?.message?.tool_calls?.[0]?.function?.arguments;
-  if (typeof args !== "string") throw new Error("resposta sem tool_call");
-  return JSON.parse(args);
-}
+const intEnv = (name: string, fallback: number, min: number, max: number) =>
+  Math.min(max, Math.max(min, Number(Deno.env.get(name) ?? fallback) || fallback));
 
 // ---------------------------------------------------------------------------
-// Prompts
-// ---------------------------------------------------------------------------
-
-const GENERATION_TOOL = {
-  name: "salvar_questoes",
-  description: "Registra as questões inéditas geradas.",
-  parameters: {
-    type: "object",
-    properties: {
-      questoes: {
-        type: "array",
-        items: {
-          type: "object",
-          properties: {
-            topico: { type: "string", description: "Tópico do edital coberto." },
-            dificuldade: { type: "string", enum: ["Fácil", "Médio", "Difícil"] },
-            nivel: { type: "string", enum: ["ambos", "medio", "superior"] },
-            enunciado: { type: "string" },
-            alternativas: { type: "array", items: { type: "string" }, minItems: 4, maxItems: 4 },
-            correta: { type: "integer", minimum: 0, maximum: 3, description: "Índice (0 a 3) da única alternativa correta." },
-            explicacao: { type: "string", description: "Justificativa didática com o fundamento (artigo de lei, conceito, cálculo) e por que as demais estão erradas." },
-          },
-          required: ["topico", "dificuldade", "nivel", "enunciado", "alternativas", "correta", "explicacao"],
-        },
-      },
-    },
-    required: ["questoes"],
-  },
-};
-
-const REVIEW_TOOL = {
-  name: "registrar_revisao",
-  description: "Registra o veredito do revisor para cada questão.",
-  parameters: {
-    type: "object",
-    properties: {
-      revisoes: {
-        type: "array",
-        items: {
-          type: "object",
-          properties: {
-            indice: { type: "integer" },
-            aprovada: { type: "boolean" },
-            motivo: { type: "string" },
-          },
-          required: ["indice", "aprovada"],
-        },
-      },
-    },
-    required: ["revisoes"],
-  },
-};
-
-function generationPrompts(ctx: SubjectContext, count: number, recent: string[], topics: string[], facts: string[]) {
-  const today = todayInCuiaba();
-  const system = `Você é um elaborador sênior de questões de concursos públicos brasileiros, especialista na banca ${ctx.banca}.
-Regras obrigatórias:
-- Questões INÉDITAS, de múltipla escolha, com exatamente 4 alternativas e UMA única correta, no estilo da banca (enunciados contextualizados, distratores plausíveis, sem "todas/nenhuma das anteriores").
-- Conteúdo estritamente dentro da ementa do edital informada e de acordo com a legislação, a jurisprudência e o entendimento técnico VIGENTES em ${today}.
-- Nunca invente números de artigos, prazos, percentuais ou nomes. Se não tiver certeza absoluta de um dado, não o use.
-- A explicação deve citar o fundamento (artigo, norma, conceito ou cálculo) e dizer por que as demais alternativas estão erradas.
-- Português formal, norma-padrão, sem marcas de formatação.
-- Não repita nem parafraseie questões já existentes listadas pelo usuário.`;
-
-  const modules = ctx.modules
-    .map((m) => `Nível ${m.nivel === "medio" ? "MÉDIO" : "SUPERIOR"} (${m.area}${m.cargo ? ` — ${m.cargo}` : ""}):\n${m.syllabus}`)
-    .join("\n\n");
-  const nivelRule = ctx.modules.length > 1
-    ? `A matéria é cobrada em mais de um nível. Use nivel="ambos" quando o tópico constar da ementa de todos os níveis; use o nível específico ("medio" ou "superior") quando o tópico só existir na ementa daquele nível.`
-    : `Use nivel="ambos".`;
-  const grounded = ctx.grounded
-    ? `\n\nATENÇÃO: esta matéria é de LEGISLAÇÃO LOCAL. Use EXCLUSIVAMENTE os fatos verificados abaixo (pode combiná-los, inverter o ângulo de cobrança ou criar situações-problema com eles), sem acrescentar nenhum dado externo:\n- ${facts.join("\n- ")}`
-    : facts.length
-      ? `\n\nBase de referência já validada (use para manter a precisão; não copie):\n- ${facts.slice(0, 15).join("\n- ")}`
-      : "";
-
-  const user = `Concurso: ${ctx.trackName}
-Matéria: ${ctx.name}
-
-Ementa do edital:
-${modules}
-
-${nivelRule}
-
-Tópicos já cobertos (priorize os pouco explorados da ementa): ${topics.slice(0, 60).join("; ") || "nenhum"}
-
-Enunciados recentes que NÃO podem ser repetidos:
-${recent.map((r) => `- ${r}`).join("\n") || "- (nenhum)"}${grounded}
-
-Gere ${count} questões inéditas, variando tópicos e dificuldade (pelo menos uma "Difícil"), e registre-as com a ferramenta salvar_questoes.`;
-  return { system, user };
-}
-
-function reviewPrompts(ctx: SubjectContext, questions: GeneratedQuestion[], facts: string[]) {
-  const system = `Você é um revisor técnico rigoroso de questões de concurso (${ctx.banca}). Reprove qualquer questão com: gabarito errado; mais de uma alternativa defensável; nenhuma correta; dado factual duvidoso, desatualizado ou inventado (artigos, prazos, percentuais); conteúdo fora da ementa; explicação que não sustenta o gabarito. Na dúvida, reprove.`;
-  const grounded = ctx.grounded
-    ? `\nFatos verificados permitidos (qualquer dado fora desta lista implica reprovação):\n- ${facts.join("\n- ")}`
-    : "";
-  const list = questions
-    .map((q, i) => `#${i}\nEnunciado: ${q.enunciado}\n${q.alternativas.map((a, k) => `${"ABCD"[k]}) ${a}`).join("\n")}\nGabarito: ${"ABCD"[q.correta]}\nExplicação: ${q.explicacao}`)
-    .join("\n\n");
-  const user = `Matéria: ${ctx.name}${grounded}\n\nRevise cada questão e registre o veredito com a ferramenta registrar_revisao:\n\n${list}`;
-  return { system, user };
-}
-
-// ---------------------------------------------------------------------------
-// Processamento por materia
+// Processamento por matéria
 // ---------------------------------------------------------------------------
 
 // deno-lint-ignore no-explicit-any
@@ -272,18 +93,19 @@ type Supa = any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
 async function processSubject(
   supabase: Supa,
-  apiKey: string,
+  llm: ReturnType<typeof createGatewayClient>,
   ctx: SubjectContext,
   missing: number,
-  model: string,
-  reviewModel: string,
+  models: PipelineModels,
+  config: PipelineConfig,
 ) {
-  const [{ data: recentRows }, { data: topicRows }, { data: factRows }] = await Promise.all([
+  const [{ data: recentRows }, { data: topicRows }, { data: factRows }, lessons] = await Promise.all([
     supabase.from("questions").select("enunciado").eq("subject_id", ctx.subjectId)
       .order("created_at", { ascending: false }).limit(40),
     supabase.from("questions").select("topico").eq("subject_id", ctx.subjectId).not("topico", "is", null).limit(1000),
     supabase.from("questions").select("explicacao").eq("subject_id", ctx.subjectId).eq("origem", "autoral")
       .not("explicacao", "is", null).limit(400),
+    loadLessons(supabase, ctx.subjectId),
   ]);
 
   const recent = (recentRows ?? []).map((r: { enunciado: string }) => r.enunciado.slice(0, 160));
@@ -291,27 +113,21 @@ async function processSubject(
   for (const r of topicRows ?? []) topicCount.set(r.topico, (topicCount.get(r.topico) ?? 0) + 1);
   const topics = [...topicCount.entries()].sort((a, b) => a[1] - b[1]).map(([t, n]) => `${t} (${n})`);
   const allFacts = (factRows ?? []).map((r: { explicacao: string }) => r.explicacao);
-  // Amostra aleatoria de fatos para variar o foco a cada dia.
+  // Legislação local só pode ser gerada a partir de fatos verificados. Sem base
+  // (ex.: trilha nova publicada pelo Radar de Concursos), não gera nada — falha fechada.
+  if (ctx.grounded && allFacts.length < 10) {
+    throw new Error("legislação local sem fatos verificados suficientes (cadastre questões autorais)");
+  }
+  // Amostra aleatória de fatos para variar o foco a cada dia.
   const facts = allFacts.sort(() => Math.random() - 0.5).slice(0, ctx.grounded ? 60 : 15);
 
-  const askFor = missing + 2; // folga para as reprovacoes do revisor
-  const gen = generationPrompts(ctx, askFor, recent, topics, facts);
-  const generated = await callModel(apiKey, model, gen.system, gen.user, GENERATION_TOOL);
-  const candidates = ((generated?.questoes ?? []) as unknown[]).map(validate).filter(Boolean) as GeneratedQuestion[];
-  if (!candidates.length) return { requested: missing, inserted: 0, error: "nenhuma questão válida gerada" };
-
-  const rev = reviewPrompts(ctx, candidates, facts);
-  const review = await callModel(apiKey, reviewModel, rev.system, rev.user, REVIEW_TOOL);
-  const approved = new Set<number>(
-    ((review?.revisoes ?? []) as { indice: number; aprovada: boolean }[])
-      .filter((r) => r && r.aprovada === true)
-      .map((r) => r.indice),
-  );
-  const accepted = candidates.filter((_, i) => approved.has(i)).slice(0, missing);
+  const outcome = await runQualityPipeline(llm, { ctx, missing, recent, topics, facts, lessons }, models, config);
+  // A memória é gravada mesmo quando nada foi aprovado — é aí que ela mais ensina.
+  await saveLessons(supabase, ctx.subjectId, outcome.lessons);
 
   const allowedNivel = new Set(ctx.modules.map((m) => m.nivel));
   const rows = [];
-  for (const q0 of accepted) {
+  for (const q0 of outcome.accepted) {
     const q = shuffleAlternatives(q0);
     let nivel: Nivel | null = null;
     if (ctx.modules.length > 1 && q.nivel !== "ambos" && allowedNivel.has(q.nivel)) nivel = q.nivel;
@@ -340,7 +156,8 @@ async function processSubject(
     if (error) throw new Error(`insert: ${error.message}`);
     inserted = data?.length ?? 0;
   }
-  return { requested: missing, inserted, error: null as string | null };
+  const error = rows.length ? null : outcome.stats.generated ? "nenhuma questão aprovada pelos agentes" : "nenhuma questão válida gerada";
+  return { requested: missing, inserted, error, stats: outcome.stats, lessons: outcome.lessons.length };
 }
 
 // ---------------------------------------------------------------------------
@@ -351,6 +168,7 @@ serve(withCors(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   if (req.method !== "POST") return jsonResponse({ error: "Método não permitido" }, 405);
 
+  const startedAt = Date.now();
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   const apiKey = Deno.env.get("LOVABLE_API_KEY");
@@ -359,9 +177,9 @@ serve(withCors(async (req) => {
 
   const supabase = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } });
 
-  // Autorizacao: cron (segredo compartilhado) ou administrador.
+  // Autorização: cron (segredo compartilhado) ou administrador.
   const providedSecret = req.headers.get("x-cron-secret") ?? "";
-  // Sem a variavel QUESTION_CRON_SECRET, o segredo e lido do Vault (o mesmo que o
+  // Sem a variável QUESTION_CRON_SECRET, o segredo é lido do Vault (o mesmo que o
   // pg_cron envia), por uma RPC exclusiva do service_role. Assim o segredo nasce e
   // fica dentro do banco, sem precisar ser copiado para o painel de Secrets.
   if (!cronSecret && providedSecret) {
@@ -375,17 +193,37 @@ serve(withCors(async (req) => {
   }
 
   const body = (await readJson<{ track_slug?: string; subject_slug?: string; max_subjects?: number }>(req, 4096)) ?? {};
-  const perDay = Math.min(Math.max(Number(Deno.env.get("QUESTIONS_PER_SUBJECT_DAY") ?? 3) || 3, 1), 10);
+  const perDay = intEnv("QUESTIONS_PER_SUBJECT_DAY", 3, 1, 10);
   const maxSubjects = Math.min(Math.max(Number(body.max_subjects ?? MAX_SUBJECTS_PER_RUN) || MAX_SUBJECTS_PER_RUN, 1), 5);
-  const model = Deno.env.get("QUESTION_MODEL") || DEFAULT_MODEL;
-  const reviewModel = Deno.env.get("QUESTION_REVIEW_MODEL") || model;
+
+  const generator = modelFromEnv("QUESTION_MODEL", DEFAULT_MODEL);
+  const models: PipelineModels = {
+    generator,
+    reviewer: modelFromEnv("QUESTION_REVIEW_MODEL", generator),
+    solvers: modelListFromEnv("QUESTION_SOLVER_MODELS", [DEFAULT_SOLVER_MODEL]).slice(0, 3),
+    arbiter: modelFromEnv("QUESTION_ARBITER_MODEL", generator),
+  };
+  const mode: PipelineMode = (Deno.env.get("QUESTION_PIPELINE") ?? "").trim() === "classic" ? "classic" : "multiagent";
+  const config: PipelineConfig = {
+    mode,
+    maxArbitrations: intEnv("QUESTION_MAX_ARBITRATIONS", 3, 0, 10),
+    // O pg_cron espera até 150 s pela resposta; o orçamento fica abaixo disso.
+    deadline: startedAt + intEnv("QUESTION_RUN_BUDGET_MS", 140_000, 60_000, 380_000),
+    now: Date.now,
+  };
+
+  const telemetry = createTelemetry("generate-track-questions");
+  // Um cliente por matéria (rodam em paralelo), para a telemetria saber de qual matéria
+  // é cada chamada. Só metadados são registrados, nunca o conteúdo.
+  const llmFor = (subjectId: string) =>
+    createGatewayClient({ apiKey, onCall: (meta) => telemetry.record(meta, { subjectId }) });
 
   const { data: rows, error } = await supabase
     .from("study_track_subjects")
     .select("subject_id, syllabus, cargo, area, weekly_target, ai_grounded_only, subjects(name, slug), study_track_modules(nivel, name, study_tracks(name, banca, slug, is_active))");
   if (error) return jsonResponse({ error: "Falha ao carregar trilhas" }, 500);
 
-  // Agrupa por materia (a mesma materia pode estar nos modulos medio e superior).
+  // Agrupa por matéria (a mesma matéria pode estar nos módulos médio e superior).
   const contexts = new Map<string, SubjectContext>();
   for (const r of (rows ?? []) as unknown as TrackSubjectRow[]) {
     const mod = r.study_track_modules;
@@ -404,14 +242,14 @@ serve(withCors(async (req) => {
       modules: [],
     };
     ctx.grounded = ctx.grounded || r.ai_grounded_only;
-    // weekly_target alto (ex.: especificas do cargo, que precisam de 40 por Simulado Oficial)
-    // aumenta a meta diaria daquela materia; nunca abaixo do minimo global nem acima de 10.
+    // weekly_target alto (ex.: específicas do cargo, que precisam de 40 por Simulado Oficial)
+    // aumenta a meta diária daquela matéria; nunca abaixo do mínimo global nem acima de 10.
     ctx.dailyTarget = Math.min(10, Math.max(ctx.dailyTarget, Math.ceil(r.weekly_target / 7)));
     ctx.modules.push({ nivel: mod.nivel, name: mod.name, syllabus: r.syllabus ?? "", cargo: r.cargo, area: r.area });
     contexts.set(r.subject_id, ctx);
   }
 
-  // Quantas questoes automaticas cada materia ja recebeu hoje (horario de Cuiaba).
+  // Quantas questões automáticas cada matéria já recebeu hoje (horário de Cuiabá).
   const dayStart = `${todayInCuiaba()}T00:00:00${TIME_ZONE_OFFSET}`;
   const pending: { ctx: SubjectContext; missing: number }[] = [];
   for (const ctx of contexts.values()) {
@@ -430,26 +268,35 @@ serve(withCors(async (req) => {
   const results = await Promise.all(
     batch.map(async ({ ctx, missing }) => {
       try {
-        const r = await processSubject(supabase, apiKey, ctx, missing, model, reviewModel);
+        const r = await processSubject(supabase, llmFor(ctx.subjectId), ctx, missing, models, config);
         const status = r.inserted >= missing ? "success" : r.inserted > 0 ? "partial" : "error";
         await supabase.from("question_generation_runs").insert({
-          subject_id: ctx.subjectId, requested: missing, inserted: r.inserted, status, model, error: r.error,
+          subject_id: ctx.subjectId, requested: missing, inserted: r.inserted, status, model: models.generator, error: r.error,
         });
-        return { subject: ctx.slug, requested: missing, inserted: r.inserted, status };
+        // Linha de fluxo de trabalho (invoke_workflow, nas convenções OTel GenAI): o resumo da matéria.
+        telemetry.record(
+          { agent: "orquestrador", model: "", promptVersion: "pipeline@2026-11-16", status: "ok", attempts: 1, latencyMs: Date.now() - startedAt, inputTokens: null, outputTokens: null },
+          { subjectId: ctx.subjectId, metadata: { operation: "invoke_workflow", requested: missing, inserted: r.inserted, lessons: r.lessons, ...r.stats } },
+        );
+        return { subject: ctx.slug, requested: missing, inserted: r.inserted, status, stats: r.stats };
       } catch (e) {
-        const message = e instanceof Error ? e.message.slice(0, 300) : "erro desconhecido";
+        const message = (e instanceof LlmError || e instanceof Error ? e.message : "erro desconhecido").slice(0, 300);
         console.error("generate-track-questions:", ctx.slug, message);
         await supabase.from("question_generation_runs").insert({
-          subject_id: ctx.subjectId, requested: missing, inserted: 0, status: "error", model, error: message,
+          subject_id: ctx.subjectId, requested: missing, inserted: 0, status: "error", model: models.generator, error: message,
         });
         return { subject: ctx.slug, requested: missing, inserted: 0, status: "error" };
       }
     }),
   );
 
+  await telemetry.flush(supabase);
+
   return jsonResponse({
     date: todayInCuiaba(),
+    pipeline: mode,
     processed: results,
     remaining_subjects: Math.max(pending.length - batch.length, 0),
+    elapsed_ms: Date.now() - startedAt,
   });
 }));
