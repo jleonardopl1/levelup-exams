@@ -28,12 +28,34 @@ export function validateQuestion(q: unknown): GeneratedQuestion | null {
     topico: typeof o.topico === "string" && o.topico.trim() ? o.topico.trim().slice(0, 120) : "Geral",
     dificuldade: dificuldade as GeneratedQuestion["dificuldade"],
     nivel: nivel as GeneratedQuestion["nivel"],
-    enunciado: o.enunciado.trim(),
+    enunciado: emphasizeNegativeCommand(o.enunciado.trim()),
     alternativas: (alts as string[]).map((a) => a.trim()),
     correta: o.correta as number,
     explicacao: o.explicacao.trim(),
   };
 }
+
+/**
+ * Comando negativo em destaque, como as bancas fazem ("assinale a alternativa INCORRETA",
+ * "EXCETO", "que NÃO"): o candidato que lê rápido não inverte a pergunta. O app mostra texto
+ * puro, então o destaque é a caixa alta. Só mexe no comando, nunca no resto do enunciado.
+ */
+export function emphasizeNegativeCommand(stem: string): string {
+  return stem
+    .replace(
+      /\b(alternativas?|op[çc](?:ão|ões)|afirmativas?|assertivas?|afirma[çc](?:ão|ões)|proposi[çc](?:ão|ões)|itens|item)\s+(incorretas?|erradas?|falsas?)\b/giu,
+      (_m, w: string, neg: string) => `${w} ${neg.toLocaleUpperCase("pt-BR")}`,
+    )
+    .replace(/\b(alternativas?|op[çc](?:ão|ões)|afirmativas?|assertivas?)\s+que\s+não\b/giu, (_m, w: string) => `${w} que NÃO`)
+    .replace(/\bexceto\b/giu, "EXCETO");
+}
+
+/**
+ * Termos absolutos ("sempre", "nunca", "exclusivamente"…). Quando só os distratores os usam,
+ * o candidato treinado elimina essas alternativas sem saber o conteúdo (Haladyna, regra dos
+ * "specific determiners"). No banco autoral, só 8 de 1.091 questões têm esse padrão.
+ */
+const ABSOLUTE = /\b(sempre|nunca|jamais|exclusivamente|unicamente|absolutamente|em (?:qualquer|nenhuma) hip[óo]tese|sob nenhuma circunst[âa]ncia|todo e qualquer)\b/iu;
 
 const ALL_OR_NONE = /\b(todas as (alternativas|anteriores|opções)|nenhuma das (alternativas|anteriores|opções))\b/i;
 
@@ -53,6 +75,11 @@ export function itemFlaws(q: GeneratedQuestion): string[] {
   const avgOthers = others.reduce((s, n) => s + n, 0) / others.length;
   if (right > Math.max(...others) && avgOthers > 0 && right >= 1.75 * avgOthers && right - avgOthers >= 40) {
     flaws.push("Alternativa correta muito mais longa que as demais (pista de tamanho para o candidato).");
+  }
+  // Termos absolutos só nos distratores: pista para eliminar sem saber.
+  const absoluteDistractors = q.alternativas.filter((a, i) => i !== q.correta && ABSOLUTE.test(a)).length;
+  if (absoluteDistractors >= 2 && !ABSOLUTE.test(q.alternativas[q.correta])) {
+    flaws.push('Termos absolutos (sempre, nunca, exclusivamente...) só nos distratores (pista para eliminar sem saber o conteúdo).');
   }
   // O gabarito não pode aparecer copiado no enunciado.
   const stem = norm(q.enunciado);

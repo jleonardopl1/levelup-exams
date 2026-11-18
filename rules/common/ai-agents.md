@@ -23,6 +23,16 @@ TradingAgents/AgroDecision. Detalhes em `docs/ARQUITETURA_MULTIAGENTE.md`.
 - Modelo por papel via secret (`*_MODEL`); nunca fixe nome de modelo espalhado pelo código.
 - Novas tentativas só em erro temporário (429/5xx/timeout/saída inválida), com backoff e jitter.
 
+## Memória e conteúdo vindo de alunos
+- Memória que volta ao prompt (`ai_lessons`) é superfície de ataque (envenenamento de memória):
+  só entra texto **normalizado, curto e cercado**, com origem registrada, contado por recorrência
+  e desativável pela equipe. Reporte de aluno vira lição só depois de resolvido por humano.
+- Nada de texto livre de aluno virar regra para outro aluno: o efeito de uma lição é sempre
+  sobre a geração de conteúdo revisada pelo pipeline, nunca sobre dados de outra pessoa.
+
+## Escrita das respostas
+- Respostas ao aluno seguem `rules/common/writing.md` (texto simples, direto, sem "cara de IA").
+
 ## Operação
 - Telemetria em `ai_runs`: agente, modelo, versão do prompt, tentativas, latência, tokens. **Nunca conteúdo.**
 - Memória auditável (`ai_lessons`): curta, contada por recorrência, desativável pela equipe.

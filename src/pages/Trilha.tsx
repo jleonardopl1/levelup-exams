@@ -8,9 +8,8 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import {
-  ArrowLeft, CalendarClock, Target, RotateCcw, Sparkles, Play, FileText,
+  ArrowLeft, CalendarClock, Target, RotateCcw, Sparkles, Play,
   Gauge, AlertTriangle, CheckCircle2, ExternalLink, ListChecks, ClipboardCheck, PenLine,
 } from 'lucide-react';
 import {
@@ -20,6 +19,9 @@ import {
 import { useTrackSelection } from '@/lib/trackPrefs';
 import { ReviewTodayCard } from '@/components/ReviewTodayCard';
 import { TrackRadarCard } from '@/components/radar/TrackRadarCard';
+import { MasteryTag, SubjectStudyPanel } from '@/components/trilha/SubjectStudyPanel';
+import { useTopicMastery } from '@/hooks/useTopicMastery';
+import { subjectMastery } from '@/lib/mastery';
 
 const PASS_MARK = 40;
 
@@ -62,6 +64,12 @@ export default function Trilha() {
   const visibleSubjects = useMemo(
     () => (module?.subjects ?? []).filter((s) => !s.cargo || s.cargo === cargoValid),
     [module, cargoValid],
+  );
+
+  const { data: topicMastery } = useTopicMastery(visibleSubjects.map((s) => s.subject_id));
+  const masteryBySubject = useMemo(
+    () => new Map(visibleSubjects.map((s) => [s.subject_id, subjectMastery(s.subject_id, topicMastery ?? [])])),
+    [visibleSubjects, topicMastery],
   );
 
   if (isLoading || authLoading) {
@@ -299,6 +307,7 @@ export default function Trilha() {
                           <p className="text-xs text-muted-foreground mt-0.5">
                             {p ? `${p.answered} de ${p.total_questions} questões` : 'Carregando progresso…'}
                             {acc !== null && ` · ${Math.round(acc * 100)}% de acerto`}
+                            <MasteryTag mastery={masteryBySubject.get(s.subject_id)} />
                           </p>
                         </div>
                         {acc !== null && (acc >= 0.7
@@ -322,23 +331,7 @@ export default function Trilha() {
                         )}
                       </div>
 
-                      {(s.syllabus || s.study_tips) && (
-                        <Accordion type="single" collapsible>
-                          <AccordionItem value="edital" className="border-b-0">
-                            <AccordionTrigger className="py-1 text-sm text-primary hover:no-underline">
-                              <span className="flex items-center gap-1.5"><FileText className="w-4 h-4" /> Conteúdo do edital e dicas</span>
-                            </AccordionTrigger>
-                            <AccordionContent className="space-y-2 text-sm">
-                              {s.syllabus && <p className="text-muted-foreground whitespace-pre-line">{s.syllabus}</p>}
-                              {s.study_tips && (
-                                <p className="rounded-lg bg-primary/5 border border-primary/15 p-3">
-                                  <span className="font-medium">Como a banca cobra: </span>{s.study_tips}
-                                </p>
-                              )}
-                            </AccordionContent>
-                          </AccordionItem>
-                        </Accordion>
-                      )}
+                      <SubjectStudyPanel trackSlug={track.slug} subject={s} mastery={masteryBySubject.get(s.subject_id)} />
                     </CardContent>
                   </Card>
                 );

@@ -10,9 +10,10 @@
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.node.json",
     "preview": "vite preview",
     "build:trilhas": "node scripts/build-track-seed.mjs camara-cuiaba-2026",
+    "test:unit": "node --test \"src/**/*.test.ts\" \".claude/hooks/*.test.mjs\"",
     "test:edge": "DENO_NO_PACKAGE_JSON=1 deno test --allow-env --no-lock supabase/functions/"
   },
   "dependencies": {
