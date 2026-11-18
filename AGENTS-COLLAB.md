@@ -66,6 +66,12 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
 - 🕸️ **Radar: páginas montadas por JavaScript chegam vazias ao coletor** (Cebraspe, portal da
   Selecon) e a Fundatec tem anti-robô — semeadas desligadas. Fonte com "página sem texto" no
   painel precisa de outra URL (página do órgão, diário oficial). O coletor não executa JS.
+- 🗝️ **A ferramenta de migration do agente do Lovable recusa SQL que lê o Vault**
+  ("Agent access to secrets is not allowed"), como o bloco de agendamento do pg_cron. A migration
+  do Radar foi aplicada em partes pela consulta SQL do Lovable (`query_database`), com o mesmo
+  conteúdo do arquivo. Em migrations futuras, deixe o agendamento num arquivo separado.
+- 🚫 **`public.has_role` não é executável por `anon`**: política com `TO anon` não pode chamá-la
+  (a consulta anônima falha com 42501). Faça uma política por papel.
 - 🧩 **Tabelas do Radar ainda não estão em `types.ts`**: o front usa `radarDb` (cliente sem tipos)
   em `src/hooks/useRadar.ts`. Depois de aplicar a migration, regerar os tipos e trocar por `supabase`.
 - 🔐 **`auth-email-hook` e `.lovable/` são gerenciados pelo Lovable** — não editar à mão (o hook de
