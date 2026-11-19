@@ -940,6 +940,429 @@ export type Database = {
         }
         Relationships: []
       }
+      radar_areas: {
+        Row: {
+          career_category_name: string | null
+          description: string | null
+          display_order: number
+          focus: string
+          icon: string
+          id: string
+          is_active: boolean
+          name: string
+          priority: number
+          slug: string
+        }
+        Insert: {
+          career_category_name?: string | null
+          description?: string | null
+          display_order?: number
+          focus?: string
+          icon?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          priority?: number
+          slug: string
+        }
+        Update: {
+          career_category_name?: string | null
+          description?: string | null
+          display_order?: number
+          focus?: string
+          icon?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          priority?: number
+          slug?: string
+        }
+        Relationships: []
+      }
+      radar_concursos: {
+        Row: {
+          area_id: string | null
+          banca: string | null
+          cargos: string[]
+          created_at: string
+          data_prova: string | null
+          escolaridade: string[]
+          esfera: string | null
+          first_seen_at: string
+          id: string
+          inscricoes_fim: string | null
+          inscricoes_inicio: string | null
+          is_published: boolean
+          last_update_at: string
+          link_oficial: string | null
+          municipio: string | null
+          nome: string
+          orgao: string
+          relevance: number
+          salario_max: number | null
+          slug: string
+          source_id: string | null
+          status: string
+          track_id: string | null
+          track_suggested: boolean
+          uf: string | null
+          vagas: number | null
+        }
+        Insert: {
+          area_id?: string | null
+          banca?: string | null
+          cargos?: string[]
+          created_at?: string
+          data_prova?: string | null
+          escolaridade?: string[]
+          esfera?: string | null
+          first_seen_at?: string
+          id?: string
+          inscricoes_fim?: string | null
+          inscricoes_inicio?: string | null
+          is_published?: boolean
+          last_update_at?: string
+          link_oficial?: string | null
+          municipio?: string | null
+          nome: string
+          orgao: string
+          relevance?: number
+          salario_max?: number | null
+          slug: string
+          source_id?: string | null
+          status?: string
+          track_id?: string | null
+          track_suggested?: boolean
+          uf?: string | null
+          vagas?: number | null
+        }
+        Update: {
+          area_id?: string | null
+          banca?: string | null
+          cargos?: string[]
+          created_at?: string
+          data_prova?: string | null
+          escolaridade?: string[]
+          esfera?: string | null
+          first_seen_at?: string
+          id?: string
+          inscricoes_fim?: string | null
+          inscricoes_inicio?: string | null
+          is_published?: boolean
+          last_update_at?: string
+          link_oficial?: string | null
+          municipio?: string | null
+          nome?: string
+          orgao?: string
+          relevance?: number
+          salario_max?: number | null
+          slug?: string
+          source_id?: string | null
+          status?: string
+          track_id?: string | null
+          track_suggested?: boolean
+          uf?: string | null
+          vagas?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "radar_concursos_area_id_fkey"
+            columns: ["area_id"]
+            isOneToOne: false
+            referencedRelation: "radar_areas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "radar_concursos_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "radar_sources"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "radar_concursos_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "study_tracks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      radar_follows: {
+        Row: {
+          area_id: string | null
+          concurso_id: string | null
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          area_id?: string | null
+          concurso_id?: string | null
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          area_id?: string | null
+          concurso_id?: string | null
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "radar_follows_area_id_fkey"
+            columns: ["area_id"]
+            isOneToOne: false
+            referencedRelation: "radar_areas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "radar_follows_concurso_id_fkey"
+            columns: ["concurso_id"]
+            isOneToOne: false
+            referencedRelation: "radar_concursos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      radar_runs: {
+        Row: {
+          candidates: number
+          details: Json
+          errors: number
+          finished_at: string | null
+          id: number
+          sources_changed: number
+          sources_checked: number
+          started_at: string
+          trigger: string
+          updates_pending: number
+          updates_published: number
+        }
+        Insert: {
+          candidates?: number
+          details?: Json
+          errors?: number
+          finished_at?: string | null
+          id?: never
+          sources_changed?: number
+          sources_checked?: number
+          started_at?: string
+          trigger?: string
+          updates_pending?: number
+          updates_published?: number
+        }
+        Update: {
+          candidates?: number
+          details?: Json
+          errors?: number
+          finished_at?: string | null
+          id?: never
+          sources_changed?: number
+          sources_checked?: number
+          started_at?: string
+          trigger?: string
+          updates_pending?: number
+          updates_published?: number
+        }
+        Relationships: []
+      }
+      radar_sources: {
+        Row: {
+          area_id: string | null
+          check_interval_hours: number
+          consecutive_failures: number
+          created_at: string
+          id: string
+          is_active: boolean
+          kind: string
+          last_changed_at: string | null
+          last_checked_at: string | null
+          last_hash: string | null
+          last_status: string | null
+          last_text: string | null
+          name: string
+          pending_retries: number
+          url: string
+        }
+        Insert: {
+          area_id?: string | null
+          check_interval_hours?: number
+          consecutive_failures?: number
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          kind?: string
+          last_changed_at?: string | null
+          last_checked_at?: string | null
+          last_hash?: string | null
+          last_status?: string | null
+          last_text?: string | null
+          name: string
+          pending_retries?: number
+          url: string
+        }
+        Update: {
+          area_id?: string | null
+          check_interval_hours?: number
+          consecutive_failures?: number
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          kind?: string
+          last_changed_at?: string | null
+          last_checked_at?: string | null
+          last_hash?: string | null
+          last_status?: string | null
+          last_text?: string | null
+          name?: string
+          pending_retries?: number
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "radar_sources_area_id_fkey"
+            columns: ["area_id"]
+            isOneToOne: false
+            referencedRelation: "radar_areas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      radar_track_drafts: {
+        Row: {
+          banca_profile: Json
+          concurso_id: string
+          created_at: string
+          created_by: string | null
+          draft: Json
+          error: string | null
+          id: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          track_id: string | null
+          warnings: string[]
+        }
+        Insert: {
+          banca_profile?: Json
+          concurso_id: string
+          created_at?: string
+          created_by?: string | null
+          draft?: Json
+          error?: string | null
+          id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          track_id?: string | null
+          warnings?: string[]
+        }
+        Update: {
+          banca_profile?: Json
+          concurso_id?: string
+          created_at?: string
+          created_by?: string | null
+          draft?: Json
+          error?: string | null
+          id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          track_id?: string | null
+          warnings?: string[]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "radar_track_drafts_concurso_id_fkey"
+            columns: ["concurso_id"]
+            isOneToOne: false
+            referencedRelation: "radar_concursos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "radar_track_drafts_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "study_tracks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      radar_updates: {
+        Row: {
+          changes: Json
+          concurso_id: string
+          created_at: string
+          evidence_url: string | null
+          id: string
+          kind: string
+          notified_at: string | null
+          patch: Json
+          review_reason: string | null
+          review_status: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          severity: string
+          source_id: string | null
+          summary: string | null
+          title: string
+        }
+        Insert: {
+          changes?: Json
+          concurso_id: string
+          created_at?: string
+          evidence_url?: string | null
+          id?: string
+          kind?: string
+          notified_at?: string | null
+          patch?: Json
+          review_reason?: string | null
+          review_status?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          severity?: string
+          source_id?: string | null
+          summary?: string | null
+          title: string
+        }
+        Update: {
+          changes?: Json
+          concurso_id?: string
+          created_at?: string
+          evidence_url?: string | null
+          id?: string
+          kind?: string
+          notified_at?: string | null
+          patch?: Json
+          review_reason?: string | null
+          review_status?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          severity?: string
+          source_id?: string | null
+          summary?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "radar_updates_concurso_id_fkey"
+            columns: ["concurso_id"]
+            isOneToOne: false
+            referencedRelation: "radar_concursos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "radar_updates_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "radar_sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rate_limits: {
         Row: {
           created_at: string
@@ -2084,6 +2507,26 @@ export type Database = {
       level_for_points: { Args: { p_points: number }; Returns: number }
       master_admin_email: { Args: never; Returns: string }
       purge_old_ai_runs: { Args: never; Returns: number }
+      radar_apply_patch: {
+        Args: { p: Json; p_concurso_id: string }
+        Returns: undefined
+      }
+      radar_fanout_update: { Args: { p_update_id: string }; Returns: number }
+      radar_follower_counts: {
+        Args: never
+        Returns: {
+          concurso_id: string
+          followers: number
+        }[]
+      }
+      radar_publish_track_draft: {
+        Args: { p_draft_id: string }
+        Returns: string
+      }
+      radar_review_update: {
+        Args: { p_approve: boolean; p_reason?: string; p_update_id: string }
+        Returns: number
+      }
       record_ai_lessons: {
         Args: { p_lessons: string[]; p_source: string; p_subject_id: string }
         Returns: number
