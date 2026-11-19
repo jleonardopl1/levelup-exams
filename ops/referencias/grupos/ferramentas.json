@@ -1,0 +1,263 @@
+[
+  {
+    "repo": "heygen-com/hyperframes",
+    "sha": "ebddc42486ec251e773770f7743ffe59ad2004cd",
+    "license": "Apache-2.0",
+    "kind": "CLI de vídeo",
+    "status": "aplicativo",
+    "component": "HyperFrames CLI 0.9.65",
+    "installation": "Distribuição oficial hyperframes@0.9.65 instalada com npm local. CLI de terminal, sem aplicativo gráfico ou serviço HeyGen.",
+    "verification": "hyperframes --version informou 0.9.65. O linter aprovou a composição HTML de teste e identificou a ausência de data-composition-id na amostra inválida.",
+    "analysis": "O CLI interpreta composições HTML e dispõe de um linter estático. Uma mesma peça de questão comentada pode ser reaproveitada por banca ou professor. O lint verifica a composição, não a qualidade da campanha.",
+    "decision": "Testar uma peça de divulgação com questão autoral e chamada para o simulado. Medir ativações atribuídas ao vídeo e rever o texto com Pedagogia.",
+    "sourcePaths": [
+      "README.md",
+      "packages/cli/package.json",
+      "packages/lint/package.json"
+    ],
+    "localPath": "hyperframes",
+    "recipe": "python3 ops/referencias/grupos/instalar-ferramentas.py --dest ../levelup-referencias --only hyperframes",
+    "fileHashes": {
+      "node_modules/hyperframes/bin/hyperframes.mjs": "1a145bb0239c1e763bee6b2e11aa04a2fae841e8b4e45525198b757f230295b0"
+    }
+  },
+  {
+    "repo": "ag-ui-protocol/ag-ui",
+    "sha": "3416b86da4b3288e87f827c7f2759a7fa18b5231",
+    "license": "MIT",
+    "kind": "SDK de protocolo",
+    "status": "componente",
+    "component": "SDK TypeScript @ag-ui/core 1.0.5",
+    "installation": "Núcleo do protocolo AG-UI instalado no Node, com o peer Zod fixado localmente.",
+    "verification": "Importados PROTOCOL_VERSION e os tipos de eventos usados no ciclo da conversa, conferindo início, fragmento e fim.",
+    "analysis": "RUN_STARTED, TEXT_MESSAGE_CONTENT e RUN_FINISHED permitem acompanhar uma resposta em partes. O SDK do protocolo não fornece o gateway de modelos nem a autorização do aluno.",
+    "decision": "Comparar o fluxo de eventos com o streaming já usado pelo Mentor, mantendo compatibilidade no cliente antes de publicar o novo formato.",
+    "sourcePaths": [
+      "README.md",
+      "sdks/typescript/packages/core/package.json",
+      "sdks/typescript/packages/core/README.md"
+    ],
+    "localPath": "ag-ui",
+    "recipe": "python3 ops/referencias/grupos/instalar-ferramentas.py --dest ../levelup-referencias --only ag-ui",
+    "fileHashes": {
+      "node_modules/@ag-ui/core/dist/index.mjs": "4cb0f6b25a64438e2dd6e5098e12f733304574818c01d46cd5a057d057ba274a"
+    }
+  },
+  {
+    "repo": "openclaw/openclaw",
+    "sha": "a2c1b0e86ff94643d22636445c695b6469bc4b82",
+    "license": "MIT",
+    "kind": "CLI e biblioteca TypeScript",
+    "status": "aplicativo",
+    "component": "OpenClaw CLI 2026.11.5 e módulo @openclaw/retry",
+    "installation": "Distribuição npm oficial em cli/, acompanhada do módulo de retentativas no commit analisado. Na edição Linux x64 foram instalados os dois complementos nativos do fornecedor. Onboarding, canais e gateway ficaram inativos.",
+    "verification": "O executável oficial informou OpenClaw 2026.11.5 (e13cf15). O módulo do commit analisado passou nos casos de atraso e cancelamento em memória.",
+    "analysis": "A aplicação oferece um gateway de canais e agentes. O módulo permite usar retentativa e cancelamento nas tarefas locais de aquisição. Um piloto de mensagens exigiria conta, consentimento e supervisão do atendimento. O SHA do catálogo identifica o código analisado. O CLI semântico veio do lançamento npm e mostra o identificador próprio e13cf15.",
+    "decision": "Reaproveitar a política em tarefas editoriais reversíveis. Uma confirmação de pagamento com estado desconhecido exige consulta ao provedor antes de repetir.",
+    "sourcePaths": [
+      "README.md",
+      "packages/retry/package.json",
+      "packages/retry/src/index.ts",
+      "packages/retry/src/index.test.ts",
+      "package.json",
+      "openclaw.mjs"
+    ],
+    "localPath": "openclaw",
+    "recipe": "python3 ops/referencias/grupos/instalar-ferramentas.py --dest ../levelup-referencias --only openclaw",
+    "fileHashes": {
+      "cli/node_modules/openclaw/openclaw.mjs": "fca855a910792b669426b4a64e69743e5dd74f7df84f110df7c7e0881b530b3e",
+      "src/index.ts": "ddb31cca499df0e4120511a3ae6ad884d642f0ddda3a57bf0cc4b6471b7d8864",
+      "LICENSE.upstream": "9efd316ecf1c4c60f6fd5d26433142fff2b6794d7d328e9bc6179b29bf9c82a4"
+    }
+  },
+  {
+    "repo": "blader/humanizer",
+    "sha": "b48c832f0f809c1b5658edbb838c2521b72f2413",
+    "license": "MIT",
+    "kind": "Skill editorial",
+    "status": "componente",
+    "component": "Perfil humanizer",
+    "installation": "Instalação manual do SKILL.md canônico no diretório .agents/skills/humanizer do laboratório.",
+    "verification": "Perfil descoberto no caminho do agente, com nome e descrição no frontmatter e conteúdo editorial no corpo.",
+    "analysis": "O perfil revisa ritmo, fórmulas repetitivas e afirmações vagas. Suas recomendações em inglês precisam de interpretação em português e revisão de fatos.",
+    "decision": "Usar nos textos de aquisição e explicações de questões junto às regras brasileiras existentes. Não alterar gabarito, fatos ou benefícios aprovados.",
+    "sourcePaths": [
+      "README.md",
+      "SKILL.md",
+      "LICENSE"
+    ],
+    "localPath": "humanizer",
+    "recipe": "python3 ops/referencias/grupos/instalar-ferramentas.py --dest ../levelup-referencias --only humanizer",
+    "fileHashes": {
+      ".agents/skills/humanizer/SKILL.md": "804a119e924ac30295b298213e0b71b3e38b2667b8ef4fb7b69e9246369b9045",
+      "LICENSE.upstream": "4ac4810254ab36d45419141aeb8e69bf50652cfafe5b2dab947d06d44e5cbf96"
+    }
+  },
+  {
+    "repo": "Nutlope/hallmark",
+    "sha": "04977e15f3dfd6ee4b74c887dac3eb52665d6c92",
+    "license": "MIT",
+    "kind": "Skill e verificador visual",
+    "status": "componente",
+    "component": "Hallmark e sloplint estático",
+    "installation": "Perfil, referências de design e verificador estático upstream instalados localmente.",
+    "verification": "Nome do perfil conferido e sloplint executado em HTML local com saída JSON.",
+    "analysis": "O sloplint verifica padrões mecânicos no HTML, com regras por gênero e etapa da página. Revisão pedagógica e acessibilidade por teclado continuam a exigir testes do fluxo.",
+    "decision": "Rodar a avaliação estática da futura página de amostra por concurso. Conferir posteriormente leitura em tela pequena e navegação por teclado.",
+    "sourcePaths": [
+      "README.md",
+      "skills/hallmark/SKILL.md",
+      "skills/hallmark/scripts/sloplint.mjs",
+      "skills/hallmark/references/gates.md"
+    ],
+    "localPath": "hallmark",
+    "recipe": "python3 ops/referencias/grupos/instalar-ferramentas.py --dest ../levelup-referencias --only hallmark",
+    "fileHashes": {
+      ".agents/skills/hallmark/SKILL.md": "25a1ff92d925b2389e8409f42fb8ad7e033fceca8b5d1f07ed4ca4c28da53dc3",
+      ".agents/skills/hallmark/LICENSE": "06088a8b94598626f27612dea42300154bf7be967c85d9d3eee4490cb056af7d",
+      ".agents/skills/hallmark/references/gates.md": "63ad234a1acab5e081dfe8ecf2331518a43cbf42760dc5c6ababfb24d7b3e50c",
+      ".agents/skills/hallmark/references/craft.md": "1b7b40f81f0fe1c04dce133696182ca1229d16162f8f3203603f24a0f585c41c",
+      ".agents/skills/hallmark/references/responsive.md": "7ed0cd54fda3351be9e7b5514ebf4a5306a837cf3d893b31e96c7fd490b348ea",
+      ".agents/skills/hallmark/references/interaction-and-states.md": "08e232008734fce86b1ec6085db72342e90d2f855351eb84f20ea3799fe0808a",
+      ".agents/skills/hallmark/references/flow.md": "d24fa0bbfd8ea6f8add579029598e09815a697fc99a4abdb8c17f67155e368e5",
+      ".agents/skills/hallmark/scripts/sloplint.mjs": "23fb94903ae0e3b709019380443163bdc50390a246911e3423b83695e4bc8037",
+      ".agents/skills/hallmark/scripts/sloplint-render.mjs": "228f14808cbf872ab6dcc5f4f9e8d58a5a9060028f1530bec80e24dbd12737f3",
+      "LICENSE.upstream": "06088a8b94598626f27612dea42300154bf7be967c85d9d3eee4490cb056af7d"
+    }
+  },
+  {
+    "repo": "pbakaus/impeccable",
+    "sha": "d41d9860b0094dcb68030657da63461212835aaa",
+    "license": "Apache-2.0",
+    "kind": "CLI de revisão de interface",
+    "status": "aplicativo",
+    "component": "Impeccable CLI 4.9.2",
+    "installation": "Pacote oficial e binário compatível com a plataforma instalados localmente, sem hooks globais.",
+    "verification": "Executados --version e detect contra uma página HTML local; validada a saída estruturada.",
+    "analysis": "O detector percorre o código ou uma página renderizada e devolve ocorrências por regra. A análise estática cobre padrões de conteúdo e de CSS, não o comportamento real da jornada do estudante.",
+    "decision": "Usar o detector no cadastro, checkout e página da trilha. Priorizar os problemas que prejudiquem o primeiro simulado no celular.",
+    "sourcePaths": [
+      "README.md",
+      "cli/bin/cli.js",
+      "package.json"
+    ],
+    "localPath": "impeccable",
+    "recipe": "python3 ops/referencias/grupos/instalar-ferramentas.py --dest ../levelup-referencias --only impeccable",
+    "fileHashes": {
+      "node_modules/impeccable/cli/bin/cli.js": "caa5a7d48addb1ef939a7e9391264e7e9faa0e214f830a4a16613ecd94530648"
+    }
+  },
+  {
+    "repo": "nateherkai/scroll-craft",
+    "sha": "75d81f74e83692add18cd7a8a8e078b8a887a579",
+    "license": "MIT",
+    "kind": "Skill e componente de interface",
+    "status": "componente",
+    "component": "Perfil scroll-craft e motor local de apresentação",
+    "installation": "Instalados skill, motor CSS/JS e referências da experiência. As ferramentas opcionais de serviços externos ficam fora do perfil instalado.",
+    "verification": "Nome e descrição do perfil conferidos; verificada a sintaxe do motor JavaScript e a presença da folha de estilo.",
+    "analysis": "O kit orienta a composição mobile, a progressão da página e o movimento reduzido. Animação longa na entrada do quiz pode aumentar o abandono e o tráfego móvel.",
+    "decision": "Reservar para um experimento de página promocional. Comparar início de simulado e tempo de carregamento com uma página estática.",
+    "sourcePaths": [
+      "README.md",
+      "plugins/nateherk-design/skills/scroll-craft/SKILL.md",
+      "plugins/nateherk-design/skills/scroll-craft/engine/scrollcraft.js"
+    ],
+    "localPath": "scroll-craft",
+    "recipe": "python3 ops/referencias/grupos/instalar-ferramentas.py --dest ../levelup-referencias --only scroll-craft",
+    "fileHashes": {
+      ".agents/skills/scroll-craft/SKILL.md": "6e798bb51c3dcbe4f35f098dcdd3cdd20d08e538a33993bcae909c9fd0a500a1",
+      ".agents/skills/scroll-craft/engine/scrollcraft.js": "4a419b3ede51f64790af7b56c0195ea01c98a84df8e0e768ebf343956b922f39",
+      ".agents/skills/scroll-craft/engine/scrollcraft.css": "e19eb3aa73b0944626ca56e6e427c76f44753481e04d60f4bac20e8cf1d7758a",
+      ".agents/skills/scroll-craft/references/feel.md": "3951f1f0331f329dab14e8766edeecb6ce8e05437ea8986c48a074726bef41a0",
+      ".agents/skills/scroll-craft/references/taste.md": "f33c581024f466ab98612ae291aa46ccbc326875f8fa0918a3f45455a2c60e80",
+      ".agents/skills/scroll-craft/references/verify.md": "de645d648f738f3e19452083eadcc649cb8477058b6ad79ab4fa29198406150a",
+      ".agents/skills/scroll-craft/references/template.html": "4be3e8d772cf063ea5d1e695d6c39443920b2ff0e8491656013bebb87d098096",
+      ".agents/skills/scroll-craft/references/uniqueness.md": "0fd65a43624da868ca2027946bd4ce152605d6ea856eeae93b35721714c8b20e",
+      ".agents/skills/scroll-craft/references/approved-collection.md": "8a963a46af4c6ed40656fb5b21589629ee3ce30aa06a8b31c10bc132b74f2780",
+      ".agents/skills/scroll-craft/references/assets.md": "0cc3871ad903ccaf3bf769cf3a05a54a9326ed558ac3e45e57f19043ce70efa6",
+      ".agents/skills/scroll-craft/references/devices.md": "e5ae5a4f2924fc1b13177bf0b0ac10f04e686edd916dc33755ed1420a6a478f5",
+      ".agents/skills/scroll-craft/references/device-diag.html": "8ec61db711e3f74ec38a81f418a051a88d9574240f5bbde4716ed9f053775e59",
+      ".agents/skills/scroll-craft/references/hero-depth.md": "2426fb9703d4398b1e3b666b2db7f4b68e7cd41112da77700a7d63f2965dd726",
+      ".agents/skills/scroll-craft/references/worldflight.md": "451fead8f90604423b113cd0b0d3bfb6be1f7ca7a7b5ab9e2688ea3da762af4c",
+      ".agents/skills/scroll-craft/references/worlds.md": "dea3e4cc20c7245f87638a6d88eb2e3fc22a69dabc9f75f001dd97a3121077bd",
+      ".agents/skills/scroll-craft/templates/FINGERPRINTS.md": "8c1597e6b068bfa77086f847cf90b9e2ebeba3ec42f1e6cc522e222e2700da16",
+      "LICENSE.upstream": "dd471a27eca72488a53e6ea6fbe9392d81aa3f01e950e63fe328affb2ddfa6e3"
+    }
+  },
+  {
+    "repo": "anthropics/knowledge-work-plugins",
+    "sha": "e91a134584eb798bac7fb0379358006a2b63b965",
+    "license": "Apache-2.0",
+    "kind": "Coleção de perfis operacionais",
+    "status": "componente",
+    "component": "Suporte e Dados: ticket-triage, draft-response, validate-data",
+    "installation": "Três skills de texto oficiais instaladas em .agents/skills no laboratório. Sem instalar as conexões administrativas dos plugins.",
+    "verification": "Descoberta local confirmou as três identidades e descrições a partir dos manifests SKILL.md.",
+    "analysis": "A triagem classifica prioridade e encaminha o caso. O rascunho organiza a resposta e a validação de dados procura inconsistências. A classificação do modelo precisa de revisão quando envolve pagamento ou dados de aluno.",
+    "decision": "Usar em A1 para preparar tickets e explicar divergências agregadas. Financeiro e atendimento decidem repasses, reembolsos e envio da resposta.",
+    "sourcePaths": [
+      "README.md",
+      "customer-support/skills/ticket-triage/SKILL.md",
+      "customer-support/skills/draft-response/SKILL.md",
+      "data/skills/validate-data/SKILL.md"
+    ],
+    "localPath": "knowledge-work-plugins",
+    "recipe": "python3 ops/referencias/grupos/instalar-ferramentas.py --dest ../levelup-referencias --only knowledge-work-plugins",
+    "fileHashes": {
+      ".agents/skills/ticket-triage/SKILL.md": "d0e5e95443e358ad2a74811b196071d10807ca95aa20351ab5760feeecee1294",
+      ".agents/skills/draft-response/SKILL.md": "1a201228b75a98fc3b5d45090cb7443d50df204b2ee748bfc8970790a64f0026",
+      ".agents/skills/validate-data/SKILL.md": "1e424822043480375b80aef9416227b1c8083af749ca536568716265f79ca54b",
+      "LICENSE.upstream": "a6946284993aeec75c7d75906064b66210c46051e562077efb30eb6dcfe72e26"
+    }
+  },
+  {
+    "repo": "deepseek-ai/deepseek-harness",
+    "sha": "ca33fd6843b205e279c7ccb6cb73a472c78f5760",
+    "license": "MIT",
+    "kind": "Biblioteca TypeScript",
+    "status": "componente",
+    "component": "@deepseek-ai/dsh-timeout do código-fonte",
+    "installation": "Módulo upstream de prazos e cancelamento instalado isoladamente. Sem host de agentes, plugins, shell ou acesso a modelos.",
+    "verification": "Importada a biblioteca e observada a expiração de um prazo com motivo verificável.",
+    "analysis": "Timeouts têm causa explícita, sinal de cancelamento e limpeza do temporizador. O fornecedor classifica o harness completo como prévia sem auditoria de segurança.",
+    "decision": "Usar o padrão para interromper uma ferramenta lenta do Mentor e apresentar a fila de revisão existente quando o prazo terminar.",
+    "sourcePaths": [
+      "README.md",
+      "SAFETY.md",
+      "packages/util/timeout/src/index.ts",
+      "packages/util/timeout/tests/timeout.spec.ts"
+    ],
+    "localPath": "deepseek-harness",
+    "recipe": "python3 ops/referencias/grupos/instalar-ferramentas.py --dest ../levelup-referencias --only deepseek-harness",
+    "fileHashes": {
+      "src/index.ts": "cadc1aea5b85854f59ca68cee8b7d08c4ebdd378d1c8e081e0031423c262e6b1",
+      "LICENSE.upstream": "ebb4f09972aee8608be255debaf78451a68e95c290f55c240dec2ecfa16ea6be"
+    }
+  },
+  {
+    "repo": "n8n-io/n8n",
+    "sha": "7b7b4e0a1f53e5281bff207af64f4eeb4e77f0e4",
+    "license": "Sustainable Use License 1.0; recursos EE sob licença separada",
+    "kind": "CLI e biblioteca de workflows",
+    "status": "aplicativo",
+    "component": "n8n CLI 2.49.0 e n8n-workflow 2.49.0",
+    "installation": "Distribuição npm oficial em cli/ e biblioteca de fluxos instalada no laboratório. A instalação omitiu scripts de ciclo de vida e pacotes opcionais. Cron, webhooks, banco e servidor ficaram inativos.",
+    "verification": "n8n --version informou 2.49.0. safeParseWorkflowStructure aceitou uma lista de nós e rejeitou um campo nodes numérico.",
+    "analysis": "A biblioteca valida a forma dos fluxos de trabalho. Persistência, filas, retentativas e execução são funções distintas do serviço. A licença limita usos comerciais, sobretudo hospedar a ferramenta para terceiros.",
+    "decision": "Avaliar alertas internos de falha de geração e de conciliação. Pagamento e concessão de direitos permanecem no serviço determinístico; revisar licença antes de embutir ou revender.",
+    "sourcePaths": [
+      "README.md",
+      "LICENSE.md",
+      "packages/workflow/package.json",
+      "packages/workflow/src/workflow.ts",
+      "packages/cli/package.json"
+    ],
+    "localPath": "n8n",
+    "recipe": "python3 ops/referencias/grupos/instalar-ferramentas.py --dest ../levelup-referencias --only n8n",
+    "fileHashes": {
+      "node_modules/n8n-workflow/dist/cjs/index.js": "4a652e0c513c87b0a441eb4fa75fefbdfd22b556f6e27b932ac445307698a844",
+      "cli/node_modules/n8n/bin/n8n": "568052cd9b5c4d3799d0a19ffa6d2ce32eed72c60ba082b32640985d3503da23"
+    }
+  }
+]
