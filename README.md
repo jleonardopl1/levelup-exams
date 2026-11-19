@@ -29,6 +29,12 @@ Plataforma gamificada de estudos para concursos publicos, vestibulares e ENEM.
 - Convencoes permanentes: [`CLAUDE.md`](CLAUDE.md) · estado vivo: [`AGENTS-COLLAB.md`](AGENTS-COLLAB.md) · catalogo de agentes: [`AGENTS.md`](AGENTS.md)
 - Regras "sempre-seguir": [`rules/`](rules/) · contribuicao: [`CONTRIBUTING.md`](CONTRIBUTING.md)
 
+## Operação da LevelUp Exams
+
+- Consulte as atribuições das dez áreas e dos 69 especialistas no [organograma](docs/ORGANOGRAMA_OPERACIONAL.md). Para usar um perfil localmente, veja o [guia dos agentes](ops/agentes/README.md).
+- Consulte o que foi instalado e testado em cada um dos 32 repositórios no [inventário das referências](docs/ANALISE_DAS_REFERENCIAS.md).
+- A campanha do primeiro simulado, as metas de aquisição e o piloto de Pix por um segundo provedor estão no [relatório de crescimento e pagamentos](docs/CRESCIMENTO_E_PAGAMENTOS.md).
+
 ## Setup Local
 
 ### Pre-requisitos

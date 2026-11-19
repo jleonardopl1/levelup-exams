@@ -1,0 +1,276 @@
+[
+  {
+    "repo": "HKUDS/DeepTutor",
+    "sha": "4c1e000d8563c5ac3b231baaaf149dc4dc4d2406",
+    "license": "Apache-2.0",
+    "kind": "Tutor adaptativo em Python",
+    "status": "componente",
+    "component": "Agendador de revisão espaçada e cálculo de domínio por tópico.",
+    "installation": "O pacote de aprendizagem do commit fixado foi disponibilizado por um arquivo .pth em um ambiente Python dedicado. O ambiente recebeu Pydantic 2.12.5 e pytest 8.4.2. O sistema completo de tutoria, o RAG e os modelos de linguagem ficaram fora da instalação.",
+    "verification": "43 testes oficiais do agendador passaram em CPU. Um teste adicional confirmou domínio de 0%, 50%, 80% e 100% após zero, um, dois e três acertos consecutivos.",
+    "analysis": "O agendador diferencia memória, conceitos, procedimentos e design. Duas respostas certas na mesma sessão não estendem duas vezes a revisão. O cálculo de domínio pondera as cinco tentativas mais recentes e limita a confiança nas duas primeiras. O LevelUp já implementa parte dessa política em src/lib/mastery.ts.",
+    "decision": "Comparar em uma amostra de tentativas o agendador atual e o de estabilidade. Medir acerto na revisão após sete dias e revisões concluídas por aluno antes de alterar a agenda em produção.",
+    "sourcePaths": [
+      "README.md",
+      "LICENSE",
+      "deeptutor/learning/scheduler.py",
+      "deeptutor/learning/mastery.py",
+      "deeptutor/learning/models.py",
+      "deeptutor/learning/tests/test_scheduler.py"
+    ],
+    "localPath": "deeptutor",
+    "checkoutPaths": [
+      "README.md",
+      "LICENSE",
+      "pyproject.toml",
+      "deeptutor/__init__.py",
+      "deeptutor/learning/"
+    ],
+    "recipe": "python3 ops/referencias/grupos/instalar_produto.py --dest ../levelup-referencias --repo HKUDS/DeepTutor"
+  },
+  {
+    "repo": "mattpocock/skills",
+    "sha": "5863806dd4e15c63174bee4e7515a4256792ecfa",
+    "license": "MIT",
+    "kind": "Coleção de habilidades para agentes",
+    "status": "componente",
+    "component": "Habilidades teach, grill-me e grilling para ensino guiado e revisão de decisões.",
+    "installation": "As três habilidades, seus arquivos auxiliares e a licença foram copiados para instalado/.agents/skills no laboratório. O perfil global e a configuração do aplicativo ficaram fora da instalação.",
+    "verification": "Os nomes de ativação de três SKILL.md e as referências locais de formatos de ensino foram verificados no destino. Avaliação por um modelo e conversa com aluno ficam para o piloto.",
+    "analysis": "teach estrutura objetivo, materiais e registros de aprendizagem. grill-me encaminha para grilling, uma entrevista para avaliar escolhas. O Mentor do LevelUp já oferece modo socrático. A entrevista intensa de revisão de decisões exige adaptação de tom antes de atender alunos.",
+    "decision": "Testar no Mentor uma dica progressiva e uma pergunta de recuperação após erro, usando questões autorizadas. Medir segundo acerto independente e abandono da conversa. Manter registros individuais sob os controles do produto.",
+    "sourcePaths": [
+      "README.md",
+      "LICENSE",
+      "skills/productivity/teach/SKILL.md",
+      "skills/productivity/teach/LEARNING-RECORD-FORMAT.md",
+      "skills/productivity/grill-me/SKILL.md",
+      "skills/productivity/grilling/SKILL.md"
+    ],
+    "localPath": "mattpocock-skills",
+    "checkoutPaths": [
+      "README.md",
+      "LICENSE",
+      "skills/productivity/teach/",
+      "skills/productivity/grill-me/",
+      "skills/productivity/grilling/",
+      "docs/productivity/teach.md"
+    ],
+    "recipe": "python3 ops/referencias/grupos/instalar_produto.py --dest ../levelup-referencias --repo mattpocock/skills"
+  },
+  {
+    "repo": "debpalash/VoiceStudio",
+    "sha": "11becfa75d9d641aa0954aefc1a305ab76704b92",
+    "license": "AGPL-3.0-only para o software. Os pesos e os recursos de terceiros têm condições próprias.",
+    "kind": "Aplicativo de voz e cliente de linha de comando",
+    "status": "componente",
+    "component": "CLI oficial e normalizador de português usado antes da síntese de fala.",
+    "installation": "A CLI oficial foi construída do diretório cli/ e instalada em um ambiente Python próprio. O normalizador e o catálogo de variantes foram disponibilizados nesse ambiente com num2words 0.5.14. O aplicativo desktop, o servidor de inferência e os pesos ficaram fora do teste.",
+    "verification": "A CLI 0.5.9b6 carregou a ajuda local. Os 28 casos em português das duas tabelas oficiais de normalização verificaram a saída e a idempotência, incluindo horários, preços, decimais e preservação de códigos. O teste verificou texto, sem gerar áudio.",
+    "analysis": "A CLI opera um backend separado. O pré-processador distingue pt-BR e pt-PT e prepara a leitura de números. O LevelUp já usa a Web Speech API em src/lib/speech.ts. A AGPL e os termos dos modelos precisam ser considerados em qualquer serviço modificado exposto a usuários.",
+    "decision": "Usar o laboratório para avaliar a leitura de valores, datas e referências de leis em português. Publicar áudios autorais em uma amostra de questões só depois de medir inteligibilidade e conclusão em dispositivos móveis.",
+    "sourcePaths": [
+      "README.md",
+      "LICENSE",
+      "LICENSE-NOTICE.md",
+      "cli/pyproject.toml",
+      "cli/hatch_build.py",
+      "cli/voicestudio_cli/__main__.py",
+      "backend/services/text_normalization.py",
+      "backend/core/language_variants.py",
+      "tests/test_text_normalization.py"
+    ],
+    "localPath": "voicestudio",
+    "checkoutPaths": [
+      "README.md",
+      "LICENSE",
+      "LICENSE-NOTICE.md",
+      "cli/",
+      "package.json",
+      "backend/services/text_normalization.py",
+      "backend/core/language_variants.py",
+      "tests/test_text_normalization.py"
+    ],
+    "recipe": "python3 ops/referencias/grupos/instalar_produto.py --dest ../levelup-referencias --repo debpalash/VoiceStudio"
+  },
+  {
+    "repo": "nilbuild/developer-roadmap",
+    "sha": "16ea08c3b308bb3e60881acad04071232489c2b2",
+    "license": "Licença própria. Uso pessoal. Compartilhamento de links permitido.",
+    "kind": "Mapas de competências e scripts editoriais",
+    "status": "nao_instalado",
+    "component": "Modelo de organização de tópicos, recursos e progresso.",
+    "installation": "O checkout do laboratório serviu para inspeção. A receita registra apenas o link do commit em referencia.url. A licença restringe o material a uso pessoal e permite compartilhar links.",
+    "verification": "A licença, o README, o modelo de tópicos e os documentos de sincronização foram lidos no commit indicado. A receita verificou o registro do endereço. Nenhum serviço de sincronização foi acionado.",
+    "analysis": "O modelo usa roadmapSlug, nodeId e recursos tipados. O fluxo de sincronização pressupõe um banco externo. A LevelUp pode estruturar material próprio por edital e acompanhar teoria e revisão com o recurso já existente.",
+    "decision": "Vincular o site oficial como leitura externa quando houver aderência. Para as páginas públicas por concurso, escrever a sequência de estudo com base no edital oficial e em questões próprias.",
+    "sourcePaths": [
+      "readme.md",
+      "license",
+      "scripts/readme.md",
+      "scripts/lib/official-roadmap-topic.ts"
+    ],
+    "localPath": "developer-roadmap",
+    "checkoutPaths": [],
+    "recipe": "python3 ops/referencias/grupos/instalar_produto.py --dest ../levelup-referencias --repo nilbuild/developer-roadmap"
+  },
+  {
+    "repo": "jwasham/coding-interview-university",
+    "sha": "2399df2f688ba9fafe11c399cc067d7270921bb1",
+    "license": "CC-BY-SA-4.0 para a compilação. Fontes externas têm termos próprios.",
+    "kind": "Roteiro de estudo em Markdown",
+    "status": "conteudo",
+    "component": "Plano de estudo e checklist em português para disciplinas de informática.",
+    "installation": "O README, a tradução brasileira, a bibliografia de programação e a licença estão disponíveis para consulta local no checkout fixado.",
+    "verification": "A tradução abriu em UTF-8. A verificação encontrou 719 linhas com caixas de seleção. O arquivo de materiais por linguagem também está presente.",
+    "analysis": "O roteiro combina planejamento por assunto com recursos para praticar algoritmos e estruturas de dados. O objetivo original é a entrevista de programação. A seleção editorial precisa relacionar cada assunto ao edital brasileiro.",
+    "decision": "Experimentar uma checklist autoral de sete dias para um concurso de TI. Na página aberta, vincular o material de origem e oferecer um simulado diagnóstico. Acompanhar cadastro e primeiro simulado concluído.",
+    "sourcePaths": [
+      "README.md",
+      "LICENSE.txt",
+      "translations/README-ptbr.md",
+      "programming-language-resources.md"
+    ],
+    "localPath": "coding-interview-university",
+    "checkoutPaths": [
+      "README.md",
+      "LICENSE.txt",
+      "translations/README-ptbr.md",
+      "programming-language-resources.md"
+    ],
+    "recipe": "python3 ops/referencias/grupos/instalar_produto.py --dest ../levelup-referencias --repo jwasham/coding-interview-university"
+  },
+  {
+    "repo": "donnemartin/system-design-primer",
+    "sha": "ae9bbd7b02d90b9866215de185217d33f39ab733",
+    "license": "CC-BY-4.0 para o material do repositório.",
+    "kind": "Guia de arquitetura e baralhos do Anki",
+    "status": "conteudo",
+    "component": "Três baralhos Anki para estudo do formato e revisão espaçada.",
+    "installation": "O guia, a licença e três arquivos .apkg do autor estão disponíveis para consulta local. Os pacotes foram abertos como arquivos ZIP e os bancos internos foram lidos em memória.",
+    "verification": "As tabelas cards foram consultadas por SQLite. System Design contém 42 cartões, System Design Exercises contém 8 e OO Design contém 6, totalizando 56.",
+    "analysis": "Os baralhos exemplificam como transformar um conceito ou exercício em cartão. O material tem foco em arquitetura de software e entrevistas. A exportação de revisão para outras disciplinas exige adaptação editorial e controle do que o aluno pode ver.",
+    "decision": "Prototipar a exportação de flashcards autorais para o caderno de erros após a correção. Testar abertura no Anki e o retorno à plataforma na semana seguinte.",
+    "sourcePaths": [
+      "README.md",
+      "LICENSE.txt",
+      "resources/flash_cards/System Design.apkg",
+      "resources/flash_cards/System Design Exercises.apkg",
+      "resources/flash_cards/OO Design.apkg"
+    ],
+    "localPath": "system-design-primer",
+    "checkoutPaths": [
+      "README.md",
+      "LICENSE.txt",
+      "resources/flash_cards/"
+    ],
+    "recipe": "python3 ops/referencias/grupos/instalar_produto.py --dest ../levelup-referencias --repo donnemartin/system-design-primer"
+  },
+  {
+    "repo": "freeCodeCamp/freeCodeCamp",
+    "sha": "a996e0d9eaef1bde5636d67a88ea65123f661ca5",
+    "license": "BSD-3-Clause para o software. O currículo em /curriculum tem copyright separado do freeCodeCamp.",
+    "kind": "Plataforma de cursos, currículo e provas",
+    "status": "componente",
+    "component": "Módulo TypeScript de montagem, embaralhamento e correção de exames.",
+    "installation": "O utilitário oficial exam.ts e seu embaralhador foram compilados com esbuild 0.25.12 em um bundle CommonJS de Node. A licença foi copiada ao lado do bundle. A instalação do cliente, banco e currículo do monorepo ficou fora deste ensaio.",
+    "verification": "Em uma prova sintética, o módulo excluiu a questão e a alternativa descontinuadas, retornou cinco alternativas sem marcador de gabarito, atribuiu 100% ao acerto e 0% ao erro e rejeitou um ID de questão inexistente.",
+    "analysis": "A montagem escolhe uma resposta correta e até quatro distratores ativos. A fórmula de aprovação usa percentual com uma casa decimal. O LevelUp já corrige respostas no servidor e atende bancas com números e formatos diferentes de alternativas.",
+    "decision": "Reaproveitar os casos de teste para simulados com alternativas desativadas, insuficientes ou formatos por banca. Preservar a correção no servidor. Produzir enunciados próprios para os diagnósticos públicos.",
+    "sourcePaths": [
+      "README.md",
+      "LICENSE.md",
+      "api/src/utils/exam.ts",
+      "api/src/utils/exam.test.ts",
+      "packages/shared/src/utils/shuffle-array.ts"
+    ],
+    "localPath": "freecodecamp",
+    "checkoutPaths": [
+      "README.md",
+      "LICENSE.md",
+      "api/src/utils/exam.ts",
+      "api/src/utils/exam-types.ts",
+      "api/src/utils/exam.test.ts",
+      "packages/shared/src/utils/shuffle-array.ts"
+    ],
+    "recipe": "python3 ops/referencias/grupos/instalar_produto.py --dest ../levelup-referencias --repo freeCodeCamp/freeCodeCamp"
+  },
+  {
+    "repo": "practical-tutorials/project-based-learning",
+    "sha": "f99ea242247b9b6df9bd277f832fa5a8f1da28e1",
+    "license": "MIT para o índice. Cada tutorial externo mantém a licença do autor.",
+    "kind": "Catálogo de projetos e validador editorial",
+    "status": "conteudo",
+    "component": "Índice por linguagem de programação e linter de contribuições.",
+    "installation": "O catálogo, as instruções de contribuição, a licença e o validador foram instalados para leitura local. O comando lint do repositório foi executado sobre o catálogo.",
+    "verification": "O linter contou 457 entradas, 458 URLs e 23 seções. Reportou zero erros, zero avisos e 52 registros informativos de HTTP. A disponibilidade atual das URLs externas não foi verificada.",
+    "analysis": "O catálogo organiza exercícios práticos por linguagem e separa a validação de estrutura da verificação de links. O modelo atende trilhas técnicas e cursos parceiros. A maioria das disciplinas de concurso exige outro tipo de atividade.",
+    "decision": "Pilotar um desafio autoral de lógica para o público de TI, com rubrica curta e encaminhamento a um simulado relacionado. Vincular tutoriais externos depois de conferir atualidade e direitos.",
+    "sourcePaths": [
+      "README.md",
+      "LICENSE.md",
+      "CONTRIBUTING.md",
+      "scripts/check_readme.py",
+      "scripts/lint-allow-duplicates.txt"
+    ],
+    "localPath": "project-based-learning",
+    "checkoutPaths": [
+      "README.md",
+      "LICENSE.md",
+      "CONTRIBUTING.md",
+      "scripts/check_readme.py",
+      "scripts/lint-allow-duplicates.txt"
+    ],
+    "recipe": "python3 ops/referencias/grupos/instalar_produto.py --dest ../levelup-referencias --repo practical-tutorials/project-based-learning"
+  },
+  {
+    "repo": "codecrafters-io/build-your-own-x",
+    "sha": "ebae1430d28d52dbe12e189ffc7507e08d8c62ca",
+    "license": "Sem licença explícita no commit consultado. Tutoriais externos seguem os termos de cada autor.",
+    "kind": "Índice público de tutoriais",
+    "status": "conteudo",
+    "component": "Consulta local de categorias de projetos construídos do zero.",
+    "installation": "O README e o formulário de contribuição foram obtidos no checkout do laboratório para consulta técnica. A receita mantém o conteúdo no diretório de fontes. Os projetos externos ficaram fora da instalação.",
+    "verification": "A leitura local identificou 30 cabeçalhos de categorias de tutoriais. O modelo de contribuição especifica título, linguagem, URL e categoria. A árvore do commit foi conferida quanto à presença de licença.",
+    "analysis": "A organização por artefato como banco de dados, CLI e servidor ajuda o editor a selecionar desafios por habilidade. A ausência de licença explícita impede presumir permissão para republicar o catálogo comercialmente.",
+    "decision": "Oferecer links diretos para materiais selecionados e publicar desafios, descrições e rubricas próprios. Priorizar apenas temas previstos no edital de TI escolhido.",
+    "sourcePaths": [
+      "README.md",
+      "ISSUE_TEMPLATE.md"
+    ],
+    "localPath": "build-your-own-x",
+    "checkoutPaths": [
+      "README.md",
+      "ISSUE_TEMPLATE.md"
+    ],
+    "recipe": "python3 ops/referencias/grupos/instalar_produto.py --dest ../levelup-referencias --repo codecrafters-io/build-your-own-x"
+  },
+  {
+    "repo": "EbookFoundation/free-programming-books",
+    "sha": "10e33dd516cc53864e6bece7e6bd51f2a035d06c",
+    "license": "CC-BY-4.0 para a compilação. Cada curso e livro tem termos próprios.",
+    "kind": "Índices de livros e cursos gratuitos",
+    "status": "conteudo",
+    "component": "Índices brasileiros de livros e cursos, com orientações de curadoria.",
+    "installation": "Os dois índices em português, o guia de contribuição, a apresentação e a licença foram instalados para leitura local. Os livros e vídeos permanecem nos sites dos autores.",
+    "verification": "A verificação contou 180 entradas com links HTTP(S) em livros e 318 em cursos nas listas brasileiras. Os catálogos foram lidos localmente. A disponibilidade e a atualização de cada obra dependem do site de origem.",
+    "analysis": "A taxonomia já atende áreas de TI em português, como bancos de dados, Git e lógica. Gratuidade de leitura e licença para redistribuição são propriedades independentes de cada obra.",
+    "decision": "Publicar uma página por edital de TI com cinco leituras externas conferidas, relevância explicada e uma questão autoral para começar. Acompanhar acesso orgânico, cadastro e primeiro simulado concluído.",
+    "sourcePaths": [
+      "README.md",
+      "LICENSE",
+      "books/free-programming-books-pt_BR.md",
+      "courses/free-courses-pt_BR.md",
+      "docs/HOWTO-pt_BR.md"
+    ],
+    "localPath": "free-programming-books",
+    "checkoutPaths": [
+      "README.md",
+      "LICENSE",
+      "books/free-programming-books-pt_BR.md",
+      "courses/free-courses-pt_BR.md",
+      "docs/HOWTO-pt_BR.md"
+    ],
+    "recipe": "python3 ops/referencias/grupos/instalar_produto.py --dest ../levelup-referencias --repo EbookFoundation/free-programming-books"
+  }
+]

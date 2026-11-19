@@ -1,0 +1,389 @@
+[
+  {
+    "repo": "affaan-m/ECC",
+    "sha": "3f14a103a8694e51c1df9a806217a6d0b5f7a6f7",
+    "license": "MIT",
+    "kind": "skills de desenvolvimento",
+    "status": "componente",
+    "component": "Perfil local de TDD e desenho de APIs",
+    "installation": "Perfil .claude/skills com tdd-workflow e api-design, acompanhado da licença. Cada arquivo foi obtido na revisão fixada.",
+    "verification": "Perfil descobre tdd-workflow pelo nome e descrição. Perfil descobre api-design pelo nome e descrição.",
+    "analysis": "tdd-workflow parte de critérios de aceite e preserva a separação entre plano e instruções. api-design orienta contratos, paginação e erros. As habilidades podem ser usadas sem o pacote de hooks do projeto.",
+    "decision": "Aplicar o roteiro de testes ao webhook e à paginação de cobranças e revisar os contratos do segundo provedor com a engenharia. A meta de cobertura do upstream é indicativa; o projeto mede os cenários financeiros críticos.",
+    "sourcePaths": [
+      "README.md",
+      "skills/tdd-workflow/SKILL.md",
+      "skills/api-design/SKILL.md",
+      "LICENSE"
+    ],
+    "localPath": "ecc",
+    "recipe": {
+      "type": "skills",
+      "skills": [
+        "skills/tdd-workflow/SKILL.md",
+        "skills/api-design/SKILL.md"
+      ],
+      "files": [
+        "LICENSE"
+      ],
+      "sourceSha256": {
+        "LICENSE": "326146379f01bb137c0a5d3c54770c1aa31076705c8b88a7f6b26a460f6221b2",
+        "skills/tdd-workflow/SKILL.md": "32cadd702f7430e87a626c1e9f4044b11b288ed41588c625f0c3e2a73fea15ce",
+        "skills/api-design/SKILL.md": "250e464413a13c0eb93cc73447b423df1f9aa8e4f80e5e68c41f895b2c33e352"
+      }
+    },
+    "recipeCommand": "python3 ops/referencias/grupos/instalar_governanca.py --dest ../levelup-referencias --only affaan-m/ECC",
+    "receiptPath": "ecc/recibo.json"
+  },
+  {
+    "repo": "cloudflare/security-audit-skill",
+    "sha": "c1c8a8c1471069fb0e188eeaff69b8e8db6564a8",
+    "license": "MIT",
+    "kind": "metodologia externa de auditoria",
+    "status": "nao_instalado",
+    "component": "Referência metodológica; sem instalação operacional",
+    "installation": "Avaliado apenas pelo escopo e pelos metadados públicos. Sem cópia, instalação ou conexão.",
+    "verification": "Identidade, revisão e licença do projeto confirmadas no GitHub. Nenhum fluxo do projeto executado.",
+    "analysis": "O projeto organiza classificação, revisão independente e registro de evidências por achado. O LevelUp já atribui a verificação das mudanças ao security-reviewer. As etapas operacionais externas excedem a necessidade desta integração.",
+    "decision": "Manter o revisor defensivo local para examinar autorização do aluno, isolamento de turmas e logs do Mentor por revisão de código.",
+    "sourcePaths": [
+      "README.md",
+      "LICENSE"
+    ],
+    "localPath": null,
+    "levelUpEvidence": [
+      ".claude/agents/security-reviewer.md",
+      "supabase/functions/ai-mentor/prompt.ts",
+      "supabase/functions/ai-mentor/prompt.test.ts"
+    ]
+  },
+  {
+    "repo": "elementalsouls/Claude-BugHunter",
+    "sha": "5d91c812ee25efc0c1d5191377632e3aed7e8d2d",
+    "license": "MIT",
+    "kind": "conjunto de red team",
+    "status": "nao_instalado",
+    "component": "Análise de finalidade, sem instalação",
+    "installation": "Avaliado apenas pelo escopo e pelos metadados públicos. Sem cópia, instalação ou conexão.",
+    "verification": "Identidade, revisão e licença do projeto confirmadas no GitHub. Nenhum fluxo do projeto executado.",
+    "analysis": "Conjunto concebido para bug bounty e red team. O componente relevante para a governança é exigir evidência e separar falso positivo de defeito confirmado. O produto educacional já possui verificações de regressão e revisão independente.",
+    "decision": "Usar security-reviewer e tester com fixtures sintéticas para verificar autorização e deduplicação no próprio código.",
+    "sourcePaths": [
+      "README.md",
+      "LICENSE"
+    ],
+    "localPath": null,
+    "levelUpEvidence": [
+      ".claude/agents/security-reviewer.md",
+      ".claude/agents/tester.md",
+      "supabase/functions/stripe-webhook/index.ts"
+    ]
+  },
+  {
+    "repo": "obra/superpowers",
+    "sha": "22f0b463e7a5e579904dd6211a520321035526f7",
+    "license": "MIT",
+    "kind": "skills de engenharia",
+    "status": "componente",
+    "component": "TDD e evidência de conclusão",
+    "installation": "Perfil .claude/skills com test-driven-development, o material auxiliar writing-good-tests.md, verification-before-completion e a licença.",
+    "verification": "Perfil descobre test-driven-development pelo nome e descrição. Perfil descobre verification-before-completion pelo nome e descrição.",
+    "analysis": "O ciclo falha/correção/refatoração exige demonstrar uma regressão previamente e verificar o resultado final. O material auxiliar de qualidade de testes acompanha a habilidade e pode ser descoberto no próprio diretório.",
+    "decision": "Usar como roteiro para estorno parcial, liquidação tardia do Pix e devolução ao aluno da fila de revisão; preservar o portão de CI existente.",
+    "sourcePaths": [
+      "README.md",
+      "skills/test-driven-development/SKILL.md",
+      "skills/test-driven-development/writing-good-tests.md",
+      "skills/verification-before-completion/SKILL.md",
+      "LICENSE"
+    ],
+    "localPath": "superpowers",
+    "recipe": {
+      "type": "skills",
+      "skills": [
+        "skills/test-driven-development/SKILL.md",
+        "skills/test-driven-development/writing-good-tests.md",
+        "skills/verification-before-completion/SKILL.md"
+      ],
+      "files": [
+        "LICENSE"
+      ],
+      "sourceSha256": {
+        "LICENSE": "a37e0e9697144819e1d965176ac4ae5bc3fa02d11e7812036bbcadf6dafe2400",
+        "skills/test-driven-development/SKILL.md": "64b03fce4aee5a97a93160cea8111f3ba13a17b7c001db4bd5836d67fd10705d",
+        "skills/test-driven-development/writing-good-tests.md": "51471c853306ff92ca8bb41dcaea05f31c0e46b03651f8f3c99754b7172f4ae1",
+        "skills/verification-before-completion/SKILL.md": "2befe7fc55bcadaa3d97dd9e8efeb633d2561c0ebe74c5a8b17c4d9e7e4520b3"
+      }
+    },
+    "recipeCommand": "python3 ops/referencias/grupos/instalar_governanca.py --dest ../levelup-referencias --only obra/superpowers",
+    "receiptPath": "superpowers/recibo.json"
+  },
+  {
+    "repo": "backnotprop/plannotator",
+    "sha": "969084882013ac7634283ebca06f3118e766d30d",
+    "license": "MIT OR Apache-2.0",
+    "kind": "aplicativo de revisão",
+    "status": "aplicativo",
+    "component": "CLI local de anotação de planos Markdown",
+    "installation": "Executável independente Linux x86-64 de v0.28.67 em bin/plannotator. SHA-256 do arquivo compactado, do executável e das duas licenças conferidos.",
+    "verification": "plannotator 0.28.67 Guia e diff sintéticos exportados em HTML com viewer local.",
+    "analysis": "O revisor permite percorrer um plano e reunir observações antes da implementação; o lançador de fonte usa Bun. A release distribui um executável independente. Compartilhamento e agentes conectados são recursos opcionais.",
+    "decision": "Usar no planejamento local do segundo provedor e do piloto do Mentor com material sintético; contratos e dados de pagamento ficam no ambiente autorizado.",
+    "sourcePaths": [
+      "README.md",
+      "apps/hook/README.md",
+      "apps/hook/server/annotate-command.ts",
+      "package.json",
+      "LICENSE-APACHE",
+      "LICENSE-MIT"
+    ],
+    "localPath": "plannotator",
+    "recipe": {
+      "type": "release",
+      "tag": "v0.28.67",
+      "asset": "plannotator-linux-x64.gz",
+      "downloadSha256": "1636387dbbf90f769eb0eecbbf28d5bf7b390abac8b71905845e7496cab03a3e",
+      "binarySha256": "39335905cd9539442d7ae83094a464c7969ee55628bb89105016e497f7e687eb",
+      "version": "0.28.67",
+      "files": [
+        "LICENSE-APACHE",
+        "LICENSE-MIT"
+      ],
+      "sourceSha256": {
+        "LICENSE-APACHE": "b96752709405e4b4eefda5514d01941a25d78230bddd891523279fed63eed5e0",
+        "LICENSE-MIT": "4307b84eae31b7ee1436003da418390ba69a4d016195cbfc451a1e8ef9e923c0"
+      }
+    },
+    "reviewedHead": "6fb447947c953258f737873238615d7447495a83",
+    "recipeCommand": "python3 ops/referencias/grupos/instalar_governanca.py --dest ../levelup-referencias --only backnotprop/plannotator",
+    "receiptPath": "plannotator/recibo.json"
+  },
+  {
+    "repo": "vercel-labs/agent-browser",
+    "sha": "1cc19526f3641c8543d55aa6700e7c55b37ac356",
+    "license": "Apache-2.0",
+    "kind": "automação de navegador",
+    "status": "aplicativo",
+    "component": "CLI Linux do navegador para testes com páginas locais",
+    "installation": "Executável independente Linux x86-64 v0.43.0 em bin/agent-browser com sua licença. SHA-256 do binário conferido.",
+    "verification": "O CLI informou agent-browser 0.43.0. Chromium do sistema, em contêiner descartável com sessão temporária e acesso limitado a 127.0.0.1, abriu a página sintética e identificou o botão “Iniciar simulado” na árvore acessível. O Chromium deste contêiner precisou do isolamento externo porque seu helper SUID pertence a nobody. Para repetir em máquina com sandbox do Chromium funcional, acrescente --chromium /usr/bin/chromium.",
+    "analysis": "O executável controla Chromium e expõe uma representação da árvore acessível. O frontend de npm também usa o binário nativo da plataforma. A fixture local permite medir se o aluno encontra a chamada para iniciar um simulado sem usar dados de conta.",
+    "decision": "Ensaiar em homologação a navegação da página pública, o cadastro, a continuidade do simulado e o retorno após checkout com usuários de teste.",
+    "sourcePaths": [
+      "README.md",
+      "package.json",
+      "bin/agent-browser.js",
+      "cli/src/native/snapshot.rs",
+      "LICENSE"
+    ],
+    "localPath": "agent-browser",
+    "recipe": {
+      "type": "release",
+      "tag": "v0.43.0",
+      "asset": "agent-browser-linux-x64",
+      "downloadSha256": "8e69c9fb662514c9cf36e4911e94e913742ba066e55102486350e049dd847612",
+      "binarySha256": "8e69c9fb662514c9cf36e4911e94e913742ba066e55102486350e049dd847612",
+      "version": "0.43.0",
+      "files": [
+        "LICENSE"
+      ],
+      "sourceSha256": {
+        "LICENSE": "014bb31e83d5c2e76aea1cc6e82217346ab41362f32cb355ad0f5c10aa0aeaff"
+      }
+    },
+    "reviewedHead": "f85ed4d620c53ace7733a3b7eeef51e5f2532c83",
+    "recipeCommand": "python3 ops/referencias/grupos/instalar_governanca.py --dest ../levelup-referencias --only vercel-labs/agent-browser --chromium /usr/bin/chromium",
+    "receiptPath": "agent-browser/recibo.json"
+  },
+  {
+    "repo": "morluto/rea",
+    "sha": "9bd17e8673debe9acad0e83284003a4981d55acb",
+    "license": "MIT",
+    "kind": "engenharia reversa assistida",
+    "status": "nao_instalado",
+    "component": "Análise de finalidade, sem instalação",
+    "installation": "Avaliado apenas pelo escopo e pelos metadados públicos. Sem cópia, instalação ou conexão.",
+    "verification": "Identidade, revisão e licença do projeto confirmadas no GitHub. Nenhum fluxo do projeto executado.",
+    "analysis": "O escopo declarado vai do comportamento de aplicativos a binários nativos. A exploração de um binário de terceiros não é uma dependência do checkout nem da aprendizagem do LevelUp.",
+    "decision": "Revisar os fluxos próprios pelo código-fonte, pelas instruções públicas dos provedores e por testes de contrato em homologação.",
+    "sourcePaths": [
+      "README.md",
+      "LICENSE"
+    ],
+    "localPath": null,
+    "levelUpEvidence": [
+      ".claude/agents/pagamentos.md",
+      "supabase/functions/_shared/stripe.ts",
+      "supabase/functions/stripe-webhook/index.ts"
+    ]
+  },
+  {
+    "repo": "AgriciDaniel/claude-seo",
+    "sha": "468ed5b0d9e3249394783710e54abb02837e326b",
+    "license": "MIT",
+    "kind": "ferramentas de SEO",
+    "status": "componente",
+    "component": "Gerador local de JSON-LD, templates e referências de schema",
+    "installation": "Gerador de JSON-LD, coleção de templates, notas sobre tipos depreciados e licença materializados em perfil local, com SHA-256 fixado.",
+    "verification": "Gerador executado com perfil fictício; ProfilePage, mainEntity.name e coleção de templates validados.",
+    "analysis": "schema_generate.py gera objetos de perfil, discussão e pedido com a biblioteca padrão do Python. As referências de schema distinguem marcação válida de elegibilidade a recursos de busca. O perfil instalado pode ser usado sem extensões externas ou credenciais.",
+    "decision": "Revisar títulos, descrições e dados estruturados da página pública de concurso; validar os fatos e as URLs antes de publicar e medir visitas que resultam em estudo.",
+    "sourcePaths": [
+      "README.md",
+      "scripts/schema_generate.py",
+      "schema/templates.json",
+      "skills/seo-schema/references/deprecated-types-2024-2026.md",
+      "LICENSE"
+    ],
+    "localPath": "claude-seo",
+    "recipe": {
+      "type": "schema",
+      "files": [
+        "LICENSE",
+        "scripts/schema_generate.py",
+        "schema/templates.json",
+        "skills/seo-schema/references/deprecated-types-2024-2026.md"
+      ],
+      "sourceSha256": {
+        "LICENSE": "a42b3b0253cecea9af810c5207a67b0be8c9a0cfbf52b9302c3d26b063e7a86b",
+        "scripts/schema_generate.py": "355c1d79378e99b603e3a9909d02197943b28f2b353043a32258f7b1b8c51995",
+        "schema/templates.json": "4bb417070cd51d0a5d91d54cda1af52bd88742bd868adfe2654e088d07fdda13",
+        "skills/seo-schema/references/deprecated-types-2024-2026.md": "2a47cfa1119322e3a88b19e3275068d2ea41fe95b7bda03a3a6aff5af86d63b1"
+      }
+    },
+    "recipeCommand": "python3 ops/referencias/grupos/instalar_governanca.py --dest ../levelup-referencias --only AgriciDaniel/claude-seo",
+    "receiptPath": "claude-seo/recibo.json"
+  },
+  {
+    "repo": "public-apis/public-apis",
+    "sha": "d6dab92da95c003e82e5b32c623bd2ad9d6a017f",
+    "license": "MIT",
+    "kind": "coleção de referência",
+    "status": "conteudo",
+    "component": "Índice seletivo de serviços públicos",
+    "installation": "Extraída a seção Geocoding em SECAO.md com atribuição, revisão, link permanente e licença do catálogo.",
+    "verification": "Texto original e recorte conferidos por SHA-256. A seção usa o título Geocoding e contém a entrada IBGE.",
+    "analysis": "O catálogo registra documentação, autenticação e cobertura por API. O IBGE é um candidato para normalizar municípios. A presença na lista não valida disponibilidade, licença de reuso ou edital de um concurso.",
+    "decision": "Consultar diretamente o órgão responsável e registrar URL e data no Radar antes de exibir dados ao aluno.",
+    "sourcePaths": [
+      "README.md",
+      "LICENSE"
+    ],
+    "localPath": "public-apis",
+    "recipe": {
+      "type": "section",
+      "files": [
+        "LICENSE"
+      ],
+      "source": "README.md",
+      "heading": "### Geocoding",
+      "marker": "IBGE",
+      "sourceSha256": {
+        "LICENSE": "07704fa08e479d81930b0ad53c7c1d634c766736d27f725044949f982c1c9447",
+        "README.md": "dbbb7fbe3ffaa3566eca9aed0156bf1551ac623c10e868b38715304744f0c45a"
+      },
+      "sectionSha256": "162aaee6826de0bec4e8f36fa94e30b3282a612cc5818b8348e8442e4b164285"
+    },
+    "recipeCommand": "python3 ops/referencias/grupos/instalar_governanca.py --dest ../levelup-referencias --only public-apis/public-apis",
+    "receiptPath": "public-apis/recibo.json"
+  },
+  {
+    "repo": "awesome-selfhosted/awesome-selfhosted",
+    "sha": "2a8926e0ac5014de75c00472319cdd6cb6a1f95d",
+    "license": "CC-BY-SA-3.0",
+    "kind": "coleção de referência",
+    "status": "conteudo",
+    "component": "Seção sobre plataformas de aprendizagem",
+    "installation": "Extraída a seção Learning and Courses em SECAO.md com atribuição, revisão, link permanente e licença do catálogo.",
+    "verification": "Texto original e recorte conferidos por SHA-256. A seção usa o título Learning and Courses e contém a entrada Moodle.",
+    "analysis": "A lista diferencia plataformas avaliativas, catálogos e sistemas completos de gestão de aprendizagem, com links, licenças e linguagem dos projetos. O documento selecionado serve para comparar requisitos e custos do piloto institucional.",
+    "decision": "Usar para entrevistar professores sobre gestão de turmas e interoperabilidade. Antes de reutilizar software citado, revisar sua própria licença.",
+    "sourcePaths": [
+      "README.md",
+      "LICENSE"
+    ],
+    "localPath": "awesome-selfhosted",
+    "recipe": {
+      "type": "section",
+      "files": [
+        "LICENSE"
+      ],
+      "source": "README.md",
+      "heading": "### Learning and Courses",
+      "marker": "Moodle",
+      "sourceSha256": {
+        "LICENSE": "16fd5f5e502cc76c18d8bc28e5f7f1e949a2228e9c1d4ea4e89b9f9087e39413",
+        "README.md": "d605e5107677daa0fc84ce96c3d2f49a40b966f39bfdbe4361082e8ecebee37c"
+      },
+      "sectionSha256": "53a5feed76ed8dfe49a0c3574d281ea69ec24e65ece315379ed6b28a6db0abe6"
+    },
+    "recipeCommand": "python3 ops/referencias/grupos/instalar_governanca.py --dest ../levelup-referencias --only awesome-selfhosted/awesome-selfhosted",
+    "receiptPath": "awesome-selfhosted/recibo.json"
+  },
+  {
+    "repo": "sindresorhus/awesome",
+    "sha": "bc98e517ddca672f55f9857d714fc3ea3c3540b2",
+    "license": "CC0-1.0",
+    "kind": "coleção de referência",
+    "status": "conteudo",
+    "component": "Seção Learn da coleção de listas",
+    "installation": "Extraída a seção Learn em SECAO.md com atribuição, revisão, link permanente e licença do catálogo.",
+    "verification": "Texto original e recorte conferidos por SHA-256. A seção usa o título Learn e contém a entrada Educational Games.",
+    "analysis": "O índice encaminha a listas temáticas mantidas por comunidades independentes. A seção Learn é uma fonte de padrões de curadoria e categorização, com conteúdo muito mais amplo do que um edital brasileiro.",
+    "decision": "Reutilizar o formato de seleção e revisão por especialista. Publicar itens de estudo somente após a curadoria pedagógica específica.",
+    "sourcePaths": [
+      "readme.md",
+      "license"
+    ],
+    "localPath": "awesome",
+    "recipe": {
+      "type": "section",
+      "files": [
+        "license"
+      ],
+      "source": "readme.md",
+      "heading": "## Learn",
+      "marker": "Educational Games",
+      "sourceSha256": {
+        "license": "d06492a8af3ebf435233748dbbc572abc189f2e9abcf0505a0e34a0212c728b3",
+        "readme.md": "465cd781335e44587d238f666800104b63d4fc8ba2395d6422974dcba421c616"
+      },
+      "sectionSha256": "c8f62a91db7b7ea41e1110c0c6a0afed214c5ecb5651a0bfb49639ee8c366b96"
+    },
+    "recipeCommand": "python3 ops/referencias/grupos/instalar_governanca.py --dest ../levelup-referencias --only sindresorhus/awesome",
+    "receiptPath": "awesome/recibo.json"
+  },
+  {
+    "repo": "vinta/awesome-python",
+    "sha": "4c3cb15dc695e95ae64add86b9994add8277f323",
+    "license": "CC-BY-4.0",
+    "kind": "coleção de referência",
+    "status": "conteudo",
+    "component": "Seção de bibliotecas Python para testes",
+    "installation": "Extraída a seção Testing em SECAO.md com atribuição, revisão, link permanente e licença do catálogo.",
+    "verification": "Texto original e recorte conferidos por SHA-256. A seção usa o título Testing e contém a entrada pytest.",
+    "analysis": "A coleção destaca bibliotecas de testes e ferramentas associadas ao pytest. Sua licença cobre o índice; cada pacote listado tem versão e licença próprias. O LevelUp usa TypeScript e Deno para o produto.",
+    "decision": "Consultar apenas em experimentos auxiliares em Python, como simulação pedagógica offline; conferir resultados com as mesmas fixtures usadas no produto.",
+    "sourcePaths": [
+      "README.md",
+      "LICENSE"
+    ],
+    "localPath": "awesome-python",
+    "recipe": {
+      "type": "section",
+      "files": [
+        "LICENSE"
+      ],
+      "source": "README.md",
+      "heading": "### Testing",
+      "marker": "pytest",
+      "sourceSha256": {
+        "LICENSE": "40adf29211f429da45be3e92cf2c4955f980e5d39d82b6c49fff8ccd18bad5ec",
+        "README.md": "22f025e3b58e4430d89bf22b7680aaf314817f52672805c458db1d9bdaa3f651"
+      },
+      "sectionSha256": "6df11ab278d4f5b78f76db7971e4465c8730bd2a2d58f2d7c09040e1136c61b1"
+    },
+    "recipeCommand": "python3 ops/referencias/grupos/instalar_governanca.py --dest ../levelup-referencias --only vinta/awesome-python",
+    "receiptPath": "awesome-python/recibo.json"
+  }
+]

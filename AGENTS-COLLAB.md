@@ -46,6 +46,10 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
 - **D11** (2026-11-17, dono) — Priorizar a conciliação de pagamento, acesso e comissão do Plus e do
   Passe Concurso e o piloto de leitura da revisão e do desempenho do próprio aluno no Mentor.
   As fases seguintes têm prazos estimados e critérios de avanço no [plano de integração operacional](docs/INTEGRACAO_OPERACIONAL.md).
+- **D12** (2026-11-18, solicitação do dono) — Disponibilizar os 10 responsáveis de área e 69 especialistas
+  com suas [descrições de cargo](docs/ORGANOGRAMA_OPERACIONAL.md) e avaliar as referências externas.
+  Os perfis iniciais A0/A1 trabalham com material público ou sintético. A campanha do simulado e a
+  homologação de Pix para o Passe são propostas para decisão no [plano de crescimento e pagamentos](docs/CRESCIMENTO_E_PAGAMENTOS.md).
 
 ---
 
@@ -150,6 +154,19 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
 ## Handoff mais recente
 <!-- Sempre o topo = o mais recente. Template: docs/colaboracao/handoff-template.md -->
 
+### 2026-11-18 · Equipe operacional, campanha do simulado e meios de pagamento
+
+- **Objetivo e decisão:** dar à equipe os perfis operacionais e um roteiro de aquisição e receita conforme D12.
+- **Entregas:** catálogo, CLI e instruções em [ops/agentes](ops/agentes/README.md), fichas do organograma,
+  referências em [ops/referencias](ops/referencias/) e relatório de crescimento e pagamentos.
+- O Claude Code reconheceu os 79 perfis. Os seis testes locais do CLI passaram, incluindo a execução
+  de `CFO.2` com um serviço simulado em localhost. As evidências de instalação estão no
+  [inventário do laboratório](docs/ANALISE_DAS_REFERENCIAS.md).
+- **Pendências:** a decisão sobre o Radar sem login continua em D10. A conciliação de vendas e o piloto do
+  Mentor seguem D11. A habilitação e a liquidação no provedor independente dependem de homologação.
+- **Próximo passo:** Pedagogia e Marketing conferem a trilha e preparam a aula aberta.
+  Financeiro e `pagamentos` acompanham um pedido avulso de teste até acesso, comissão e eventual estorno.
+
 ### 2026-11-17 · Integração operacional do Plus, Passe e Mentor
 
 - **Objetivo e decisão:** registrar a prioridade D11 e os responsáveis por cada etapa.
@@ -178,20 +195,3 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
   nenhuma migration nova nesta entrega.
 - **Bloqueios:** D10 (Radar público) é decisão do dono.
 - **Próximo passo:** P0 do backlog continua prioritário; depois itens 13–19.
-
-### 2026-11-17 · Radar de Concursos (Claude Code, nas faixas de `engenheiro-ia`, `supabase-db`, `frontend` e `documentation-writer`)
-- **Objetivo:** grupo de agentes (master → coordenador por área → especialistas) para pesquisar e
-  monitorar concursos com edital previsto/publicado, manter o aluno avisado e criar trilhas novas.
-- **O que mudou:** Edge Function `radar-concursos` (`fetcher.ts` coletor seguro + diff, `agents.ts`
-  6 papéis, `evidence.ts` portão e consolidação, `scoring.ts` relevância, `pipeline.ts` orquestração,
-  `tracks.ts` rascunho de trilha); migration `20261117120000` (7 tabelas, RLS, RPCs, sementes, cron
-  a cada 3 h); páginas `/radar` e `/radar/:slug`, cartão na trilha, atalho em Trilhas, notificação
-  clicável, aba Admin → Radar; guarda em `generate-track-questions` para legislação local sem fatos;
-  `docs/RADAR_CONCURSOS.md`.
-- **Testado:** `bun run typecheck` ✅ · `bun run lint` ✅ (0 erros; 48 avisos antigos) · `bun run build` ✅ ·
-  `deno test` ✅ 65/65 (35 novos) · `deno check` ✅ 12/12 funções · migration no PGlite ✅ (2×, RLS,
-  RPCs, fan-out sem duplicar, publicação de trilha, limite de follows) · coletor contra as fontes reais ✅
-  (5 com texto; 3 dinâmicas/anti-robô semeadas desligadas).
-- **Não testado:** chamadas reais ao gateway de IA (sem `LOVABLE_API_KEY` nesta sessão) e publicação no Supabase.
-- **Bloqueios:** aplicação da migration e deploy dependem do dono (D4).
-- **Próximo passo:** P0.4 do backlog; depois, fontes por área e banco autoral inicial das trilhas novas.

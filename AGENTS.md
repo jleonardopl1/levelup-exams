@@ -9,6 +9,7 @@ estilo do ECC e o mesmo modelo adotado no AgroDecision.
 - **Regras "sempre-seguir"** (o *quê*): `rules/` (comum + por stack).
 - **Definição de cada agente** (o *quem/como*): `.claude/agents/` (mapa em `.claude/agents/README.md`).
 - **Arquitetura e roadmap:** `docs/ARQUITETURA_MULTIAGENTE.md`.
+- Para preparar trabalho das áreas de negócio, consulte a [hierarquia e as descrições de cargo](docs/ORGANOGRAMA_OPERACIONAL.md) e o [guia de uso dos perfis operacionais](ops/agentes/README.md).
 
 ## Ordem de leitura
 

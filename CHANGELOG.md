@@ -1,5 +1,11 @@
 # Changelog
 
+## [Não lançado]
+
+- As dez áreas da operação e seus 69 especialistas têm descrições de cargo, supervisão, entregas e perfis utilizáveis localmente. [Organograma](docs/ORGANOGRAMA_OPERACIONAL.md)
+- As instalações de referência podem ser reproduzidas com as revisões identificadas em cada ficha. [Resultados dos 32 repositórios](docs/ANALISE_DAS_REFERENCIAS.md)
+- O plano comercial define a primeira campanha com professores, os critérios de conversão e a homologação do Passe Concurso via Pix em um segundo provedor. [Crescimento e pagamentos](docs/CRESCIMENTO_E_PAGAMENTOS.md)
+
 ## [1.3.1] - 2026-11-11 (revisão diária)
 
 ### Conteúdo
