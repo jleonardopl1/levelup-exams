@@ -114,7 +114,7 @@ const App = () => (
                 <Route path="/configuracoes" element={<RequireAuth><Settings /></RequireAuth>} />
                 <Route path="/redefinir-senha" element={<ResetPassword />} />
                 <Route path="/trilhas" element={<RequireAuth><Trilhas /></RequireAuth>} />
-                <Route path="/trilhas/:slug" element={<RequireAuth><Trilha /></RequireAuth>} />
+                <Route path="/trilhas/:slug" element={<Trilha />} />
                 <Route path="/trilhas/:slug/simulado" element={<RequireAuth><SimuladoOficial /></RequireAuth>} />
                 <Route path="/trilhas/:slug/simulado/:examId" element={<RequireAuth><SimuladoOficial /></RequireAuth>} />
                 <Route path="/trilhas/:slug/discursiva" element={<RequireAuth><Discursiva /></RequireAuth>} />

@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { AppHeader } from '@/components/AppHeader';
@@ -22,6 +22,7 @@ import { TrackRadarCard } from '@/components/radar/TrackRadarCard';
 import { MasteryTag, SubjectStudyPanel } from '@/components/trilha/SubjectStudyPanel';
 import { useTopicMastery } from '@/hooks/useTopicMastery';
 import { subjectMastery } from '@/lib/mastery';
+import { TrilhaPublica } from '@/components/trilha/TrilhaPublica';
 
 const PASS_MARK = 40;
 
@@ -57,10 +58,6 @@ export default function Trilha() {
 
   const { data: progress } = useTrackProgress(module?.id);
 
-  useEffect(() => {
-    if (!authLoading && !user) navigate('/auth');
-  }, [authLoading, user, navigate]);
-
   const visibleSubjects = useMemo(
     () => (module?.subjects ?? []).filter((s) => !s.cargo || s.cargo === cargoValid),
     [module, cargoValid],
@@ -79,6 +76,8 @@ export default function Trilha() {
       </div>
     );
   }
+
+  if (!user && data) return <TrilhaPublica track={data.track} modules={data.modules} />;
 
   if (!data || !module) {
     return (
