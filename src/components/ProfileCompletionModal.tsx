@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -22,6 +22,13 @@ export default function ProfileCompletionModal({ open, onComplete }: ProfileComp
   const [displayName, setDisplayName] = useState('');
   const [selectedAvatar, setSelectedAvatar] = useState(avatarOptions[0]);
   const [loading, setLoading] = useState(false);
+  const saveRequest = useRef<AbortController | null>(null);
+  useEffect(() => () => saveRequest.current?.abort(), []);
+
+  const skipProfile = () => {
+    saveRequest.current?.abort();
+    onComplete();
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,6 +43,9 @@ export default function ProfileCompletionModal({ open, onComplete }: ProfileComp
       return;
     }
 
+    if (saveRequest.current) return;
+    const controller = new AbortController();
+    saveRequest.current = controller;
     setLoading(true);
 
     try {
@@ -45,17 +55,19 @@ export default function ProfileCompletionModal({ open, onComplete }: ProfileComp
           display_name: displayName.trim(),
           avatar_url: selectedAvatar,
         })
-        .eq('user_id', user.id);
+        .eq('user_id', user.id)
+        .abortSignal(controller.signal);
 
+      if (controller.signal.aborted) return;
       if (error) throw error;
 
       toast.success('Perfil criado com sucesso!');
       onComplete();
-    } catch (error: unknown) {
-      const message = (error as { message?: unknown } | null)?.message;
-      toast.error((typeof message === 'string' && message) || 'Erro ao criar perfil');
+    } catch {
+      if (!controller.signal.aborted) toast.error('Não foi possível salvar o perfil. Você pode continuar e editá-lo depois.');
     } finally {
-      setLoading(false);
+      saveRequest.current = null;
+      if (!controller.signal.aborted) setLoading(false);
     }
   };
 
@@ -69,7 +81,7 @@ export default function ProfileCompletionModal({ open, onComplete }: ProfileComp
   };
 
   return (
-    <Dialog open={open} onOpenChange={() => {}}>
+    <Dialog open={open} onOpenChange={nextOpen => { if (!nextOpen) skipProfile(); }}>
       <DialogContent className="sm:max-w-md border-0 bg-gradient-to-br from-card via-card to-card/95 shadow-2xl backdrop-blur-xl">
         <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-primary/10 via-transparent to-accent/10 pointer-events-none" />
         
@@ -166,9 +178,9 @@ export default function ProfileCompletionModal({ open, onComplete }: ProfileComp
             )}
           </Button>
 
-          <p className="text-center text-xs text-muted-foreground">
-            Você pode alterar essas informações depois nas configurações
-          </p>
+          <Button type="button" variant="ghost" className="w-full" onClick={skipProfile}>
+            Continuar sem avatar
+          </Button>
         </form>
       </DialogContent>
     </Dialog>

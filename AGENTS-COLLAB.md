@@ -154,6 +154,13 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
 ## Handoff mais recente
 <!-- Sempre o topo = o mais recente. Template: docs/colaboracao/handoff-template.md -->
 
+### 2026-11-19 · Login e recuperação do serviço de autenticação
+
+- A tela de login sinaliza a indisponibilidade e permite tentar novamente. Quem já tem sessão válida segue para a página solicitada mesmo se a consulta opcional do avatar falhar. O aluno pode adiar a escolha do avatar. O app avisa se o retorno do provedor termina sem sessão.
+- Na validação local, passaram 79 testes unitários, 76 testes de funções, a checagem de tipos das 12 funções, o typecheck e o build do app. O lint terminou com zero erros e 45 avisos preexistentes.
+- Na verificação de produção, o DNS público respondeu `NXDOMAIN` para `rxsovhyimflzvxggppal.supabase.co`, o endereço usado pelo app. Os três provedores sociais iniciaram o redirecionamento. O Lovable Cloud indicou que a infraestrutura estava habilitada, mas a consulta `SELECT 1` retornou `database is possibly not accessible`. O login completo continua pendente.
+- O responsável pelo projeto original no Lovable Cloud deve restaurar o acesso à base dos alunos. Manter o app apontado para esse projeto, pois o homônimo no Supabase pessoal tem outra referência. Após a reativação, a faixa `tester` deve confirmar o DNS e fazer login com uma conta de teste em produção, verificando se a sessão abre a página protegida solicitada.
+
 ### 2026-11-18 · Equipe operacional, campanha do simulado e meios de pagamento
 
 - **Objetivo e decisão:** dar à equipe os perfis operacionais e um roteiro de aquisição e receita conforme D12.
@@ -177,21 +184,3 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
   O histórico do ambiente e os testes de homologação indicarão quais etapas operacionais estão concluídas.
 - **Próximo passo:** `supabase-db` e `edge-functions` conferem as versões de IA, Plus e Radar.
   Com o ambiente identificado, `pagamentos` e Financeiro executam P0.5.
-
-### 2026-11-17 · Referências externas: 32 repositórios (Claude Code, nas faixas de `frontend`, `engenheiro-ia`, `tester`, `security-reviewer` e `documentation-writer`)
-- **Objetivo:** investigar os repositórios indicados pelo dono e incorporar o que melhora o app e o processo.
-- **O que mudou:** relatório `docs/REFERENCIAS_REPOSITORIOS.md`; domínio por tópico (`src/lib/mastery.ts`,
-  `useTopicMastery`) e edital verticalizado (`src/lib/edital.ts`, `useEditalState`) no painel
-  `components/trilha/SubjectStudyPanel.tsx` da trilha; leitura em voz alta (`src/lib/speech.ts`,
-  `useSpeech`, `SpeakButton`) no quiz; Mentor com modos direto/socrático (`ai-mentor/prompt.ts`,
-  `mentor@2026-11-17`) e seletor na tela; portão de questões (termos absolutos, comando negativo;
-  `elaborador@2026-11-17`); SEO (`src/lib/seo.ts`, `useSeo`, sitemap, robots); guardrails
-  (`.claude/hooks/guardrails.mjs` + `settings.json`); `security-reviewer`, `tester`,
-  `rules/common/writing.md`, `rules/common/ai-agents.md`; `typecheck` que de fato checa; CI com `test:unit`.
-- **Testado:** `bun run typecheck` ✅ · `bun run lint` ✅ (0 erros; 45 avisos antigos) · `bun run test:unit` ✅
-  62/62 · `bun run test:edge` ✅ 76/76 · `deno check` ✅ todas as funções · `bun run build` ✅ ·
-  parser do edital rodado contra as 26 ementas reais da trilha ✅.
-- **Não testado:** voz no navegador real e chamadas reais ao gateway de IA (sem `LOVABLE_API_KEY`);
-  nenhuma migration nova nesta entrega.
-- **Bloqueios:** D10 (Radar público) é decisão do dono.
-- **Próximo passo:** P0 do backlog continua prioritário; depois itens 13–19.

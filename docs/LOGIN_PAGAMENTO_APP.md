@@ -37,6 +37,27 @@ Opcional:
   de um app em linkedin.com/developers (produto "Sign In with LinkedIn using OpenID Connect").
   Depois peça ao Lovable no chat: "adicione o botão de login OIDC do LinkedIn".
 
+### Incidente de 19/11/2026 no domínio de produção
+
+A página `levelupexams.com.br/auth` abriu e os botões de Google, Microsoft e Apple
+encaminharam o navegador até os respectivos provedores. O endereço do serviço que
+valida a sessão, `rxsovhyimflzvxggppal.supabase.co`, retornou `NXDOMAIN` em dois
+resolvedores públicos. O navegador também precisa desse serviço para entrar com e-mail e senha.
+O Lovable indicou infraestrutura habilitada e não conseguiu concluir uma consulta
+`SELECT 1`. A causa administrativa da indisponibilidade ainda precisa ser confirmada.
+
+1. Abra **Mais → Database** no projeto original do LevelUp Exams e confira o estado
+   da instância. Se o painel indicar pausa e oferecer **Wake up**, reative a instância
+   existente. O projeto homônimo no Supabase tem outro identificador.
+   [Projeto no Lovable](https://lovable.dev/projects/42ea172a-0a3b-4331-b866-f7ed4fc4ba44) ·
+   [Guia de reativação](https://docs.lovable.dev/features/database-pause-remove#resume-a-paused-project)
+2. Confirme que o endereço volta a resolver e que `/auth/v1/settings` aceita a chave
+   pública do app e responde com HTTP 200 e o objeto `external`.
+3. Com uma conta de teste autorizada, abra uma trilha protegida pelo domínio publicado.
+   Valide o acesso por senha e pelos provedores habilitados, o retorno à trilha,
+   a persistência após recarregar e o encerramento da sessão. Registre os resultados
+   sem incluir e-mails, tokens ou URLs completas de retorno.
+
 ## 2. Pagamentos (Stripe)
 
 ### O que foi verificado

@@ -2,7 +2,8 @@ import React, { createContext, useContext, useEffect, useRef, useState } from 'r
 import { useQueryClient } from '@tanstack/react-query';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-import { lovable } from '@/integrations/lovable';
+import { createLovableAuth, type OAuthProvider as ManagedProvider } from '@lovable.dev/cloud-auth-js';
+import { completeManagedSignIn } from '@/lib/oauth';
 import { SOCIAL_PROVIDERS, type SocialProviderId } from '@/lib/authProviders';
 import { clearQuizResult } from '@/lib/quizSession';
 
@@ -25,6 +26,7 @@ interface AuthContextType {
 }
 
 const PASSWORD_RESET_PATH = '/redefinir-senha';
+const managedAuth = createLovableAuth();
 
 // Singleton em globalThis: durante hot-reload (HMR) o módulo pode ser
 // reinstanciado enquanto consumidores ainda referenciam o contexto antigo,
@@ -107,14 +109,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Google, Apple e Microsoft gerenciados pelo Lovable Cloud passam pelo broker OAuth.
     if (config.via === 'managed') {
       try {
-        const result = await lovable.auth.signInWithOAuth(provider as 'microsoft' | 'apple' | 'google', {
+        const result = await managedAuth.signInWithOAuth(provider as ManagedProvider, {
           redirect_uri: `${window.location.origin}/`,
           extraParams: config.queryParams,
         });
-        if (result.error) {
-          return { error: result.error instanceof Error ? result.error : new Error(String(result.error)) };
-        }
-        return { error: null };
+        return await completeManagedSignIn(result, tokens => supabase.auth.setSession(tokens));
       } catch (e) {
         return { error: e instanceof Error ? e : new Error(String(e)) };
       }

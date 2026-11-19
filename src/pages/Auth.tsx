@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { Mail, Lock, User, Github, MailCheck, ArrowLeft } from 'lucide-react';
-import { passwordErrorMessage } from '@/lib/authErrors';
+import { AUTH_UNAVAILABLE_MESSAGE, authAvailabilityMessage, emailAuthErrorMessage } from '@/lib/authService';
 import { takeAfterLogin } from '@/lib/afterLogin';
 import heroPattern from '@/assets/hero-pattern.png';
 import ProfileCompletionModal from '@/components/ProfileCompletionModal';
@@ -73,32 +73,45 @@ export default function Auth() {
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [loading, setLoading] = useState(false);
-  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [profileToComplete, setProfileToComplete] = useState<string | null>(null);
   const { signIn, signUp, signInWithOAuth, requestPasswordReset, user } = useAuth();
-  const { providers: socialProviders, loading: providersLoading } = useAvailableSocialProviders();
+  const social = useAvailableSocialProviders();
   const navigate = useNavigate();
+  const userId = user?.id;
 
-  // Check if user needs to complete profile after signup
+  // O avatar é opcional. A consulta ao perfil não decide se a sessão é válida.
   useEffect(() => {
-    const checkProfileCompletion = async () => {
-      if (user) {
-        const { data: profile } = await supabase
+    setProfileToComplete(null);
+    if (!userId) return;
+    let active = true;
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    async function finishLogin(authenticatedId: string) {
+      let needsAvatar = false;
+      try {
+        const { data: profile, error } = await supabase
           .from('profiles')
-          .select('display_name, avatar_url')
-          .eq('user_id', user.id)
+          .select('avatar_url')
+          .eq('user_id', authenticatedId)
+          .abortSignal(controller.signal)
           .maybeSingle();
-
-        // If profile exists but has no avatar (new user via email signup)
-        if (profile && !profile.avatar_url) {
-          setShowProfileModal(true);
-        } else if (profile) {
-          navigate(takeAfterLogin('/'), { replace: true });
-        }
+        needsAvatar = !error && !!profile && !profile.avatar_url;
+      } catch {
+        // O aluno já entrou e poderá editar o perfil nas configurações.
+      } finally {
+        clearTimeout(timeout);
       }
+      if (!active) return;
+      if (needsAvatar) setProfileToComplete(authenticatedId);
+      else navigate(takeAfterLogin('/'), { replace: true });
+    }
+    void finishLogin(userId);
+    return () => {
+      active = false;
+      clearTimeout(timeout);
+      controller.abort();
     };
-
-    checkProfileCompletion();
-  }, [user, navigate]);
+  }, [userId, navigate]);
 
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -108,15 +121,20 @@ export default function Auth() {
       return;
     }
     setLoading(true);
-    const { error } = await requestPasswordReset(emailResult.data);
-    setLoading(false);
-    // Resposta igual exista ou não a conta (não revela quais e-mails estão cadastrados),
-    // exceto limite de envio, que o usuário precisa saber.
-    if (error && /rate limit|only request this after/i.test(error.message)) {
-      toast.error(passwordErrorMessage(error));
-      return;
+    try {
+      const { error } = await requestPasswordReset(emailResult.data);
+      // A resposta para o endereço permanece igual exista ou não uma conta.
+      const serviceMessage = authAvailabilityMessage(error);
+      if (serviceMessage) {
+        toast.error(serviceMessage);
+        return;
+      }
+      setResetSentTo(emailResult.data);
+    } catch (error) {
+      toast.error(authAvailabilityMessage(error) ?? 'Não foi possível solicitar o e-mail. Tente novamente.');
+    } finally {
+      setLoading(false);
     }
-    setResetSentTo(emailResult.data);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -159,19 +177,7 @@ export default function Auth() {
         // Profile modal will be shown via useEffect when user state updates
       }
     } catch (error: unknown) {
-      // Handle specific Supabase auth errors with user-friendly messages
-      const rawMessage = (error as { message?: unknown } | null)?.message;
-      const message = typeof rawMessage === 'string' ? rawMessage : '';
-      const errorMessage = message.toLowerCase();
-      if (errorMessage.includes('user already registered') || errorMessage.includes('already exists')) {
-        toast.error('Este email já está cadastrado. Tente fazer login.');
-      } else if (errorMessage.includes('invalid login credentials')) {
-        toast.error('Email ou senha incorretos.');
-      } else if (errorMessage.includes('email not confirmed')) {
-        toast.error('Por favor, confirme seu email antes de fazer login.');
-      } else {
-        toast.error(message || 'Ocorreu um erro. Tente novamente.');
-      }
+      toast.error(emailAuthErrorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -184,7 +190,7 @@ export default function Auth() {
       if (error) throw error;
       // Sucesso: o navegador segue para o provedor (ou a sessão já foi criada).
     } catch (error: unknown) {
-      toast.error(oauthErrorMessage(error instanceof Error ? error.message : String(error)));
+      toast.error(oauthErrorMessage(error));
     } finally {
       // Libera os botões: se o aluno voltar do provedor, a tela não fica travada.
       setLoading(false);
@@ -192,7 +198,7 @@ export default function Auth() {
   };
 
   const handleProfileComplete = () => {
-    setShowProfileModal(false);
+    setProfileToComplete(null);
     navigate(takeAfterLogin('/'), { replace: true });
   };
 
@@ -217,15 +223,22 @@ export default function Auth() {
         </CardHeader>
         
         <CardContent className="space-y-6">
-          {/* Social Login Buttons (ocultos na redefinição de senha) */}
-          {!forgotMode && (<>
-          {providersLoading ? (
+          {social.unavailable && !resetSentTo && (
+            <div role="status" className="space-y-2 rounded-md border p-3 text-sm">
+              <p>{AUTH_UNAVAILABLE_MESSAGE}</p>
+              <Button type="button" variant="outline" size="sm" disabled={social.retrying}
+                onClick={() => { void social.retry(); }}>
+                {social.retrying ? 'Verificando…' : 'Tentar novamente'}
+              </Button>
+            </div>
+          )}
+          {!forgotMode && (social.loading ? (
             <div className="h-10 rounded-md bg-muted/50 animate-pulse" aria-label="Carregando opções de login" />
-          ) : socialProviders.length > 0 && (
-            <div className={`grid gap-3 ${socialProviders.length > 1 ? 'grid-cols-2' : 'grid-cols-1'}`}>
-              {socialProviders.map((p, i) => {
+          ) : social.providers.length > 0 && (<>
+            <div className={`grid gap-3 ${social.providers.length > 1 ? 'grid-cols-2' : 'grid-cols-1'}`}>
+              {social.providers.map((p, i) => {
                 const Icon = PROVIDER_ICONS[p.id];
-                const fullWidth = socialProviders.length > 1 && socialProviders.length % 2 === 1 && i === socialProviders.length - 1;
+                const fullWidth = social.providers.length > 1 && social.providers.length % 2 === 1 && i === social.providers.length - 1;
                 return (
                   <Button
                     key={p.id}
@@ -237,12 +250,11 @@ export default function Auth() {
                     title={p.id === 'microsoft' ? 'Contas Microsoft, Outlook, Hotmail e Live' : undefined}
                   >
                     <Icon />
-                    {socialProviders.length === 1 ? `Continuar com ${p.label}` : p.label}
+                    {social.providers.length === 1 ? `Continuar com ${p.label}` : p.label}
                   </Button>
                 );
               })}
             </div>
-          )}
 
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
@@ -252,7 +264,7 @@ export default function Auth() {
               <span className="bg-card px-2 text-muted-foreground">ou</span>
             </div>
           </div>
-          </>)}
+          </>))}
 
           {forgotMode ? (
             resetSentTo ? (
@@ -394,10 +406,9 @@ export default function Auth() {
         </CardContent>
       </Card>
 
-      <ProfileCompletionModal
-        open={showProfileModal}
-        onComplete={handleProfileComplete}
-      />
+      {userId && profileToComplete === userId && (
+        <ProfileCompletionModal key={userId} open onComplete={handleProfileComplete} />
+      )}
     </div>
   );
 }
