@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { oauthErrorMessage } from '@/lib/authProviders';
+import { oauthReturnError } from '@/lib/oauth';
 
 /**
  * Ao voltar de um login social com falha, o provedor (Supabase ou broker do Lovable)
@@ -15,17 +15,12 @@ export function OAuthReturnHandler() {
 
   useEffect(() => {
     if (location.pathname === '/redefinir-senha') return;
-    const query = new URLSearchParams(location.search);
-    const hash = new URLSearchParams(location.hash.replace(/^#/, ''));
-    const error = query.get('error') || hash.get('error');
-    if (!error) return;
+    const message = oauthReturnError(location.search, location.hash);
+    if (!message) return;
 
-    const description = query.get('error_description') || hash.get('error_description') || error;
-    toast.error(oauthErrorMessage(description));
-
-    ['error', 'error_code', 'error_description', 'state'].forEach((k) => query.delete(k));
-    const search = query.toString();
-    navigate({ pathname: '/auth', search: search ? `?${search}` : '', hash: '' }, { replace: true });
+    toast.error(message, { id: 'oauth-return-error' });
+    // A rota pretendida já está na sessão do navegador. Descarte os parâmetros do provedor.
+    navigate('/auth', { replace: true });
   }, [location.pathname, location.search, location.hash, navigate]);
 
   return null;

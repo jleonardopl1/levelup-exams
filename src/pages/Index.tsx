@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
+import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
 import { useLeaderboard } from '@/hooks/useQuizResults';
@@ -21,6 +22,7 @@ import { FeaturedTrackCard } from '@/components/FeaturedTrackCard';
 import { ReviewTodayCard } from '@/components/ReviewTodayCard';
 import { SiteFooter } from '@/components/SiteFooter';
 import { takeAfterLogin } from '@/lib/afterLogin';
+import { hasOAuthSessionParameters, OAUTH_SESSION_UNCONFIRMED, oauthReturnError } from '@/lib/oauth';
 
 export default function Index() {
   const { user, loading: authLoading } = useAuth();
@@ -29,6 +31,7 @@ export default function Index() {
   const { data: rewards } = useUserRewards();
   const { isPremium, questionsRemaining, dailyLimit, hasReachedLimit, tier } = useQuestionLimits();
   const navigate = useNavigate();
+  const { search, hash } = useLocation();
   const [showLimitModal, setShowLimitModal] = useState(false);
 
   const handleStartQuiz = () => {
@@ -40,15 +43,17 @@ export default function Index() {
   };
 
   useEffect(() => {
-    if (!authLoading && !user) {
-      navigate('/auth');
-    } else if (!authLoading && user) {
-      // Volta do login com Google/Apple/Microsoft (sempre cai em "/"): leva para a página
-      // que o visitante tentou abrir antes de entrar, se houver.
-      const target = takeAfterLogin('');
-      if (target && target !== '/') navigate(target, { replace: true });
+    // OAuthReturnHandler já cuida dos erros que vieram explícitos na URL.
+    if (authLoading || oauthReturnError(search, hash)) return;
+    const isCallback = hasOAuthSessionParameters(search, hash);
+    if (!user) {
+      if (isCallback) toast.error(OAUTH_SESSION_UNCONFIRMED, { id: 'oauth-return-error' });
+      navigate('/auth', { replace: true });
+      return;
     }
-  }, [user, authLoading, navigate]);
+    const target = takeAfterLogin('');
+    if (isCallback || (target && target !== '/')) navigate(target || '/', { replace: true });
+  }, [user, authLoading, navigate, search, hash]);
 
   if (authLoading) {
     return (

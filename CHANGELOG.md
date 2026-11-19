@@ -2,6 +2,8 @@
 
 ## [Não lançado]
 
+- O login avisa quando o serviço de autenticação está indisponível e oferece a opção de tentar novamente.
+- Com uma sessão válida, o aluno segue para a página de destino mesmo se a consulta do avatar falhar. O login social valida o retorno da janela do provedor antes de aceitar a sessão.
 - As dez áreas da operação e seus 69 especialistas têm descrições de cargo, supervisão, entregas e perfis utilizáveis localmente. [Organograma](docs/ORGANOGRAMA_OPERACIONAL.md)
 - As instalações de referência podem ser reproduzidas com as revisões identificadas em cada ficha. [Resultados dos 32 repositórios](docs/ANALISE_DAS_REFERENCIAS.md)
 - O plano comercial define a primeira campanha com professores, os critérios de conversão e a homologação do Passe Concurso via Pix em um segundo provedor. [Crescimento e pagamentos](docs/CRESCIMENTO_E_PAGAMENTOS.md)
