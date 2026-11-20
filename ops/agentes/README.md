@@ -15,6 +15,30 @@ printf '%s\n' 'Caso fictício. Compare o extrato de teste de 100 com o registro 
 
 `preparar` devolve o destino nativo (`levelup-operacao:cfo-2`), o ID, o supervisor, a alçada e o texto recebido em `entrada`. Aceita até 16 KiB pela entrada padrão. O endereço do agente e suas permissões vêm do catálogo. Use material público ou sintético sem dados pessoais. O comando é local e não inicia uma sessão de IA.
 
+## Skills dos cargos no Claude Code
+
+Cada ficha do catálogo também é uma skill do Claude Code em [`.claude/skills/`](../../.claude/skills/). Elas aparecem em qualquer sessão aberta neste repositório, no terminal, no app ou na web. O nome de cada skill está na ficha do [organograma](../../docs/ORGANOGRAMA_OPERACIONAL.md).
+
+- **Especialistas (69):** digite `/`, o nome da skill e a tarefa. Exemplo: `/cfo-2-rebate-comissionamento Caso fictício: compare o extrato de teste de 100 com o registro de 98.` Essas skills só rodam quando alguém as chama e por isso não ocupam o contexto das sessões de desenvolvimento.
+- **Áreas (10):** também funcionam pelo `/` e podem ser escolhidas pelo próprio Claude quando o pedido é de negócio. A área lê a ficha do especialista certo e segue aquela ficha. O CEO encaminha às outras nove áreas.
+- **Comando sem tarefa:** a skill usa o pedido mais recente da conversa, então dá para colar o material antes e chamar a skill depois.
+
+Enquanto a skill está ativa, o Claude Code retira do turno comandos, gravação de arquivos, rede, conectores MCP, publicação, agendamento e subagentes (campo `disallowed-tools`). A leitura de arquivos continua disponível para consultar documentos do repositório. Na mensagem seguinte as ferramentas voltam, sob as permissões normais da sessão: é o momento de pedir para salvar o rascunho. Para uma execução isolada e sem nenhuma ferramenta, use o plugin descrito abaixo.
+
+As skills são geradas a partir do catálogo. Não edite os arquivos à mão:
+
+```sh
+node ops/agentes/skills.mjs           # grava as 79 skills e remove as que saíram do catálogo
+node ops/agentes/skills.mjs --check   # falha se alguma estiver desatualizada (roda em bun run test:unit)
+node ops/agentes/documentar.mjs       # atualiza o organograma, que mostra o nome de cada skill
+```
+
+O gerador recusa texto do catálogo com `$` seguido de letra, número ou chave, porque o Claude Code trocaria esse trecho pelo argumento da skill. Também recusa `!` seguido de crase, que executaria um comando. Ele só altera ou apaga pastas que têm a marca de geração no fim do `SKILL.md`. Uma skill escrita à mão com o mesmo nome de um cargo interrompe a geração.
+
+Os campos `argument-hint`, `disable-model-invocation` e `disallowed-tools` são do Claude Code. O envio de skills ao claude.ai aceita só `name`, `description`, `license`, `compatibility`, `metadata` e `allowed-tools`, então essas pastas não servem para upload direto.
+
+`node --test ops/agentes/skills.test.mjs` confere nomes, frontmatter, encaminhamento, a proteção contra texto do catálogo e a limpeza. Com `LEVELUP_CLAUDE_BIN` definido, o teste também roda o Claude Code instalado contra um modelo simulado em localhost. Ele verifica que a skill recebe a tarefa, que só as descrições das áreas entram no contexto e que um comando pedido no turno é negado.
+
 ## Carregar os perfis no Claude Code
 
 ```sh

@@ -50,6 +50,10 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
   com suas [descrições de cargo](docs/ORGANOGRAMA_OPERACIONAL.md) e avaliar as referências externas.
   Os perfis iniciais A0/A1 trabalham com material público ou sintético. A campanha do simulado e a
   homologação de Pix para o Passe são propostas para decisão no [plano de crescimento e pagamentos](docs/CRESCIMENTO_E_PAGAMENTOS.md).
+- **D13** (2026-11-20, solicitação do dono) — Cada um dos 79 cargos é uma skill do Claude Code em
+  `.claude/skills/`, gerada do catálogo por `ops/agentes/skills.mjs`. As 10 áreas ficam visíveis ao
+  modelo e encaminham ao especialista; os 69 especialistas só rodam por `/`. No turno da skill,
+  `disallowed-tools` deixa só leitura. O plugin `levelup-operacao`, sem ferramentas, continua para execução isolada.
 
 ---
 
@@ -153,6 +157,27 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
 
 ## Handoff mais recente
 <!-- Sempre o topo = o mais recente. Template: docs/colaboracao/handoff-template.md -->
+
+### 2026-11-20 · Skills dos 79 cargos do organograma
+
+- **Objetivo da sessão:** criar uma skill por cargo do [organograma operacional](docs/ORGANOGRAMA_OPERACIONAL.md) (D13).
+- **O que mudou:** `ops/agentes/skills.mjs` gera `.claude/skills/<cargo>/SKILL.md` a partir do catálogo,
+  com nome no formato `cfo-2-rebate-comissionamento`. Cada ficha do organograma mostra o comando da skill.
+  `bun run test:unit` roda `skills.mjs --check`. Uso e regras do gerador estão no [guia](ops/agentes/README.md).
+- **Testado:** `bun run test:unit` → 84 aprovados, 2 pulados (os de host). Com
+  `LEVELUP_CLAUDE_BIN` (Claude Code 2.1.329, modelo simulado em localhost),
+  `node --test "ops/agentes/*.test.mjs"` → 14/14. Nesse teste, a skill recebe a tarefa, as
+  descrições dos especialistas ficam fora do contexto e o Bash pedido no turno é negado. Sem a regra
+  de bloqueio, o mesmo teste falha. Typecheck e build passaram. O lint terminou com 0 erros e 45 avisos preexistentes.
+- **Não testado:** respostas de um modelo real com as skills; `bun run test:edge`, porque a sessão
+  não tem Deno e a mudança não toca as funções.
+- **Armadilhas novas:** `disallowed-tools` vale só no turno em que a skill é acionada. Na mensagem
+  seguinte, as permissões normais da sessão voltam. Para o Claude Code carregar skills de projeto num teste em pasta temporária,
+  a pasta precisa estar marcada como confiável em `.claude.json`, com `HOME` fora dela (ver `skills.test.mjs`).
+  Os campos próprios do Claude Code impedem o envio direto dessas pastas ao claude.ai.
+- **Próximo passo sugerido:** o dono testa `/ceo-direcao-executiva-estrategia` com a pauta semanal
+  sintética e `/cfo-2-rebate-comissionamento` com o caso de comissão de teste. Ajustes de texto entram no
+  catálogo e são aplicados com `node ops/agentes/skills.mjs` e `node ops/agentes/documentar.mjs`.
 
 ### 2026-11-19 · Login e recuperação do serviço de autenticação
 
