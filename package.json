@@ -14,7 +14,8 @@
     "preview": "vite preview",
     "build:trilhas": "node scripts/build-track-seed.mjs camara-cuiaba-2026",
     "agentes": "node ops/agentes/cli.mjs",
-    "test:unit": "node --test \"src/**/*.test.ts\" \".claude/hooks/*.test.mjs\" \"ops/agentes/*.test.mjs\" && node ops/agentes/documentar.mjs --check && node ops/referencias/catalogo.mjs validar",
+    "skills:cargos": "node ops/agentes/skills.mjs",
+    "test:unit": "node --test \"src/**/*.test.ts\" \".claude/hooks/*.test.mjs\" \"ops/agentes/*.test.mjs\" && node ops/agentes/documentar.mjs --check && node ops/agentes/skills.mjs --check && node ops/referencias/catalogo.mjs validar",
     "test:edge": "DENO_NO_PACKAGE_JSON=1 deno test --allow-env --no-lock supabase/functions/"
   },
   "dependencies": {

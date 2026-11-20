@@ -17,7 +17,7 @@ const LISTAS = {
   escalonar: 'Quando escalar',
 };
 const CAMPOS = new Set(['id', 'tipo', 'nome', 'supervisor', 'missao', 'alcada', ...Object.keys(LISTAS)]);
-const ALCADAS = {
+export const ALCADAS = {
   A0: 'Observe os dados fornecidos e relate o que consegue verificar.',
   A1: 'Prepare uma proposta ou um rascunho para o responsável humano revisar.',
 };
@@ -58,6 +58,19 @@ export function validarCatalogo(catalogo) {
 
 function nomeNativo(id) {
   return id.toLowerCase().replace('.', '-');
+}
+
+const PALAVRAS_VAZIAS = new Set(['e', 'de', 'do', 'da', 'dos', 'das']);
+
+/** Nome da skill do Claude Code: ID do cargo + nome sem acentos (ex.: cfo-2-rebate-comissionamento). */
+export function nomeSkill(agente) {
+  const palavras = agente.nome
+    .normalize('NFD')
+    .replace(/\p{M}/gu, '')
+    .toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .filter(palavra => palavra && !PALAVRAS_VAZIAS.has(palavra));
+  return [nomeNativo(agente.id), ...palavras].join('-');
 }
 
 function perfilNativo(a) {

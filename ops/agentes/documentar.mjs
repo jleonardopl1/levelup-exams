@@ -1,5 +1,5 @@
 import { access, readFile, writeFile } from 'node:fs/promises';
-import { validarCatalogo } from './cli.mjs';
+import { nomeSkill, validarCatalogo } from './cli.mjs';
 
 const fonte = new URL('./catalogo.json', import.meta.url);
 const destino = new URL('../../docs/ORGANOGRAMA_OPERACIONAL.md', import.meta.url);
@@ -38,6 +38,8 @@ function ficha(agente) {
     `**Missão** · ${markdown(agente.missao)}`,
     '',
     `**Supervisão** · ${supervisor}　 **Alçada** · ${agente.alcada}`,
+    '',
+    `**Skill no Claude Code** · \`/${nomeSkill(agente)}\``,
   ];
   for (const [chave, titulo] of campos) {
     linhas.push('', `**${titulo}**`, '', ...agente[chave].map(item => '- ' + markdown(item)));
@@ -54,6 +56,8 @@ function renderizar({ agentes }) {
     `Consulte as ${agentes.length} fichas de cargo, distribuídas entre ${areas.length} responsáveis de área e ${especialistas.length} especialistas. Escolha uma área e abra a ficha pelo ID.`,
     '',
     'A0 permite analisar o contexto expressamente fornecido. A1 permite preparar rascunhos para revisão humana. Em ambos os níveis, cada perfil trabalha com material sintético ou público e apresenta o que precisa de decisão da pessoa responsável.',
+    '',
+    'No Claude Code, cada ficha é uma skill: digite `/` e o nome indicado na ficha, seguido da tarefa, como em `/cfo-2-rebate-comissionamento`. As skills das áreas também podem ser escolhidas pelo próprio Claude e encaminham ao especialista. [Guia das skills e dos perfis](../ops/agentes/README.md)',
     '',
     'No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [Guia do projeto](../README.md) · [Plano de integração](INTEGRACAO_OPERACIONAL.md) · [Catálogo em JSON](../ops/agentes/catalogo.json)',
     '',

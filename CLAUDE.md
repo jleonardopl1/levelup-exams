@@ -15,6 +15,9 @@ Plataforma gamificada de estudos para concursos públicos, vestibulares e ENEM (
   `CLAUDE.md` → `rules/` → `docs/` → código.
 - **Elenco de 17 agentes** com faixas que não se sobrepõem em `.claude/agents/` (mapa em
   `.claude/agents/README.md`). Pedido que cruza áreas começa pelo `coordenador`.
+- **Skills dos 79 cargos** do organograma em `.claude/skills/`, geradas de `ops/agentes/catalogo.json`
+  por `node ops/agentes/skills.mjs` — não editar à mão. Áreas podem ser acionadas pelo modelo e
+  encaminham; especialistas só por `/`. No turno da skill, só leitura (`disallowed-tools`).
 - **Bootstrap:** o hook `SessionStart` (`.claude/settings.json`) injeta
   `docs/colaboracao/bootstrap.md` no início de cada sessão.
 - **Handoff:** ao encerrar trabalho relevante, atualize *Handoff mais recente* em
@@ -62,6 +65,7 @@ Plataforma gamificada de estudos para concursos públicos, vestibulares e ENEM (
 - testes unitários (lógica pura do front + guardrails): `bun run test:unit` (`node --test`, Node 22.18+)
 - testes das Edge Functions: `bun run test:edge` (requer Deno 2)
 - seed das trilhas: `bun run build:trilhas`
+- skills dos cargos: `node ops/agentes/skills.mjs` (depois de mudar o catálogo; `--check` roda no `test:unit`)
 - migrations: `supabase db push` (remoto exige aprovação do dono) · deploy de função: `supabase functions deploy <nome>`
 - CI (`.github/workflows/ci.yml`): typecheck + lint + testes unitários + build + testes Deno + `deno check` de todas as funções
 - **Guardrails:** `.claude/hooks/guardrails.mjs` (PreToolUse) aplica em código as convenções acima

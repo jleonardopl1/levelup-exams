@@ -4,6 +4,8 @@ Consulte as 79 fichas de cargo, distribuídas entre 10 responsáveis de área e 
 
 A0 permite analisar o contexto expressamente fornecido. A1 permite preparar rascunhos para revisão humana. Em ambos os níveis, cada perfil trabalha com material sintético ou público e apresenta o que precisa de decisão da pessoa responsável.
 
+No Claude Code, cada ficha é uma skill: digite `/` e o nome indicado na ficha, seguido da tarefa, como em `/cfo-2-rebate-comissionamento`. As skills das áreas também podem ser escolhidas pelo próprio Claude e encaminham ao especialista. [Guia das skills e dos perfis](../ops/agentes/README.md)
+
 No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [Guia do projeto](../README.md) · [Plano de integração](INTEGRACAO_OPERACIONAL.md) · [Catálogo em JSON](../ops/agentes/catalogo.json)
 
 <a name="indice-areas"></a>
@@ -31,6 +33,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 **Missão** · Dar ao fundador uma visão conjunta do estudo recorrente, da capacidade da equipe e da saúde econômica do LevelUp.
 
 **Supervisão** · fundador　 **Alçada** · A1
+
+**Skill no Claude Code** · `/ceo-direcao-executiva-estrategia`
 
 **Cargos de origem**
 
@@ -83,6 +87,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 
 **Supervisão** · [CEO](#perfil-ceo)　 **Alçada** · A1
 
+**Skill no Claude Code** · `/ceo-1-estrategia-okrs`
+
 **Cargos de origem**
 
 - Direção executiva
@@ -128,6 +134,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 
 **Supervisão** · [CEO](#perfil-ceo)　 **Alçada** · A1
 
+**Skill no Claude Code** · `/ceo-2-portfolio-coordenacao`
+
 **Cargos de origem**
 
 - Liderança executiva
@@ -172,6 +180,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 **Missão** · Preparar a representação institucional do LevelUp com afirmações sustentadas por evidência.
 
 **Supervisão** · [CEO](#perfil-ceo)　 **Alçada** · A1
+
+**Skill no Claude Code** · `/ceo-3-relacoes-reputacao`
 
 **Cargos de origem**
 
@@ -221,6 +231,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 **Missão** · Priorizar mudanças que ajudem o candidato a iniciar e manter uma rotina de estudo.
 
 **Supervisão** · [CEO](#perfil-ceo)　 **Alçada** · A1
+
+**Skill no Claude Code** · `/cpo-produto-experiencia-aluno`
 
 **Cargos de origem**
 
@@ -274,6 +286,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 
 **Supervisão** · [CPO](#perfil-cpo)　 **Alçada** · A1
 
+**Skill no Claude Code** · `/cpo-1-discovery-pesquisa`
+
 **Cargos de origem**
 
 - Head de Produto
@@ -320,6 +334,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 
 **Supervisão** · [CPO](#perfil-cpo)　 **Alçada** · A1
 
+**Skill no Claude Code** · `/cpo-2-aprendizagem-oferta`
+
 **Cargos de origem**
 
 - Gerência de Produto da Plataforma de Aprendizagem
@@ -365,6 +381,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 
 **Supervisão** · [CPO](#perfil-cpo)　 **Alçada** · A1
 
+**Skill no Claude Code** · `/cpo-3-contas-integracoes`
+
 **Cargos de origem**
 
 - Gerência de Produto de Gestão Escolar e Integrações
@@ -408,6 +426,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 **Missão** · Organizar demandas de produto e preparar a passagem de uma entrega para a equipe.
 
 **Supervisão** · [CPO](#perfil-cpo)　 **Alçada** · A1
+
+**Skill no Claude Code** · `/cpo-4-product-operations`
 
 **Cargos de origem**
 
@@ -454,6 +474,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 **Missão** · Desenhar fluxos de estudo e checkout acessíveis em diferentes dispositivos.
 
 **Supervisão** · [CPO](#perfil-cpo)　 **Alçada** · A1
+
+**Skill no Claude Code** · `/cpo-5-design-acessibilidade`
 
 **Cargos de origem**
 
@@ -504,6 +526,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 **Missão** · Orientar a evolução do app com atenção à disponibilidade do estudo e à integridade da cobrança.
 
 **Supervisão** · [CEO](#perfil-ceo)　 **Alçada** · A1
+
+**Skill no Claude Code** · `/cto-tecnologia-engenharia-seguranca`
 
 **Cargos de origem**
 
@@ -561,6 +585,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 
 **Supervisão** · [CTO](#perfil-cto)　 **Alçada** · A1
 
+**Skill no Claude Code** · `/cto-1-arquitetura-capacidade`
+
 **Cargos de origem**
 
 - Head de Engenharia
@@ -607,6 +633,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 
 **Supervisão** · [CTO](#perfil-cto)　 **Alçada** · A1
 
+**Skill no Claude Code** · `/cto-2-backend-apis`
+
 **Cargos de origem**
 
 - Engenharia de Backend júnior, pleno e sênior
@@ -651,6 +679,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 **Missão** · Planejar fluxos que preservem a continuidade do estudo entre telas e diante de falha de rede.
 
 **Supervisão** · [CTO](#perfil-cto)　 **Alçada** · A1
+
+**Skill no Claude Code** · `/cto-3-web-mobile`
 
 **Cargos de origem**
 
@@ -698,6 +728,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 
 **Supervisão** · [CTO](#perfil-cto)　 **Alçada** · A1
 
+**Skill no Claude Code** · `/cto-4-integracoes-externas`
+
 **Cargos de origem**
 
 - Gerência de Integrações e APIs
@@ -742,6 +774,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 **Missão** · Antecipar indisponibilidade e preparar a recuperação de filas, banco e funções.
 
 **Supervisão** · [CTO](#perfil-cto)　 **Alçada** · A1
+
+**Skill no Claude Code** · `/cto-5-infraestrutura-sre`
 
 **Cargos de origem**
 
@@ -790,6 +824,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 
 **Supervisão** · [CTO](#perfil-cto)　 **Alçada** · A0
 
+**Skill no Claude Code** · `/cto-6-seguranca-acessos`
+
 **Cargos de origem**
 
 - Coordenação de Segurança da Informação
@@ -834,6 +870,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 **Missão** · Definir a evidência que permite aceitar uma mudança nos fluxos críticos.
 
 **Supervisão** · [CTO](#perfil-cto)　 **Alçada** · A1
+
+**Skill no Claude Code** · `/cto-7-qualidade-automacao`
 
 **Cargos de origem**
 
@@ -880,6 +918,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 **Missão** · Esclarecer incidentes que ultrapassam o roteiro de primeiro atendimento.
 
 **Supervisão** · [CTO](#perfil-cto)　 **Alçada** · A1
+
+**Skill no Claude Code** · `/cto-8-suporte-tecnico-n3`
 
 **Cargos de origem**
 
@@ -929,6 +969,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 **Missão** · Assegurar que questões e recomendações de estudo tenham fundamento verificável e objetivo pedagógico.
 
 **Supervisão** · [CEO](#perfil-ceo)　 **Alçada** · A1
+
+**Skill no Claude Code** · `/clo-pedagogia-conteudo-avaliacao`
 
 **Cargos de origem**
 
@@ -985,6 +1027,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 
 **Supervisão** · [CLO](#perfil-clo)　 **Alçada** · A1
 
+**Skill no Claude Code** · `/clo-1-curriculo-radar`
+
 **Cargos de origem**
 
 - Head de Conteúdo e Currículo
@@ -1031,6 +1075,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 
 **Supervisão** · [CLO](#perfil-clo)　 **Alçada** · A1
 
+**Skill no Claude Code** · `/clo-2-elaboracao-questoes`
+
 **Cargos de origem**
 
 - Coordenação de Produção de Conteúdo
@@ -1076,6 +1122,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 
 **Supervisão** · [CLO](#perfil-clo)　 **Alçada** · A0
 
+**Skill no Claude Code** · `/clo-3-solucao-revisao-independente`
+
 **Cargos de origem**
 
 - Revisão técnica de conteúdo
@@ -1120,6 +1168,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 **Missão** · Desenhar uma sequência de prática, feedback e revisão que ajude o candidato a aprender.
 
 **Supervisão** · [CLO](#perfil-clo)　 **Alçada** · A1
+
+**Skill no Claude Code** · `/clo-4-design-instrucional`
 
 **Cargos de origem**
 
@@ -1167,6 +1217,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 
 **Supervisão** · [CLO](#perfil-clo)　 **Alçada** · A0
 
+**Skill no Claude Code** · `/clo-5-learning-analytics`
+
 **Cargos de origem**
 
 - Coordenação de Avaliação e Learning Analytics
@@ -1213,6 +1265,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 
 **Supervisão** · [CLO](#perfil-clo)　 **Alçada** · A1
 
+**Skill no Claude Code** · `/clo-6-formacao-professores`
+
 **Cargos de origem**
 
 - Coordenação de Formação de Professores
@@ -1257,6 +1311,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 **Missão** · Manter a coerência entre os itens de estudo, suas fontes e o histórico de versões.
 
 **Supervisão** · [CLO](#perfil-clo)　 **Alçada** · A1
+
+**Skill no Claude Code** · `/clo-7-curadoria-atualizacao`
 
 **Cargos de origem**
 
@@ -1308,6 +1364,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 **Missão** · Orientar a aquisição, a retenção e os canais com base na contribuição de cada venda e na continuidade do estudo.
 
 **Supervisão** · [CEO](#perfil-ceo)　 **Alçada** · A1
+
+**Skill no Claude Code** · `/cro-comercial-receita-mercado-parcerias`
 
 **Cargos de origem**
 
@@ -1369,6 +1427,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 
 **Supervisão** · [CRO](#perfil-cro)　 **Alçada** · A1
 
+**Skill no Claude Code** · `/cro-1-growth-integrado`
+
 **Cargos de origem**
 
 - Head de Growth e Performance de Receita
@@ -1414,6 +1474,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 
 **Supervisão** · [CRO](#perfil-cro)　 **Alçada** · A1
 
+**Skill no Claude Code** · `/cro-2-aquisicao-alunos`
+
 **Cargos de origem**
 
 - Gerência de Aquisição de Alunos B2C e B2B2C
@@ -1457,6 +1519,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 **Missão** · Qualificar uma oportunidade institucional e preparar uma proposta adequada à turma.
 
 **Supervisão** · [CRO](#perfil-cro)　 **Alçada** · A1
+
+**Skill no Claude Code** · `/cro-3-vendas-b2b`
 
 **Cargos de origem**
 
@@ -1504,6 +1568,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 
 **Supervisão** · [CRO](#perfil-cro)　 **Alçada** · A1
 
+**Skill no Claude Code** · `/cro-4-governo-licitacoes`
+
 **Cargos de origem**
 
 - Gerência de Redes Públicas e Governo
@@ -1549,6 +1615,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 **Missão** · Preparar a qualificação inicial de uma demanda comercial com perguntas proporcionais ao interesse declarado.
 
 **Supervisão** · [CRO](#perfil-cro)　 **Alçada** · A1
+
+**Skill no Claude Code** · `/cro-5-pre-vendas`
 
 **Cargos de origem**
 
@@ -1596,6 +1664,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 
 **Supervisão** · [CRO](#perfil-cro)　 **Alçada** · A1
 
+**Skill no Claude Code** · `/cro-6-solucoes-demonstracoes`
+
 **Cargos de origem**
 
 - Engenharia de Soluções de Pré-vendas
@@ -1639,6 +1709,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 **Missão** · Manter critérios consistentes para interpretar o funil e a previsão de vendas.
 
 **Supervisão** · [CRO](#perfil-cro)　 **Alçada** · A0
+
+**Skill no Claude Code** · `/cro-7-revops-forecast`
 
 **Cargos de origem**
 
@@ -1686,6 +1758,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 
 **Supervisão** · [CRO](#perfil-cro)　 **Alçada** · A1
 
+**Skill no Claude Code** · `/cro-8-precificacao-modelos`
+
 **Cargos de origem**
 
 - Análise de Precificação e Modelos de Receita
@@ -1730,6 +1804,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 **Missão** · Avaliar segmentos e parceiros potenciais com fontes identificáveis e hipóteses explícitas.
 
 **Supervisão** · [CRO](#perfil-cro)　 **Alçada** · A0
+
+**Skill no Claude Code** · `/cro-9-inteligencia-mercado`
 
 **Cargos de origem**
 
@@ -1776,6 +1852,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 **Missão** · Preparar a entrada e o acompanhamento de afiliados e associações no canal autorizado.
 
 **Supervisão** · [CRO](#perfil-cro)　 **Alçada** · A1
+
+**Skill no Claude Code** · `/cro-10-afiliados-associados`
 
 **Cargos de origem**
 
@@ -1824,6 +1902,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 
 **Supervisão** · [CRO](#perfil-cro)　 **Alçada** · A1
 
+**Skill no Claude Code** · `/cro-11-parcerias-estrategicas`
+
 **Cargos de origem**
 
 - Head de Parcerias e Canais
@@ -1870,6 +1950,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 **Missão** · Distinguir os canais que trazem alunos ativos daqueles que apenas geram cadastros.
 
 **Supervisão** · [CRO](#perfil-cro)　 **Alçada** · A0
+
+**Skill no Claude Code** · `/cro-12-performance-parceiros`
 
 **Cargos de origem**
 
@@ -1920,6 +2002,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 **Missão** · Ajudar alunos e instituições a receber valor contínuo a partir do estudo e do atendimento.
 
 **Supervisão** · [CEO](#perfil-ceo)　 **Alçada** · A1
+
+**Skill no Claude Code** · `/cco-sucesso-cliente-suporte-renovacao`
 
 **Cargos de origem**
 
@@ -1974,6 +2058,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 
 **Supervisão** · [CCO](#perfil-cco)　 **Alçada** · A1
 
+**Skill no Claude Code** · `/cco-1-jornada-implantacao`
+
 **Cargos de origem**
 
 - Head de Onboarding
@@ -2019,6 +2105,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 **Missão** · Avaliar a adoção por uma turma e preparar a conversa sobre renovação ou expansão.
 
 **Supervisão** · [CCO](#perfil-cco)　 **Alçada** · A1
+
+**Skill no Claude Code** · `/cco-2-carteira-expansao`
 
 **Cargos de origem**
 
@@ -2068,6 +2156,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 
 **Supervisão** · [CCO](#perfil-cco)　 **Alçada** · A1
 
+**Skill no Claude Code** · `/cco-3-retencao-reativacao`
+
 **Cargos de origem**
 
 - Análise de Customer Success
@@ -2112,6 +2202,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 **Missão** · Orientar a triagem de dúvidas frequentes e reconhecer quando o caso exige suporte técnico.
 
 **Supervisão** · [CCO](#perfil-cco)　 **Alçada** · A1
+
+**Skill no Claude Code** · `/cco-4-suporte-n1-n2`
 
 **Cargos de origem**
 
@@ -2158,6 +2250,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 **Missão** · Transformar dúvidas recorrentes em orientações reutilizáveis e sinais para Produto.
 
 **Supervisão** · [CCO](#perfil-cco)　 **Alçada** · A1
+
+**Skill no Claude Code** · `/cco-5-conhecimento-voz-aluno`
 
 **Cargos de origem**
 
@@ -2207,6 +2301,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 **Missão** · Orientar a aquisição de alunos com mensagens verdadeiras sobre o que o LevelUp oferece.
 
 **Supervisão** · [CEO](#perfil-ceo)　 **Alçada** · A1
+
+**Skill no Claude Code** · `/cmo-marketing-marca-geracao-demanda`
 
 **Cargos de origem**
 
@@ -2263,6 +2359,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 
 **Supervisão** · [CMO](#perfil-cmo)　 **Alçada** · A1
 
+**Skill no Claude Code** · `/cmo-1-demanda-performance`
+
 **Cargos de origem**
 
 - Head de Geração de Demanda
@@ -2310,6 +2408,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 
 **Supervisão** · [CMO](#perfil-cmo)　 **Alçada** · A1
 
+**Skill no Claude Code** · `/cmo-2-conteudo-seo`
+
 **Cargos de origem**
 
 - Coordenação de Inbound e SEO
@@ -2355,6 +2455,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 
 **Supervisão** · [CMO](#perfil-cmo)　 **Alçada** · A1
 
+**Skill no Claude Code** · `/cmo-3-automacao-relacionamento`
+
 **Cargos de origem**
 
 - Análise de Automação de Marketing
@@ -2398,6 +2500,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 **Missão** · Preparar comunicação institucional e moderação que preservem a confiança da comunidade.
 
 **Supervisão** · [CMO](#perfil-cmo)　 **Alçada** · A1
+
+**Skill no Claude Code** · `/cmo-4-marca-comunicacao-comunidade`
 
 **Cargos de origem**
 
@@ -2445,6 +2549,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 
 **Supervisão** · [CMO](#perfil-cmo)　 **Alçada** · A1
 
+**Skill no Claude Code** · `/cmo-5-design-marketing`
+
 **Cargos de origem**
 
 - Design de Marketing
@@ -2488,6 +2594,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 **Missão** · Planejar encontros com educadores que permitam demonstrar uma prática de estudo útil.
 
 **Supervisão** · [CMO](#perfil-cmo)　 **Alçada** · A1
+
+**Skill no Claude Code** · `/cmo-6-eventos-educadores`
 
 **Cargos de origem**
 
@@ -2533,6 +2641,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 **Missão** · Explicar a utilidade de um lançamento para o segmento que melhor pode aproveitá-lo.
 
 **Supervisão** · [CMO](#perfil-cmo)　 **Alçada** · A1
+
+**Skill no Claude Code** · `/cmo-7-marketing-produto-inteligencia`
 
 **Cargos de origem**
 
@@ -2583,6 +2693,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 **Missão** · Explicar como uma venda se transforma em acesso, comissão, liquidação e margem verificáveis.
 
 **Supervisão** · [CEO](#perfil-ceo)　 **Alçada** · A0
+
+**Skill no Claude Code** · `/cfo-financas-administracao-juridico-privacidade`
 
 **Cargos de origem**
 
@@ -2642,6 +2754,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 
 **Supervisão** · [CFO](#perfil-cfo)　 **Alçada** · A0
 
+**Skill no Claude Code** · `/cfo-1-billing-recebiveis-cobranca`
+
 **Cargos de origem**
 
 - Coordenação de Contas a Pagar e Receber
@@ -2687,6 +2801,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 
 **Supervisão** · [CFO](#perfil-cfo)　 **Alçada** · A0
 
+**Skill no Claude Code** · `/cfo-2-rebate-comissionamento`
+
 **Cargos de origem**
 
 - Análise de Rebate e Comissionamento
@@ -2731,6 +2847,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 **Missão** · Distinguir o valor apurado, o liquidado e o ainda devido a um parceiro fictício.
 
 **Supervisão** · [CFO](#perfil-cfo)　 **Alçada** · A0
+
+**Skill no Claude Code** · `/cfo-3-conciliacao-repasse`
 
 **Cargos de origem**
 
@@ -2778,6 +2896,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 
 **Supervisão** · [CFO](#perfil-cfo)　 **Alçada** · A1
 
+**Skill no Claude Code** · `/cfo-4-controladoria-contabilidade`
+
 **Cargos de origem**
 
 - Head de Controladoria
@@ -2824,6 +2944,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 
 **Supervisão** · [CFO](#perfil-cfo)　 **Alçada** · A1
 
+**Skill no Claude Code** · `/cfo-5-fiscal-documentos`
+
 **Cargos de origem**
 
 - Coordenação Fiscal e Tributária
@@ -2868,6 +2990,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 **Missão** · Avaliar a sensibilidade da operação às hipóteses de conversão, custo e retenção.
 
 **Supervisão** · [CFO](#perfil-cfo)　 **Alçada** · A1
+
+**Skill no Claude Code** · `/cfo-6-fp-a`
 
 **Cargos de origem**
 
@@ -2915,6 +3039,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 
 **Supervisão** · [CFO](#perfil-cfo)　 **Alçada** · A0
 
+**Skill no Claude Code** · `/cfo-7-tesouraria-caixa`
+
 **Cargos de origem**
 
 - Coordenação de Tesouraria
@@ -2961,6 +3087,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 
 **Supervisão** · [CFO](#perfil-cfo)　 **Alçada** · A1
 
+**Skill no Claude Code** · `/cfo-8-juridico-compliance`
+
 **Cargos de origem**
 
 - Coordenação Jurídica e de Compliance
@@ -3006,6 +3134,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 
 **Supervisão** · [CFO](#perfil-cfo)　 **Alçada** · A1
 
+**Skill no Claude Code** · `/cfo-9-privacidade-titulares`
+
 **Cargos de origem**
 
 - Encarregado de proteção de dados (DPO)
@@ -3050,6 +3180,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 **Missão** · Ajudar a escolher fornecedores e recursos administrativos compatíveis com a operação.
 
 **Supervisão** · [CFO](#perfil-cfo)　 **Alçada** · A1
+
+**Skill no Claude Code** · `/cfo-10-compras-administracao`
 
 **Cargos de origem**
 
@@ -3099,6 +3231,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 **Missão** · Planejar a capacidade humana e a qualificação necessárias para sustentar o trabalho da equipe e dos agentes.
 
 **Supervisão** · [CEO](#perfil-ceo)　 **Alçada** · A1
+
+**Skill no Claude Code** · `/chro-pessoas-cultura-capacidade-operacional`
 
 **Cargos de origem**
 
@@ -3154,6 +3288,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 
 **Supervisão** · [CHRO](#perfil-chro)　 **Alçada** · A1
 
+**Skill no Claude Code** · `/chro-1-atracao-selecao`
+
 **Cargos de origem**
 
 - Head de Atração e Seleção
@@ -3199,6 +3335,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 **Missão** · Ajudar operadores e parceiros a aprender procedimentos verificáveis do LevelUp.
 
 **Supervisão** · [CHRO](#perfil-chro)　 **Alçada** · A1
+
+**Skill no Claude Code** · `/chro-2-desenvolvimento-cultura`
 
 **Cargos de origem**
 
@@ -3246,6 +3384,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 
 **Supervisão** · [CHRO](#perfil-chro)　 **Alçada** · A1
 
+**Skill no Claude Code** · `/chro-3-engajamento-marca-empregadora`
+
 **Cargos de origem**
 
 - Coordenação de Employer Branding e Engajamento
@@ -3290,6 +3430,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 **Missão** · Prever gargalos entre áreas e propor uma distribuição de trabalho compatível com as competências disponíveis.
 
 **Supervisão** · [CHRO](#perfil-chro)　 **Alçada** · A1
+
+**Skill no Claude Code** · `/chro-4-planejamento-business-partner`
 
 **Cargos de origem**
 
@@ -3336,6 +3478,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 
 **Supervisão** · [CHRO](#perfil-chro)　 **Alçada** · A1
 
+**Skill no Claude Code** · `/chro-5-departamento-pessoal`
+
 **Cargos de origem**
 
 - Coordenação de Departamento Pessoal e Remuneração
@@ -3380,6 +3524,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 **Missão** · Comparar cenários de remuneração e benefícios de uma função sem avaliar pessoas individualmente.
 
 **Supervisão** · [CHRO](#perfil-chro)　 **Alçada** · A1
+
+**Skill no Claude Code** · `/chro-6-remuneracao-beneficios`
 
 **Cargos de origem**
 
@@ -3428,6 +3574,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 **Missão** · Manter definições independentes para medir aprendizagem, receita e qualidade das decisões assistidas por IA.
 
 **Supervisão** · [CEO](#perfil-ceo)　 **Alçada** · A0
+
+**Skill no Claude Code** · `/cdo-dados-inteligencia-avaliacao-ia`
 
 **Cargos de origem**
 
@@ -3483,6 +3631,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 
 **Supervisão** · [CDO](#perfil-cdo)　 **Alçada** · A1
 
+**Skill no Claude Code** · `/cdo-1-engenharia-qualidade-dados`
+
 **Cargos de origem**
 
 - Head de Engenharia de Dados
@@ -3531,6 +3681,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 
 **Supervisão** · [CDO](#perfil-cdo)　 **Alçada** · A1
 
+**Skill no Claude Code** · `/cdo-2-bi-metricas`
+
 **Cargos de origem**
 
 - Head de BI
@@ -3577,6 +3729,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 **Missão** · Avaliar se uma recomendação melhora a escolha do próximo passo de estudo frente a uma regra simples.
 
 **Supervisão** · [CDO](#perfil-cdo)　 **Alçada** · A0
+
+**Skill no Claude Code** · `/cdo-3-ciencia-dados-aplicada`
 
 **Cargos de origem**
 
@@ -3626,6 +3780,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 
 **Supervisão** · [CDO](#perfil-cdo)　 **Alçada** · A0
 
+**Skill no Claude Code** · `/cdo-4-propensao-previsao`
+
 **Cargos de origem**
 
 - Análise de Propensão e Previsão
@@ -3672,6 +3828,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 
 **Supervisão** · [CDO](#perfil-cdo)　 **Alçada** · A0
 
+**Skill no Claude Code** · `/cdo-5-performance-receita`
+
 **Cargos de origem**
 
 - Análise de Performance de Receita
@@ -3717,6 +3875,8 @@ No terminal, consulte uma ficha com `node ops/agentes/cli.mjs mostrar CFO.2`. [G
 **Missão** · Comparar versões de agentes pela qualidade da tarefa aceita e pelo custo de obtê-la.
 
 **Supervisão** · [CDO](#perfil-cdo)　 **Alçada** · A0
+
+**Skill no Claude Code** · `/cdo-6-avaliacao-custo-agentes`
 
 **Cargos de origem**
 
