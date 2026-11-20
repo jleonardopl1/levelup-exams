@@ -62,7 +62,11 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
   efetivo. Pendentes com o dono: preço, juros do parcelamento, desconto no Pix, reembolso fora dos 7
   dias e conta habilitada ([plano, §2](docs/MERCADO_PAGO.md)). Código da fase 1 na `main` e desligado
   (`MP_ENABLED` ausente) em 2026-11-20, com as correções da revisão de segurança; homologar com
-  `MP_ENABLED=staff` e `MP_LIVE_MODE=false` seguindo "Como ligar" no plano.
+  `MP_ENABLED=staff` e `MP_LIVE_MODE=false` seguindo "Como ligar" no plano. Em produção desde
+  2026-11-20 (migrations, funções e site), desligado até o dono cadastrar os secrets `MP_*`.
+- **D15** (pendente — dono) — Anúncios no Free: proposta de patrocínio próprio, contextual, nas
+  pausas do estudo, sem rede de terceiros nem perfil do aluno; rede programática só depois da
+  verificação de idade (D6). Plano: [docs/ANUNCIOS.md](docs/ANUNCIOS.md).
 
 ---
 
@@ -118,8 +122,14 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
   Se `dl.deno.land`, `deno.land` e `esm.sh` estiverem bloqueados, o Deno sai do npm
   (`npm pack @deno/linux-x64-glibc`) e `deno check`/`deno test` rodam com `--import-map` que troca
   `esm.sh/<pacote>` por `npm:<pacote>` e o std por shims locais (fora do repositório).
-- 🧾 **Tabelas do Mercado Pago ainda não estão em `types.ts`**: o front chama `get_my_payment_orders`
-  por um cliente sem tipos (`useMyPaymentOrders`). Depois de aplicar `20261120120000`, regerar os tipos.
+- 🧾 **`types.ts` já tem as tabelas do Mercado Pago** (regerado pelo Lovable no commit `0909a1d`), mas
+  `useMyPaymentOrders` ainda chama `get_my_payment_orders` por um cliente sem tipos; pode passar a usar `supabase`.
+- 🌐 **Esta sessão na nuvem não alcança `*.supabase.co` nem `levelupexams.com.br`** (proxy). Para testar
+  funções publicadas e o site, use `net.http_get`/`net.http_post` pelo `query_database` do Lovable e leia
+  `net._http_response`. O `send_message` do MCP do Lovable estoura em 60 s: confira com `list_messages`
+  e `get_message` antes de reenviar.
+- 🧮 **Migration aplicada por `query_database`:** depois, compare o md5 do corpo das funções em produção
+  com o do PGlite (todas as migrations) para garantir que a transcrição está íntegra.
 - 🕛 **O limite diário do Free renova à meia-noite UTC** (21h de Brasília), não à meia-noite local.
 - 💳 **Stripe:** confirmar em produção o endpoint do webhook registrado e o segredo de assinatura
   antes de planejar a ativação. O [PR #18](https://github.com/jleonardopl1/levelup-exams/pull/18) registra pendências no momento do diagnóstico.
@@ -179,6 +189,24 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
 
 ## Handoff mais recente
 <!-- Sempre o topo = o mais recente. Template: docs/colaboracao/handoff-template.md -->
+
+### 2026-11-20 · Mercado Pago em produção (desligado) e plano de anúncios (`pagamentos`)
+
+- **Objetivo da sessão:** aplicar migrations, publicar funções e site do Mercado Pago; planejar anúncios no Free.
+- **O que mudou em produção:** antes de aplicar, conferi que as 6 funções reescritas estavam iguais ao
+  repositório (2 diferiam só nos comentários). PR #31 mesclado; migrations `20261120120000` e `20261120130000`
+  aplicadas por `query_database`, cada uma numa transação, e registradas em `schema_migrations`. O md5 do
+  corpo das 12 funções bate com o do repositório; permissões, RLS, job horário e plano dos 20 alunos conferidos
+  (nenhum mudou). O Lovable publicou `mp-create-checkout`, `mp-webhook`, `mp-sync-order`, `create-checkout` e
+  `check-subscription` e regerou `types.ts` (`0909a1d`); o site foi publicado e serve o build novo.
+- **Testado em produção (via `pg_net`):** as três funções com login respondem 401 sem sessão; `mp-webhook` responde
+  500 "Not configured" (sem secrets) e 405 em GET; o bundle do site contém o código do Mercado Pago.
+- **Não testado:** compra no Mercado Pago (faltam conta, credenciais e webhook do dono).
+- **Decisões tomadas:** D14 atualizada; D15 (anúncios) registrada como pendente.
+- **Bloqueios / pendências:** passo 4 de "Como ligar" em `docs/MERCADO_PAGO.md` (conta PJ com Pix, credenciais de
+  teste, webhook, secrets no Lovable Cloud) e as decisões da §2; D15.
+- **Próximo passo sugerido:** o dono cadastra os secrets de teste com `MP_ENABLED=staff`; `pagamentos` + `tester`
+  acompanham uma compra de teste pelos registros de `payment_orders` e `audit_logs`.
 
 ### 2026-11-20 · Mercado Pago: correções da revisão de segurança (`pagamentos` + `security-reviewer`)
 
