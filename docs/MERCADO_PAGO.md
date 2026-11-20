@@ -53,6 +53,10 @@ idade antes do pagamento (ECA Digital, D6).
 
 ### Como ligar (com o dono)
 
+**Feito em 2026-11-20:** passos 1 e 2 em produção (migrations aplicadas e conferidas função a
+função pelo md5 do corpo, funções publicadas, `types.ts` regerado, site publicado com o front
+novo). O Mercado Pago continua desligado até os secrets do passo 4.
+
 1. Aplicar, nesta ordem, as migrations `20261120120000_mercadopago_payment_orders.sql` e
    `20261120130000_mercadopago_hardening.sql` pelo Lovable (não leem o Vault nem agendam cron; o
    job horário `expire-premium-grants` já existe e passa a encerrar pedidos vencidos e apagar
