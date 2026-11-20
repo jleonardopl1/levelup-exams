@@ -8,7 +8,7 @@ import { rpcErrorMessage } from '@/hooks/useAdminUsers';
 export interface PlatformOverview {
   generated_at: string;
   users: {
-    total: number; plus: number; plus_granted?: number; new_7d: number; new_30d: number;
+    total: number; plus: number; plus_granted?: number; plus_mercadopago?: number; new_7d: number; new_30d: number;
     active_1d: number; active_7d: number; active_30d: number; banned: number;
   };
   quizzes: {
@@ -22,8 +22,15 @@ export interface PlatformOverview {
     questions_active: number; questions_inactive: number; questions_premium: number;
     questions_new_7d: number; reports_open: number;
   };
+  /** Vendas avulsas do Mercado Pago (migration 20261120120000); ausente antes dela. */
+  payments?: {
+    mercadopago: {
+      paid_30d: number; received_30d_cents: number; refunded_30d_cents: number; pix_30d: number;
+      installments_30d: number; open_orders: number; needs_review: number;
+    };
+  };
   health: {
-    last_stripe_event_at: string | null; stripe_events_30d: number;
+    last_stripe_event_at: string | null; stripe_events_30d: number; last_mercadopago_event_at?: string | null;
     last_generation_at: string | null; generation_errors_7d: number; generation_inserted_7d: number;
     failed_events_24h: number;
   };

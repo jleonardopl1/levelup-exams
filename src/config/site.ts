@@ -19,7 +19,7 @@ export const SITE = {
   controller: 'Jonas Leonardo de Paula Leite da Silva',
   city: 'Cuiabá/MT',
   /** Data da versão vigente dos documentos legais (dd/mm/aaaa). */
-  legalUpdatedAt: '11/11/2026',
+  legalUpdatedAt: '20/11/2026',
 } as const;
 
 export const siteUrl = (path = '/') => `https://${SITE.domain}${path}`;

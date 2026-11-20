@@ -40,12 +40,19 @@ export default function Terms() {
             exibidos na página de planos no momento da contratação.
           </li>
           <li>
-            <strong>Direito de arrependimento:</strong> você pode desistir em até 7 dias da primeira contratação e
-            recebe o valor integral de volta (art. 49 do Código de Defesa do Consumidor).
+            Quando a opção aparece na página de planos, o Plus anual também pode ser pago uma única vez pelo Mercado
+            Pago, por Pix ou no cartão (à vista ou parcelado). Esse pagamento vale 12 meses a partir da confirmação e
+            não renova sozinho. O Passe Concurso também é um pagamento único e vale até 15 dias depois da prova da
+            trilha escolhida.
           </li>
           <li>
-            Você pode cancelar a renovação a qualquer momento. O acesso Plus continua até o fim do período já pago, sem
-            novas cobranças.
+            <strong>Direito de arrependimento:</strong> você pode desistir em até 7 dias da primeira contratação ou da
+            compra e recebe o valor integral de volta (art. 49 do Código de Defesa do Consumidor). A devolução é feita
+            pelo mesmo meio de pagamento. No cartão parcelado, a operadora do cartão estorna as parcelas.
+          </li>
+          <li>
+            Você pode cancelar a renovação da assinatura a qualquer momento. O acesso Plus continua até o fim do período
+            já pago, sem novas cobranças. Nos pagamentos únicos não há renovação para cancelar.
           </li>
           <li>
             Mudanças de preço valem apenas para renovações futuras e serão avisadas com antecedência.
