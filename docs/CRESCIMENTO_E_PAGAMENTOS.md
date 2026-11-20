@@ -1,5 +1,7 @@
 # Crescimento, divulgação e pagamentos
 
+> **Atualização de 2026-11-20 (D14):** o dono escolheu o Mercado Pago como segundo provedor, no lugar do Asaas. Plano em [Mercado Pago · Pix e Plus anual parcelado](MERCADO_PAGO.md).
+
 O primeiro teste é levar uma turma de candidatos até a conclusão de um Simulado Oficial, acompanhar a revisão dos erros e conferir se as vendas atribuídas à campanha deixam margem. Para aceitar pagamentos por outro provedor, a primeira opção a homologar é um Pix avulso no Asaas para o Passe Concurso. A assinatura mensal e os mandatos de débito recorrente exigem uma segunda etapa.
 
 O relatório usa o código em `e88195d`. Os volumes de piloto e as metas abaixo são propostas para decisão de Produto, Comercial e Financeiro. O registro das vendas, cotações, aprovações de conta e resultados de cada parceiro fica no espaço privado da operação. [Plano de integração](INTEGRACAO_OPERACIONAL.md)

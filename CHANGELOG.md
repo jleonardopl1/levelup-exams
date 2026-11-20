@@ -8,6 +8,7 @@
 - Cada um dos 79 cargos virou uma skill do Claude Code, acionada com `/` e o nome da ficha. As áreas encaminham ao especialista, e a skill só lê arquivos no turno em que é acionada. [Guia das skills](ops/agentes/README.md)
 - As instalações de referência podem ser reproduzidas com as revisões identificadas em cada ficha. [Resultados dos 32 repositórios](docs/ANALISE_DAS_REFERENCIAS.md)
 - O plano comercial define a primeira campanha com professores, os critérios de conversão e a homologação do Passe Concurso via Pix em um segundo provedor. [Crescimento e pagamentos](docs/CRESCIMENTO_E_PAGAMENTOS.md)
+- Plano para aceitar Pix e o Plus anual em até 12x pelo Mercado Pago, ao lado das assinaturas da Stripe. [Mercado Pago](docs/MERCADO_PAGO.md)
 
 ## [1.3.1] - 2026-11-11 (revisão diária)
 

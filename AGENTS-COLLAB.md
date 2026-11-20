@@ -55,6 +55,13 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
   modelo e encaminham ao especialista; os 69 especialistas só rodam por `/`. No turno da skill,
   `disallowed-tools` deixa só leitura. O plugin `levelup-operacao`, sem ferramentas, continua para execução isolada.
 
+- **D14** (2026-11-20, solicitação do dono) — O **Mercado Pago** entra como segundo provedor, pelo
+  Checkout Pro: Pix e cartão em até 12x para o **Plus anual pré-pago** (sem renovação automática) e
+  para o Passe Concurso. As assinaturas da Stripe não mudam e o Asaas fica pausado (um provedor por
+  vez). `billing_tier` continua só da Stripe; o acesso pago pelo Mercado Pago é outra fonte do plano
+  efetivo. Pendentes com o dono: preço, juros do parcelamento, desconto no Pix, reembolso fora dos 7
+  dias e conta habilitada ([plano, §2](docs/MERCADO_PAGO.md)).
+
 ---
 
 ## Armadilhas conhecidas
@@ -136,6 +143,8 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
   8. Observabilidade: Sentry (front + funções) e **alerta** quando a geração ou o gateway falham
      (ex.: aviso ao admin em erro 402 ou em N falhas seguidas).
   8a. Reconstituir `20261115140000_plus_internal_grants` (comparar o schema de produção com o das migrations).
+  8b. Mercado Pago (D14): 5 PRs com `MP_ENABLED` desligado, sandbox e produção controlada
+      ([plano, §8](docs/MERCADO_PAGO.md)). Em paralelo, dono e Financeiro abrem a conta e respondem a §2.
 - **P2 — próximos 1–3 meses:**
   9. Revisão espaçada FSRS no lugar das caixas fixas (1/3/7/14/30) (`cientista-aprendizagem`).
   10. Calibração TRI (3PL) das questões com as respostas reais → nota estimada estilo ENEM.
@@ -157,6 +166,27 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
 
 ## Handoff mais recente
 <!-- Sempre o topo = o mais recente. Template: docs/colaboracao/handoff-template.md -->
+
+### 2026-11-20 · Plano do Mercado Pago: Pix e Plus anual parcelado (`pagamentos` + `coordenador`)
+
+- **Objetivo da sessão:** planejar o Mercado Pago como segundo meio de pagamento, com Pix e o anual parcelado.
+- **O que mudou:** [docs/MERCADO_PAGO.md](docs/MERCADO_PAGO.md) com ofertas, decisões do dono, produto
+  (Checkout Pro), banco, funções, front, segurança, testes, fases e faixas. Decisão D14 e backlog P1.8b.
+  Nenhum código de produto mudou.
+- **Testado:** `npm run test:unit` → 84 aprovados, 2 pulados; checagens de fichas, skills e referências ok.
+  O plano foi conferido contra `create-checkout`,
+  `stripe-webhook`, `check-subscription`, `_shared/stripe.ts`, `useSubscription.ts`, `Upgrade.tsx`, `Terms.tsx`
+  e as migrations de cortesia, Passe e afiliados.
+- **Não testado:** campos da preferência, validade do Pix, assinatura das notificações vindas de
+  `notification_url` e aprovação de Pix no sandbox. A documentação oficial do Mercado Pago não abriu
+  nesta sessão (rede); esses pontos estão marcados para conferir na homologação.
+- **Decisões tomadas:** D14.
+- **Armadilhas novas:** gravar o acesso do Mercado Pago em `billing_tier` faria o `check-subscription`
+  apagá-lo na próxima consulta à Stripe (plano, §4).
+- **Bloqueios / pendências:** conta PJ do Mercado Pago com chave Pix, cotação de taxas e respostas às
+  decisões a–h (dono e Financeiro).
+- **Próximo passo sugerido:** `arquiteto-dados` especifica `payment_orders` e `apply_mp_payment` a partir
+  da §5.1; `supabase-db` abre o PR 1 (migration + testes de banco).
 
 ### 2026-11-20 · Skills dos 79 cargos do organograma
 
