@@ -98,6 +98,7 @@ export function AdminPlatformOverview({ onOpenReports }: { onOpenReports?: () =>
   }
 
   const { users, quizzes, content, health, answers } = data;
+  const mp = data.payments?.mercadopago;
   const weeklyTrend = quizzes.last_week > 0
     ? Math.round(((quizzes.this_week - quizzes.last_week) / quizzes.last_week) * 100)
     : null;
@@ -167,7 +168,7 @@ export function AdminPlatformOverview({ onOpenReports }: { onOpenReports?: () =>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <Kpi label="Usuários" value={num(users.total)} hint={`+${num(users.new_7d)} nos últimos 7 dias`} icon={Users} />
         <Kpi label="Ativos hoje / 7d / 30d" value={`${num(users.active_1d)} / ${num(users.active_7d)} / ${num(users.active_30d)}`} hint={`Engajamento diário: ${stickiness}% dos ativos do mês`} icon={Activity} tone="text-blue-500" />
-        <Kpi label="Assinantes Plus" value={num(users.plus)} hint={`Conversão: ${conversion}% da base${users.plus_granted ? ` · +${num(users.plus_granted)} liberado(s)` : ''}`} icon={Crown} tone="text-amber-500" />
+        <Kpi label="Assinantes Plus" value={num(users.plus)} hint={`Conversão: ${conversion}% da base${users.plus_mercadopago ? ` · +${num(users.plus_mercadopago)} pelo Mercado Pago` : ''}${users.plus_granted ? ` · +${num(users.plus_granted)} liberado(s)` : ''}`} icon={Crown} tone="text-amber-500" />
         <Kpi label="Novos (30 dias)" value={num(users.new_30d)} hint={users.banned > 0 ? `${users.banned} banido(s) ativo(s)` : undefined} icon={UserPlus} tone="text-emerald-500" />
       </div>
 
@@ -194,12 +195,34 @@ export function AdminPlatformOverview({ onOpenReports }: { onOpenReports?: () =>
         ) : (
           <>
             <Kpi label="MRR" value={brl(stripe?.revenue.mrr ?? 0)} icon={TrendingUp} tone="text-emerald-500" />
-            <Kpi label="Receita (30 dias)" value={brl(stripe?.revenue.totalRevenue ?? 0)} icon={DollarSign} tone="text-emerald-600" />
+            <Kpi label="Receita Stripe (30 dias)" value={brl(stripe?.revenue.totalRevenue ?? 0)} icon={DollarSign} tone="text-emerald-600" />
             <Kpi label="Assinaturas ativas (Stripe)" value={num(stripe?.revenue.activeSubscriptions)} icon={Crown} />
             <Kpi label="Cancelamentos" value={num(stripe?.revenue.canceledSubscriptions)} icon={XCircle} tone="text-destructive" />
           </>
         )}
       </div>
+
+      {/* Receita (Mercado Pago): Plus anual pré-pago e Passe, por Pix ou cartão parcelado */}
+      {mp && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <Kpi
+            label="Mercado Pago (30 dias)"
+            value={brl(mp.received_30d_cents)}
+            hint={`${num(mp.paid_30d)} venda(s) · ${num(mp.pix_30d)} no Pix · ${num(mp.installments_30d)} parcelada(s)`}
+            icon={DollarSign}
+            tone="text-sky-600"
+          />
+          <Kpi label="Estornos e chargebacks (30 dias)" value={brl(mp.refunded_30d_cents)} icon={XCircle} tone="text-destructive" />
+          <Kpi label="Pagamentos em aberto" value={num(mp.open_orders)} hint="Pix gerado ou checkout aberto" icon={Activity} />
+          <Kpi
+            label="Para o Financeiro revisar"
+            value={num(mp.needs_review)}
+            hint="Comissão após estorno, disputa ou pagamento em dobro"
+            icon={AlertTriangle}
+            tone={mp.needs_review > 0 ? 'text-amber-500' : 'text-muted-foreground'}
+          />
+        </div>
+      )}
 
       <div className="grid md:grid-cols-2 gap-4">
         <Card>

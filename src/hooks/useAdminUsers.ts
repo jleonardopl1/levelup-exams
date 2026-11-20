@@ -27,7 +27,7 @@ export interface AdminUserRow {
   affiliate_code: string | null;
   can_moderate: boolean;
   /** 'master' (permanente), 'stripe' (pago), 'grant' (liberado pela administração) ou null. */
-  premium_source: 'master' | 'stripe' | 'grant' | null;
+  premium_source: 'master' | 'stripe' | 'mercadopago' | 'grant' | null;
   /** Fim da liberação manual (null = sem prazo ou sem liberação). */
   premium_grant_expires_at: string | null;
   /** Motivo da liberação (visível só para o master). */

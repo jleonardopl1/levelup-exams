@@ -11,7 +11,7 @@ auditoria em `docs/SECURITY_AUDIT.md`.
 4. Sem HTML não sanitizado (`dangerouslySetInnerHTML` com dado externo é proibido); e-mails com `escapeHtml`.
 5. RLS em toda tabela; `service_role` só no servidor; RPC `SECURITY DEFINER` com `search_path` fixo,
    checagem do chamador e `EXECUTE` revogado de `PUBLIC`/`anon`.
-6. Webhook autenticado (assinatura Stripe) e cron com segredo comparado em tempo constante.
+6. Webhook autenticado (assinatura Stripe; `x-signature` do Mercado Pago, com o pagamento relido na API) e cron com segredo comparado em tempo constante.
 7. Rate limit em endpoint público e por usuário em endpoint autenticado; cotas por RPC atômica.
 8. Erro ao cliente sem stack, SQL, nome de tabela ou mensagem do provedor.
 9. Gabarito e dados de outros alunos nunca chegam ao cliente.
@@ -29,7 +29,8 @@ auditoria em `docs/SECURITY_AUDIT.md`.
 
 Só em secrets das Edge Functions ou no Vault do Supabase: `SUPABASE_SERVICE_ROLE_KEY`,
 `LOVABLE_API_KEY`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_*`, `RESEND_API_KEY`,
-`QUESTION_CRON_SECRET`. Exposição → rotacionar imediatamente e auditar o histórico.
+`QUESTION_CRON_SECRET`, `MP_ACCESS_TOKEN`, `MP_WEBHOOK_SECRET` (os demais `MP_*` são configuração,
+não segredo). Exposição → rotacionar imediatamente e auditar o histórico.
 
 ## Resposta a incidente
 

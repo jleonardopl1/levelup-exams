@@ -2,14 +2,18 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Crown, Check, Sparkles, Lock, Settings, Loader2, Ticket, X, CalendarCheck } from 'lucide-react';
+import { ArrowLeft, Crown, Check, Sparkles, Lock, Settings, Loader2, Ticket, X, CalendarCheck, QrCode, Clock, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { FREE_BENEFITS, PLUS_BENEFITS, PRICES } from '@/config/plans';
 import { Input } from '@/components/ui/input';
 import { supabase } from '@/integrations/supabase/client';
 import { clearStoredReferralCode, getStoredReferralCode, REFERRAL_CODE_RE, storeReferralCode } from '@/hooks/useAffiliates';
 import { useQuestionLimits } from '@/hooks/useDailyUsage';
 import { useProfile } from '@/hooks/useProfile';
-import { useSubscription, useCreateCheckout, useCustomerPortal, useExamPassOffer, syncSubscription, type SubscriptionPlan } from '@/hooks/useSubscription';
+import {
+  useSubscription, useCreateCheckout, useCustomerPortal, useExamPassOffer, syncSubscription, type SubscriptionPlan,
+  useMpOffer, useMpCheckout, useMyPaymentOrders, syncMpOrder, type MpOrderStatus, type MpProduct,
+} from '@/hooks/useSubscription';
+import { checkoutRedirectUrl, installmentHint, orderOutcome, renewalOpen } from '@/lib/checkout';
 import { PremiumBadge } from '@/components/PremiumBadge';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
@@ -35,6 +39,16 @@ export default function Upgrade() {
   const hasPaidPlan = (subscription?.billing_tier ?? profile?.billing_tier) === 'plus';
   const createCheckout = useCreateCheckout();
   const { data: examPass } = useExamPassOffer(!!user && !isPremium);
+  // Mercado Pago: Pix ou cartão parcelado, sem renovação automática (anual pré-pago e Passe).
+  const canRenewMp = !hasPaidPlan && subscription?.paid_product === 'plus_annual' && renewalOpen(subscription?.paid_until);
+  const { data: mpAnnual } = useMpOffer('plus_annual', !!user && (!isPremium || canRenewMp));
+  const { data: mpPass } = useMpOffer('exam_pass', !!user && !isPremium);
+  const mpCheckout = useMpCheckout();
+  const { data: myOrders } = useMyPaymentOrders(!!user);
+  const openOrder = myOrders?.find((o) => (o.status === 'created' || o.status === 'pending') && checkoutRedirectUrl(o.checkout_url));
+  const [mpReturn, setMpReturn] = useState<MpOrderStatus | null>(null);
+  const [mpRechecking, setMpRechecking] = useState(false);
+  const mpReturnHandled = useRef(false);
   const fmtDay = (iso: string) => new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
   const fmtMoney = (cents: number, currency = 'BRL') =>
     (cents / 100).toLocaleString('pt-BR', { style: 'currency', currency });
@@ -124,6 +138,75 @@ export default function Upgrade() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams, session?.user?.id]);
 
+  // Volta do Mercado Pago (/upgrade?pedido=<id>). Os parâmetros que o Mercado Pago acrescenta
+  // à URL não valem nada: o servidor confere o pedido na API. Pix pode levar alguns segundos,
+  // então a tela consulta de novo por até 2 minutos.
+  useEffect(() => {
+    const orderId = searchParams.get('pedido');
+    if (!orderId || !session?.access_token) return;
+    if (mpReturnHandled.current) return;
+    mpReturnHandled.current = true;
+    window.history.replaceState({}, '', '/upgrade');
+
+    let cancelled = false;
+    (async () => {
+      for (let attempt = 0; attempt < 30 && !cancelled; attempt++) {
+        const status = await syncMpOrder(session.access_token, orderId);
+        if (cancelled) return;
+        if (status) {
+          setMpReturn(status);
+          const outcome = orderOutcome(status.order.status);
+          if (outcome === 'approved') {
+            clearStoredReferralCode();
+            await queryClient.invalidateQueries({ queryKey: ['subscription'] });
+            await queryClient.invalidateQueries({ queryKey: ['profile'] });
+          }
+          if (outcome !== 'waiting') break;
+        }
+        await new Promise((r) => setTimeout(r, 4000));
+      }
+      if (!cancelled) void queryClient.invalidateQueries({ queryKey: ['my-payment-orders'] });
+    })();
+    return () => {
+      cancelled = true;
+      mpReturnHandled.current = false; // StrictMode remonta o efeito: deixa a 2ª execução seguir
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams, session?.user?.id]);
+
+  const recheckMpOrder = async () => {
+    if (!mpReturn || !session?.access_token) return;
+    setMpRechecking(true);
+    const status = await syncMpOrder(session.access_token, mpReturn.order.id);
+    setMpRechecking(false);
+    if (!status) {
+      toast.error('Não foi possível consultar o pagamento agora. Tente de novo em instantes.');
+      return;
+    }
+    setMpReturn(status);
+    if (orderOutcome(status.order.status) === 'approved') {
+      clearStoredReferralCode();
+      await queryClient.invalidateQueries({ queryKey: ['subscription'] });
+      await queryClient.invalidateQueries({ queryKey: ['profile'] });
+    }
+  };
+
+  const handleMpCheckout = (product: MpProduct, trackId?: string) => {
+    if (!user) {
+      toast.error('Você precisa estar logado para pagar');
+      navigate('/auth');
+      return;
+    }
+    mpCheckout.mutate(
+      { product, referralCode: referral?.code, trackId },
+      {
+        onError: (error) => {
+          if ((error as Error & { code?: string }).code === 'referral_invalid') removeReferral();
+        },
+      },
+    );
+  };
+
   const handleSubscribe = (plan: SubscriptionPlan) => {
     if (!user) {
       toast.error('Você precisa estar logado para assinar');
@@ -147,7 +230,17 @@ export default function Upgrade() {
 
   // Bloqueia a assinatura enquanto o código de indicação é validado: um checkout criado
   // antes disso sairia sem desconto e sem atribuição ao afiliado.
-  const isLoading = createCheckout.isPending || customerPortal.isPending || checkingReferral;
+  const isLoading = createCheckout.isPending || customerPortal.isPending || mpCheckout.isPending || checkingReferral;
+
+  const stripePass = examPass?.available && examPass.amount_cents && examPass.track && examPass.access_until ? examPass : null;
+  const mpPassOffer = mpPass?.available && mpPass.amount_cents && mpPass.track && mpPass.access_until ? mpPass : null;
+  const passInfo = stripePass ?? mpPassOffer;
+  const mpAnnualOffer = mpAnnual?.available && mpAnnual.amount_cents ? mpAnnual : null;
+  const mpLabel = (offer: { max_installments?: number }) =>
+    (offer.max_installments ?? 1) > 1 ? `Pagar com Pix ou em até ${offer.max_installments}x` : 'Pagar com Pix ou cartão';
+  const lowerFirst = (text: string) => text.charAt(0).toLowerCase() + text.slice(1);
+  const mpHint = (offer: { amount_cents?: number; max_installments?: number; interest_free_installments?: number }) =>
+    installmentHint(offer.amount_cents ?? 0, offer.max_installments ?? 1, offer.interest_free_installments ?? 1);
 
   return (
     <div className="min-h-screen bg-background">
@@ -177,6 +270,34 @@ export default function Upgrade() {
 
       {/* Plans */}
       <div className="px-4 -mt-6 pb-8 space-y-4">
+        {mpReturn && (
+          <MpReturnCard
+            status={mpReturn}
+            rechecking={mpRechecking}
+            onRecheck={recheckMpOrder}
+            onClose={() => setMpReturn(null)}
+            fmtDay={fmtDay}
+          />
+        )}
+
+        {!mpReturn && !isPremium && openOrder && (
+          <Card variant="default" className="border-primary/40">
+            <CardContent className="p-4 flex items-center justify-between gap-3">
+              <p className="text-sm">
+                Você tem um pagamento em aberto ({openOrder.product === 'exam_pass' ? 'Passe Concurso' : 'Plus anual'},{' '}
+                {fmtMoney(openOrder.amount_cents)}).
+              </p>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => { const url = checkoutRedirectUrl(openOrder.checkout_url); if (url) window.location.assign(url); }}
+              >
+                Continuar
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Referral / affiliate code */}
         {!isPremium && user && (
           <Card variant="default">
@@ -305,11 +426,13 @@ export default function Upgrade() {
                 <p className="font-medium text-foreground">
                   {subscription?.source === 'master'
                     ? 'Plus permanente da conta administradora.'
-                    : subscription?.grant_kind === 'exam_pass'
-                      ? 'Seu Passe Concurso está ativo.'
-                      : 'Seu acesso Plus foi liberado pela equipe LevelUp.'}
+                    : subscription?.source === 'mercadopago'
+                      ? (subscription.paid_product === 'exam_pass' ? 'Seu Passe Concurso está ativo.' : 'Seu Plus anual está ativo.')
+                      : subscription?.grant_kind === 'exam_pass'
+                        ? 'Seu Passe Concurso está ativo.'
+                        : 'Seu acesso Plus foi liberado pela equipe LevelUp.'}
                 </p>
-                {subscription?.source === 'grant' && (
+                {(subscription?.source === 'grant' || subscription?.source === 'mercadopago') && (
                   <p>
                     {subscription.access_until
                       ? `Válido até ${new Date(subscription.access_until).toLocaleDateString('pt-BR')}.`
@@ -317,10 +440,23 @@ export default function Upgrade() {
                   </p>
                 )}
                 <p>
-                  {subscription?.grant_kind === 'exam_pass'
-                    ? 'Pagamento único: não há renovação automática.'
-                    : 'Todas as funcionalidades do plano estão ativas, sem cobrança.'}
+                  {subscription?.source === 'mercadopago'
+                    ? 'Pago pelo Mercado Pago, sem renovação automática.'
+                    : subscription?.grant_kind === 'exam_pass'
+                      ? 'Pagamento único: não há renovação automática.'
+                      : 'Todas as funcionalidades do plano estão ativas, sem cobrança.'}
                 </p>
+                {canRenewMp && mpAnnualOffer && (
+                  <div className="pt-2 space-y-1.5">
+                    <Button variant="outline" size="lg" className="w-full" onClick={() => handleMpCheckout('plus_annual')} disabled={isLoading}>
+                      {mpCheckout.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <QrCode className="w-4 h-4 mr-2" />}
+                      Renovar por mais 12 meses
+                    </Button>
+                    <p className="text-xs">
+                      {fmtMoney(mpAnnualOffer.amount_cents!)} no Pix ou no cartão. Os 12 meses novos começam quando o período atual terminar.
+                    </p>
+                  </div>
+                )}
               </div>
             )}
 
@@ -354,7 +490,7 @@ export default function Upgrade() {
         </Card>
 
         {/* Passe Concurso (pagamento único até a prova) */}
-        {!isPremium && examPass?.available && examPass.amount_cents && examPass.track && examPass.access_until && (
+        {!isPremium && passInfo && (
           <Card variant="default" className="relative border-primary/40">
             <div className="absolute -top-3 right-4 px-3 py-1 bg-primary text-primary-foreground text-xs font-bold rounded-full">
               SEM RENOVAÇÃO
@@ -365,19 +501,38 @@ export default function Upgrade() {
                   Passe Concurso
                   <CalendarCheck className="w-5 h-5 text-primary" />
                 </span>
-                <span className="text-2xl font-bold">{fmtMoney(examPass.amount_cents, examPass.currency)}</span>
+                <span className="text-2xl font-bold">{fmtMoney(passInfo.amount_cents!, passInfo.currency)}</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <p className="text-sm text-muted-foreground">
-                Todo o Plus até {fmtDay(examPass.access_until)}: a prova de {examPass.track.shortName} em{' '}
-                {fmtDay(`${examPass.track.examDate}T12:00:00`)} e mais 15 dias para conferir o gabarito.
+                Todo o Plus até {fmtDay(passInfo.access_until!)}: a prova de {passInfo.track!.shortName} em{' '}
+                {fmtDay(`${passInfo.track!.examDate}T12:00:00`)} e mais 15 dias para conferir o gabarito.
                 Pagamento único, sem assinatura para cancelar.
               </p>
-              <Button variant="outline" size="lg" className="w-full" onClick={() => handleSubscribe('exam_pass')} disabled={isLoading}>
-                {isLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
-                Comprar Passe Concurso
-              </Button>
+              {stripePass && (
+                <Button variant="outline" size="lg" className="w-full" onClick={() => handleSubscribe('exam_pass')} disabled={isLoading}>
+                  {createCheckout.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+                  {mpPassOffer ? 'Pagar no cartão' : 'Comprar Passe Concurso'}
+                </Button>
+              )}
+              {mpPassOffer && (
+                <div className="space-y-1.5">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="w-full"
+                    aria-label={`Passe Concurso: ${lowerFirst(mpLabel(mpPassOffer))}`}
+                    onClick={() => handleMpCheckout('exam_pass', mpPassOffer.track!.id)}
+                    disabled={isLoading}
+                  >
+                    {mpCheckout.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <QrCode className="w-4 h-4 mr-2" />}
+                    {mpLabel(mpPassOffer)}
+                    {stripePass && stripePass.amount_cents !== mpPassOffer.amount_cents ? ` · ${fmtMoney(mpPassOffer.amount_cents!)}` : ''}
+                  </Button>
+                  {mpHint(mpPassOffer) && <p className="text-xs text-muted-foreground text-center">Pelo Mercado Pago, {mpHint(mpPassOffer)}.</p>}
+                </div>
+              )}
             </CardContent>
           </Card>
         )}
@@ -404,6 +559,25 @@ export default function Upgrade() {
               <p className="text-sm text-muted-foreground mb-4">
                 Equivale a {PRICES.annualPerMonth}/mês. Todos os benefícios do Plus com desconto especial.
               </p>
+              {mpAnnualOffer && (
+                <div className="mb-3 space-y-1.5">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="w-full"
+                    aria-label={`Plus anual: ${lowerFirst(mpLabel(mpAnnualOffer))}`}
+                    onClick={() => handleMpCheckout('plus_annual')}
+                    disabled={isLoading}
+                  >
+                    {mpCheckout.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <QrCode className="w-4 h-4 mr-2" />}
+                    {mpLabel(mpAnnualOffer)}
+                  </Button>
+                  <p className="text-xs text-muted-foreground text-center">
+                    {fmtMoney(mpAnnualOffer.amount_cents!)} por 12 meses de Plus, sem renovação automática
+                    {mpHint(mpAnnualOffer) ? ` · ${mpHint(mpAnnualOffer)}` : ''}.
+                  </p>
+                </div>
+              )}
               <Button 
                 variant="outline" 
                 size="lg" 
@@ -411,15 +585,91 @@ export default function Upgrade() {
                 onClick={() => handleSubscribe('annual')}
                 disabled={isLoading}
               >
-                {isLoading ? (
+                {createCheckout.isPending ? (
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                 ) : null}
-                Assinar Anual
+                {mpAnnualOffer ? 'Assinar no cartão · renova todo ano' : 'Assinar Anual'}
               </Button>
             </CardContent>
           </Card>
         )}
       </div>
     </div>
+  );
+}
+
+/** Situação do pagamento do Mercado Pago na volta do checkout. */
+function MpReturnCard({ status, rechecking, onRecheck, onClose, fmtDay }: {
+  status: MpOrderStatus;
+  rechecking: boolean;
+  onRecheck: () => void;
+  onClose: () => void;
+  fmtDay: (iso: string) => string;
+}) {
+  const outcome = orderOutcome(status.order.status);
+  const until = status.access.access_until ?? status.access.paid_until;
+  const resumeUrl = checkoutRedirectUrl(status.order.checkout_url);
+  const content = {
+    approved: {
+      icon: CheckCircle2,
+      tone: 'border-success/40 bg-success/5',
+      title: 'Pagamento confirmado!',
+      text: until ? `Seu Plus vale até ${fmtDay(until)}.` : 'Seu Plus já está ativo.',
+    },
+    waiting: {
+      icon: Clock,
+      tone: 'border-primary/40',
+      title: 'Estamos esperando a confirmação do pagamento.',
+      text: 'No Pix, a confirmação costuma chegar poucos segundos depois que você paga no app do banco.',
+    },
+    failed: {
+      icon: AlertCircle,
+      tone: 'border-destructive/40',
+      title: 'O pagamento não foi aprovado.',
+      text: 'Tente outro cartão ou pague com Pix.',
+    },
+    expired: {
+      icon: AlertCircle,
+      tone: 'border-amber-500/40',
+      title: 'O prazo deste pagamento acabou.',
+      text: 'Gere outro quando quiser. Se você já pagou, o Plus é liberado assim que o pagamento for confirmado.',
+    },
+    reversed: {
+      icon: AlertCircle,
+      tone: 'border-amber-500/40',
+      title: 'Este pagamento foi estornado.',
+      text: 'Se tiver dúvida sobre o estorno, fale com o suporte do LevelUp.',
+    },
+  }[outcome];
+  const Icon = content.icon;
+
+  return (
+    <Card variant="default" className={content.tone} role="status" aria-live="polite">
+      <CardContent className="p-4 space-y-3">
+        <div className="flex items-start gap-3">
+          <Icon className="w-5 h-5 mt-0.5 shrink-0" aria-hidden />
+          <div className="flex-1 space-y-1">
+            <p className="font-medium">{content.title}</p>
+            <p className="text-sm text-muted-foreground">{content.text}</p>
+          </div>
+          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onClose} aria-label="Fechar aviso">
+            <X className="w-4 h-4" />
+          </Button>
+        </div>
+        {outcome === 'waiting' && (
+          <div className="flex flex-wrap gap-2">
+            <Button size="sm" onClick={onRecheck} disabled={rechecking}>
+              {rechecking ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+              Já paguei
+            </Button>
+            {resumeUrl && (
+              <Button size="sm" variant="outline" onClick={() => window.location.assign(resumeUrl)}>
+                Voltar para o pagamento
+              </Button>
+            )}
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }

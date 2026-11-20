@@ -37,7 +37,11 @@ const faqItems = [
   },
   {
     question: "Como gerar o pagamento?",
-    answer: "Para assinar o plano Plus, acesse a página 'Upgrade' no menu do aplicativo. Você pode escolher entre o plano mensal (R$ 19,90/mês) ou anual (R$ 159,90/ano). O pagamento é processado de forma segura através do Stripe, aceitando cartões de crédito e débito."
+    answer: "Para assinar o plano Plus, acesse a página 'Upgrade' no menu do aplicativo. Você pode escolher entre o plano mensal (R$ 19,90/mês) ou anual (R$ 159,90/ano). A assinatura é paga no cartão pelo Stripe e renova automaticamente."
+  },
+  {
+    question: "Posso pagar com Pix ou parcelar o plano anual?",
+    answer: "Sim, quando a opção aparece na página de planos. O Plus anual e o Passe Concurso podem ser pagos uma única vez pelo Mercado Pago, por Pix ou no cartão em parcelas. O Plus anual pago assim vale 12 meses a partir da confirmação e não renova sozinho: perto do fim, você escolhe se quer renovar. O Pix costuma ser confirmado em poucos segundos."
   },
   {
     question: "Como me tornar um Parceiro?",

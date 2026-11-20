@@ -25,3 +25,9 @@ project_id = "rxsovhyimflzvxggppal"
     verify_jwt = false
   [functions.radar-concursos]
     verify_jwt = false
+  [functions.mp-create-checkout]
+    verify_jwt = false
+  [functions.mp-webhook]
+    verify_jwt = false
+  [functions.mp-sync-order]
+    verify_jwt = false

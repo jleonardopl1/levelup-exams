@@ -68,7 +68,9 @@ function PlusBadge({ u }: { u: AdminUserRow }) {
       ? (u.premium_grant_expires_at
         ? `Plus liberado até ${format(parseISO(u.premium_grant_expires_at), 'dd/MM/yy')}`
         : 'Plus liberado · sem prazo')
-      : 'Plus · assinante';
+      : u.premium_source === 'mercadopago'
+        ? 'Plus · pago no Mercado Pago'
+        : 'Plus · assinante';
   return (
     <Badge variant="outline" className="text-[10px] gap-1 bg-amber-500/10 text-amber-600 border-amber-500/30">
       {u.premium_source === 'grant' ? <Gift className="w-3 h-3" /> : <Crown className="w-3 h-3" />} {label}

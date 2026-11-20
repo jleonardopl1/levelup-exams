@@ -1,8 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { useEffect } from 'react';
+import { checkoutRedirectUrl } from '@/lib/checkout';
 
 /**
  * Planos de assinatura. O app envia só o NOME do plano; o servidor (create-checkout)
@@ -19,8 +21,11 @@ async function functionError(error: unknown): Promise<Error & { code?: string }>
   return err;
 }
 
-/** Origem do Plus: assinatura paga, liberação pela administração ou conta do admin master. */
-export type PremiumSource = 'stripe' | 'grant' | 'master' | null;
+/**
+ * Origem do Plus: assinatura paga na Stripe, pagamento avulso no Mercado Pago (anual pré-pago
+ * ou Passe), liberação pela administração ou conta do admin master.
+ */
+export type PremiumSource = 'stripe' | 'mercadopago' | 'grant' | 'master' | null;
 
 export interface SubscriptionStatus {
   subscribed: boolean;
@@ -29,10 +34,13 @@ export interface SubscriptionStatus {
   source?: PremiumSource;
   /** Plano pago no Stripe ('plus' = há assinatura para gerenciar), independente da origem do acesso. */
   billing_tier?: 'free' | 'plus';
-  /** Fim do Plus liberado pela administração (null = sem prazo). */
+  /** Fim do Plus liberado pela administração ou pago no Mercado Pago (null = sem prazo). */
   access_until?: string | null;
   /** Plus liberado: Passe Concurso comprado ('exam_pass') ou cortesia da equipe ('staff'). */
   grant_kind?: 'exam_pass' | 'staff' | null;
+  /** Fim do acesso pago no Mercado Pago, mesmo quando outra origem prevalece. */
+  paid_until?: string | null;
+  paid_product?: MpProduct | null;
 }
 
 export interface ExamPassOffer {
@@ -113,7 +121,7 @@ export function useCreateCheckout() {
       return data;
     },
     onSuccess: (data) => {
-      openStripeUrl(data?.url);
+      openCheckoutUrl(data?.url);
     },
     onError: (error: Error) => {
       toast.error(error.message || 'Erro ao criar sessão de pagamento');
@@ -142,7 +150,7 @@ export function useCustomerPortal() {
       return data;
     },
     onSuccess: (data) => {
-      openStripeUrl(data?.url);
+      openCheckoutUrl(data?.url);
     },
     onError: (error: Error) => {
       toast.error(error.message || 'Erro ao abrir portal');
@@ -151,27 +159,129 @@ export function useCustomerPortal() {
 }
 
 /**
- * Leva o usuário ao Stripe NA MESMA ABA. Antes era `window.open(..., '_blank')` depois
- * de uma chamada assíncrona: Safari/iPhone, app instalado (PWA) e bloqueadores de pop-up
- * barravam a janela e o botão "Assinar" parecia não fazer nada. Só aceita URLs do Stripe.
+ * Leva o usuário ao pagamento (Stripe ou Mercado Pago) NA MESMA ABA. Antes era
+ * `window.open(..., '_blank')` depois de uma chamada assíncrona: Safari/iPhone, app instalado
+ * (PWA) e bloqueadores de pop-up barravam a janela e o botão parecia não fazer nada.
+ * Só aceita os hosts de `CHECKOUT_HOSTS` (src/lib/checkout.ts).
  */
-function openStripeUrl(url: unknown) {
-  if (typeof url !== 'string') {
-    toast.error('Não foi possível abrir o pagamento. Tente novamente.');
+function openCheckoutUrl(url: unknown) {
+  const target = checkoutRedirectUrl(url);
+  if (!target) {
+    toast.error(typeof url === 'string' ? 'Link de pagamento inválido' : 'Não foi possível abrir o pagamento. Tente novamente.');
     return;
   }
-  try {
-    const parsed = new URL(url);
-    const allowed = parsed.protocol === 'https:' &&
-      (parsed.hostname === 'checkout.stripe.com' || parsed.hostname === 'billing.stripe.com');
-    if (!allowed) {
-      toast.error('Link de pagamento inválido');
-      return;
-    }
-    window.location.assign(parsed.toString());
-  } catch {
-    toast.error('Link de pagamento inválido');
-  }
+  window.location.assign(target);
+}
+
+// ---------------------------------------------------------------------------
+// Mercado Pago: Pix ou cartão em até 12x (Plus anual pré-pago e Passe Concurso)
+// ---------------------------------------------------------------------------
+
+export type MpProduct = 'plus_annual' | 'exam_pass';
+
+export interface MpOffer {
+  available: boolean;
+  product: MpProduct;
+  amount_cents?: number;
+  currency?: string;
+  max_installments?: number;
+  interest_free_installments?: number;
+  track?: { id: string; shortName: string; examDate: string };
+  access_until?: string;
+}
+
+/** Oferta do Mercado Pago: preço e parcelas vêm do servidor (secrets), não do app. */
+export function useMpOffer(product: MpProduct, enabled: boolean) {
+  const { session } = useAuth();
+  return useQuery({
+    queryKey: ['mp-offer', product, session?.user?.id],
+    enabled: enabled && !!session,
+    staleTime: 10 * 60 * 1000,
+    retry: false,
+    queryFn: async (): Promise<MpOffer> => {
+      const { data, error } = await supabase.functions.invoke('mp-create-checkout', {
+        body: { product, preview: true },
+        headers: { Authorization: `Bearer ${session!.access_token}` },
+      });
+      if (error || !data) return { available: false, product };
+      return data as MpOffer;
+    },
+  });
+}
+
+export function useMpCheckout() {
+  const { session } = useAuth();
+  return useMutation({
+    mutationFn: async ({ product, referralCode, trackId }: { product: MpProduct; referralCode?: string; trackId?: string }) => {
+      if (!session) throw new Error('Você precisa estar logado');
+      const { data, error } = await supabase.functions.invoke('mp-create-checkout', {
+        body: { product, ...(referralCode ? { referralCode } : {}), ...(trackId ? { trackId } : {}) },
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+      if (error) throw await functionError(error);
+      if (data?.error) throw new Error(data.error);
+      return data as { url: string; orderId: string };
+    },
+    onSuccess: (data) => {
+      openCheckoutUrl(data?.url);
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Erro ao abrir o pagamento');
+    },
+  });
+}
+
+export interface MpOrderStatus {
+  checked: boolean;
+  order: {
+    id: string;
+    product: MpProduct;
+    status: string;
+    amount_cents: number;
+    currency: string;
+    payment_method_type: string | null;
+    installments: number | null;
+    paid_at: string | null;
+    checkout_url: string | null;
+  };
+  access: { tier: 'free' | 'plus'; source: PremiumSource; access_until: string | null; paid_until: string | null };
+}
+
+/** Situação do pedido conferida no Mercado Pago pelo servidor (nunca pela URL de volta). */
+export async function syncMpOrder(accessToken: string, orderId: string): Promise<MpOrderStatus | null> {
+  const { data, error } = await supabase.functions.invoke('mp-sync-order', {
+    body: { orderId },
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  if (error || !data || data.error) return null;
+  return data as MpOrderStatus;
+}
+
+export interface MyPaymentOrder {
+  id: string;
+  product: MpProduct;
+  status: string;
+  amount_cents: number;
+  created_at: string;
+  expires_at: string;
+  checkout_url: string | null;
+}
+
+/** Pedidos do próprio aluno (para retomar um Pix em aberto). Sem a migration, lista vazia. */
+export function useMyPaymentOrders(enabled: boolean) {
+  const { session } = useAuth();
+  return useQuery({
+    queryKey: ['my-payment-orders', session?.user?.id],
+    enabled: enabled && !!session,
+    staleTime: 60_000,
+    retry: false,
+    queryFn: async (): Promise<MyPaymentOrder[]> => {
+      // RPC nova (migration 20261120120000): ainda não está nos tipos gerados (types.ts é gerado).
+      const { data, error } = await (supabase as unknown as SupabaseClient).rpc('get_my_payment_orders', { p_limit: 5 });
+      if (error || !Array.isArray(data)) return [];
+      return data as MyPaymentOrder[];
+    },
+  });
 }
 
 /** Consulta o Stripe (via Edge Function) e atualiza o plano salvo no perfil. */

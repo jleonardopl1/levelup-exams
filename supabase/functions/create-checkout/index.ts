@@ -11,6 +11,9 @@ import {
   requireUser,
 } from "../_shared/utils.ts";
 import { findCustomerForUser, getCustomerEntitlement, getStripe } from "../_shared/stripe.ts";
+import { resolveReferral } from "../_shared/referral.ts";
+import { RENEWAL_WINDOW_DAYS } from "../_shared/mercadopago.ts";
+import { findExamPassTrack } from "../_shared/exam-pass.ts";
 
 /**
  * Planos -> preços do Stripe, definidos NO SERVIDOR (o app só envia "monthly" ou "annual").
@@ -63,70 +66,30 @@ function resolvePlan(body: { plan?: unknown; priceId?: unknown } | null): Plan |
  * Quem libera o acesso é o stripe-webhook (grant_exam_pass), nunca esta função.
  */
 const EXAM_PASS_PRICE = (Deno.env.get("STRIPE_PRICE_EXAM_PASS") ?? "").trim();
-const EXAM_PASS_EXTRA_DAYS = 15;
 
 async function examPassOffer(stripe: NonNullable<ReturnType<typeof getStripe>>, supabase: SupabaseClient, trackId: unknown) {
   if (!EXAM_PASS_PRICE) return null;
   const price = await stripe.prices.retrieve(EXAM_PASS_PRICE).catch(() => null);
   if (!price || !price.active || price.type !== "one_time" || !price.unit_amount) return null;
 
-  const today = new Date(Date.now() - 4 * 3600 * 1000).toISOString().slice(0, 10); // Cuiabá
-  let query = supabase.from("study_tracks").select("id, short_name, exam_date")
-    .eq("is_active", true).gte("exam_date", today).order("exam_date", { ascending: true }).limit(1);
-  if (typeof trackId === "string" && /^[0-9a-f-]{36}$/i.test(trackId)) query = query.eq("id", trackId);
-  const { data: track } = await query.maybeSingle();
-  if (!track?.exam_date) return null;
-
-  const until = new Date(`${track.exam_date}T00:00:00-04:00`);
-  until.setUTCDate(until.getUTCDate() + EXAM_PASS_EXTRA_DAYS);
+  const pass = await findExamPassTrack(supabase, trackId);
+  if (!pass) return null;
   return {
     priceId: EXAM_PASS_PRICE,
     amountCents: price.unit_amount as number,
     currency: (price.currency as string).toUpperCase(),
-    track: { id: track.id as string, shortName: track.short_name as string, examDate: track.exam_date as string },
-    accessUntil: until.toISOString(),
+    track: pass.track,
+    accessUntil: pass.accessUntil,
   };
 }
 
 const RATE_LIMIT_WINDOW_MS = 60000;
 const RATE_LIMIT_MAX_REQUESTS = 5;
-const REFERRAL_CODE_RE = /^[A-Z0-9]{4,20}$/;
 
 // deno-lint-ignore no-explicit-any
 type SupabaseClient = any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
-/**
- * Valida o codigo de indicacao no servidor. Regras:
- *  - codigo ativo e nao removido;
- *  - nao e o codigo do proprio comprador;
- *  - o comprador ainda nao usou nenhum codigo (1 indicacao por usuario).
- */
-async function resolveReferral(
-  supabase: SupabaseClient,
-  rawCode: unknown,
-  userId: string,
-): Promise<{ id: string; discount: number } | { error: string } | null> {
-  if (rawCode === undefined || rawCode === null || rawCode === "") return null;
-  if (typeof rawCode !== "string") return { error: "Código de indicação inválido" };
-  const code = rawCode.trim().toUpperCase();
-  if (!REFERRAL_CODE_RE.test(code)) return { error: "Código de indicação inválido" };
-
-  const { data: ref } = await supabase
-    .from("referral_codes")
-    .select("id, user_id, discount_percent, is_active, revoked_at")
-    .eq("code", code)
-    .maybeSingle();
-  if (!ref || !ref.is_active || ref.revoked_at) return { error: "Código de indicação inválido ou inativo" };
-  if (ref.user_id === userId) return { error: "Você não pode usar o seu próprio código de indicação" };
-
-  const { count } = await supabase
-    .from("referral_uses")
-    .select("id", { count: "exact", head: true })
-    .eq("referred_user_id", userId);
-  if ((count ?? 0) > 0) return { error: "Você já utilizou um código de indicação" };
-
-  return { id: ref.id as string, discount: Number(ref.discount_percent) || 0 };
-}
+type PremiumAccess = { source?: string | null; access_until?: string | null; paid_until?: string | null };
 
 /** Cupom reutilizavel por percentual (primeira cobranca), criado sob demanda. */
 async function ensureReferralCoupon(stripe: NonNullable<ReturnType<typeof getStripe>>, percent: number): Promise<string> {
@@ -200,9 +163,12 @@ serve(withCors(async (req) => {
       }
       // Já tem Plus liberado por mais tempo que o passe? Não cobra à toa.
       const { data: access } = await supabase.rpc("get_premium_access", { p_user_id: user.id });
-      const a = access as { source?: string | null; access_until?: string | null } | null;
+      const a = access as PremiumAccess | null;
       const grantEnd = a?.access_until ? new Date(a.access_until).getTime() : null;
-      if (a?.source === "master" || (a?.source === "grant" && (grantEnd === null || grantEnd >= new Date(offer.accessUntil).getTime()))) {
+      const paidEnd = a?.paid_until ? new Date(a.paid_until).getTime() : null;
+      const passEnd = new Date(offer.accessUntil).getTime();
+      if (a?.source === "master" || (a?.source === "grant" && (grantEnd === null || grantEnd >= passEnd))
+        || (paidEnd !== null && paidEnd >= passEnd)) {
         return jsonResponse({ error: "Seu Plus já vale até depois da prova." }, 409);
       }
 
@@ -254,6 +220,14 @@ serve(withCors(async (req) => {
       return jsonResponse({ error: "Plano temporariamente indisponível. Tente novamente mais tarde." }, 503);
     }
     const priceId = price.id;
+
+    // Plus pago no Mercado Pago (anual pré-pago ou Passe): assinar agora cobraria em dobro.
+    const { data: paidAccess } = await supabase.rpc("get_premium_access", { p_user_id: user.id });
+    const paidUntil = (paidAccess as PremiumAccess | null)?.paid_until;
+    if (paidUntil && new Date(paidUntil).getTime() - Date.now() > RENEWAL_WINDOW_DAYS * 24 * 3600 * 1000) {
+      const day = new Date(paidUntil).toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" });
+      return jsonResponse({ error: `Seu Plus já vale até ${day}. A assinatura pode ser feita nos últimos ${RENEWAL_WINDOW_DAYS} dias.` }, 409);
+    }
 
     const referral = await resolveReferral(supabase, body?.referralCode, user.id);
     if (referral && "error" in referral) {

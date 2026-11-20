@@ -35,8 +35,10 @@ export default function Privacy() {
             conquistas, pontos, posição no ranking e uso do Mentor IA.
           </li>
           <li>
-            <strong>Assinatura:</strong> plano contratado e situação do pagamento. Os dados do cartão são digitados e
-            processados diretamente pelo Stripe; o {SITE.name} não recebe nem armazena o número do cartão.
+            <strong>Assinatura e pagamentos:</strong> plano contratado, valor, meio de pagamento (cartão ou Pix),
+            número de parcelas e situação do pagamento. Os dados do cartão e do pagador são digitados e processados
+            diretamente pelo Stripe ou pelo Mercado Pago; o {SITE.name} não recebe nem armazena o número do cartão nem
+            o CPF.
           </li>
           <li>
             <strong>Programa de parceiros:</strong> código de indicação, visitas e conversões geradas pelo link e
@@ -88,7 +90,8 @@ export default function Privacy() {
             <strong>Hospedagem, banco de dados e autenticação:</strong> Lovable e Supabase.
           </li>
           <li>
-            <strong>Pagamentos:</strong> Stripe.
+            <strong>Pagamentos:</strong> Stripe e Mercado Pago. Ao Mercado Pago enviamos só o seu e-mail e o número
+            do pedido.
           </li>
           <li>
             <strong>Inteligência artificial do Mentor e das explicações:</strong> o texto da sua pergunta é enviado ao

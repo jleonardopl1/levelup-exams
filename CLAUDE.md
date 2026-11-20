@@ -42,7 +42,7 @@ Plataforma gamificada de estudos para concursos públicos, vestibulares e ENEM (
 - Front: Vite + React 18 + TypeScript (SWC) · React Router · TanStack Query · Tailwind + shadcn/ui (Radix) · Recharts · PWA (`public/sw.js`, `public/manifest.json`)
 - Back: Supabase (Postgres + RLS + RPC `SECURITY DEFINER`, Auth, Edge Functions em Deno, pg_cron, Vault)
 - IA: Lovable AI Gateway (compatível com a API de chat da OpenAI) — modelos por papel via secrets
-- Pagamentos: Stripe (assinatura Plus e Passe Concurso) · E-mail: Resend / e-mails gerenciados do Lovable
+- Pagamentos: Stripe (assinatura Plus e Passe Concurso) e Mercado Pago (Checkout Pro: Pix e cartão em até 12x no Plus anual pré-pago e no Passe; `docs/MERCADO_PAGO.md`) · E-mail: Resend / e-mails gerenciados do Lovable
 - Gerenciador de pacotes: **bun** (lockfile oficial `bun.lockb`, o mesmo do Lovable); `npm install` também funciona
 - Integração Lovable ativa — **não** remover nem editar `.lovable/` e `.env`
 
@@ -54,6 +54,8 @@ Plataforma gamificada de estudos para concursos públicos, vestibulares e ENEM (
 - `src/integrations/supabase/types.ts` é gerado — não editar à mão.
 - Gabarito (`questions.correta`) nunca vai ao cliente; validação via RPC `validate_answer`.
 - Pontos, níveis, cotas e plano efetivo são decididos no servidor (RPC atômica), nunca no cliente.
+- `profiles.billing_tier` é só da Stripe (o `check-subscription` o reescreve). Acesso pago por outro provedor
+  entra como fonte própria do plano efetivo (`payment_orders` → `_paid_access_until`), nunca nesse campo.
 - Migrations idempotentes (`IF NOT EXISTS`, `CREATE OR REPLACE`, `DROP POLICY IF EXISTS`) e
   tolerantes à ordem de publicação (função publicada antes da migration não pode quebrar).
 - Commits em **Conventional Commits** (`feat/fix/refactor/docs/test/chore/perf/ci`).
@@ -64,6 +66,8 @@ Plataforma gamificada de estudos para concursos públicos, vestibulares e ENEM (
 - typecheck: `bun run typecheck` · lint: `bun run lint` · build: `bun run build`
 - testes unitários (lógica pura do front + guardrails): `bun run test:unit` (`node --test`, Node 22.18+)
 - testes das Edge Functions: `bun run test:edge` (requer Deno 2)
+- testes de banco (PGlite, fora da CI): `npm i --no-save @electric-sql/pglite@0.5.16` e então
+  `node docs/proposta-plus/validate.mjs` e `node supabase/tests/mercadopago.validate.mjs`
 - seed das trilhas: `bun run build:trilhas`
 - skills dos cargos: `node ops/agentes/skills.mjs` (depois de mudar o catálogo; `--check` roda no `test:unit`)
 - migrations: `supabase db push` (remoto exige aprovação do dono) · deploy de função: `supabase functions deploy <nome>`
@@ -114,12 +118,13 @@ Plataforma gamificada de estudos para concursos públicos, vestibulares e ENEM (
 - Gamificação: `achievements`, `user_achievements`, `daily_challenges`, `user_daily_challenges`, `user_rewards`, `reward_catalog`, `user_redemptions`, `user_milestones`, `notifications`
 - Afiliados e billing: `referral_codes`, `referral_uses`, `referral_link_visits`, `affiliate_payouts`, `stripe_webhook_events`, `platform_settings`
 - IA: `ai_runs` (telemetria), `ai_lessons` (memória de lições) — migration `20261116120000`
+- Mercado Pago: `payment_orders` (pedido, estado, acesso pago), `payment_provider_events` — migration `20261120120000`
 - Radar: `radar_areas`, `radar_sources`, `radar_concursos`, `radar_updates`, `radar_follows`, `radar_track_drafts`, `radar_runs` — migration `20261117120000`
 
 ## Edge Functions
 
 `ai-mentor` · `essay-review` · `generate-track-questions` (cron) · `radar-concursos` (cron) · `create-checkout` · `customer-portal` ·
-`check-subscription` · `stripe-webhook` · `admin-metrics` · `admin-notify` · `send-contact` · `auth-email-hook` (gerenciada pelo Lovable).
+`check-subscription` · `stripe-webhook` · `mp-create-checkout` · `mp-webhook` · `mp-sync-order` · `admin-metrics` · `admin-notify` · `send-contact` · `auth-email-hook` (gerenciada pelo Lovable).
 Utilidades em `_shared/` (CORS por lista de origens, auth, rate limit atômico, auditoria, IA).
 
 ## Aprendizagem (lógica pura em `src/lib`, testada com `node --test`)
