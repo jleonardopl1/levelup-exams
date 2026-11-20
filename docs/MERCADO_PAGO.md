@@ -6,7 +6,46 @@ parcelas**. As assinaturas atuais na Stripe continuam como estão.
 
 Responsável pela faixa: `pagamentos`. Revisão obrigatória: `security-reviewer`. Nada vai a
 produção (secrets, migration, publicação de função, modo live) sem aprovação do dono (D4).
-Base de código: `699c5fe`. Contexto anterior: [crescimento e pagamentos](CRESCIMENTO_E_PAGAMENTOS.md),
+Base de código: `699c5fe`.
+
+## Estado da implementação (2026-11-20)
+
+O código da fase 1 está pronto e **desligado** (`MP_ENABLED` ausente): sem os secrets, os botões
+do Mercado Pago não aparecem e nada muda para o aluno. As fases 0, 2, 3 e 4 (§8) dependem do dono
+e do Financeiro.
+
+| Peça | Onde | Verificação local |
+| --- | --- | --- |
+| Pedidos, eventos, máquina de estados, acesso pago como fonte do plano, visão do admin | `supabase/migrations/20261120120000_mercadopago_payment_orders.sql` | `node supabase/tests/mercadopago.validate.mjs`: 57 verificações; `docs/proposta-plus/validate.mjs` continua passando |
+| Assinatura, validação do pagamento, preferência, cliente HTTP | `supabase/functions/_shared/mercadopago.ts` | `mercadopago.test.ts`: 9 testes (entra no `bun run test:edge`) |
+| Checkout, webhook e sincronização | `mp-create-checkout`, `mp-webhook`, `mp-sync-order` | `deno check` com os imports remotos trocados pelos do npm (a sessão não alcança `deno.land`/`esm.sh`; a CI confere com os originais) |
+| Travas na Stripe e fonte `mercadopago` | `create-checkout`, `check-subscription`, `_shared/referral.ts`, `_shared/exam-pass.ts` | idem; os 76 testes anteriores das funções passam |
+| Planos, volta do checkout, renovação, pagamento em aberto | `src/pages/Upgrade.tsx`, `src/hooks/useSubscription.ts`, `src/lib/checkout.ts` | `checkout.test.ts` (7 testes) + 16 verificações no navegador com o Supabase simulado na rede |
+| Admin | `AdminPlatformOverview.tsx` (vendas, estornos, Pix/parcelado, revisão), selo "pago no Mercado Pago" | typecheck e build |
+| Textos | Termos (seção 3), Privacidade, FAQ | revisar com o jurídico antes de ligar (§2, decisão g) |
+
+Diferenças em relação ao plano abaixo: as cinco entregas da fase 1 entraram como commits do mesmo
+PR (a sessão só pode publicar num branch), e a receita do Mercado Pago aparece em
+`admin_platform_overview` (lida do banco), não no `admin-metrics`, que continua só com a Stripe.
+
+### Como ligar (fase 3, com o dono)
+
+1. Aplicar a migration `20261120120000_mercadopago_payment_orders.sql` pelo Lovable (não lê o
+   Vault nem agenda cron; o job horário `expire-premium-grants` já existe e passa a encerrar
+   pedidos vencidos). Depois, regerar `types.ts`.
+2. Publicar `mp-create-checkout`, `mp-webhook`, `mp-sync-order`, `create-checkout` e
+   `check-subscription`.
+3. No painel do Mercado Pago (Suas integrações → Webhooks), cadastrar
+   `https://<projeto>.supabase.co/functions/v1/mp-webhook` no tópico **Pagamentos** e copiar a
+   assinatura secreta.
+4. Cadastrar os secrets: `MP_ACCESS_TOKEN`, `MP_WEBHOOK_SECRET`, `MP_COLLECTOR_ID`,
+   `MP_PRICE_PLUS_ANNUAL_CENTS` (ex.: `15990`), `MP_PRICE_EXAM_PASS_CENTS`,
+   `MP_MAX_INSTALLMENTS` (padrão 12), `MP_INTEREST_FREE_INSTALLMENTS` (igual à configuração da
+   conta; padrão 1 = sem promessa de "sem juros") e, por último, `MP_ENABLED=true`.
+   `MP_NOTIFICATION_URL` é opcional: só se a homologação mostrar que as notificações da
+   preferência chegam assinadas (§5.3).
+5. Com credenciais de teste, rodar o roteiro da fase 2. Para desligar a qualquer momento, remover
+   `MP_ENABLED`: o checkout some; webhook e sincronização continuam tratando estornos. Contexto anterior: [crescimento e pagamentos](CRESCIMENTO_E_PAGAMENTOS.md),
 [implantação do Plus](PLUS_IMPLANTACAO.md), [afiliados](ADMIN_E_AFILIADOS.md).
 
 ---
@@ -206,8 +245,9 @@ desligada sozinha. `verify_jwt = false` em `supabase/config.toml`, como as demai
   master; passa a responder também para `mercadopago`.
 - **`create-checkout` (Stripe)** — recusa nova assinatura de quem tem anual pré-pago ativo
   ("Seu Plus vale até DD/MM/AAAA") e trata o Passe da mesma forma que hoje trata a cortesia.
-- **`admin-metrics`** — receita do Mercado Pago lida de `payment_orders` (pagos nos últimos 30
-  dias, menos estornos). O anual pré-pago aparece separado do MRR (normalizado por 12, rotulado).
+- **Painel do admin** — vendas, estornos, Pix/parcelado, pedidos em aberto e itens para o
+  Financeiro revisar saem de `admin_platform_overview` (lidos de `payment_orders`). O
+  `admin-metrics` continua só com a Stripe; o anual pré-pago não entra no MRR.
 
 **Secrets (o dono cadastra; nunca no código):** `MP_ACCESS_TOKEN`, `MP_WEBHOOK_SECRET`,
 `MP_COLLECTOR_ID` (id da conta recebedora), `MP_PRICE_PLUS_ANNUAL_CENTS`,
