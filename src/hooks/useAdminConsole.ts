@@ -27,6 +27,8 @@ export interface PlatformOverview {
     mercadopago: {
       paid_30d: number; received_30d_cents: number; refunded_30d_cents: number; pix_30d: number;
       installments_30d: number; open_orders: number; needs_review: number;
+      /** Pagamentos de teste (homologação), fora das vendas (migration 20261120130000). */
+      test_paid_30d?: number;
     };
   };
   health: {

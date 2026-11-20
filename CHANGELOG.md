@@ -10,6 +10,7 @@
 - O plano comercial define a primeira campanha com professores, os critérios de conversão e a homologação do Passe Concurso via Pix em um segundo provedor. [Crescimento e pagamentos](docs/CRESCIMENTO_E_PAGAMENTOS.md)
 - Plano para aceitar Pix e o Plus anual em até 12x pelo Mercado Pago, ao lado das assinaturas da Stripe. [Mercado Pago](docs/MERCADO_PAGO.md)
 - Pagamento pelo Mercado Pago pronto e desligado até a homologação: o Plus anual (12 meses, sem renovação automática) e o Passe Concurso podem ser pagos por Pix ou no cartão em até 12x. A página de Planos mostra a opção, confere o pagamento na volta do checkout, retoma um Pix em aberto e oferece a renovação nos últimos 30 dias. O admin vê vendas, estornos e pagamentos para revisar. Termos, Privacidade e FAQ descrevem a nova forma de pagamento. [Como ligar](docs/MERCADO_PAGO.md)
+- Mercado Pago mais seguro antes de ligar: pagamento feito com credenciais de teste não vira acesso real nem receita, a homologação pode ficar restrita à equipe, o mesmo código de indicação não dá desconto em dois pedidos e a comissão só conta pagamento aprovado. O Passe Concurso aparece só para provas nos próximos 12 meses. [Revisão de segurança](docs/MERCADO_PAGO.md)
 
 ## [1.3.1] - 2026-11-11 (revisão diária)
 

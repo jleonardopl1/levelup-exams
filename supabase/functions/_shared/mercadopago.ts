@@ -21,13 +21,24 @@ export const RENEWAL_WINDOW_DAYS = 30;
 /** Menor valor cobrado (centavos): evita pedido de R$ 0,00 por desconto mal configurado. */
 export const MIN_AMOUNT_CENTS = 100;
 
+/** Quem vê a oferta: ninguém, só a equipe (homologação) ou todos. */
+export type MpAvailability = "off" | "staff" | "all";
+
 export interface MpConfig {
-  /** MP_ENABLED=true: oferta e checkout ligados. Webhook e sincronização funcionam mesmo desligado. */
-  enabled: boolean;
+  /**
+   * MP_ENABLED=true liga a oferta para todos; MP_ENABLED=staff, só para a equipe (fase de
+   * homologação). Webhook e sincronização funcionam mesmo desligado (estornos continuam chegando).
+   */
+  availability: MpAvailability;
+  /**
+   * Ambiente das credenciais: MP_LIVE_MODE=false para credenciais de teste. Pagamento de outro
+   * ambiente é recusado, e o de teste dá no máximo 24 h de acesso (migration 20261120130000).
+   */
+  liveMode: boolean;
   accessToken: string;
   webhookSecret: string | null;
-  /** Id da conta recebedora: pagamento de outra conta é recusado. */
-  collectorId: string | null;
+  /** Id da conta recebedora (obrigatório): pagamento de outra conta é recusado. */
+  collectorId: string;
   priceAnnualCents: number | null;
   priceExamPassCents: number | null;
   maxInstallments: number;
@@ -51,17 +62,24 @@ function priceEnv(env: Env, key: string): number | null {
   return cents !== null && cents >= MIN_AMOUNT_CENTS ? cents : null;
 }
 
-/** Lê a configuração dos secrets. Sem MP_ACCESS_TOKEN, o Mercado Pago não existe (null). */
+/**
+ * Lê a configuração dos secrets. Sem MP_ACCESS_TOKEN ou sem MP_COLLECTOR_ID, o Mercado Pago não
+ * existe (null): sem a conta recebedora não há como recusar pagamento de outra conta.
+ */
 export function getMpConfig(env: Env = Deno.env): MpConfig | null {
   const accessToken = env.get("MP_ACCESS_TOKEN")?.trim();
-  if (!accessToken) return null;
+  const collectorId = env.get("MP_COLLECTOR_ID")?.trim();
+  if (!accessToken || !collectorId || !/^\d{1,20}$/.test(collectorId)) return null;
   const maxInstallments = clamp(intEnv(env, "MP_MAX_INSTALLMENTS") ?? 12, 1, 12);
   const notification = env.get("MP_NOTIFICATION_URL")?.trim() ?? "";
+  const enabled = env.get("MP_ENABLED")?.trim().toLowerCase();
   return {
-    enabled: env.get("MP_ENABLED")?.trim().toLowerCase() === "true",
+    availability: enabled === "true" ? "all" : enabled === "staff" ? "staff" : "off",
+    // Fail-closed: só "false" explícito aceita pagamentos de teste.
+    liveMode: env.get("MP_LIVE_MODE")?.trim().toLowerCase() !== "false",
     accessToken,
     webhookSecret: env.get("MP_WEBHOOK_SECRET")?.trim() || null,
-    collectorId: env.get("MP_COLLECTOR_ID")?.trim() || null,
+    collectorId,
     priceAnnualCents: priceEnv(env, "MP_PRICE_PLUS_ANNUAL_CENTS"),
     priceExamPassCents: priceEnv(env, "MP_PRICE_EXAM_PASS_CENTS"),
     maxInstallments,
@@ -220,6 +238,8 @@ export interface MpPayment {
   installments?: number;
   date_approved?: string | null;
   date_created?: string | null;
+  /** false = pagamento feito com credenciais de teste. */
+  live_mode?: boolean;
 }
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -228,23 +248,25 @@ export const MP_PAYMENT_ID_RE = /^\d{1,20}$/;
 
 export type PaymentCheck =
   | { ok: true; orderId: string }
-  | { ok: false; reason: "no_reference" | "collector_mismatch" | "invalid_payment" };
+  | { ok: false; reason: "no_reference" | "collector_mismatch" | "environment_mismatch" | "invalid_payment" };
 
-/** Conferências que não dependem do pedido: referência válida, conta recebedora e id. */
-export function checkPayment(payment: MpPayment, cfg: Pick<MpConfig, "collectorId">): PaymentCheck {
+/** Conferências que não dependem do pedido: id, referência, conta recebedora e ambiente. */
+export function checkPayment(payment: MpPayment, cfg: Pick<MpConfig, "collectorId" | "liveMode">): PaymentCheck {
   if (!MP_PAYMENT_ID_RE.test(String(payment?.id ?? "")) || typeof payment.status !== "string") {
     return { ok: false, reason: "invalid_payment" };
   }
   const ref = typeof payment.external_reference === "string" ? payment.external_reference.trim() : "";
   if (!UUID_RE.test(ref)) return { ok: false, reason: "no_reference" };
-  if (cfg.collectorId && String(payment.collector_id ?? "") !== cfg.collectorId) {
+  if (String(payment.collector_id ?? "") !== cfg.collectorId) {
     return { ok: false, reason: "collector_mismatch" };
   }
+  // Sem o campo, recusa: um pagamento de teste não pode virar acesso real por omissão.
+  if (payment.live_mode !== cfg.liveMode) return { ok: false, reason: "environment_mismatch" };
   return { ok: true, orderId: ref.toLowerCase() };
 }
 
-/** Argumentos de apply_mp_payment a partir do pagamento relido na API. */
-export function applyArgs(orderId: string, payment: MpPayment) {
+/** Argumentos de apply_mp_payment a partir do pagamento relido na API (já conferido). */
+export function applyArgs(orderId: string, payment: MpPayment, liveMode: boolean) {
   return {
     p_order_id: orderId,
     p_payment_id: String(payment.id),
@@ -256,6 +278,7 @@ export function applyArgs(orderId: string, payment: MpPayment) {
     p_method_type: payment.payment_type_id ? String(payment.payment_type_id) : null,
     p_installments: Number.isInteger(payment.installments) ? payment.installments : null,
     p_approved_at: payment.date_approved ?? null,
+    p_live_mode: liveMode,
   };
 }
 
@@ -276,7 +299,7 @@ export async function applyPaymentToOrder(supabase: SupabaseClient, cfg: MpConfi
     await audit(supabase, "MP_PAYMENT_IGNORED", null, { payment_id: String(payment?.id ?? ""), reason: check.reason });
     return { applied: false, reason: check.reason };
   }
-  const { data, error } = await supabase.rpc("apply_mp_payment", applyArgs(check.orderId, payment));
+  const { data, error } = await supabase.rpc("apply_mp_payment", applyArgs(check.orderId, payment, cfg.liveMode));
   if (error) throw new Error("apply_mp_payment failed");
   const result = (data ?? {}) as Record<string, unknown>;
   if (result.error === "order_not_found") {
@@ -303,6 +326,11 @@ async function audit(supabase: SupabaseClient, eventType: string, userId: string
 export class MpApiError extends Error {
   constructor(readonly status: number) {
     super(`Mercado Pago API ${status}`);
+  }
+
+  /** 400/404: repetir não muda nada (id inexistente ou de outro tópico). */
+  get permanent(): boolean {
+    return this.status === 400 || this.status === 404;
   }
 }
 

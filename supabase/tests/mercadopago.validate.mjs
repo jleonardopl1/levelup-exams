@@ -1,4 +1,5 @@
-// Testes de banco do Mercado Pago (migration 20261120120000_mercadopago_payment_orders.sql).
+// Testes de banco do Mercado Pago (migrations 20261120120000_mercadopago_payment_orders.sql e
+// 20261120130000_mercadopago_hardening.sql).
 // Sobe o Postgres em memória com todas as migrations e confere pedidos, máquina de estados,
 // acesso pago como fonte do plano efetivo, comissão, permissões e a visão do admin.
 //
@@ -23,14 +24,14 @@ const tier = async (uid) => (await one(`SELECT tier FROM profiles WHERE user_id=
 const order = async (id) => one(`SELECT * FROM payment_orders WHERE id=$1`, [id]);
 const access = async (uid) => { await as(uid); const a = await rpc(`SELECT get_premium_access()`); await as(null, 'service_role'); return a; };
 
-const CREATE = `SELECT create_payment_order($1, $2, $3, $4, $5, $6, $7, $8)`;
-const create = (uid, product, { track = null, list = 15990, discount = 0, ref = null, until = null, ttl = 60 } = {}) =>
-  rpc(CREATE, [uid, product, track, list, discount, ref, until, ttl]);
+const CREATE = `SELECT create_payment_order($1, $2, $3, $4, $5, $6, $7, $8, $9)`;
+const create = (uid, product, { track = null, list = 15990, discount = 0, ref = null, until = null, ttl = 60, live = true } = {}) =>
+  rpc(CREATE, [uid, product, track, list, discount, ref, until, ttl, live]);
 const attach = (id, n = 1) => db.query(`UPDATE payment_orders SET provider_preference_id=$2, checkout_url=$3 WHERE id=$1`,
   [id, `pref-${id.slice(0, 8)}-${n}`, `https://www.mercadopago.com.br/checkout/v1/redirect?pref_id=${id}`]);
-const APPLY = `SELECT apply_mp_payment($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`;
-const apply = (orderId, paymentId, status, { amount = 15990, refunded = 0, currency = 'BRL', method = 'bank_transfer', installments = 1, approvedAt = null, detail = 'accredited' } = {}) =>
-  rpc(APPLY, [orderId, paymentId, status, detail, amount, refunded, currency, method, installments, approvedAt]);
+const APPLY = `SELECT apply_mp_payment($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`;
+const apply = (orderId, paymentId, status, { amount = 15990, refunded = 0, currency = 'BRL', method = 'bank_transfer', installments = 1, approvedAt = null, detail = 'accredited', live = true } = {}) =>
+  rpc(APPLY, [orderId, paymentId, status, detail, amount, refunded, currency, method, installments, approvedAt, live]);
 
 const buyer = await mkUser('buyer@test.local');
 const other = await mkUser('other@test.local');
@@ -43,17 +44,23 @@ const priv = async (sql) => Object.values(await one(sql))[0];
 check(await priv(`SELECT NOT has_table_privilege('authenticated', 'public.payment_orders', 'SELECT')`), 'aluno não lê payment_orders direto');
 check(await priv(`SELECT NOT has_table_privilege('anon', 'public.payment_provider_events', 'SELECT')`), 'anônimo não lê payment_provider_events');
 for (const fn of [
-  'public.create_payment_order(uuid, text, uuid, integer, integer, uuid, timestamptz, integer)',
-  'public.apply_mp_payment(uuid, text, text, text, integer, integer, text, text, integer, timestamptz)',
+  'public.create_payment_order(uuid, text, uuid, integer, integer, uuid, timestamptz, integer, boolean)',
+  'public.apply_mp_payment(uuid, text, text, text, integer, integer, text, text, integer, timestamptz, boolean)',
   'public._paid_access_until(uuid)',
+  'public._has_paid_access(uuid)',
+  'public._mp_order_status(text, integer, integer)',
+  'public.expire_premium_grants()',
 ]) {
   check(await priv(`SELECT NOT has_function_privilege('authenticated', '${fn}', 'EXECUTE') AND NOT has_function_privilege('anon', '${fn}', 'EXECUTE')`),
     `${fn.split('(')[0]} fechada para cliente`);
 }
 check(await priv(`SELECT has_function_privilege('authenticated', 'public.get_my_payment_orders(integer)', 'EXECUTE')`), 'get_my_payment_orders liberada para o aluno logado');
+check(await priv(`SELECT NOT has_function_privilege('anon', 'public.get_my_payment_orders(integer)', 'EXECUTE')`), 'get_my_payment_orders fechada para anônimo');
+check(await priv(`SELECT count(*) = 0 FROM pg_proc WHERE proname IN ('create_payment_order', 'apply_mp_payment') AND pronamespace = 'public'::regnamespace AND pronargs IN (8, 10)`),
+  'assinaturas antigas de create_payment_order e apply_mp_payment removidas');
 await as(buyer);
 check((await create(buyer, 'plus_annual')).error === 'forbidden', 'create_payment_order recusa chamada de cliente');
-check((await rpc(APPLY, ['00000000-0000-0000-0000-000000000000', '1', 'approved', '', 1, 0, 'BRL', 'x', 1, null])).error === 'forbidden',
+check((await rpc(APPLY, ['00000000-0000-0000-0000-000000000000', '1', 'approved', '', 1, 0, 'BRL', 'x', 1, null, true])).error === 'forbidden',
   'apply_mp_payment recusa chamada de cliente');
 
 // ---------- Mapeamento de status ----------
@@ -96,6 +103,8 @@ check(Number(conv.subscription_amount) === 143.91 && Number(conv.commission_earn
   'comissão sobre o valor do produto com desconto, chave mp:<pedido>');
 await apply(A, 'pay-1', 'approved', { amount: 14391 });
 check((await one(`SELECT count(*)::int n FROM referral_uses WHERE referred_user_id=$1`, [buyer])).n === 1, 'reentrega não duplica a comissão');
+check((await create(buyer, 'exam_pass', { track, list: 4990, discount: 499, ref: refCode, until: new Date(Date.now() + 30 * DAY).toISOString() })).error === 'referral_in_use',
+  'o mesmo código não dá desconto num segundo pedido enquanto o primeiro está pago');
 const auditCount = async () => (await one(`SELECT count(*)::int n FROM audit_logs WHERE event_type='PAYMENT_ORDER_UPDATED' AND metadata->>'order_id'=$1`, [A])).n;
 const audits = await auditCount();
 await apply(A, 'pay-1', 'approved', { amount: 14391 });
@@ -196,15 +205,51 @@ let denied = false;
 try { await rpc(`SELECT get_my_payment_orders(10)`); } catch { denied = true; }
 check(denied, 'sem login, get_my_payment_orders recusa');
 
+// ---------- Ambiente: teste x produção ----------
+await as(null, 'service_role');
+const tester = await mkUser('tester@test.local');
+const T = (await create(tester, 'plus_annual', { live: false })).order_id; await attach(T);
+check((await order(T)).live_mode === false, 'pedido criado com credencial de teste fica marcado');
+r = await apply(T, 'pay-t', 'approved', { live: true });
+check(r.error === 'environment_mismatch' && await tier(tester) === 'free', 'pagamento real não vale para pedido de teste');
+r = await apply(T, 'pay-t', 'approved', { live: false });
+const tAcc = await access(tester);
+check(r.status === 'paid' && near(tAcc.access_until, new Date((await order(T)).paid_at).getTime() + DAY),
+  'pagamento de teste dá no máximo 24 h de acesso');
+const R = (await create(other, 'exam_pass', { track, list: 4990, until: new Date(Date.now() + 30 * DAY).toISOString() })).order_id; await attach(R);
+r = await apply(R, 'pay-r', 'approved', { amount: 4990, live: false });
+check(r.error === 'environment_mismatch', 'pagamento de teste não vale para pedido real');
+
+// ---------- Comissão: estorno lido primeiro e desconto sem comissão nova ----------
+const affiliate2 = await mkUser('affiliate2@test.local');
+const ref2 = (await one(`INSERT INTO referral_codes(user_id, code, discount_percent, commission_percent) VALUES ($1, 'PROF20', 10, 20) RETURNING id`, [affiliate2])).id;
+const late2 = await mkUser('late2@test.local');
+const E = (await create(late2, 'plus_annual', { discount: 1599, ref: ref2 })).order_id; await attach(E);
+r = await apply(E, 'pay-e', 'refunded', { amount: 14391, refunded: 14391 });
+check(r.status === 'refunded' && (await one(`SELECT count(*)::int n FROM referral_uses WHERE referred_user_id=$1`, [late2])).n === 0
+  && (await order(E)).commission_review === false, 'estorno lido antes da aprovação não gera comissão nem revisão');
+const C = (await create(buyer, 'plus_annual', { discount: 1599, ref: refCode })).order_id; await attach(C);
+r = await apply(C, 'pay-c', 'approved', { amount: 14391 });
+check(r.status === 'paid' && (await order(C)).commission_review === true,
+  'desconto sem comissão nova (indicado já registrado) fica para o Financeiro revisar');
+
+// ---------- Retenção das notificações ----------
+await db.query(`INSERT INTO payment_provider_events(provider, event_id, topic, received_at) VALUES ('mercadopago', 'old', 'payment', now() - interval '200 days'), ('mercadopago', 'new', 'payment', now())`);
+await rpc(`SELECT expire_premium_grants()`);
+check((await one(`SELECT count(*)::int n FROM payment_provider_events WHERE event_id IN ('old', 'new')`)).n === 1, 'notificações com mais de 180 dias são apagadas');
+
 // ---------- Visão do admin ----------
 const admin = await mkUser('admin@test.local');
 await db.query(`INSERT INTO user_roles(user_id, role) VALUES ($1, 'admin')`, [admin]);
 await as(admin);
 const ov = await rpc(`SELECT admin_platform_overview()`);
 const mp = ov.payments?.mercadopago;
-// Pagos nos últimos 30 dias: renovação (depois chargeback), dois anuais em duplicidade e o Passe.
-check(!!mp && mp.paid_30d === 4 && mp.received_30d_cents === 3 * 15990 + 4990 && mp.refunded_30d_cents === 15990
-  && mp.needs_review === 3 && mp.open_orders === 1, `visão do admin traz vendas do Mercado Pago (${JSON.stringify(mp)})`);
+// Pagos reais nos últimos 30 dias: renovação (depois chargeback), dois anuais em duplicidade, o Passe,
+// o anual estornado antes de aprovar (E) e o anual com desconto sem comissão nova (C). O de teste fica fora.
+// Abertos: o do aluno do Passe e o pedido real que recusou o pagamento de teste (R).
+check(!!mp && mp.paid_30d === 6 && mp.received_30d_cents === 3 * 15990 + 4990 + 2 * 14391
+  && mp.refunded_30d_cents === 15990 + 14391 && mp.needs_review === 4 && mp.open_orders === 2 && mp.test_paid_30d === 1,
+  `visão do admin traz vendas do Mercado Pago (${JSON.stringify(mp)})`);
 check(ov.users.plus_mercadopago >= 2 && typeof ov.users.plus_granted === 'number', 'Plus pago no Mercado Pago separado da cortesia');
 
 console.log(failures ? `\n${failures} FALHA(S)` : '\nTodos os testes passaram');

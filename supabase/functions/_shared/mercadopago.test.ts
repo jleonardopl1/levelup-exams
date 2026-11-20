@@ -23,14 +23,23 @@ import {
 const env = (vars: Record<string, string>) => ({ get: (k: string) => vars[k] });
 const ORDER = "6f1c2b9e-3d4a-4b8e-9f10-1a2b3c4d5e6f";
 
-Deno.test("config: sem token não existe; MP_ENABLED liga só o checkout", () => {
+Deno.test("config: sem token ou sem conta recebedora não existe; MP_ENABLED liga o checkout", () => {
   assert.equal(getMpConfig(env({})), null);
-  const off = getMpConfig(env({ MP_ACCESS_TOKEN: "APP_USR-x" }))!;
-  assert.equal(off.enabled, false);
+  assert.equal(getMpConfig(env({ MP_ACCESS_TOKEN: "APP_USR-x" })), null, "sem MP_COLLECTOR_ID");
+  assert.equal(getMpConfig(env({ MP_ACCESS_TOKEN: "APP_USR-x", MP_COLLECTOR_ID: "conta-1" })), null, "id não numérico");
+  const off = getMpConfig(env({ MP_ACCESS_TOKEN: "APP_USR-x", MP_COLLECTOR_ID: "555" }))!;
+  assert.equal(off.availability, "off");
+  assert.equal(off.liveMode, true, "sem MP_LIVE_MODE, só pagamento real");
   assert.equal(off.maxInstallments, 12);
   assert.equal(off.priceAnnualCents, null);
+  const staff = getMpConfig(env({ MP_ACCESS_TOKEN: "TEST-x", MP_COLLECTOR_ID: "555", MP_ENABLED: "staff", MP_LIVE_MODE: "false" }))!;
+  assert.equal(staff.availability, "staff");
+  assert.equal(staff.liveMode, false);
+  assert.equal(getMpConfig(env({ MP_ACCESS_TOKEN: "x", MP_COLLECTOR_ID: "555", MP_ENABLED: "sim" }))!.availability, "off");
+  assert.equal(getMpConfig(env({ MP_ACCESS_TOKEN: "x", MP_COLLECTOR_ID: "555", MP_LIVE_MODE: "0" }))!.liveMode, true);
   const on = getMpConfig(env({
     MP_ACCESS_TOKEN: "APP_USR-x",
+    MP_COLLECTOR_ID: "555",
     MP_ENABLED: "true",
     MP_PRICE_PLUS_ANNUAL_CENTS: "15990",
     MP_PRICE_EXAM_PASS_CENTS: "99", // abaixo do mínimo: oferta desligada
@@ -38,7 +47,7 @@ Deno.test("config: sem token não existe; MP_ENABLED liga só o checkout", () =>
     MP_INTEREST_FREE_INSTALLMENTS: "20",
     MP_NOTIFICATION_URL: "http://inseguro.example",
   }))!;
-  assert.equal(on.enabled, true);
+  assert.equal(on.availability, "all");
   assert.equal(on.priceAnnualCents, 15990);
   assert.equal(on.priceExamPassCents, null);
   assert.equal(on.maxInstallments, 12);
@@ -131,12 +140,18 @@ Deno.test("pagamento: referência, conta recebedora e argumentos da RPC", () => 
     payment_type_id: "credit_card",
     installments: 12,
     date_approved: "2026-11-20T10:00:00.000-03:00",
+    live_mode: true,
   };
-  assert.deepEqual(checkPayment(payment, { collectorId: "555" }), { ok: true, orderId: ORDER });
-  assert.deepEqual(checkPayment(payment, { collectorId: "999" }), { ok: false, reason: "collector_mismatch" });
-  assert.deepEqual(checkPayment({ ...payment, external_reference: "pedido-123" }, { collectorId: null }), { ok: false, reason: "no_reference" });
-  assert.deepEqual(checkPayment({ ...payment, id: "../v1/x" }, { collectorId: null }), { ok: false, reason: "invalid_payment" });
-  assert.deepEqual(applyArgs(ORDER, payment), {
+  const live = { collectorId: "555", liveMode: true };
+  assert.deepEqual(checkPayment(payment, live), { ok: true, orderId: ORDER });
+  assert.deepEqual(checkPayment(payment, { ...live, collectorId: "999" }), { ok: false, reason: "collector_mismatch" });
+  assert.deepEqual(checkPayment({ ...payment, external_reference: "pedido-123" }, live), { ok: false, reason: "no_reference" });
+  assert.deepEqual(checkPayment({ ...payment, id: "../v1/x" }, live), { ok: false, reason: "invalid_payment" });
+  // Pagamento de teste não vira acesso real, e vice-versa; sem o campo, recusa.
+  assert.deepEqual(checkPayment({ ...payment, live_mode: false }, live), { ok: false, reason: "environment_mismatch" });
+  assert.deepEqual(checkPayment(payment, { ...live, liveMode: false }), { ok: false, reason: "environment_mismatch" });
+  assert.deepEqual(checkPayment({ ...payment, live_mode: undefined }, live), { ok: false, reason: "environment_mismatch" });
+  assert.deepEqual(applyArgs(ORDER, payment, true), {
     p_order_id: ORDER,
     p_payment_id: "987654321",
     p_status: "approved",
@@ -147,6 +162,7 @@ Deno.test("pagamento: referência, conta recebedora e argumentos da RPC", () => 
     p_method_type: "credit_card",
     p_installments: 12,
     p_approved_at: "2026-11-20T10:00:00.000-03:00",
+    p_live_mode: true,
   });
 });
 
@@ -160,7 +176,7 @@ function fakeSupabase(rpcResult: { data?: unknown; error?: unknown }) {
 }
 
 const CFG = getMpConfig(env({ MP_ACCESS_TOKEN: "x", MP_COLLECTOR_ID: "555" }))!;
-const PAYMENT = { id: 1, status: "approved", external_reference: ORDER, transaction_amount: 10, currency_id: "BRL", collector_id: 555 };
+const PAYMENT = { id: 1, status: "approved", external_reference: ORDER, transaction_amount: 10, currency_id: "BRL", collector_id: 555, live_mode: true };
 
 Deno.test("applyPaymentToOrder: aplica, ignora pedido desconhecido e lança em erro do banco", async () => {
   const ok = fakeSupabase({ data: { order_id: ORDER, status: "paid" } });
@@ -200,5 +216,6 @@ Deno.test("cliente HTTP: idempotência, id numérico e erro sem corpo", async ()
   assert.deepEqual(await mp.searchPaymentsByReference("nao-e-uuid"), []);
 
   await assert.rejects(() => mp.getPayment("1/../../users"), MpApiError);
-  await assert.rejects(() => mp.getPayment("404"), (e: unknown) => e instanceof MpApiError && e.status === 404 && !e.message.includes("dados"));
+  await assert.rejects(() => mp.getPayment("404"), (e: unknown) => e instanceof MpApiError && e.status === 404 && e.permanent && !e.message.includes("dados"));
+  assert.equal(new MpApiError(503).permanent, false);
 });
