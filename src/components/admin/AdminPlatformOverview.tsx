@@ -208,7 +208,7 @@ export function AdminPlatformOverview({ onOpenReports }: { onOpenReports?: () =>
           <Kpi
             label="Mercado Pago (30 dias)"
             value={brl(mp.received_30d_cents)}
-            hint={`${num(mp.paid_30d)} venda(s) · ${num(mp.pix_30d)} no Pix · ${num(mp.installments_30d)} parcelada(s)`}
+            hint={`${num(mp.paid_30d)} venda(s) · ${num(mp.pix_30d)} no Pix · ${num(mp.installments_30d)} parcelada(s)${mp.test_paid_30d ? ` · ${num(mp.test_paid_30d)} de teste fora da conta` : ''}`}
             icon={DollarSign}
             tone="text-sky-600"
           />

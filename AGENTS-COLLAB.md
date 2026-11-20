@@ -60,8 +60,9 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
   para o Passe Concurso. As assinaturas da Stripe não mudam e o Asaas fica pausado (um provedor por
   vez). `billing_tier` continua só da Stripe; o acesso pago pelo Mercado Pago é outra fonte do plano
   efetivo. Pendentes com o dono: preço, juros do parcelamento, desconto no Pix, reembolso fora dos 7
-  dias e conta habilitada ([plano, §2](docs/MERCADO_PAGO.md)). Código da fase 1 pronto e desligado
-  (`MP_ENABLED` ausente) em 2026-11-20; para ligar, seguir "Como ligar" no plano.
+  dias e conta habilitada ([plano, §2](docs/MERCADO_PAGO.md)). Código da fase 1 na `main` e desligado
+  (`MP_ENABLED` ausente) em 2026-11-20, com as correções da revisão de segurança; homologar com
+  `MP_ENABLED=staff` e `MP_LIVE_MODE=false` seguindo "Como ligar" no plano.
 
 ---
 
@@ -153,6 +154,10 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
       revisão jurídica dos Termos, migration + funções publicadas, secrets, roteiro de sandbox e produção
       controlada ([como ligar](docs/MERCADO_PAGO.md)).
   8c. Levar os testes de banco em PGlite (`validate.mjs`, `mercadopago.validate.mjs`) para a CI.
+  8d. Mercado Pago, antes da abertura (fase 4): reconciliação periódica dos pedidos pagos (estorno com
+      webhook perdido), lista dos pedidos para revisão no admin e estorno automático da comissão.
+      Decisões do dono: retenção fiscal ao excluir conta (`payment_orders` em `ON DELETE CASCADE`) e
+      verificação de idade antes do pagamento (D6).
 - **P2 — próximos 1–3 meses:**
   9. Revisão espaçada FSRS no lugar das caixas fixas (1/3/7/14/30) (`cientista-aprendizagem`).
   10. Calibração TRI (3PL) das questões com as respostas reais → nota estimada estilo ENEM.
@@ -174,6 +179,28 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
 
 ## Handoff mais recente
 <!-- Sempre o topo = o mais recente. Template: docs/colaboracao/handoff-template.md -->
+
+### 2026-11-20 · Mercado Pago: correções da revisão de segurança (`pagamentos` + `security-reviewer`)
+
+- **Objetivo da sessão:** corrigir os achados do `security-reviewer` sobre o PR #30 (já mesclado).
+- **O que mudou:** migration `20261120130000_mercadopago_hardening.sql` (`live_mode` no pedido,
+  ambiente conferido em `apply_mp_payment`, acesso de teste limitado a 24 h e fora das vendas,
+  indicação recusada em dois pedidos, comissão só com aprovação, retenção de 180 dias das
+  notificações); `MP_COLLECTOR_ID` obrigatório, `MP_LIVE_MODE` e `MP_ENABLED=staff`; webhook com
+  chave de reentrega assinada, limite pelo `Content-Length` e 404 sem repetição; título genérico do
+  Passe; sincronização reconsulta pedidos recusados; Passe só para prova nos próximos 12 meses
+  (também na Stripe); PGlite com as concessões padrão do Supabase.
+- **Testado:** `node supabase/tests/mercadopago.validate.mjs` → 70 verificações ok;
+  `node docs/proposta-plus/validate.mjs` ok; `deno test` (import map local) → 85 ok; `deno check` das
+  funções de pagamento ok; `bun run test:unit` → 91 ok; typecheck e build ok; lint 0 erros (45 avisos anteriores).
+- **Não testado:** API real do Mercado Pago, incluindo se `live_mode` vem em todo pagamento (sem o
+  campo, o pagamento é recusado de propósito; conferir na fase 2).
+- **Decisões tomadas:** D14 atualizada (homologação com `MP_ENABLED=staff` e `MP_LIVE_MODE=false`).
+- **Armadilhas novas:** a segunda migration troca a assinatura de `create_payment_order` e
+  `apply_mp_payment`: publicar as funções `mp-*` desta versão junto.
+- **Bloqueios / pendências:** decisões da §2 e conta (dono); backlog P1.8d.
+- **Próximo passo sugerido:** dono aplica as duas migrations e publica as funções; `pagamentos` +
+  `tester` rodam a fase 2 com credenciais de teste e `MP_ENABLED=staff`.
 
 ### 2026-11-20 · Mercado Pago implementado e desligado (`pagamentos` + `supabase-db` + `edge-functions` + `frontend`)
 

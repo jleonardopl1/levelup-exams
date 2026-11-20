@@ -10,7 +10,8 @@ import { applyPaymentToOrder, getMpConfig, MpClient } from "../_shared/mercadopa
  * Os parâmetros que o Mercado Pago acrescenta à URL de volta nunca são usados.
  */
 
-const OPEN = new Set(["created", "pending", "expired"]);
+// Sem pagamento confirmado: um Pix pago depois de um cartão recusado também conta.
+const OPEN = new Set(["created", "pending", "expired", "failed", "canceled"]);
 
 serve(withCors(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });

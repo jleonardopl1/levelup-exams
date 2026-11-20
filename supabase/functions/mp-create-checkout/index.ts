@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { corsHeaders, withCors } from "../_shared/cors.ts";
 import {
   checkRateLimit,
+  getAccessLevel,
   getClientIp,
   getSiteUrl,
   jsonResponse,
@@ -112,8 +113,11 @@ serve(withCors(async (req) => {
       return jsonResponse({ error: "Muitas tentativas. Aguarde um momento." }, 429, { "Retry-After": "60" });
     }
 
+    // MP_ENABLED=staff: só a equipe vê a oferta (homologação no projeto de produção).
     const cfg = getMpConfig();
-    const listCents = cfg?.enabled ? (product === "plus_annual" ? cfg.priceAnnualCents : cfg.priceExamPassCents) : null;
+    const offered = cfg?.availability === "all" ||
+      (cfg?.availability === "staff" && (await getAccessLevel(supabase, user.id)) !== "user");
+    const listCents = offered ? (product === "plus_annual" ? cfg!.priceAnnualCents : cfg!.priceExamPassCents) : null;
     const pass = listCents && product === "exam_pass" ? await findExamPassTrack(supabase, body?.trackId) : null;
     const available = !!cfg && !!listCents && (product === "plus_annual" || !!pass);
 
@@ -158,6 +162,7 @@ serve(withCors(async (req) => {
       p_referral_code_id: referral?.id ?? null,
       p_access_until_fixed: pass?.accessUntil ?? null,
       p_ttl_minutes: ORDER_TTL_MINUTES,
+      p_live_mode: cfg!.liveMode,
     });
     const order = created as { order_id?: string; reused?: boolean; checkout_url?: string; expires_at?: string; error?: string } | null;
     if (orderError || !order) {
@@ -166,6 +171,9 @@ serve(withCors(async (req) => {
     }
     if (order.error === "busy") {
       return jsonResponse({ error: "Já estamos abrindo seu pagamento. Tente de novo em alguns segundos." }, 409);
+    }
+    if (order.error === "referral_in_use") {
+      return jsonResponse({ error: "Seu código de indicação já está em outro pagamento. Remova o código para continuar.", code: "referral_invalid" }, 400);
     }
     if (order.error || !order.order_id || !order.expires_at) {
       return jsonResponse({ error: "Não foi possível abrir o pagamento." }, 400);
@@ -181,7 +189,8 @@ serve(withCors(async (req) => {
       const pref = await mp.createPreference(buildPreference({
         orderId: order.order_id,
         product,
-        title: product === "plus_annual" ? "LevelUp Exams Plus · 12 meses" : `Passe Concurso · ${pass!.track.shortName}`,
+        // Sem o nome da trilha: o Mercado Pago recebe só e-mail e número do pedido (Privacidade).
+        title: product === "plus_annual" ? "LevelUp Exams Plus · 12 meses" : "LevelUp Exams · Passe Concurso",
         amountCents,
         payerEmail: user.email,
         siteUrl: getSiteUrl(),

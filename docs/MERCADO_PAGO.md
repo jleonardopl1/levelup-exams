@@ -6,48 +6,77 @@ parcelas**. As assinaturas atuais na Stripe continuam como estão.
 
 Responsável pela faixa: `pagamentos`. Revisão obrigatória: `security-reviewer`. Nada vai a
 produção (secrets, migration, publicação de função, modo live) sem aprovação do dono (D4).
-Base de código: `699c5fe`.
+Base de código: `699c5fe`. Contexto anterior: [crescimento e pagamentos](CRESCIMENTO_E_PAGAMENTOS.md),
+[implantação do Plus](PLUS_IMPLANTACAO.md), [afiliados](ADMIN_E_AFILIADOS.md).
 
 ## Estado da implementação (2026-11-20)
 
-O código da fase 1 está pronto e **desligado** (`MP_ENABLED` ausente): sem os secrets, os botões
-do Mercado Pago não aparecem e nada muda para o aluno. As fases 0, 2, 3 e 4 (§8) dependem do dono
-e do Financeiro.
+O código da fase 1 está na `main` ([PR #30](https://github.com/jleonardopl1/levelup-exams/pull/30)
+e correções da revisão de segurança) e **desligado** (`MP_ENABLED` ausente): sem os secrets, os
+botões do Mercado Pago não aparecem e nada muda para o aluno. As fases 0, 2, 3 e 4 (§8) dependem
+do dono e do Financeiro.
 
 | Peça | Onde | Verificação local |
 | --- | --- | --- |
-| Pedidos, eventos, máquina de estados, acesso pago como fonte do plano, visão do admin | `supabase/migrations/20261120120000_mercadopago_payment_orders.sql` | `node supabase/tests/mercadopago.validate.mjs`: 57 verificações; `docs/proposta-plus/validate.mjs` continua passando |
+| Pedidos, eventos, máquina de estados, acesso pago como fonte do plano, visão do admin | migrations `20261120120000_mercadopago_payment_orders.sql` e `20261120130000_mercadopago_hardening.sql` | `node supabase/tests/mercadopago.validate.mjs`: 70 verificações; `docs/proposta-plus/validate.mjs` continua passando |
 | Assinatura, validação do pagamento, preferência, cliente HTTP | `supabase/functions/_shared/mercadopago.ts` | `mercadopago.test.ts`: 9 testes (entra no `bun run test:edge`) |
 | Checkout, webhook e sincronização | `mp-create-checkout`, `mp-webhook`, `mp-sync-order` | `deno check` com os imports remotos trocados pelos do npm (a sessão não alcança `deno.land`/`esm.sh`; a CI confere com os originais) |
 | Travas na Stripe e fonte `mercadopago` | `create-checkout`, `check-subscription`, `_shared/referral.ts`, `_shared/exam-pass.ts` | idem; os 76 testes anteriores das funções passam |
 | Planos, volta do checkout, renovação, pagamento em aberto | `src/pages/Upgrade.tsx`, `src/hooks/useSubscription.ts`, `src/lib/checkout.ts` | `checkout.test.ts` (7 testes) + 16 verificações no navegador com o Supabase simulado na rede |
-| Admin | `AdminPlatformOverview.tsx` (vendas, estornos, Pix/parcelado, revisão), selo "pago no Mercado Pago" | typecheck e build |
+| Admin | `AdminPlatformOverview.tsx` (vendas reais, estornos, Pix/parcelado, revisão, pagamentos de teste à parte), selo "pago no Mercado Pago" | typecheck e build |
 | Textos | Termos (seção 3), Privacidade, FAQ | revisar com o jurídico antes de ligar (§2, decisão g) |
 
 Diferenças em relação ao plano abaixo: as cinco entregas da fase 1 entraram como commits do mesmo
 PR (a sessão só pode publicar num branch), e a receita do Mercado Pago aparece em
 `admin_platform_overview` (lida do banco), não no `admin-metrics`, que continua só com a Stripe.
 
-### Como ligar (fase 3, com o dono)
+### Revisão de segurança (2026-11-20)
 
-1. Aplicar a migration `20261120120000_mercadopago_payment_orders.sql` pelo Lovable (não lê o
-   Vault nem agenda cron; o job horário `expire-premium-grants` já existe e passa a encerrar
-   pedidos vencidos). Depois, regerar `types.ts`.
+O `security-reviewer` não achou nada crítico nem alto. O acesso só vem do pagamento relido na API
+e conferido contra o pedido. Correções feitas a partir dos achados:
+
+| Achado | Correção |
+| --- | --- |
+| Médio: pagamento feito com credenciais de teste viraria acesso Plus real e receita | `MP_LIVE_MODE` (padrão: produção) e `MP_COLLECTOR_ID` obrigatórios; o pedido guarda `live_mode` e recusa pagamento de outro ambiente; pagamento de teste dá no máximo 24 h de acesso e fica fora das vendas; `MP_ENABLED=staff` mostra a oferta só para a equipe |
+| Baixo: reentrega do webhook com corpo trocado gerava novas consultas | chave de reentrega só com campos assinados (`data.id` + `x-request-id` + `ts`); pagamento inexistente (404) não é repetido |
+| Baixo: corpo do webhook lido antes de checar o tamanho | recusa pelo `Content-Length` antes de ler |
+| Baixo: mesmo código de indicação com desconto em dois pedidos abertos | `create_payment_order` recusa (`referral_in_use`); desconto concedido sem comissão nova fica marcado para o Financeiro |
+| Baixo: comissão registrada quando o primeiro estado lido já era estorno | comissão só com aprovação (`paid`, `partially_refunded`, `in_dispute`) |
+| Baixo: nome do concurso ia ao Mercado Pago, ao contrário do aviso de privacidade; eventos sem retenção | título genérico do Passe; notificações apagadas depois de 180 dias |
+| Observação: sincronização não reconsultava pedido recusado; Passe sem teto de duração | `mp-sync-order` reconsulta `failed`/`canceled`; Passe só para prova nos próximos 12 meses (vale também na Stripe) |
+| Teste de permissões não simulava as concessões padrão do Supabase | o PGlite agora concede `EXECUTE` a `anon`/`authenticated` como o Supabase, e os testes conferem os `REVOKE` |
+
+Ficaram para decisão ou backlog (sem impacto enquanto desligado): reconciliação periódica de
+pedidos pagos (estorno com webhook perdido), lista dos pedidos para revisão no admin, estorno
+automático da comissão, retenção fiscal ao excluir a conta (`ON DELETE CASCADE`) e verificação de
+idade antes do pagamento (ECA Digital, D6).
+
+### Como ligar (com o dono)
+
+1. Aplicar, nesta ordem, as migrations `20261120120000_mercadopago_payment_orders.sql` e
+   `20261120130000_mercadopago_hardening.sql` pelo Lovable (não leem o Vault nem agendam cron; o
+   job horário `expire-premium-grants` já existe e passa a encerrar pedidos vencidos e apagar
+   notificações antigas). Depois, regerar `types.ts`.
 2. Publicar `mp-create-checkout`, `mp-webhook`, `mp-sync-order`, `create-checkout` e
-   `check-subscription`.
+   `check-subscription` (a segunda migration muda a assinatura das RPCs: publicar as funções desta
+   versão).
 3. No painel do Mercado Pago (Suas integrações → Webhooks), cadastrar
    `https://<projeto>.supabase.co/functions/v1/mp-webhook` no tópico **Pagamentos** e copiar a
    assinatura secreta.
-4. Cadastrar os secrets: `MP_ACCESS_TOKEN`, `MP_WEBHOOK_SECRET`, `MP_COLLECTOR_ID`,
-   `MP_PRICE_PLUS_ANNUAL_CENTS` (ex.: `15990`), `MP_PRICE_EXAM_PASS_CENTS`,
+4. **Fase 2, homologação só com a equipe:** secrets com as credenciais de **teste** —
+   `MP_ACCESS_TOKEN`, `MP_WEBHOOK_SECRET`, `MP_COLLECTOR_ID` (id da conta vendedora de teste),
+   `MP_LIVE_MODE=false`, `MP_PRICE_PLUS_ANNUAL_CENTS` (ex.: `15990`), `MP_PRICE_EXAM_PASS_CENTS`,
    `MP_MAX_INSTALLMENTS` (padrão 12), `MP_INTEREST_FREE_INSTALLMENTS` (igual à configuração da
-   conta; padrão 1 = sem promessa de "sem juros") e, por último, `MP_ENABLED=true`.
-   `MP_NOTIFICATION_URL` é opcional: só se a homologação mostrar que as notificações da
-   preferência chegam assinadas (§5.3).
-5. Com credenciais de teste, rodar o roteiro da fase 2. Para desligar a qualquer momento, remover
-   `MP_ENABLED`: o checkout some; webhook e sincronização continuam tratando estornos. Contexto anterior: [crescimento e pagamentos](CRESCIMENTO_E_PAGAMENTOS.md),
-[implantação do Plus](PLUS_IMPLANTACAO.md), [afiliados](ADMIN_E_AFILIADOS.md).
+   conta; padrão 1 = sem promessa de "sem juros") e, por último, `MP_ENABLED=staff`. Rodar o
+   roteiro da fase 2 com contas da equipe; o acesso de teste dura no máximo 24 h.
+5. **Fase 3, produção controlada:** trocar `MP_ACCESS_TOKEN`, `MP_WEBHOOK_SECRET` e
+   `MP_COLLECTOR_ID` pelos de produção e remover `MP_LIVE_MODE` (ou `true`). Manter
+   `MP_ENABLED=staff` para as compras reais da equipe com estorno.
+6. **Fase 4, abertura:** `MP_ENABLED=true`. `MP_NOTIFICATION_URL` é opcional: só se a homologação
+   mostrar que as notificações da preferência chegam assinadas (§5.3).
 
+Para desligar a qualquer momento, remover `MP_ENABLED`: o checkout some; webhook e sincronização
+continuam tratando estornos.
 ---
 
 ## 1. O que muda para o aluno
@@ -250,9 +279,10 @@ desligada sozinha. `verify_jwt = false` em `supabase/config.toml`, como as demai
   `admin-metrics` continua só com a Stripe; o anual pré-pago não entra no MRR.
 
 **Secrets (o dono cadastra; nunca no código):** `MP_ACCESS_TOKEN`, `MP_WEBHOOK_SECRET`,
-`MP_COLLECTOR_ID` (id da conta recebedora), `MP_PRICE_PLUS_ANNUAL_CENTS`,
-`MP_PRICE_EXAM_PASS_CENTS`, `MP_MAX_INSTALLMENTS`, `MP_INTEREST_FREE_INSTALLMENTS` (só para exibir)
-e `MP_ENABLED`. Sem `MP_ENABLED=true` a prévia responde `available: false` e o botão não aparece.
+`MP_COLLECTOR_ID` (id da conta recebedora, obrigatório), `MP_LIVE_MODE` (`false` só com credenciais
+de teste), `MP_PRICE_PLUS_ANNUAL_CENTS`, `MP_PRICE_EXAM_PASS_CENTS`, `MP_MAX_INSTALLMENTS`,
+`MP_INTEREST_FREE_INSTALLMENTS` (só para exibir) e `MP_ENABLED` (`staff` = só a equipe; `true` =
+todos). Sem `MP_ENABLED` a prévia responde `available: false` e o botão não aparece.
 Atualizar a lista de segredos em `rules/common/security.md`.
 
 ### 5.3 Webhook: assinatura e duplicidade
