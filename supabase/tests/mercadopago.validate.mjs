@@ -216,6 +216,11 @@ r = await apply(T, 'pay-t', 'approved', { live: false });
 const tAcc = await access(tester);
 check(r.status === 'paid' && near(tAcc.access_until, new Date((await order(T)).paid_at).getTime() + DAY),
   'pagamento de teste dá no máximo 24 h de acesso');
+const switcher = await mkUser('switch@test.local');
+const S1 = (await create(switcher, 'plus_annual', { live: false })).order_id; await attach(S1);
+const S2 = await create(switcher, 'plus_annual', { live: true });
+check(S2.reused === false && S2.order_id !== S1 && (await order(S1)).status === 'expired' && (await order(S2.order_id)).live_mode === true,
+  'ao trocar teste por produção, o pedido de teste aberto não é reaproveitado');
 const R = (await create(other, 'exam_pass', { track, list: 4990, until: new Date(Date.now() + 30 * DAY).toISOString() })).order_id; await attach(R);
 r = await apply(R, 'pay-r', 'approved', { amount: 4990, live: false });
 check(r.error === 'environment_mismatch', 'pagamento de teste não vale para pedido real');
@@ -246,9 +251,10 @@ const ov = await rpc(`SELECT admin_platform_overview()`);
 const mp = ov.payments?.mercadopago;
 // Pagos reais nos últimos 30 dias: renovação (depois chargeback), dois anuais em duplicidade, o Passe,
 // o anual estornado antes de aprovar (E) e o anual com desconto sem comissão nova (C). O de teste fica fora.
-// Abertos: o do aluno do Passe e o pedido real que recusou o pagamento de teste (R).
+// Abertos: o do aluno do Passe, o pedido real que recusou o pagamento de teste (R) e o real
+// criado depois da troca de ambiente (S2).
 check(!!mp && mp.paid_30d === 6 && mp.received_30d_cents === 3 * 15990 + 4990 + 2 * 14391
-  && mp.refunded_30d_cents === 15990 + 14391 && mp.needs_review === 4 && mp.open_orders === 2 && mp.test_paid_30d === 1,
+  && mp.refunded_30d_cents === 15990 + 14391 && mp.needs_review === 4 && mp.open_orders === 3 && mp.test_paid_30d === 1,
   `visão do admin traz vendas do Mercado Pago (${JSON.stringify(mp)})`);
 check(ov.users.plus_mercadopago >= 2 && typeof ov.users.plus_granted === 'number', 'Plus pago no Mercado Pago separado da cortesia');
 

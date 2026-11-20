@@ -104,7 +104,10 @@ BEGIN
   FOR UPDATE;
 
   IF FOUND THEN
+    -- Reaproveita só no mesmo ambiente: depois de trocar as credenciais de teste pelas de
+    -- produção, um pedido de teste ainda aberto é encerrado e outro é criado.
     IF v_open.amount_cents = v_amount
+       AND v_open.live_mode = COALESCE(p_live_mode, true)
        AND v_open.referral_code_id IS NOT DISTINCT FROM p_referral_code_id
        AND v_open.checkout_url IS NOT NULL THEN
       RETURN jsonb_build_object('order_id', v_open.id, 'reused', true, 'checkout_url', v_open.checkout_url,
