@@ -597,6 +597,144 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_orders: {
+        Row: {
+          access_months: number | null
+          access_revoked_at: string | null
+          access_until_fixed: string | null
+          amount_cents: number
+          checkout_url: string | null
+          commission_review: boolean
+          created_at: string
+          currency: string
+          discount_cents: number
+          expires_at: string
+          id: string
+          installments: number | null
+          list_amount_cents: number
+          live_mode: boolean
+          paid_at: string | null
+          payment_method_type: string | null
+          possible_duplicate: boolean
+          product: string
+          provider: string
+          provider_payment_id: string | null
+          provider_preference_id: string | null
+          provider_status: string | null
+          provider_status_detail: string | null
+          referral_code_id: string | null
+          refunded_cents: number
+          status: string
+          track_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          access_months?: number | null
+          access_revoked_at?: string | null
+          access_until_fixed?: string | null
+          amount_cents: number
+          checkout_url?: string | null
+          commission_review?: boolean
+          created_at?: string
+          currency?: string
+          discount_cents?: number
+          expires_at: string
+          id?: string
+          installments?: number | null
+          list_amount_cents: number
+          live_mode?: boolean
+          paid_at?: string | null
+          payment_method_type?: string | null
+          possible_duplicate?: boolean
+          product: string
+          provider?: string
+          provider_payment_id?: string | null
+          provider_preference_id?: string | null
+          provider_status?: string | null
+          provider_status_detail?: string | null
+          referral_code_id?: string | null
+          refunded_cents?: number
+          status?: string
+          track_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          access_months?: number | null
+          access_revoked_at?: string | null
+          access_until_fixed?: string | null
+          amount_cents?: number
+          checkout_url?: string | null
+          commission_review?: boolean
+          created_at?: string
+          currency?: string
+          discount_cents?: number
+          expires_at?: string
+          id?: string
+          installments?: number | null
+          list_amount_cents?: number
+          live_mode?: boolean
+          paid_at?: string | null
+          payment_method_type?: string | null
+          possible_duplicate?: boolean
+          product?: string
+          provider?: string
+          provider_payment_id?: string | null
+          provider_preference_id?: string | null
+          provider_status?: string | null
+          provider_status_detail?: string | null
+          referral_code_id?: string | null
+          refunded_cents?: number
+          status?: string
+          track_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_orders_referral_code_id_fkey"
+            columns: ["referral_code_id"]
+            isOneToOne: false
+            referencedRelation: "referral_codes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_orders_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "study_tracks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payment_provider_events: {
+        Row: {
+          event_id: string
+          processed_at: string | null
+          provider: string
+          received_at: string
+          resource_id: string | null
+          topic: string
+        }
+        Insert: {
+          event_id: string
+          processed_at?: string | null
+          provider: string
+          received_at?: string
+          resource_id?: string | null
+          topic: string
+        }
+        Update: {
+          event_id?: string
+          processed_at?: string | null
+          provider?: string
+          received_at?: string
+          resource_id?: string | null
+          topic?: string
+        }
+        Relationships: []
+      }
       platform_settings: {
         Row: {
           key: string
@@ -2203,6 +2341,7 @@ export type Database = {
       }
       _display_name_from_meta: { Args: { p_meta: Json }; Returns: string }
       _essay_used_7d: { Args: { p_user_id: string }; Returns: number }
+      _has_paid_access: { Args: { p_user_id: string }; Returns: boolean }
       _has_premium_grant: { Args: { p_user_id: string }; Returns: boolean }
       _has_role: {
         Args: {
@@ -2213,6 +2352,15 @@ export type Database = {
       }
       _is_master: { Args: { p_user_id: string }; Returns: boolean }
       _level_rank: { Args: { p_level: string }; Returns: number }
+      _mp_order_status: {
+        Args: {
+          p_amount_cents: number
+          p_refunded_cents: number
+          p_status: string
+        }
+        Returns: string
+      }
+      _paid_access_until: { Args: { p_user_id: string }; Returns: string }
       _premium_source: {
         Args: { p_billing_tier: string; p_user_id: string }
         Returns: string
@@ -2368,6 +2516,22 @@ export type Database = {
       }
       affiliate_default_terms: { Args: never; Returns: Json }
       affiliate_self_enrollment_enabled: { Args: never; Returns: boolean }
+      apply_mp_payment: {
+        Args: {
+          p_amount_cents: number
+          p_approved_at: string
+          p_currency: string
+          p_installments: number
+          p_live_mode: boolean
+          p_method_type: string
+          p_order_id: string
+          p_payment_id: string
+          p_refunded_cents: number
+          p_status: string
+          p_status_detail: string
+        }
+        Returns: Json
+      }
       begin_essay_submission: {
         Args: {
           p_cargo: string
@@ -2394,6 +2558,20 @@ export type Database = {
       consume_ai_mentor_quota: {
         Args: { p_limit: number; p_user_id: string }
         Returns: boolean
+      }
+      create_payment_order: {
+        Args: {
+          p_access_until_fixed: string
+          p_discount_cents: number
+          p_list_amount_cents: number
+          p_live_mode?: boolean
+          p_product: string
+          p_referral_code_id: string
+          p_track_id: string
+          p_ttl_minutes?: number
+          p_user_id: string
+        }
+        Returns: Json
       }
       expire_premium_grants: { Args: never; Returns: number }
       finish_mock_exam: { Args: { p_exam_id: string }; Returns: Json }
@@ -2429,6 +2607,7 @@ export type Database = {
       }
       get_mock_exam_standing: { Args: { p_exam_id: string }; Returns: Json }
       get_my_access: { Args: never; Returns: Json }
+      get_my_payment_orders: { Args: { p_limit?: number }; Returns: Json }
       get_practice_questions: {
         Args: {
           p_limit?: number
