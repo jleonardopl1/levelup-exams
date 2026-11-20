@@ -10,9 +10,12 @@ const RATE_LIMIT_MAX_REQUESTS = 20;
 type PremiumAccess = {
   tier: "free" | "plus";
   billing_tier: "free" | "plus";
-  source: "master" | "stripe" | "grant" | null;
+  source: "master" | "stripe" | "mercadopago" | "grant" | null;
   access_until: string | null;
   grant_kind?: "exam_pass" | "staff" | null;
+  /** Acesso pago pelo Mercado Pago (anual pré-pago ou Passe), mesmo se outra fonte prevalece. */
+  paid_until?: string | null;
+  paid_product?: "plus_annual" | "exam_pass" | null;
 };
 
 serve(withCors(async (req) => {
@@ -35,7 +38,8 @@ serve(withCors(async (req) => {
     if (!rl.allowed) return jsonResponse({ error: "Muitas requisições" }, 429, { "Retry-After": "60" });
 
     // 1. Assinatura paga (Stripe). Se o Stripe estiver fora, segue com o que o banco sabe:
-    //    o Plus liberado pela administração (ou do admin master) não depende do Stripe.
+    //    o Plus liberado pela administração, o do admin master e o pago pelo Mercado Pago
+    //    não dependem do Stripe.
     let stripeEnt: { tier: "free" | "plus"; subscriptionEnd: string | null } | null = null;
     const stripe = getStripe();
     if (stripe) {
@@ -56,12 +60,12 @@ serve(withCors(async (req) => {
       : { updated_at: new Date().toISOString() };
     await supabase.from("profiles").update(patch).eq("user_id", user.id);
 
-    // 3. Situação final (Stripe + liberação manual + admin master).
+    // 3. Situação final (Stripe + Mercado Pago + liberação manual + admin master).
     const { data: access, error: accessError } = await supabase.rpc("get_premium_access", { p_user_id: user.id });
     if (accessError || !access) throw new Error("access lookup failed");
     const a = access as PremiumAccess;
 
-    if (!stripeEnt && a.source !== "grant" && a.source !== "master") {
+    if (!stripeEnt && a.source !== "grant" && a.source !== "master" && a.source !== "mercadopago") {
       // Comportamento anterior: sem confirmação do Stripe, não afirmar nada sobre a assinatura.
       return stripe
         ? jsonResponse({ error: "Não foi possível verificar a assinatura" }, 500)
@@ -78,6 +82,9 @@ serve(withCors(async (req) => {
       access_until: a.access_until,
       // Plus liberado: Passe Concurso comprado ou cortesia da equipe.
       grant_kind: a.grant_kind ?? null,
+      // Plus pago no Mercado Pago (sem renovação automática).
+      paid_until: a.paid_until ?? null,
+      paid_product: a.paid_product ?? null,
     });
   } catch {
     console.error("[CHECK-SUBSCRIPTION] error");
