@@ -7,65 +7,27 @@
 // Uso (na raiz do repo):
 //   npm i --no-save @electric-sql/pglite@0.5.16
 //   node docs/proposta-plus/validate.mjs
-import { PGlite } from '@electric-sql/pglite';
-import { pgcrypto } from '@electric-sql/pglite/contrib/pgcrypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { bootSupabaseDb, sqlHelpers } from '../../supabase/tests/pglite-supabase.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const repo = path.resolve(here, '../..');
-const db = new PGlite({ extensions: { pgcrypto } });
-
-const STUBS = `
-CREATE EXTENSION IF NOT EXISTS pgcrypto;
-DO $$ BEGIN CREATE ROLE anon NOLOGIN; CREATE ROLE authenticated NOLOGIN; CREATE ROLE service_role NOLOGIN;
-EXCEPTION WHEN duplicate_object THEN NULL; END $$;
-CREATE SCHEMA auth; CREATE SCHEMA extensions; CREATE SCHEMA vault; CREATE SCHEMA cron; CREATE SCHEMA net;
-CREATE TABLE auth.users (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), email text,
-  raw_user_meta_data jsonb DEFAULT '{}'::jsonb, raw_app_meta_data jsonb DEFAULT '{}'::jsonb,
-  created_at timestamptz DEFAULT now(), last_sign_in_at timestamptz, email_confirmed_at timestamptz,
-  banned_until timestamptz, deleted_at timestamptz);
-CREATE TABLE auth.identities (id uuid DEFAULT gen_random_uuid(), user_id uuid, provider text, identity_data jsonb);
-CREATE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql STABLE AS $$ SELECT nullif(current_setting('request.jwt.claim.sub', true), '')::uuid $$;
-CREATE FUNCTION auth.role() RETURNS text LANGUAGE sql STABLE AS $$ SELECT coalesce(nullif(current_setting('request.jwt.claim.role', true), ''), 'authenticated') $$;
-CREATE FUNCTION auth.jwt() RETURNS jsonb LANGUAGE sql STABLE AS $$ SELECT '{}'::jsonb $$;
-CREATE FUNCTION extensions.gen_random_bytes(int) RETURNS bytea LANGUAGE sql AS $$ SELECT public.gen_random_bytes($1) $$;
-CREATE TABLE vault.secrets (id uuid DEFAULT gen_random_uuid(), name text UNIQUE, secret text, description text);
-CREATE VIEW vault.decrypted_secrets AS SELECT id, name, secret AS decrypted_secret, description FROM vault.secrets;
-CREATE FUNCTION vault.create_secret(s text, n text DEFAULT NULL, d text DEFAULT NULL) RETURNS uuid LANGUAGE sql AS
-  $$ INSERT INTO vault.secrets(name, secret, description) VALUES (n, s, d) RETURNING id $$;
-CREATE FUNCTION vault.update_secret(i uuid, s text DEFAULT NULL, n text DEFAULT NULL, d text DEFAULT NULL) RETURNS void LANGUAGE sql AS $$ SELECT $$;
-CREATE TABLE cron.job (jobid bigserial, jobname text, schedule text, command text);
-CREATE FUNCTION cron.schedule(n text, s text, c text) RETURNS bigint LANGUAGE sql AS $$ INSERT INTO cron.job(jobname, schedule, command) VALUES (n, s, c) RETURNING jobid $$;
-CREATE FUNCTION cron.unschedule(n text) RETURNS boolean LANGUAGE sql AS $$ DELETE FROM cron.job WHERE jobname = n RETURNING true $$;
-CREATE FUNCTION net.http_post(url text, body jsonb DEFAULT '{}', params jsonb DEFAULT '{}', headers jsonb DEFAULT '{}', timeout_milliseconds int DEFAULT 5000) RETURNS bigint LANGUAGE sql AS $$ SELECT 1::bigint $$;
-`;
-const clean = (sql) => sql
-  .replace(/CREATE EXTENSION IF NOT EXISTS pg_(cron|net)[^;]*;/gi, '')
-  .replace(/GRANT USAGE ON SCHEMA cron[^;]*;/gi, '');
 
 let failures = 0;
 const check = (cond, msg) => { console.log(`${cond ? 'PASS' : 'FAIL'}  ${msg}`); if (!cond) failures++; };
-const as = async (uid, role = 'authenticated') => {
-  await db.query(`SELECT set_config('request.jwt.claim.sub', $1, false), set_config('request.jwt.claim.role', $2, false)`, [uid ?? '', role]);
-};
-const one = async (sql, params = []) => (await db.query(sql, params)).rows[0];
-const rpc = async (sql, params = []) => Object.values(await one(sql, params))[0];
 
-await db.exec(STUBS);
-const migDir = path.join(repo, 'supabase/migrations');
 const PLUS_MIGRATION = '20261115120000_plus_features_v1.sql';
-const fnSrc = async (name) => (await one(`SELECT prosrc FROM pg_proc WHERE proname = $1 AND pronamespace = 'public'::regnamespace`, [name])).prosrc;
+const fnSrc = async (db, name) => (await db.query(`SELECT prosrc FROM pg_proc WHERE proname = $1 AND pronamespace = 'public'::regnamespace`, [name])).rows[0].prosrc;
 let validateAnswerBefore = null;
-for (const f of fs.readdirSync(migDir).filter((x) => x.endsWith('.sql')).sort()) {
-  if (f === PLUS_MIGRATION) validateAnswerBefore = await fnSrc('validate_answer');
-  try { await db.exec(clean(fs.readFileSync(path.join(migDir, f), 'utf8'))); }
-  catch (e) { failures++; console.log(`FAIL  migration ${f}: ${e.message}`); }
-}
+const { db, failures: migrationFailures } = await bootSupabaseDb({
+  onBeforeMigration: async (f, d) => { if (f === PLUS_MIGRATION) validateAnswerBefore = await fnSrc(d, 'validate_answer'); },
+});
+for (const m of migrationFailures) { failures++; console.log(`FAIL  migration ${m}`); }
+const { as, one, rpc } = sqlHelpers(db);
 // A migration Plus redefine validate_answer: o corpo novo tem que ser o anterior + só a trava nova.
 const norm = (s) => s.replace(/\s+/g, ' ').trim();
-const validateAnswerAfter = await fnSrc('validate_answer');
+const validateAnswerAfter = await fnSrc(db, 'validate_answer');
 const withoutNewBlock = validateAnswerAfter.replace(/\n\s*-- NOVO:[\s\S]*?END IF;\n/, '\n');
 check(validateAnswerAfter !== validateAnswerBefore && norm(withoutNewBlock) === norm(validateAnswerBefore),
   'validate_answer = versão anterior + apenas a trava do simulado aberto');
@@ -161,8 +123,8 @@ check((await rpc(`SELECT validate_answer($1, 0)`, [p3q])).correct_index !== unde
 
 // Salvar e finalizar usam o mesmo lock. O PGlite tem uma conexão só, então a corrida em si
 // não é reproduzível aqui: verificamos que a trava existe nas duas funções.
-const saveSrc = await fnSrc('save_mock_answer');
-const finishSrc = await fnSrc('finish_mock_exam');
+const saveSrc = await fnSrc(db, 'save_mock_answer');
+const finishSrc = await fnSrc(db, 'finish_mock_exam');
 check(/FROM public\.mock_exams[^;]*FOR UPDATE/.test(saveSrc) && /FROM public\.mock_exams[\s\S]*?FOR UPDATE/.test(finishSrc),
   'save_mock_answer e finish_mock_exam travam a mesma linha (FOR UPDATE) — corrida real só testável em Postgres com 2 conexões');
 
