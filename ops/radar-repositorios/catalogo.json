@@ -328,7 +328,7 @@
       "o_que_e": "API, CLI e servidor MCP que transformam páginas (inclusive as montadas por JavaScript) e PDFs em markdown, com versão local em Rust, nuvem paga e auto-hospedagem.",
       "uso_no_levelup": "Radar: as fontes que chegam vazias ao fetcher.ts (Cebraspe e portal da Selecon, semeadas desligadas) passariam a ser renderizadas pela API da Firecrawl Cloud, só nas fontes marcadas, mantendo diff, portão de evidência e verificador. A Fundatec (anti-robô) continua desligada.",
       "gatilho": "Produção só depois do P0.4 (Radar publicado e rodando) e se a URL estática, o endpoint JSON que a página consome ou o diário oficial (P17) não resolverem a fonte.",
-      "como_ativar": "O curador tenta antes as alternativas sem custo; se falharem, o dono cria conta (nunca o modo sem chave) e o laboratório testa as duas páginas com o robots.txt conferido. Depois, edge-functions adiciona um modo de renderização por fonte (campo novo via supabase-db) que chama a API v2 por fetch, sem SDK, confere o host da URL final, mantém 2 MB/15 s e usa o secret FIRECRAWL_API_KEY.",
+      "como_ativar": "Aprovado pelo dono em 2026-11-23 (de acordo: 1). Código pronto e desligado: coluna radar_sources.render_mode ('direto' | 'firecrawl', migration 20261123120000) e fetchRendered (API v2 por fetch, sem SDK, sem cache, proxy basic, robots.txt e URL final conferidos, 2 MB). Para ligar: (1) curador confirma que URL estática, endpoint JSON ou diário oficial não resolvem a fonte; (2) dono cria a conta e grava o secret FIRECRAWL_API_KEY; (3) dono aplica a migration; (4) marcar a fonte com render_mode = 'firecrawl' e rodar Admin → Radar → Verificar agora. Roteiro em docs/RADAR_CONCURSOS.md.",
       "riscos": "AGPL-3.0 só pesa se hospedarmos versão modificada; consumir a API não gera obrigação. Custo baixo (2 fontes a cada 12 h dá cerca de 120 créditos/mês, contra 1.000 grátis segundo o README), mas é dependência externa em produção, pode não respeitar robots.txt (o fetcher confere antes) e a resposta é dado não confiável (fenceUntrusted).",
       "relacao_backlog": "Armadilha do Radar (páginas por JavaScript); P0.4; P17; D8"
     },
@@ -470,9 +470,16 @@
       "o_que_e": "Skill de redesenho anti-slop: audita a tela contra sinais de interface com cara de IA (gradientes, brilhos, emoji, pulsos, copy exclamativa), propõe uma direção e espera o de acordo antes de editar.",
       "uso_no_levelup": "Rodar só a auditoria e o modo polimento em Quiz, Result e SimuladoOficial, que têm os sinais que ela procura (Card glass, shadow-glow-accent, gradient-accent, animate-sparkle, animate-pulse no timer; 29 arquivos com bg-gradient). As regras de copy batem com rules/common/writing.md.",
       "gatilho": "Promover para agora se o piloto no Quiz render ao menos 5 achados acionáveis que o Impeccable (item 19) não apontou, sem propostas que baixem o alvo de toque de 44 px ou troquem fonte e paleta; senão, descartar.",
-      "como_ativar": "Com o de acordo do dono: copiar de heydamir/unslop@620163eedb3529d9cd23a3994ed8d287d06f760d só skills/unslop/SKILL.md e skills/unslop/references/*.md para .claude/skills/unslop/, com LICENSE e ORIGEM.md (crédito a Damir Sokolovsky). Antes, corrigir as linhas 105 ('!' seguido de crase) e 122 ('$48,210') da SKILL.md, que o validador recusa; sem scripts/ e sem a etapa de geração de imagens.",
+      "como_ativar": "Feito (piloto aprovado pelo dono em 2026-11-23): SKILL.md e references/*.md do commit 620163e copiados para .claude/skills/unslop/, com LICENSE e ORIGEM.md (crédito a Damir Sokolovsky). Adaptações: só por /unslop, só auditoria e polimento, sem scripts e sem geração de imagem, linhas 105 e 122 corrigidas. Próximo passo: designer roda /unslop no Quiz e registra os achados contra o critério do gatilho.",
       "riscos": "CC-BY-4.0 exige atribuição em cópias e adaptações. Pensada para desktop (alvos de 32 a 36 px), não trata movimento reduzido e tende a propor fonte e paleta novas ou cortar celebrações da gamificação. Os scripts usam Playwright, ffmpeg e rede; a etapa de visuais envia a descrição do produto a geradores de imagem pagos. Revisão de segurança: aprovado com essas condições.",
-      "relacao_backlog": "Alternativa ao Impeccable do item 19: pilotar os dois no Quiz e ficar com o que der achados mais acionáveis."
+      "relacao_backlog": "Alternativa ao Impeccable do item 19: pilotar os dois no Quiz e ficar com o que der achados mais acionáveis.",
+      "ativacao": {
+        "tipo": "skill",
+        "alvo": ".claude/skills/unslop",
+        "commit": "620163eedb3529d9cd23a3994ed8d287d06f760d",
+        "aprovado_por": "dono (de acordo: 3)",
+        "aprovado_em": "2026-11-23"
+      }
     },
     {
       "repo": "ItsNotRexed/Leonida",

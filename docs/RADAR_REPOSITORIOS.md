@@ -62,6 +62,7 @@ candidatos a instalação, dos arquivos reais numa revisão fixada.
 | [multica-ai/andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills) | regra | `rules/common/coding-style.md` @ `2c606141936f` | code-reviewer, documentation-writer | dono, 2026-11-23 |
 | [karpathy/llm-wiki](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f) | regra | `.claude/agents/gerente-contexto.md` @ `ac46de1ad27f` | gerente-contexto, engenheiro-ia | dono, 2026-11-23 |
 | [GoogleChrome/modern-web-guidance](https://github.com/GoogleChrome/modern-web-guidance) | skill | `.claude/skills/guias-web-modernos` @ `2b4aa13a72dd` | designer, frontend, mobile | dono, 2026-11-23 |
+| [heydamir/unslop](https://github.com/heydamir/unslop) | skill | `.claude/skills/unslop` @ `620163eedb35` | designer | dono (de acordo: 3), 2026-11-23 |
 | [cloudflare/security-audit-skill](https://github.com/cloudflare/security-audit-skill) | skill | `.claude/skills/security-audit` @ `c1c8a8c14710` | security-reviewer | dono, 2026-11-23 |
 
 ### Aguardando o de acordo do dono
@@ -86,18 +87,9 @@ candidatos a instalação, dos arquivos reais numa revisão fixada.
 - **[firecrawl/firecrawl](https://github.com/firecrawl/firecrawl)** — API, CLI e servidor MCP que transformam páginas (inclusive as montadas por JavaScript) e PDFs em markdown, com versão local em Rust, nuvem paga e auto-hospedagem. _★ 207.661 · AGPL-3.0 · avaliado em 2026-11-23; faixa: edge-functions, curador-conteudo, engenheiro-ia._
   - **Uso no LevelUp:** Radar: as fontes que chegam vazias ao fetcher.ts (Cebraspe e portal da Selecon, semeadas desligadas) passariam a ser renderizadas pela API da Firecrawl Cloud, só nas fontes marcadas, mantendo diff, portão de evidência e verificador. A Fundatec (anti-robô) continua desligada.
   - **Gatilho:** Produção só depois do P0.4 (Radar publicado e rodando) e se a URL estática, o endpoint JSON que a página consome ou o diário oficial (P17) não resolverem a fonte.
-  - **Como ativar:** O curador tenta antes as alternativas sem custo; se falharem, o dono cria conta (nunca o modo sem chave) e o laboratório testa as duas páginas com o robots.txt conferido. Depois, edge-functions adiciona um modo de renderização por fonte (campo novo via supabase-db) que chama a API v2 por fetch, sem SDK, confere o host da URL final, mantém 2 MB/15 s e usa o secret FIRECRAWL_API_KEY.
+  - **Como ativar:** Aprovado pelo dono em 2026-11-23 (de acordo: 1). Código pronto e desligado: coluna radar_sources.render_mode ('direto' | 'firecrawl', migration 20261123120000) e fetchRendered (API v2 por fetch, sem SDK, sem cache, proxy basic, robots.txt e URL final conferidos, 2 MB). Para ligar: (1) curador confirma que URL estática, endpoint JSON ou diário oficial não resolvem a fonte; (2) dono cria a conta e grava o secret FIRECRAWL_API_KEY; (3) dono aplica a migration; (4) marcar a fonte com render_mode = 'firecrawl' e rodar Admin → Radar → Verificar agora. Roteiro em docs/RADAR_CONCURSOS.md.
   - **Riscos:** AGPL-3.0 só pesa se hospedarmos versão modificada; consumir a API não gera obrigação. Custo baixo (2 fontes a cada 12 h dá cerca de 120 créditos/mês, contra 1.000 grátis segundo o README), mas é dependência externa em produção, pode não respeitar robots.txt (o fetcher confere antes) e a resposta é dado não confiável (fenceUntrusted).
   - **Backlog:** Armadilha do Radar (páginas por JavaScript); P0.4; P17; D8.
-
-#### Design e front-end
-
-- **[heydamir/unslop](https://github.com/heydamir/unslop)** — Skill de redesenho anti-slop: audita a tela contra sinais de interface com cara de IA (gradientes, brilhos, emoji, pulsos, copy exclamativa), propõe uma direção e espera o de acordo antes de editar. _★ 20.708 · CC-BY-4.0 · avaliado em 2026-11-23; faixa: designer._
-  - **Uso no LevelUp:** Rodar só a auditoria e o modo polimento em Quiz, Result e SimuladoOficial, que têm os sinais que ela procura (Card glass, shadow-glow-accent, gradient-accent, animate-sparkle, animate-pulse no timer; 29 arquivos com bg-gradient). As regras de copy batem com rules/common/writing.md.
-  - **Gatilho:** Promover para agora se o piloto no Quiz render ao menos 5 achados acionáveis que o Impeccable (item 19) não apontou, sem propostas que baixem o alvo de toque de 44 px ou troquem fonte e paleta; senão, descartar.
-  - **Como ativar:** Com o de acordo do dono: copiar de heydamir/unslop@620163eedb3529d9cd23a3994ed8d287d06f760d só skills/unslop/SKILL.md e skills/unslop/references/*.md para .claude/skills/unslop/, com LICENSE e ORIGEM.md (crédito a Damir Sokolovsky). Antes, corrigir as linhas 105 ('!' seguido de crase) e 122 ('$48,210') da SKILL.md, que o validador recusa; sem scripts/ e sem a etapa de geração de imagens.
-  - **Riscos:** CC-BY-4.0 exige atribuição em cópias e adaptações. Pensada para desktop (alvos de 32 a 36 px), não trata movimento reduzido e tende a propor fonte e paleta novas ou cortar celebrações da gamificação. Os scripts usam Playwright, ffmpeg e rede; a etapa de visuais envia a descrição do produto a geradores de imagem pagos. Revisão de segurança: aprovado com essas condições.
-  - **Backlog:** Alternativa ao Impeccable do item 19: pilotar os dois no Quiz e ficar com o que der achados mais acionáveis.
 
 ### Futuro — ativar quando o gatilho acontecer
 
@@ -373,6 +365,12 @@ candidatos a instalação, dos arquivos reais numa revisão fixada.
   - **Como ativar:** Feito: copiados só os guias (14 categorias, 202 arquivos) do commit 2b4aa13 para .claude/skills/guias-web-modernos/guides/, com LICENSE, ORIGEM.md e SKILL.md própria que consulta os guias com Grep e Read. Não instalar o plugin nem liberar npx.
   - **Riscos:** Revisão de segurança: o plugin foi reprovado como está (a SKILL.md original roda npx -y modern-web-guidance@latest a cada consulta, sem versão fixa, se declara obrigatória em toda tarefa, pede pré-autorização de rede e sugere editar CLAUDE.md); a cópia dos guias foi aprovada. Guias em inglês e para HTML puro (adaptar a React/shadcn).
   - **Backlog:** Complementa o item 19 (auditoria de UI) e prepara o P2.12 pela instalação do PWA.
+- **[heydamir/unslop](https://github.com/heydamir/unslop)** — Skill de redesenho anti-slop: audita a tela contra sinais de interface com cara de IA (gradientes, brilhos, emoji, pulsos, copy exclamativa), propõe uma direção e espera o de acordo antes de editar. _★ 20.708 · CC-BY-4.0 · avaliado em 2026-11-23; faixa: designer._
+  - **Uso no LevelUp:** Rodar só a auditoria e o modo polimento em Quiz, Result e SimuladoOficial, que têm os sinais que ela procura (Card glass, shadow-glow-accent, gradient-accent, animate-sparkle, animate-pulse no timer; 29 arquivos com bg-gradient). As regras de copy batem com rules/common/writing.md.
+  - **Gatilho:** Promover para agora se o piloto no Quiz render ao menos 5 achados acionáveis que o Impeccable (item 19) não apontou, sem propostas que baixem o alvo de toque de 44 px ou troquem fonte e paleta; senão, descartar.
+  - **Como ativar:** Feito (piloto aprovado pelo dono em 2026-11-23): SKILL.md e references/*.md do commit 620163e copiados para .claude/skills/unslop/, com LICENSE e ORIGEM.md (crédito a Damir Sokolovsky). Adaptações: só por /unslop, só auditoria e polimento, sem scripts e sem geração de imagem, linhas 105 e 122 corrigidas. Próximo passo: designer roda /unslop no Quiz e registra os achados contra o critério do gatilho.
+  - **Riscos:** CC-BY-4.0 exige atribuição em cópias e adaptações. Pensada para desktop (alvos de 32 a 36 px), não trata movimento reduzido e tende a propor fonte e paleta novas ou cortar celebrações da gamificação. Os scripts usam Playwright, ffmpeg e rede; a etapa de visuais envia a descrição do produto a geradores de imagem pagos. Revisão de segurança: aprovado com essas condições.
+  - **Backlog:** Alternativa ao Impeccable do item 19: pilotar os dois no Quiz e ficar com o que der achados mais acionáveis.
 
 #### Segurança
 

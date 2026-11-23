@@ -27,7 +27,7 @@ import { jsonResponse, readJson, requireAdmin, UUID_RE } from "../_shared/utils.
 import { createGatewayClient, modelFromEnv } from "../_shared/ai/llm.ts";
 import { createTelemetry } from "../_shared/ai/telemetry.ts";
 import { slugify } from "./evidence.ts";
-import { diffNewLines, fetchPage, FetchError } from "./fetcher.ts";
+import { diffNewLines, fetchPage, FetchError, fetchRendered } from "./fetcher.ts";
 import { type ChangedPage, type ConcursoOutcome, isSourceDue, pool, runMonitor } from "./pipeline.ts";
 import { relevanceScore, shouldSuggestTrack } from "./scoring.ts";
 import { runTrackDraft } from "./tracks.ts";
@@ -55,6 +55,8 @@ interface SourceRow {
   last_text: string | null;
   consecutive_failures: number;
   pending_retries: number;
+  /** 'firecrawl' = página montada por JavaScript, renderizada pelo serviço (piloto D15). Sem a coluna = 'direto'. */
+  render_mode?: string | null;
 }
 
 const intEnv = (name: string, fallback: number, min: number, max: number) =>
@@ -186,7 +188,8 @@ async function monitor(supabase: Supa, apiKey: string, trigger: "cron" | "admin"
   const [{ data: areaRows }, { data: sourceRows }, { data: concursoRows }] = await Promise.all([
     supabase.from("radar_areas").select("id, slug, name, focus, priority").eq("is_active", true),
     supabase.from("radar_sources")
-      .select("id, name, url, area_id, check_interval_hours, last_checked_at, last_hash, last_text, consecutive_failures, pending_retries")
+      // "*" e não a lista de colunas: a função publicada antes da migration de render_mode continua lendo as fontes.
+      .select("*")
       .eq("is_active", true).order("last_checked_at", { ascending: true, nullsFirst: true }).limit(200),
     supabase.from("radar_concursos").select(CONCURSO_COLUMNS).order("last_update_at", { ascending: false }).limit(2000),
   ]);
@@ -204,7 +207,10 @@ async function monitor(supabase: Supa, apiKey: string, trigger: "cron" | "admin"
   // 1. Coleta (sem IA): baixa, normaliza e calcula o trecho novo.
   const fetched = await pool(due, 3, async (s) => {
     try {
-      return { source: s, page: await fetchPage(s.url, { robotsCache }) as FetchedPage, error: null as string | null };
+      const page = s.render_mode === "firecrawl"
+        ? await fetchRendered(s.url, { robotsCache, apiKey: Deno.env.get("FIRECRAWL_API_KEY") ?? undefined })
+        : await fetchPage(s.url, { robotsCache });
+      return { source: s, page: page as FetchedPage, error: null as string | null };
     } catch (e) {
       return { source: s, page: null, error: e instanceof FetchError ? e.message : "erro na coleta" };
     }

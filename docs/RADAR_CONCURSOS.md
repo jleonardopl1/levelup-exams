@@ -108,7 +108,37 @@ segue o fluxo de `docs/TRILHAS.md`.
 
 - **Páginas montadas por JavaScript** (Cebraspe, portal da Selecon) e com anti-robô (Fundatec)
   chegam sem texto ao coletor: ficam cadastradas e desligadas. Use a página do órgão, o diário
-  oficial ou outra URL estática da banca.
+  oficial ou outra URL estática da banca. Se nada disso resolver, use o piloto de renderização
+  abaixo (só para JavaScript; anti-robô continua desligado de propósito).
+
+## Piloto: fontes montadas por JavaScript (Firecrawl, D15)
+
+Aprovado pelo dono em 2026-11-23. O código está pronto e **desligado**: só vale para a fonte
+marcada com `render_mode = 'firecrawl'` e com o secret `FIRECRAWL_API_KEY` configurado.
+
+**Como funciona.** Para a fonte marcada, a função `radar-concursos` confere a URL (`safeUrl`) e o
+`robots.txt` da fonte, e só então pede à API da Firecrawl (`POST https://api.firecrawl.dev/v2/scrape`,
+endpoint fixo) o HTML já renderizado. O pedido vai sem cache (`maxAge: 0`, `storeInCache: false`)
+e com proxy `basic`, para não contornar anti-robô. A resposta é limitada a 2 MB, a URL final passa
+de novo por `safeUrl` e o HTML segue o caminho normal: texto, links, hash, diff, portão de
+evidência e verificador. Só a URL pública da fonte vai ao serviço; nenhum dado de aluno.
+As páginas de detalhe e o `link_oficial` continuam no coletor direto.
+
+**Para ligar (dono):**
+1. `curador-conteudo` confirma que a URL estática da banca, o endpoint JSON que a página consome
+   ou o diário oficial (backlog 17) não resolvem a fonte.
+2. Criar a conta na Firecrawl e gravar o secret `FIRECRAWL_API_KEY` nas Edge Functions (Lovable
+   Cloud). O plano gratuito cobre o piloto: 2 fontes a cada 12 h dão cerca de 120 créditos por mês.
+3. Aplicar a migration `20261123120000_radar_render_mode.sql` e publicar `radar-concursos`, em
+   qualquer ordem: a função trata a coluna ausente como `direto`.
+4. Marcar e ligar a fonte (SQL do Lovable):
+   `UPDATE public.radar_sources SET render_mode = 'firecrawl', is_active = true WHERE url = '<url da fonte>';`
+5. Admin → Radar → **Verificar agora** e conferir no painel que a fonte deixou de ter "página sem
+   texto". Acompanhar os créditos no painel da Firecrawl.
+
+**Erros que aparecem na fonte:** "renderização não configurada" (falta o secret), "renderização sem
+crédito" (402), "renderização limitada (429)", "bloqueado pelo robots.txt", "HTTP <código>" (a página
+respondeu com erro). **Desligar:** `render_mode = 'direto'` na fonte ou remover o secret.
 - **PDF**: o coletor só detecta que o arquivo mudou (vira revisão humana); a leitura do edital em
   PDF para o rascunho de trilha é por texto colado.
 - O Radar não inventa concursos que não estejam nas fontes cadastradas: a cobertura depende da

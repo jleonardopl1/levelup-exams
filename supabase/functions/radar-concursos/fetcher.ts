@@ -318,3 +318,88 @@ export async function fetchPage(rawUrl: string, opts: FetchOptions = {}): Promis
   const links = isHtml ? extractLinks(raw, url.toString()) : [];
   return { url: url.toString(), status: res.status, contentType, text, links, hash: await sha256(text), binary: false };
 }
+
+// ---------------------------------------------------------------------------
+// Renderização por serviço externo (piloto Firecrawl, D15)
+// ---------------------------------------------------------------------------
+
+/** Endpoint fixo: a chave só vai para este host (nada configurável por onde o segredo vaze). */
+export const FIRECRAWL_SCRAPE_URL = "https://api.firecrawl.dev/v2/scrape";
+const RENDER_TIMEOUT_MS = 45_000;
+
+export interface RenderOptions extends FetchOptions {
+  /** Secret FIRECRAWL_API_KEY. Sem ele a fonte falha com mensagem curta (piloto desligado). */
+  apiKey?: string;
+}
+
+interface FirecrawlPayload {
+  success?: unknown;
+  data?: { html?: unknown; metadata?: { statusCode?: unknown; url?: unknown } };
+}
+
+/**
+ * Página oficial montada por JavaScript (ex.: portais de banca que chegam vazios ao fetchPage):
+ * pede à Firecrawl o HTML já renderizado e segue o mesmo caminho do coletor (texto, links, hash).
+ * Mantém as regras do coletor: URL segura, robots.txt da fonte conferido ANTES, resposta limitada
+ * a 2 MB, URL final conferida com safeUrl. Sem cache (`maxAge: 0`, `storeInCache: false`) e com
+ * proxy `basic`: não contorna anti-robô. Só a URL pública da fonte vai ao serviço.
+ */
+export async function fetchRendered(rawUrl: string, opts: RenderOptions = {}): Promise<FetchedPage> {
+  if (!opts.apiKey) throw new FetchError("renderização não configurada");
+  const fetchFn = opts.fetchFn ?? fetch;
+  const initial = safeUrl(rawUrl);
+  if (!initial) throw new FetchError("URL não permitida");
+
+  const rules = await robotsFor(initial, opts);
+  if (!isAllowed(rules, initial.pathname + initial.search)) throw new FetchError("bloqueado pelo robots.txt");
+
+  let res: Response;
+  try {
+    res = await fetchFn(FIRECRAWL_SCRAPE_URL, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${opts.apiKey}`, "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify({
+        url: initial.toString(),
+        formats: ["html"],
+        onlyMainContent: false,
+        maxAge: 0,
+        storeInCache: false,
+        proxy: "basic",
+        blockAds: true,
+        timeout: 30_000,
+      }),
+      redirect: "error",
+      signal: AbortSignal.timeout(opts.timeoutMs ?? RENDER_TIMEOUT_MS),
+    });
+  } catch (e) {
+    const name = e instanceof Error ? e.name : "";
+    throw new FetchError(name === "TimeoutError" || name === "AbortError" ? "renderização: tempo esgotado" : "renderização: falha de rede");
+  }
+  if (!res.ok) {
+    await res.body?.cancel().catch(() => {});
+    if (res.status === 402) throw new FetchError("renderização sem crédito");
+    if (res.status === 429) throw new FetchError("renderização limitada (429)");
+    throw new FetchError(`renderização falhou (HTTP ${res.status})`);
+  }
+
+  let payload: FirecrawlPayload;
+  try {
+    payload = JSON.parse(new TextDecoder().decode(await readCapped(res))) as FirecrawlPayload;
+  } catch (e) {
+    if (e instanceof FetchError) throw e;
+    throw new FetchError("renderização: resposta inválida");
+  }
+  const html = payload?.data?.html;
+  const meta = payload?.data?.metadata;
+  if (payload?.success !== true || typeof html !== "string" || typeof meta?.statusCode !== "number") {
+    throw new FetchError("renderização: resposta inválida");
+  }
+  const status = meta.statusCode;
+  if (!((status >= 200 && status < 300) || status === 304)) throw new FetchError(`HTTP ${status}`);
+  const finalUrl = safeUrl(typeof meta.url === "string" && meta.url ? meta.url : initial.toString());
+  if (!finalUrl) throw new FetchError("redirecionamento não permitido");
+
+  const text = htmlToText(html).slice(0, 400_000);
+  const links = extractLinks(html, finalUrl.toString());
+  return { url: finalUrl.toString(), status, contentType: "text/html", text, links, hash: await sha256(text), binary: false };
+}
