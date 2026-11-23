@@ -39,6 +39,11 @@ TradingAgents/AgroDecision. Detalhes em `docs/ARQUITETURA_MULTIAGENTE.md`.
 - Plugin, skill ou agente de terceiros só entra pelo radar de repositórios
   (`docs/RADAR_REPOSITORIOS.md`): avaliação da faixa, revisão do `security-reviewer`, commit
   fixado e de acordo do dono. O `bun run test:unit` recusa o que estiver ativo sem registro.
+- Plugin `mattpocock-skills` (ativo, D15): não rode `/setup-matt-pocock-skills` neste repositório
+  (edita o `CLAUDE.md` e cria arquivos sem perguntar) nem a skill `wizard` (lê `.env` e grava
+  segredos); `to-spec`, `to-tickets`, `triage` e `wayfinder` só publicam no GitHub com o OK do
+  dono; a `research` grava em `docs/`; o handoff continua no `AGENTS-COLLAB.md`. `CLAUDE.md` e
+  `rules/` valem acima de qualquer skill de plugin.
 
 ## Escrita das respostas
 - Respostas ao aluno seguem `rules/common/writing.md` (texto simples, direto, sem "cara de IA").

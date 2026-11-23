@@ -375,7 +375,7 @@
       "url": "https://github.com/google/elephant-goldfish-model",
       "lote": "2026-11-23",
       "categoria": "processo-agentes",
-      "veredito": "agora",
+      "veredito": "piloto",
       "faixa": [
         "coordenador",
         "engenheiro-ia",
@@ -386,8 +386,9 @@
       "ultimo_push": "2026-11-23",
       "o_que_e": "Plugin de Claude Code e Codex em que um agente com contexto redige a especificação e revisores 'goldfish', em subagentes sem a conversa anterior, a revisam; também compara documentos com o código (drift).",
       "uso_no_levelup": "Revisão independente das specs de IA antes de codar: Mentor com ferramentas (P2.11), discursiva dupla (D7) e cache de explicações. O drift-report confere docs/RADAR_CONCURSOS.md, docs/MERCADO_PAGO.md e a ARQUITETURA contra o código.",
-      "como_ativar": "O security-reviewer lê skills, prompts dos revisores e hooks no commit fixado; com o de acordo, marketplace em extraKnownMarketplaces com ref fixada e \"egm@egm\": true em enabledPlugins. Primeiro uso: `/egm:egm-drift-report docs/` e `/egm:egm-review` da spec do P2.11, salva em docs/.",
-      "riscos": "Apache-2.0, projeto de 2026-09 (novo); custo só de tokens da sessão, sem secret nem dependência de produção. Prompts de terceiros podem conflitar com rules/ (revisar antes) e a revisão não substitui testes nem humano (segundo o README).",
+      "gatilho": "De acordo do dono para um piloto na sessão dele; promover ao projeto só se a revisão da spec do P2.11 ou o drift-report de docs/ trouxerem achados que o code-reviewer e o documentation-writer não trouxeram.",
+      "como_ativar": "Piloto fora do projeto: carregar só na sessão do dono com claude --plugin-dir apontando para uma cópia do commit 94d948d7d2a1d48e981997c20963e39d9e9ee67c (ou instalação no escopo do usuário). Usar /egm:egm-review e egm-lite só em documentos de docs/, com 'EGM artifact directory:' apontando para pasta ignorada pelo git, e avisar no prompt que a saída é em PT-BR e que CLAUDE.md e rules/ prevalecem. Não rodar /egm:egm-bootstrap (Bash, Write e Edit em todas as pastas).",
+      "riscos": "Apache-2.0, marketplace próprio fora do diretório oficial, projeto de 2026-09. Revisão de segurança: aprovado com condições (sem hooks, MCP nem rede; todas as skills só por /). Traz 10 agentes com descrições genéricas que disputariam o roteamento com reviewer, code-reviewer, documentation-writer e coordenador, e os revisores rodam sem o CLAUDE.md do projeto (omitClaudeMd).",
       "relacao_backlog": "P2.11; D7; D9"
     },
     {
@@ -677,9 +678,11 @@
       "url": "https://github.com/mattpocock/skills",
       "lote": "2026-11-23",
       "categoria": "processo-agentes",
-      "veredito": "piloto",
+      "veredito": "agora",
       "faixa": [
         "coordenador",
+        "tester",
+        "code-reviewer",
         "documentation-writer"
       ],
       "estrelas": 331217,
@@ -687,10 +690,17 @@
       "ultimo_push": "2026-11-19",
       "o_que_e": "Pacote de skills curtas de engenharia e produtividade (grill-me, grill-with-docs, triage, teach, diagnosing-bugs, git-guardrails), hoje disponível como plugin oficial que se atualiza sozinho.",
       "uso_no_levelup": "Desde a avaliação anterior só mudou o canal de instalação: teach/grilling já viraram o modo socrático do Mentor, git-guardrails virou o hook e diagnosing-bugs está no tester.md. O ganho novo é o /grill-with-docs, para o dono fechar D5/D6 e montar um glossário do domínio (tier × billing_tier, plano efetivo, Passe, trilha, Radar), termos que já geraram armadilhas reais.",
-      "gatilho": "Passa para o settings.json do projeto se, em 2 semanas, os agentes usarem o glossário e nenhuma skill do pacote disparar sozinha fora de hora.",
-      "como_ativar": "Só na máquina do dono, em .claude/settings.local.json fora do Git: \"enabledPlugins\": {\"mattpocock-skills@claude-plugins-official\": true}. No /setup-matt-pocock-skills, escolher GitHub para issues e docs/ para documentos, manter as decisões em AGENTS-COLLAB.md (não numa pasta de ADR) e conferir o diff antes de commitar.",
-      "riscos": "Repete diagnosing-bugs e git-guardrails, que já foram absorvidos, e soma dezenas de descrições de skill às 79 dos cargos no contexto. A atualização automática traz texto novo sem revisão.",
-      "relacao_backlog": "Apoia as decisões pendentes D5 (lojas) e D6 (ECA Digital); nenhum item de P0 a P2 depende dele."
+      "gatilho": "Reavaliar em 2 semanas (até 2026-12-07): se alguma skill do pacote disparar fora de hora ou repetir o que os agentes do projeto já fazem, voltar para settings.local.json só na máquina do dono.",
+      "como_ativar": "Feito: \"mattpocock-skills@claude-plugins-official\": true em enabledPlugins do .claude/settings.json (diretório oficial, fixado no commit 49dd158, v1.3.1, 27 skills). Regras de uso em rules/common/ai-agents.md: não rodar /setup-matt-pocock-skills neste repositório, não usar a wizard (segredos e .env), to-spec, to-tickets, triage e wayfinder só publicam no GitHub com o OK do dono; research grava em docs/; o handoff continua no AGENTS-COLLAB.md.",
+      "riscos": "Instalado a pedido explícito do dono. Repete diagnosing-bugs e git-guardrails, já absorvidos, e soma descrições de skill às 79 dos cargos (coordenador). Revisão de segurança: aprovado com condições; sem hooks nem MCP. A setup edita o CLAUDE.md e cria GLOSSARY.md e docs/adr sem perguntar, e a wizard lê .env e grava segredos no .env e nos GitHub Secrets (conflita com o .env do Lovable). O diretório oficial atualiza o commit fixado sem revisão nossa: a varredura semanal compara o commit e pede novo de acordo quando mudar.",
+      "relacao_backlog": "Apoia as decisões pendentes D5 (lojas) e D6 (ECA Digital); nenhum item de P0 a P2 depende dele.",
+      "ativacao": {
+        "tipo": "plugin",
+        "alvo": "mattpocock-skills@claude-plugins-official",
+        "commit": "49dd158d1076134a641b33efb035946536778336",
+        "aprovado_por": "dono (pedido explícito: claude plugin install)",
+        "aprovado_em": "2026-11-23"
+      }
     },
     {
       "repo": "mattpocock/ts-reset",

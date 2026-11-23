@@ -11,7 +11,7 @@ const base = (extra = {}) => ({
 });
 const catalogo = (...avaliacoes) => ({ lotes: [{ id: '2026-11-23', origem: 'dono', descricao: 'teste' }], avaliacoes });
 const ambiente = (extra = {}) => ({ enabledPlugins: {}, skillsManuais: [], existe: () => true, ...extra });
-const plugin = base({ veredito: 'agora', como_ativar: 'enabledPlugins', ativacao: { tipo: 'plugin', alvo: 'x@claude-plugins-official', aprovado_por: 'dono', aprovado_em: '2026-11-23' } });
+const plugin = base({ veredito: 'agora', como_ativar: 'enabledPlugins', ativacao: { tipo: 'plugin', alvo: 'x@claude-plugins-official', commit: 'b'.repeat(40), aprovado_por: 'dono', aprovado_em: '2026-11-23' } });
 const skill = base({
   repo: 'org/skill', url: 'https://github.com/org/skill', veredito: 'agora', como_ativar: 'copiar',
   ativacao: { tipo: 'skill', alvo: '.claude/skills/skill-x', commit: 'a'.repeat(40), aprovado_por: 'dono', aprovado_em: '2026-11-23' },
@@ -61,12 +61,14 @@ test('só "agora" ou "piloto" podem ter ativação, sempre com aprovação do do
   assert.ok(conferir(catalogo(futuro), ambiente({ enabledPlugins: { 'x@claude-plugins-official': true } })).some(p => p.includes('só "agora"')));
   const semAprovacao = { ...plugin, ativacao: { ...plugin.ativacao, aprovado_por: '' } };
   assert.ok(conferir(catalogo(semAprovacao), ambiente({ enabledPlugins: { 'x@claude-plugins-official': true } })).some(p => p.includes('aprovação do dono')));
+  const semCommit = { ...plugin, ativacao: { ...plugin.ativacao, commit: undefined } };
+  assert.ok(conferir(catalogo(semCommit), ambiente({ enabledPlugins: { 'x@claude-plugins-official': true } })).some(p => p.includes('commit revisado')));
 });
 
 test('skill de terceiros exige commit fixado, SKILL.md e ORIGEM.md', () => {
   assert.deepEqual(conferir(catalogo(skill), ambiente({ skillsManuais: ['skill-x'] })), []);
   const semCommit = { ...skill, ativacao: { ...skill.ativacao, commit: 'main' } };
-  assert.ok(conferir(catalogo(semCommit), ambiente({ skillsManuais: ['skill-x'] })).some(p => p.includes('commit fixado')));
+  assert.ok(conferir(catalogo(semCommit), ambiente({ skillsManuais: ['skill-x'] })).some(p => p.includes('commit revisado')));
   const semOrigem = conferir(catalogo(skill), ambiente({ skillsManuais: ['skill-x'], existe: rel => !rel.endsWith('ORIGEM.md') }));
   assert.ok(semOrigem.some(p => p.includes('ORIGEM.md')));
 });

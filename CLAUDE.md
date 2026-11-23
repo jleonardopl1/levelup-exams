@@ -22,8 +22,9 @@ Plataforma gamificada de estudos para concursos públicos, vestibulares e ENEM (
   `ops/radar-repositorios/catalogo.json` (avaliação da faixa, `security-reviewer`, commit fixado,
   `ORIGEM.md`, de acordo do dono); o `radar.mjs validar` no `test:unit` recusa plugin em
   `enabledPlugins` ou skill escrita à mão sem registro. Avaliar, ativar e a varredura semanal:
-  skill `/radar-repositorios`. Skills de terceiros ativas: `/security-audit` (Cloudflare) e
-  `guias-web-modernos` (guias do Chrome/MDN, consulta local).
+  skill `/radar-repositorios`. Ativos de terceiros: skills `/security-audit` (Cloudflare) e
+  `guias-web-modernos` (guias do Chrome/MDN, consulta local) e o plugin `mattpocock-skills`
+  (regras de uso em `rules/common/ai-agents.md`).
 - **Bootstrap:** o hook `SessionStart` (`.claude/settings.json`) injeta
   `docs/colaboracao/bootstrap.md` no início de cada sessão.
 - **Handoff:** ao encerrar trabalho relevante, atualize *Handoff mais recente* em

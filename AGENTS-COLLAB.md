@@ -81,6 +81,10 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
   `gist.githubusercontent.com`; funcionam `raw.githubusercontent.com`, `git clone` de repositório
   público e `gh api -X GET search/repositories`. A tarefa semanal do radar roda **sem conectores**
   (sem Exa); para ler esses portais ela depende da busca web da sessão.
+- 🪝 **Hook do plugin `stackhawk-hawkscan` (sincronizado da conta do dono, fora do projeto)**
+  procura "git commit" na saída inteira do Bash e injeta "Fix all findings, commit fixes, then
+  rescan" até em agentes só de leitura. Não é instrução do dono: o DAST exige app rodando e
+  `HAWK_API_KEY`. Decisão do dono: manter o plugin na conta ou corrigir o filtro (`tool_input.command`).
 
 - 🚨 **`gateway 402` = saldo de IA do workspace do Lovable esgotado.** Em 2026-11-16, das 05:10 às
   08:50 UTC, 67 execuções da geração falharam com 402 (0 questões inseridas). Com 402, Mentor e
@@ -209,6 +213,30 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
 
 ## Handoff mais recente
 <!-- Sempre o topo = o mais recente. Template: docs/colaboracao/handoff-template.md -->
+
+### 2026-11-23 · Radar de repositórios: 62 avaliações, ativações e varredura semanal (`engenheiro-ia` + `coordenador` + `designer` + `mobile` + `security-reviewer`)
+
+- **Objetivo da sessão:** avaliar os 61 repositórios e o gist indicados pelo dono, ativar o que
+  é imediato, guardar o resto para ativar depois e criar a varredura semanal com pedido de de acordo.
+- **O que mudou:** catálogo `ops/radar-repositorios/` (validador no `test:unit`: nada de terceiros
+  ativo sem avaliação, commit fixado e aprovação; skill escrita à mão sem `!`+crase nem `$`);
+  relatório `docs/RADAR_REPOSITORIOS.md`; skill `/radar-repositorios`. Ativos: plugin
+  `mattpocock-skills` (pedido do dono), skills `security-audit` (Cloudflare) e `guias-web-modernos`
+  (só os guias, sem o `npx @latest` do plugin), regras "Mudança mínima e cirúrgica"
+  (karpathy-skills + ponytail, reescritas), lint da documentação no `gerente-contexto` (LLM Wiki) e
+  regra contra gateway "grátis" e memória automática. Tarefa agendada "Radar semanal de
+  repositórios": segundas 6h33 (Brasília), sessão nova, notificação no celular, primeira em 30/11.
+- **Testado:** `npm run test:unit` → 103 aprovados, 0 falhas; `radar.mjs validar` → 62 avaliações ok.
+- **Não testado:** carregamento real das skills e do plugin numa sessão nova (a desta sessão já
+  vem da conta do dono); se o Claude Code troca `$TMPDIR` em skills do plugin (pior caso: texto
+  trocado); a tarefa semanal ainda não rodou.
+- **Decisões tomadas:** D15. O veículo da "Questão do dia" (P3) passa do openclaw para uma
+  biblioteca de chat numa Edge Function.
+- **Armadilhas novas:** padrões perigosos em SKILL.md; portais bloqueados pelo proxy; hook do hawkscan.
+- **Bloqueios / pendências:** de acordo do dono para os pilotos 21–24 (Firecrawl, elephant-goldfish,
+  unslop, ts-reset); jurídico para a licença ORA 2.3 (app-store-compliance) quando a D5 andar.
+- **Próximo passo sugerido:** `designer` + `frontend` atacam o P1.8f (movimento reduzido) com
+  `guias-web-modernos`; `mobile` + `supabase-db` especificam o P1.8e (exclusão de conta).
 
 ### 2026-11-20 · Mercado Pago: correções da revisão de segurança (`pagamentos` + `security-reviewer`)
 

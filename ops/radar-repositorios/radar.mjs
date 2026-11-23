@@ -98,11 +98,11 @@ export function conferir(catalogo, ambiente) {
     if (!TIPOS_ATIVACAO.has(ativ.tipo)) erro(nome, `tipo de ativação inválido ${ativ.tipo}`);
     if (!texto(ativ.alvo)) erro(nome, 'ativação sem alvo');
     if (!texto(ativ.aprovado_por) || !DATA.test(ativ.aprovado_em ?? '')) erro(nome, 'ativação sem aprovação do dono (aprovado_por, aprovado_em)');
+    if (!SHA.test(ativ.commit ?? '')) erro(nome, 'ativação exige o commit revisado (40 hex); para plugin, o que o marketplace fixa');
     if (ativ.tipo === 'plugin') {
       if (!/^[\w.-]+@[\w.-]+$/.test(ativ.alvo ?? '')) erro(nome, 'plugin deve ser "nome@marketplace"');
       plugins.set(ativ.alvo, nome);
     } else {
-      if (!SHA.test(ativ.commit ?? '')) erro(nome, 'código copiado de terceiros exige commit fixado (40 hex)');
       if (!ambiente.existe(ativ.alvo)) erro(nome, `alvo ${ativ.alvo} não existe`);
       if (ativ.tipo === 'skill') {
         const pasta = String(ativ.alvo).replace(/\/$/, '');
