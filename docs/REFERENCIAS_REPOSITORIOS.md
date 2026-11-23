@@ -8,6 +8,11 @@ com teste nesta entrega. O resto ficou no backlog ou foi descartado com o motivo
 
 Legenda: ✅ incorporado nesta entrega · 🗂️ backlog (`AGENTS-COLLAB.md`) · ➖ descartado (motivo).
 
+> **Atualização 2026-11-23.** As avaliações seguintes, incluindo novas revisões de mattpocock/skills,
+> obra/superpowers, affaan-m/ECC, openclaw, deepseek-harness e da skill da Cloudflare, estão no
+> [Radar de repositórios](RADAR_REPOSITORIOS.md) (decisão D15). Mudança de decisão: a "Questão do
+> dia" por mensageiro (P3) passa do openclaw para uma biblioteca de chat numa Edge Function.
+
 ## 1. Aprendizagem e produto
 
 | Repositório | O que é | O que o LevelUp fez |

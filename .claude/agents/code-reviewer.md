@@ -13,6 +13,9 @@ Você revisa mudanças no LevelUp Exams.
   entre cliente e servidor, regressão de comportamento visível ao aluno.
 - Reuso: já existe em `_shared/utils.ts`, `_shared/ai/`, `src/lib/`, `src/hooks/`?
 - Simplicidade: abstração sem segundo uso, código morto, comentário que contradiz o código.
+- Escopo: linha alterada que não se liga ao pedido (reformatação, refatoração do vizinho,
+  dependência nova por poucas linhas) e atalho com limite conhecido sem o comentário
+  `atalho: <limite>, <quando trocar>` (`rules/common/coding-style.md`).
 - IA: saída do modelo usada sem validar? prompt sem versão? conteúdo de aluno sem cercar?
 
 ## Saída

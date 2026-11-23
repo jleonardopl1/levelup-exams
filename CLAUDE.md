@@ -18,6 +18,13 @@ Plataforma gamificada de estudos para concursos públicos, vestibulares e ENEM (
 - **Skills dos 79 cargos** do organograma em `.claude/skills/`, geradas de `ops/agentes/catalogo.json`
   por `node ops/agentes/skills.mjs` — não editar à mão. Áreas podem ser acionadas pelo modelo e
   encaminham; especialistas só por `/`. No turno da skill, só leitura (`disallowed-tools`).
+- **Radar de repositórios (D15):** skill, plugin ou agente de terceiros só entra pelo catálogo
+  `ops/radar-repositorios/catalogo.json` (avaliação da faixa, `security-reviewer`, commit fixado,
+  `ORIGEM.md`, de acordo do dono); o `radar.mjs validar` no `test:unit` recusa plugin em
+  `enabledPlugins` ou skill escrita à mão sem registro. Avaliar, ativar e a varredura semanal:
+  skill `/radar-repositorios`. Ativos de terceiros: skills `/security-audit` (Cloudflare) e
+  `guias-web-modernos` (guias do Chrome/MDN, consulta local) e o plugin `mattpocock-skills`
+  (regras de uso em `rules/common/ai-agents.md`).
 - **Bootstrap:** o hook `SessionStart` (`.claude/settings.json`) injeta
   `docs/colaboracao/bootstrap.md` no início de cada sessão.
 - **Handoff:** ao encerrar trabalho relevante, atualize *Handoff mais recente* em
@@ -70,6 +77,7 @@ Plataforma gamificada de estudos para concursos públicos, vestibulares e ENEM (
   `node docs/proposta-plus/validate.mjs` e `node supabase/tests/mercadopago.validate.mjs`
 - seed das trilhas: `bun run build:trilhas`
 - skills dos cargos: `node ops/agentes/skills.mjs` (depois de mudar o catálogo; `--check` roda no `test:unit`)
+- radar de repositórios: `node ops/radar-repositorios/radar.mjs relatorio` (depois de mudar o catálogo; `validar` roda no `test:unit`)
 - migrations: `supabase db push` (remoto exige aprovação do dono) · deploy de função: `supabase functions deploy <nome>`
 - CI (`.github/workflows/ci.yml`): typecheck + lint + testes unitários + build + testes Deno + `deno check` de todas as funções
 - **Guardrails:** `.claude/hooks/guardrails.mjs` (PreToolUse) aplica em código as convenções acima

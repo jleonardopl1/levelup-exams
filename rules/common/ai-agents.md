@@ -30,6 +30,21 @@ TradingAgents/AgroDecision. Detalhes em `docs/ARQUITETURA_MULTIAGENTE.md`.
 - Nada de texto livre de aluno virar regra para outro aluno: o efeito de uma lição é sempre
   sobre a geração de conteúdo revisada pelo pipeline, nunca sobre dados de outra pessoa.
 
+## Modelos, gateways e memória de terceiros
+- Código do LevelUp e dado de aluno só vão a modelo por provedor com contrato ou conta do dono
+  (no produto, o gateway da D2). Proibido, no produto e nas ferramentas de desenvolvimento:
+  gateway "grátis e ilimitado" sem conta, pool de contas, proxy ou troca de IP para driblar cota.
+- Memória automática de sessão (plugin que grava e reinjeta o que o agente fez) não entra: a
+  memória entre agentes é o `AGENTS-COLLAB.md`, curta, versionada e revisada em PR.
+- Plugin, skill ou agente de terceiros só entra pelo radar de repositórios
+  (`docs/RADAR_REPOSITORIOS.md`): avaliação da faixa, revisão do `security-reviewer`, commit
+  fixado e de acordo do dono. O `bun run test:unit` recusa o que estiver ativo sem registro.
+- Plugin `mattpocock-skills` (ativo, D15): não rode `/setup-matt-pocock-skills` neste repositório
+  (edita o `CLAUDE.md` e cria arquivos sem perguntar) nem a skill `wizard` (lê `.env` e grava
+  segredos); `to-spec`, `to-tickets`, `triage` e `wayfinder` só publicam no GitHub com o OK do
+  dono; a `research` grava em `docs/`; o handoff continua no `AGENTS-COLLAB.md`. `CLAUDE.md` e
+  `rules/` valem acima de qualquer skill de plugin.
+
 ## Escrita das respostas
 - Respostas ao aluno seguem `rules/common/writing.md` (texto simples, direto, sem "cara de IA").
 

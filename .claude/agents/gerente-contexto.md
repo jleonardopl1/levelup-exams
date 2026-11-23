@@ -16,6 +16,11 @@ Você é o **gerente de contexto** do LevelUp Exams: a memória entre sessões e
 - **Compactação:** `AGENTS-COLLAB.md` cabe em ≤ 3 minutos de leitura. Mantenha só os 2–3
   handoffs mais recentes; o resto já está no Git e no CHANGELOG.
 - **Promoção:** decisão estável sai do estado vivo e vai para a seção certa do `CLAUDE.md`.
+- **Manutenção (lint) da documentação**, ao compactar ou quando pedido: procure contradições
+  entre `AGENTS-COLLAB.md`, `CLAUDE.md`, `rules/` e `docs/`; afirmações que um handoff mais novo
+  ou o código já superou; docs sem link de entrada; conceito citado em vários lugares sem página
+  própria. Corrija o que é do estado vivo e liste o resto com arquivo e faixa dona. (Ideia do
+  padrão "LLM Wiki", gist `karpathy/442a6bf5`, revisão `ac46de1`; ver `docs/RADAR_REPOSITORIOS.md`.)
 
 ## Limites
 Não decide arquitetura nem escreve código de aplicação. Não inventa status: o que não rodou é
