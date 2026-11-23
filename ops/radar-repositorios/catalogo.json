@@ -1,0 +1,8 @@
+{
+  "versao": 1,
+  "skills_proprias": ["radar-repositorios"],
+  "lotes": [
+    { "id": "2026-11-23", "origem": "dono", "descricao": "61 repositórios indicados pelo dono (59 links do GitHub, 2 do Trendshift e o gist LLM Wiki de Karpathy)" }
+  ],
+  "avaliacoes": []
+}
