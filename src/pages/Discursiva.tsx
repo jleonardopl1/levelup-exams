@@ -24,7 +24,11 @@ function loadDraft(slug: string): { tema: string; texto: string } {
   try {
     const raw = localStorage.getItem(DRAFT_KEY(slug));
     const parsed = raw ? JSON.parse(raw) : null;
-    return { tema: String(parsed?.tema ?? ''), texto: String(parsed?.texto ?? '') };
+    if (!parsed || typeof parsed !== 'object') return { tema: '', texto: '' };
+    return {
+      tema: 'tema' in parsed && typeof parsed.tema === 'string' ? parsed.tema : '',
+      texto: 'texto' in parsed && typeof parsed.texto === 'string' ? parsed.texto : '',
+    };
   } catch {
     return { tema: '', texto: '' };
   }

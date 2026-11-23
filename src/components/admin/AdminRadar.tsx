@@ -28,6 +28,7 @@ import {
   useToggleRadarSource,
 } from '@/hooks/useAdminRadar';
 import { FIELD_LABEL, formatChangeValue, STATUS_LABEL } from '@/lib/radar';
+import { parseErrorBody } from '@/lib/errorBody';
 
 const ago = (iso: string | null) => (iso ? formatDistanceToNow(new Date(iso), { addSuffix: true, locale: ptBR }) : 'nunca');
 
@@ -35,8 +36,8 @@ const ago = (iso: string | null) => (iso ? formatDistanceToNow(new Date(iso), { 
 async function functionError(err: unknown): Promise<string> {
   const ctx = (err as { context?: Response })?.context;
   try {
-    const body = ctx && typeof ctx.json === 'function' ? await ctx.json() : null;
-    if (body?.error) return String(body.error);
+    const { error } = parseErrorBody(ctx && typeof ctx.json === 'function' ? await ctx.json() : null);
+    if (error) return error;
   } catch { /* corpo não é JSON */ }
   return err instanceof Error ? err.message : 'Erro desconhecido';
 }
