@@ -226,7 +226,7 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
   (karpathy-skills + ponytail, reescritas), lint da documentação no `gerente-contexto` (LLM Wiki) e
   regra contra gateway "grátis" e memória automática. Tarefa agendada "Radar semanal de
   repositórios": segundas 6h33 (Brasília), sessão nova, notificação no celular, primeira em 30/11.
-- **Testado:** `npm run test:unit` → 103 aprovados, 0 falhas; `radar.mjs validar` → 62 avaliações ok.
+- **Testado:** `npm run test:unit` → 102 aprovados, 0 falhas; `radar.mjs validar` → 62 avaliações ok.
 - **Não testado:** carregamento real das skills e do plugin numa sessão nova (a desta sessão já
   vem da conta do dono); se o Claude Code troca `$TMPDIR` em skills do plugin (pior caso: texto
   trocado); a tarefa semanal ainda não rodou.
