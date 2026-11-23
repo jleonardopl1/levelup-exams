@@ -36,8 +36,10 @@ multiagente é de desenho (papéis ambíguos, verificação fraca), não do mode
 
 ## Contrato de delegação (padrão orquestrador–trabalhadores)
 
-Toda delegação diz: **objetivo**, **formato de saída**, **fontes/ferramentas** permitidas e
-**limites** (o que não fazer, quando parar). Trabalhos independentes rodam em paralelo; o
+Toda delegação diz: **objetivo**, **formato de saída**, **fontes/ferramentas** permitidas,
+**limites** (o que não fazer, quando parar) e o **critério de pronto** verificável (o comando ou
+teste que prova). Toda entrega termina com o que foi verificado e o que não foi, com o risco
+(`rules/common/coding-style.md`, "Mudança mínima e cirúrgica"). Trabalhos independentes rodam em paralelo; o
 `coordenador` junta os resultados. Sem isso, subagentes duplicam trabalho ou deixam lacunas.
 
 ## Revisão em três faixas (de propósito)
