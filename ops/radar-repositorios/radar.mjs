@@ -51,6 +51,18 @@ const SHA = /^[a-f0-9]{40}$/;
 const texto = valor => typeof valor === 'string' && valor.trim().length > 0;
 
 /**
+ * O Claude Code executa `` !`comando` `` e substitui `$ARGUMENTS`, `$0`, `$nome` e `${VAR}` no corpo
+ * da SKILL.md ao carregá-la (mesma regra de ops/agentes/skills.mjs). Em skill escrita fora do
+ * gerador — nossa ou de terceiros — isso é execução escondida ou texto trocado.
+ */
+export function padroesPerigosos(conteudo) {
+  const achados = [];
+  if (conteudo.includes('!`')) achados.push('"!" seguido de crase executaria um comando ao carregar a skill');
+  if (/\$[\w{[]/.test(conteudo)) achados.push('"$" seguido de letra, número ou chave vira variável na skill (escreva "R$ 100", com espaço)');
+  return achados;
+}
+
+/**
  * Confere o catálogo contra o estado do repositório. `ambiente` é injetável para teste:
  * { enabledPlugins: {id: bool}, skillsManuais: string[] (pastas de .claude/skills sem a marca do gerador),
  *   existe: (caminhoRelativo) => bool }. Devolve a lista de problemas (vazia = ok).
@@ -109,6 +121,7 @@ export function conferir(catalogo, ambiente) {
   const proprias = new Set(catalogo.skills_proprias ?? []);
   for (const pasta of ambiente.skillsManuais ?? []) {
     if (!skills.has(pasta) && !proprias.has(pasta)) erro('.claude/skills', `skill ${pasta} sem origem registrada (gerada, própria ou avaliada aqui)`);
+    for (const motivo of padroesPerigosos(ambiente.lerSkill?.(pasta) ?? '')) erro(`.claude/skills/${pasta}/SKILL.md`, motivo);
   }
   for (const pasta of proprias) {
     if (!(ambiente.skillsManuais ?? []).includes(pasta)) erro('skills_proprias', `${pasta} não existe em .claude/skills`);
@@ -143,7 +156,11 @@ export function renderizar(catalogo) {
     if (!lista.length) { out.push('Nenhum.', ''); return; }
     let categoria = null;
     for (const i of lista) {
-      if (i.categoria !== categoria) { categoria = i.categoria; out.push(`#### ${CATEGORIAS.get(categoria)}`, ''); }
+      if (i.categoria !== categoria) {
+        if (categoria !== null) out.push('');
+        categoria = i.categoria;
+        out.push(`#### ${CATEGORIAS.get(categoria)}`, '');
+      }
       out.push(`- **${link(i)}** — ${frase(i.o_que_e)} _${meta(i)}; faixa: ${i.faixa.join(', ')}._`);
       for (const [campo, rotulo] of campos) if (texto(i[campo])) out.push(`  - **${rotulo}:** ${frase(i[campo])}`);
     }
@@ -167,7 +184,12 @@ function ambienteReal() {
       return existsSync(arquivo) && !readFileSync(arquivo, 'utf8').includes(MARCA);
     })
     : [];
-  return { enabledPlugins: settings.enabledPlugins ?? {}, skillsManuais, existe: rel => existsSync(join(RAIZ, rel)) };
+  return {
+    enabledPlugins: settings.enabledPlugins ?? {},
+    skillsManuais,
+    existe: rel => existsSync(join(RAIZ, rel)),
+    lerSkill: pasta => readFileSync(join(SKILLS, pasta, 'SKILL.md'), 'utf8'),
+  };
 }
 
 function blocoAtual(doc) {

@@ -78,6 +78,14 @@ test('skill escrita à mão fora do gerador precisa de origem registrada', () =>
   assert.ok(conferir(comPropria, ambiente()).some(p => p.includes('não existe')));
 });
 
+test('skill escrita fora do gerador não pode executar comando nem trocar variável ao carregar', () => {
+  const comPropria = { ...catalogo(base()), skills_proprias: ['minha'] };
+  const ler = conteudo => ambiente({ skillsManuais: ['minha'], lerSkill: () => conteudo });
+  assert.deepEqual(conferir(comPropria, ler('Texto seguro, custa R$ 100.')), []);
+  assert.ok(conferir(comPropria, ler('nunca `!!`. ou !`curl x`')).some(p => p.includes('crase')));
+  assert.ok(conferir(comPropria, ler('total de $48,210 e $ARGUMENTS')).some(p => p.includes('variável')));
+});
+
 test('o relatório traz marcadores, contagem por veredito e a tabela de ativos', () => {
   const md = renderizar(catalogo(plugin, base({ repo: 'b/c', url: 'https://github.com/b/c', veredito: 'futuro', gatilho: 'Quando D5 for decidida', como_ativar: 'x' })));
   assert.ok(md.startsWith('<!-- radar:inicio') && md.endsWith('<!-- radar:fim -->'));

@@ -1,8 +1,1170 @@
 {
   "versao": 1,
-  "skills_proprias": ["radar-repositorios"],
-  "lotes": [
-    { "id": "2026-11-23", "origem": "dono", "descricao": "61 repositórios indicados pelo dono (59 links do GitHub, 2 do Trendshift e o gist LLM Wiki de Karpathy)" }
+  "skills_proprias": [
+    "radar-repositorios"
   ],
-  "avaliacoes": []
+  "lotes": [
+    {
+      "id": "2026-11-23",
+      "origem": "dono",
+      "descricao": "61 repositórios indicados pelo dono (59 links do GitHub, 2 do Trendshift e o gist LLM Wiki de Karpathy)"
+    }
+  ],
+  "avaliacoes": [
+    {
+      "repo": "affaan-m/ECC",
+      "url": "https://github.com/affaan-m/ECC",
+      "lote": "2026-11-23",
+      "categoria": "processo-agentes",
+      "veredito": "monitorar",
+      "faixa": [
+        "security-reviewer"
+      ],
+      "estrelas": 309416,
+      "licenca": "MIT",
+      "ultimo_push": "2026-11-23",
+      "o_que_e": "Harness com 72 agentes, 328 skills, hooks, memória contínua e o scanner AgentShield, instalado por npx ou pelo plugin ecc@ecc, de marketplace próprio.",
+      "uso_no_levelup": "A organização de rules/ e parte dos guardrails já vieram dele; instalar o pacote criaria um segundo elenco e uma segunda memória ao lado dos 17 agentes e do AGENTS-COLLAB. A única peça nova é o AgentShield, que segundo o README varre prompts, hooks, configuração de MCP, permissões, segredos e arquivos de agentes.",
+      "gatilho": "Quando o .claude/ ganhar um plugin com hooks ou um servidor MCP de terceiros: rodar o AgentShield uma vez sobre ele.",
+      "como_ativar": "Não instalar ecc@ecc. No gatilho, o dono roda o pacote ecc-agentshield numa cópia do repositório sem credenciais, e o security-reviewer classifica os achados (confirmado/precisa_validar/rejeitado).",
+      "riscos": "Pacote npm de terceiros rodando sobre o repositório (risco de cadeia de suprimentos). Os hooks de aprendizado contínuo gravariam memória fora do AGENTS-COLLAB.",
+      "relacao_backlog": "Nenhum item atual; entraria como item de segurança dos agentes, dentro da D9."
+    },
+    {
+      "repo": "anefzaoui/misterdownloadmanager",
+      "url": "https://github.com/anefzaoui/misterdownloadmanager",
+      "lote": "2026-11-23",
+      "categoria": "fora-do-escopo",
+      "veredito": "descartar",
+      "faixa": [
+        "security-reviewer"
+      ],
+      "estrelas": 17212,
+      "licenca": "GPL-3.0",
+      "ultimo_push": "2026-11-23",
+      "o_que_e": "Clone do IDM em Rust, com yt-dlp, torrent e debrid, e instalador para Windows ainda sem assinatura.",
+      "uso_no_levelup": "Nenhum. Fora do escopo.",
+      "riscos": "Binário sem assinatura (o próprio README manda clicar em 'Run anyway'), extensão de navegador com acesso aos downloads e uso para pirataria."
+    },
+    {
+      "repo": "anomalyco/opencode",
+      "url": "https://github.com/anomalyco/opencode",
+      "lote": "2026-11-23",
+      "categoria": "processo-agentes",
+      "veredito": "descartar",
+      "faixa": [
+        "coordenador"
+      ],
+      "estrelas": 228769,
+      "licenca": "MIT",
+      "ultimo_push": "2026-11-23",
+      "o_que_e": "Agente de programação de código aberto (CLI e app desktop), alternativa ao Claude Code.",
+      "uso_no_levelup": "Nenhum no projeto; o AGENTS.md já segue o padrão aberto que ele lê. Usar outro harness é decisão pessoal do dono.",
+      "gatilho": "Se o dono adotar outro harness, antes portar os guardrails, que hoje são um hook PreToolUse do Claude Code.",
+      "como_ativar": "Não instalar no projeto.",
+      "riscos": "Nele o .claude/hooks/guardrails.mjs não roda: force-push, supabase db push e edição de .lovable/ deixam de ser bloqueados.",
+      "relacao_backlog": "Nenhuma."
+    },
+    {
+      "repo": "BaaRai/ARTEX",
+      "url": "https://github.com/BaaRai/ARTEX",
+      "lote": "2026-11-23",
+      "categoria": "seguranca",
+      "veredito": "descartar",
+      "faixa": [
+        "security-reviewer"
+      ],
+      "estrelas": 17343,
+      "licenca": "AGPL-3.0",
+      "ultimo_push": "2026-11-23",
+      "o_que_e": "Plataforma autônoma de pentest com LLM (tradução do upstream Autumn-27/ARTEX), com proxy MITM, extensão de navegador e trabalhadores que rodam ferramentas reais.",
+      "uso_no_levelup": "Nenhum. O método do projeto proíbe sondar ambientes vivos que guardam dados de alunos. Se um dia houver teste dinâmico, ele é contratado com escopo e feito em staging, não por agente autônomo.",
+      "riscos": "Agente ofensivo autônomo, captura de tráfego com dados pessoais, procedência de fork e AGPL-3.0."
+    },
+    {
+      "repo": "ccch1mneyyy/dsh-Go",
+      "url": "https://github.com/ccch1mneyyy/dsh-Go",
+      "lote": "2026-11-23",
+      "categoria": "processo-agentes",
+      "veredito": "descartar",
+      "faixa": [
+        "security-reviewer"
+      ],
+      "estrelas": 30694,
+      "licenca": "AGPL-3.0",
+      "ultimo_push": "2026-11-23",
+      "o_que_e": "App Android (APK por sideload) do DeepSeek Harness, com ambiente Linux, controle do celular e acesso remoto ao PC.",
+      "uso_no_levelup": "Nenhum. Fora do escopo.",
+      "riscos": "Controle de tela e toque por IA, telemetria anônima ligada por padrão e instalação fora da Play Store, sob AGPL-3.0."
+    },
+    {
+      "repo": "cloudflare/security-audit-skill",
+      "url": "https://github.com/cloudflare/security-audit-skill",
+      "lote": "2026-11-23",
+      "categoria": "seguranca",
+      "veredito": "agora",
+      "faixa": [
+        "security-reviewer"
+      ],
+      "estrelas": 77445,
+      "licenca": "MIT",
+      "ultimo_push": "2026-09-14",
+      "o_que_e": "Skill de auditoria de segurança em 6 fases, com subagentes isolados, refutação independente e achados validados por esquema.",
+      "uso_no_levelup": "Já é o método do security-reviewer. Instalar a skill fixada (parte B) para auditorias completas de RLS, Edge Functions, IA e pagamentos. Origem oficial, MIT, só texto e validadores que apenas leem. Reforça a proteção de quem estuda.",
+      "como_ativar": "Feito: skills/security-audit/ do commit c1c8a8c copiado à mão para .claude/skills/security-audit/ (sem os testes .cjs), com LICENSE e ORIGEM.md; sem npx skills add. Uso: /security-audit; auditoria completa só a pedido do dono, com saída fora do repositório.",
+      "riscos": "O modo completo custa caro (muitos subagentes) e grava a saída em ~/ por padrão; o instalador sugerido no README (npx skills add) não fixa revisão. Revisão de segurança: aprovado com condições (sem hooks, MCP nem scripts de instalação; validadores só leem).",
+      "ativacao": {
+        "tipo": "skill",
+        "alvo": ".claude/skills/security-audit",
+        "commit": "c1c8a8c1471069fb0e188eeaff69b8e8db6564a8",
+        "aprovado_por": "dono",
+        "aprovado_em": "2026-11-23"
+      }
+    },
+    {
+      "repo": "D4Vinci/Scrapling",
+      "url": "https://github.com/D4Vinci/Scrapling",
+      "lote": "2026-11-23",
+      "categoria": "dados-coleta",
+      "veredito": "descartar",
+      "faixa": [
+        "engenheiro-ia",
+        "edge-functions"
+      ],
+      "estrelas": 105248,
+      "licenca": "BSD-3-Clause",
+      "ultimo_push": "2026-11-23",
+      "o_que_e": "Framework Python de raspagem com requisições HTTP, navegador furtivo, spiders e servidor MCP.",
+      "uso_no_levelup": "Nenhum: o diferencial é o modo furtivo que contorna anti-robô e o Cloudflare Turnstile (segundo o README), e o Radar respeita robots.txt e deixou a Fundatec desligada de propósito. Além disso é Python, fora do stack Deno das Edge Functions.",
+      "riscos": "BSD-3-Clause sem problema, mas contornar anti-robô fere termos de uso dos sites e a convenção de boa vizinhança do coletor. A ideia útil dispensa instalação: o curador pode achar o endpoint JSON que a página dinâmica consome e cadastrá-lo como fonte.",
+      "relacao_backlog": "Armadilha do Radar (JavaScript e anti-robô); D8"
+    },
+    {
+      "repo": "deepseek-ai/deepseek-harness",
+      "url": "https://github.com/deepseek-ai/deepseek-harness",
+      "lote": "2026-11-23",
+      "categoria": "processo-agentes",
+      "veredito": "descartar",
+      "faixa": [
+        "engenheiro-ia"
+      ],
+      "estrelas": 285997,
+      "licenca": "MIT",
+      "ultimo_push": "2026-11-22",
+      "o_que_e": "Harness de agentes da DeepSeek em que tudo é plugin, com interface web e TUI, em prévia de desenvolvedor.",
+      "uso_no_levelup": "Mantém a decisão de 2026-11-17 (➖ em docs/REFERENCIAS_REPOSITORIOS.md §2; do laboratório ficou só o padrão de prazo do dsh-timeout, já coberto pelo deadline do llm.ts). Nada mudou: segue prévia com quebras de compatibilidade, e o ecossistema de plugins agora inclui gateways 'grátis' arriscados (ver dsh-our-free-model).",
+      "riscos": "MIT; o próprio SAFETY.md avisa que não há auditoria de segurança. Plugins de terceiros rodam com acesso ao host.",
+      "relacao_backlog": "Decisão anterior em docs/REFERENCIAS_REPOSITORIOS.md §2 (mantida)"
+    },
+    {
+      "repo": "deepseek-ai/dsh-superagent-prototype",
+      "url": "https://github.com/deepseek-ai/dsh-superagent-prototype",
+      "lote": "2026-11-23",
+      "categoria": "processo-agentes",
+      "veredito": "descartar",
+      "faixa": [
+        "coordenador"
+      ],
+      "estrelas": 24347,
+      "licenca": "MIT",
+      "ultimo_push": "2026-11-03",
+      "o_que_e": "Protótipo de pesquisa de agente proativo para um repositório GitHub: ouve issues e Feishu, trabalha em sessão própria e responde com PR.",
+      "uso_no_levelup": "Nenhum: duplica as sessões do Claude Code com o coordenador, e um agente que escreve no repositório por conta própria colide com D4 e com os guardrails. O princípio de gastar o mínimo de atenção humana já está nos handoffs e nos portões da CI.",
+      "riscos": "MIT, 'não é produto oficial' e 'pode ter bugs' (segundo o README), sobre um harness em prévia. Exige app do GitHub com escrita e instalação conduzida por agente.",
+      "relacao_backlog": "D4; convenção de PR para main"
+    },
+    {
+      "repo": "DietrichGebert/ponytail",
+      "url": "https://github.com/DietrichGebert/ponytail",
+      "lote": "2026-11-23",
+      "categoria": "processo-agentes",
+      "veredito": "agora",
+      "faixa": [
+        "code-reviewer",
+        "frontend",
+        "edge-functions",
+        "supabase-db",
+        "engenheiro-ia",
+        "pagamentos",
+        "mobile"
+      ],
+      "estrelas": 197393,
+      "licenca": "MIT",
+      "ultimo_push": "2026-11-22",
+      "o_que_e": "Prompt de 'dev sênior preguiçoso' (a menor mudança que resolve tudo) distribuído como plugin com hooks, skills de revisão e auditoria e uma barra de custo por tarefa.",
+      "uso_no_levelup": "Incorporar três regras: a escada (já existe no repositório → recurso da plataforma → dependência já instalada → código mínimo, e nunca dependência nova por poucas linhas), o comentário `atalho: <limite>, <quando trocar>` e 'código movido ou fundido mantém validação e tratamento de erro'. O teto de 1.000 respostas no domínio por tópico (backlog 20) é o tipo de atalho que essa marcação teria deixado à vista.",
+      "gatilho": "Não se aplica (entra agora, só o texto).",
+      "como_ativar": "Feito: a escada (repositório → plataforma → dependência instalada → mínimo), o comentário 'atalho: <limite>, <quando trocar>' e 'código movido mantém validação' reescritos em rules/common/coding-style.md. Não instalar o plugin.",
+      "riscos": "Plugin reprovado pelo security-reviewer: 3 hooks (SessionStart, SubagentStart, UserPromptSubmit) injetam a persona em toda sessão e em todo subagente, por cima das 17 faixas; grava estado em ~/.claude e ~/.config/ponytail, oferece editar ~/.claude/settings.json e tem webhook opcional com o primeiro prompt.",
+      "relacao_backlog": "Backlog 20 (RPC de domínio por tópico); nenhum item novo.",
+      "ativacao": {
+        "tipo": "regra",
+        "alvo": "rules/common/coding-style.md",
+        "commit": "ebd8654c2c627f721eb8f9c0d1bd4090a29f9e10",
+        "aprovado_por": "dono",
+        "aprovado_em": "2026-11-23"
+      }
+    },
+    {
+      "repo": "earendil-works/pi",
+      "url": "https://github.com/earendil-works/pi",
+      "lote": "2026-11-23",
+      "categoria": "processo-agentes",
+      "veredito": "descartar",
+      "faixa": [
+        "engenheiro-ia"
+      ],
+      "estrelas": 123502,
+      "licenca": "MIT",
+      "ultimo_push": "2026-11-23",
+      "o_que_e": "Harness mínimo de agente com CLI de código, API unificada de vários provedores (pi-ai), runtime de agente com ferramentas e contratos de telemetria.",
+      "uso_no_levelup": "Nenhum: pi-ai e pi-agent-core duplicariam a camada _shared/ai (D2) no laço de ferramentas do Mentor (P2.11), que cabe em llm.ts com limite de turnos e prazo. Como CLI de desenvolvimento, não tem sistema de permissões (segundo o README) e ficaria fora dos guardrails.",
+      "riscos": "MIT; roda com todas as permissões do usuário. Seria mais uma dependência de produção sem ganho de qualidade medido.",
+      "relacao_backlog": "D2; P2.11"
+    },
+    {
+      "repo": "Ebony-Vinyl/dsh-our-free-model",
+      "url": "https://github.com/Ebony-Vinyl/dsh-our-free-model",
+      "lote": "2026-11-23",
+      "categoria": "processo-agentes",
+      "veredito": "descartar",
+      "faixa": [
+        "engenheiro-ia",
+        "security-reviewer"
+      ],
+      "estrelas": 84935,
+      "licenca": "NOASSERTION",
+      "ultimo_push": "2026-11-23",
+      "o_que_e": "Plugin do dsh que oferece modelos de ponta 'grátis e sem limite', sem conta nem chave, via gateways públicos de terceiros, pools de contas e uma porta local compatível com OpenAI.",
+      "uso_no_levelup": "Nenhum, nem em desenvolvimento: código do LevelUp e qualquer dado de aluno iriam para gateways sem contrato. Toda chamada de produto passa pelo gateway contratado (D2).",
+      "como_ativar": "Não instalar. Sugestão: regra em rules/common/ai-agents.md proibindo gateway de modelo sem contrato ou conta do dono, pool de contas e proxy para driblar cota, conferida pelo security-reviewer.",
+      "riscos": "Licença NOASSERTION; troca de IP de saída para driblar cota e pools de contas violam termos de uso, e o próprio README avisa que o upstream pode registrar os prompts. Atualização a quente e avisos em tela cheia enviados pelo mantenedor abrem a cadeia de suprimentos.",
+      "relacao_backlog": "D2; rules/common/privacy.md (provedores de IA)"
+    },
+    {
+      "repo": "EL4CTEO/fast-anything",
+      "url": "https://github.com/EL4CTEO/fast-anything",
+      "lote": "2026-11-23",
+      "categoria": "processo-agentes",
+      "veredito": "descartar",
+      "faixa": [
+        "coordenador"
+      ],
+      "estrelas": 2975,
+      "licenca": "MIT",
+      "ultimo_push": "2026-11-23",
+      "o_que_e": "Ferramenta que mede o app, porta para Rust só as funções lentas e prova a equivalência com chamadas reais gravadas.",
+      "uso_no_levelup": "Não há gargalo de CPU: o tempo vai para o modelo e o banco, e o front roda no navegador, onde binding nativo não carrega.",
+      "gatilho": "Reavaliar só se um script local de Node (ex.: build:trilhas) ficar lento por CPU.",
+      "como_ativar": "Não instalar.",
+      "riscos": "Criado em 21/11/2026. A ferramenta MCP fast_enable altera o código-fonte sem passar pelo hook de guardrails.",
+      "relacao_backlog": "Nenhuma."
+    },
+    {
+      "repo": "elementalsouls/Claude-BugHunter",
+      "url": "https://github.com/elementalsouls/Claude-BugHunter",
+      "lote": "2026-11-23",
+      "categoria": "seguranca",
+      "veredito": "descartar",
+      "faixa": [
+        "security-reviewer"
+      ],
+      "estrelas": 19299,
+      "licenca": "MIT",
+      "ultimo_push": "2026-11-23",
+      "o_que_e": "Pacote de 83 skills e 15 comandos de bug bounty e red team, com MCP do Burp e do HackerOne e instaladores que copiam para o ~/.claude de vários agentes.",
+      "uso_no_levelup": "Nenhum além do 'portão de 7 perguntas', já incorporado em 2026-11-17. É ofensivo e fora do escopo. Mantém a decisão anterior.",
+      "riscos": "As skills ofensivas carregam sozinhas por tema, o instalador pede token do HackerOne e liga o MCP do Burp. Reconhecimento contra alvos externos traz risco jurídico."
+    },
+    {
+      "repo": "erkamyaman/safe-anything",
+      "url": "https://github.com/erkamyaman/safe-anything",
+      "lote": "2026-11-23",
+      "categoria": "seguranca",
+      "veredito": "monitorar",
+      "faixa": [
+        "security-reviewer"
+      ],
+      "estrelas": 393,
+      "licenca": "MIT",
+      "ultimo_push": "2026-11-23",
+      "o_que_e": "Scanner em Rust (CLI, MCP e GitHub Action) de XSS, SQLi, segredos, CVEs via OSV.dev e configuração insegura de agentes.",
+      "uso_no_levelup": "As regras de 'agent setups' (bypassPermissions, npx sem versão em MCP, curl|sh em hooks, Unicode invisível) servem de checklist para revisar skills. Útil em tese, mas imaturo demais para rodar no repositório. Reavaliar quando tiver histórico e o código for lido, rodando com --offline.",
+      "gatilho": "Projeto com ao menos 3 meses de histórico e mais de um mantenedor; antes de qualquer piloto, clonar, ler o código e rodar só com --offline numa cópia sem .env.",
+      "riscos": "Criado em 2026-11-22 por um autor só. É um binário novo que lê o repositório inteiro (inclusive o .env do Lovable) e consulta a rede por padrão; não foi clonado nem lido aqui."
+    },
+    {
+      "repo": "farion1231/cc-switch",
+      "url": "https://github.com/farion1231/cc-switch",
+      "lote": "2026-11-23",
+      "categoria": "processo-agentes",
+      "veredito": "descartar",
+      "faixa": [
+        "coordenador"
+      ],
+      "estrelas": 156627,
+      "licenca": "MIT",
+      "ultimo_push": "2026-11-23",
+      "o_que_e": "App desktop que troca o provedor de API do Claude Code e de outros agentes e centraliza MCP, skills e prompts.",
+      "uso_no_levelup": "Nenhum no projeto; é decisão pessoal do dono. A sincronização central de skills disputaria espaço com as 79 geradas por ops/agentes/skills.mjs.",
+      "como_ativar": "Não instalar no projeto.",
+      "riscos": "O modo de roteamento passa as requisições por um proxy local e permite mandar o código do repositório para provedores de terceiros. As configurações prontas vêm com links de afiliado.",
+      "relacao_backlog": "Nenhuma."
+    },
+    {
+      "repo": "firecrawl/firecrawl",
+      "url": "https://github.com/firecrawl/firecrawl",
+      "lote": "2026-11-23",
+      "categoria": "dados-coleta",
+      "veredito": "piloto",
+      "faixa": [
+        "edge-functions",
+        "curador-conteudo",
+        "engenheiro-ia"
+      ],
+      "estrelas": 207661,
+      "licenca": "AGPL-3.0",
+      "ultimo_push": "2026-11-23",
+      "o_que_e": "API, CLI e servidor MCP que transformam páginas (inclusive as montadas por JavaScript) e PDFs em markdown, com versão local em Rust, nuvem paga e auto-hospedagem.",
+      "uso_no_levelup": "Radar: as fontes que chegam vazias ao fetcher.ts (Cebraspe e portal da Selecon, semeadas desligadas) passariam a ser renderizadas pela API da Firecrawl Cloud, só nas fontes marcadas, mantendo diff, portão de evidência e verificador. A Fundatec (anti-robô) continua desligada.",
+      "gatilho": "Produção só depois do P0.4 (Radar publicado e rodando) e se a URL estática, o endpoint JSON que a página consome ou o diário oficial (P17) não resolverem a fonte.",
+      "como_ativar": "O curador tenta antes as alternativas sem custo; se falharem, o dono cria conta (nunca o modo sem chave) e o laboratório testa as duas páginas com o robots.txt conferido. Depois, edge-functions adiciona um modo de renderização por fonte (campo novo via supabase-db) que chama a API v2 por fetch, sem SDK, confere o host da URL final, mantém 2 MB/15 s e usa o secret FIRECRAWL_API_KEY.",
+      "riscos": "AGPL-3.0 só pesa se hospedarmos versão modificada; consumir a API não gera obrigação. Custo baixo (2 fontes a cada 12 h dá cerca de 120 créditos/mês, contra 1.000 grátis segundo o README), mas é dependência externa em produção, pode não respeitar robots.txt (o fetcher confere antes) e a resposta é dado não confiável (fenceUntrusted).",
+      "relacao_backlog": "Armadilha do Radar (páginas por JavaScript); P0.4; P17; D8"
+    },
+    {
+      "repo": "garrytan/gstack",
+      "url": "https://github.com/garrytan/gstack",
+      "lote": "2026-11-23",
+      "categoria": "processo-agentes",
+      "veredito": "descartar",
+      "faixa": [
+        "coordenador"
+      ],
+      "estrelas": 142458,
+      "licenca": "MIT",
+      "ultimo_push": "2026-11-23",
+      "o_que_e": "Conjunto de 23 comandos que fazem papéis (CEO, designer, QA com navegador, segurança, release), clonado em ~/.claude/skills por um setup que registra hooks.",
+      "uso_no_levelup": "Os papéis repetem os 17 agentes e os 79 cargos (o organograma já tem CEO e CTO), e /review, /cso e /ship repetem code-reviewer, security-reviewer e reviewer. Segundo o próprio README, não melhorou a correção de bugs (58 tarefas com gstack contra 61 de 99 sem).",
+      "gatilho": "Nenhum; o E2E com navegador segue pelo agent-browser/Playwright já registrado em docs/REFERENCIAS_REPOSITORIOS.md.",
+      "como_ativar": "Não instalar.",
+      "riscos": "A instalação manda escrever no CLAUDE.md uma regra de navegação ('/browse para toda navegação'), registra hooks, e o modo equipe faz commit no repositório com atualização automática. Exige Bun 1.4.2+ e compila um navegador próprio.",
+      "relacao_backlog": "Repete o E2E de login, simulado e checkout do tester sem acrescentar nada."
+    },
+    {
+      "repo": "google-gemini/gemini-api-cli",
+      "url": "https://github.com/google-gemini/gemini-api-cli",
+      "lote": "2026-11-23",
+      "categoria": "processo-agentes",
+      "veredito": "monitorar",
+      "faixa": [
+        "engenheiro-ia",
+        "cmo"
+      ],
+      "estrelas": 956,
+      "licenca": "Apache-2.0",
+      "ultimo_push": "2026-11-20",
+      "o_que_e": "CLI experimental em Go que dá a qualquer agente com shell acesso à API do Gemini: texto, análise de arquivos, imagem, áudio, vídeo e agentes gerenciados.",
+      "uso_no_levelup": "Hoje nenhum: os modelos Gemini de texto já chegam pelo Lovable AI Gateway com uma chave e telemetria. Ler edital em PDF com modelo não serve de evidência literal do Radar (use extração determinística de texto); sobra gerar mídia para o cmo.",
+      "gatilho": "Sair de experimental e o cmo precisar de imagem ou voz geradas em volume, com chave paga do dono.",
+      "riscos": "Apache-2.0, experimental e sem aceitar PRs; GEMINI_API_KEY é secret do dono e é preciso conferir nos termos se o nível gratuito usa os dados para melhorar produtos. Só material público, nunca dado de aluno.",
+      "relacao_backlog": "Limite de PDF do Radar (docs/RADAR_CONCURSOS.md); D2"
+    },
+    {
+      "repo": "google/elephant-goldfish-model",
+      "url": "https://github.com/google/elephant-goldfish-model",
+      "lote": "2026-11-23",
+      "categoria": "processo-agentes",
+      "veredito": "agora",
+      "faixa": [
+        "coordenador",
+        "engenheiro-ia",
+        "documentation-writer"
+      ],
+      "estrelas": 22365,
+      "licenca": "Apache-2.0",
+      "ultimo_push": "2026-11-23",
+      "o_que_e": "Plugin de Claude Code e Codex em que um agente com contexto redige a especificação e revisores 'goldfish', em subagentes sem a conversa anterior, a revisam; também compara documentos com o código (drift).",
+      "uso_no_levelup": "Revisão independente das specs de IA antes de codar: Mentor com ferramentas (P2.11), discursiva dupla (D7) e cache de explicações. O drift-report confere docs/RADAR_CONCURSOS.md, docs/MERCADO_PAGO.md e a ARQUITETURA contra o código.",
+      "como_ativar": "O security-reviewer lê skills, prompts dos revisores e hooks no commit fixado; com o de acordo, marketplace em extraKnownMarketplaces com ref fixada e \"egm@egm\": true em enabledPlugins. Primeiro uso: `/egm:egm-drift-report docs/` e `/egm:egm-review` da spec do P2.11, salva em docs/.",
+      "riscos": "Apache-2.0, projeto de 2026-09 (novo); custo só de tokens da sessão, sem secret nem dependência de produção. Prompts de terceiros podem conflitar com rules/ (revisar antes) e a revisão não substitui testes nem humano (segundo o README).",
+      "relacao_backlog": "P2.11; D7; D9"
+    },
+    {
+      "repo": "GoogleChrome/modern-web-guidance",
+      "url": "https://github.com/GoogleChrome/modern-web-guidance",
+      "lote": "2026-11-23",
+      "categoria": "design",
+      "veredito": "agora",
+      "faixa": [
+        "designer",
+        "frontend",
+        "mobile"
+      ],
+      "estrelas": 25438,
+      "licenca": "Apache-2.0",
+      "ultimo_push": "2026-11-23",
+      "o_que_e": "Plugin mantido por Chrome, Edge, Firefox e MDN com cerca de 240 guias curtos de HTML, CSS e JS modernos (acessibilidade, movimento, formulários, diálogos, PWA), consultados sob demanda.",
+      "uso_no_levelup": "Dá a correção com recurso nativo para a auditoria das telas de estudo: movimento reduzido (hoje não há nenhuma regra prefers-reduced-motion em src/; o timer do Quiz pulsa e a alternativa errada sacode), anúncio acessível de erro e progresso no Quiz e no Simulado, diálogo de entrega do simulado, campos obrigatórios na Discursiva e no Auth, e a instalação do PWA em /instalar.",
+      "gatilho": "Reavaliar se a CLI passar a pedir chave, coletar telemetria ou mudar de licença.",
+      "como_ativar": "Feito: copiados só os guias (14 categorias, 202 arquivos) do commit 2b4aa13 para .claude/skills/guias-web-modernos/guides/, com LICENSE, ORIGEM.md e SKILL.md própria que consulta os guias com Grep e Read. Não instalar o plugin nem liberar npx.",
+      "riscos": "Revisão de segurança: o plugin foi reprovado como está (a SKILL.md original roda npx -y modern-web-guidance@latest a cada consulta, sem versão fixa, se declara obrigatória em toda tarefa, pede pré-autorização de rede e sugere editar CLAUDE.md); a cópia dos guias foi aprovada. Guias em inglês e para HTML puro (adaptar a React/shadcn).",
+      "relacao_backlog": "Complementa o item 19 (auditoria de UI) e prepara o P2.12 pela instalação do PWA.",
+      "ativacao": {
+        "tipo": "skill",
+        "alvo": ".claude/skills/guias-web-modernos",
+        "commit": "2b4aa13a72dd47cd135b06ce5abfccd92e19b24f",
+        "aprovado_por": "dono",
+        "aprovado_em": "2026-11-23"
+      }
+    },
+    {
+      "repo": "Graphify-Labs/graphify",
+      "url": "https://github.com/Graphify-Labs/graphify",
+      "lote": "2026-11-23",
+      "categoria": "processo-agentes",
+      "veredito": "futuro",
+      "faixa": [
+        "coordenador",
+        "code-reviewer"
+      ],
+      "estrelas": 152411,
+      "licenca": "Apache-2.0",
+      "ultimo_push": "2026-11-23",
+      "o_que_e": "CLI e skill que transformam código (AST com tree-sitter, local e sem LLM, segundo o README), docs e PDFs num grafo consultável, com arestas marcadas como extraídas ou inferidas.",
+      "uso_no_levelup": "Rastrear impacto entre RPCs SECURITY DEFINER, políticas RLS, Edge Functions e telas antes de mudanças sensíveis (code-reviewer, security-reviewer). No tamanho atual do repositório, grep e as regras dão conta.",
+      "gatilho": "Início do B2B multi-tenant (P3, RLS por tenant) ou uma regressão causada por dependência entre arquivos que a revisão não viu.",
+      "como_ativar": "No laboratório (ops/referencias), só o passe de código, com saída fora do repositório e `graphify install` em nível de usuário; o security-reviewer lê a skill antes.",
+      "riscos": "Apache-2.0; o passe semântico de docs e PDFs chama modelo ou chave configurada e a instalação altera a configuração do assistente. O README empurra o Graphify Cloud, e 152 mil estrelas em 7 meses pedem cautela.",
+      "relacao_backlog": "P3 (B2B multi-tenant)"
+    },
+    {
+      "repo": "havenicec/google-qr-sms-helper",
+      "url": "https://github.com/havenicec/google-qr-sms-helper",
+      "lote": "2026-11-23",
+      "categoria": "seguranca",
+      "veredito": "descartar",
+      "faixa": [
+        "security-reviewer"
+      ],
+      "estrelas": 4240,
+      "licenca": "MIT",
+      "ultimo_push": "2026-10-28",
+      "o_que_e": "Extensão do Chrome que contorna a verificação por QR do Google falsificando o navegador (iPad Mini), injetando RPCs e usando números de serviços de recebimento de SMS.",
+      "uso_no_levelup": "Nenhum. É ferramenta de contorno de verificação. Não instalar em nenhuma máquina com acesso ao projeto.",
+      "riscos": "Contorna controle de segurança e os termos do Google. Uma extensão com acesso à sessão de accounts.google.com pode tomar as contas que administram o projeto."
+    },
+    {
+      "repo": "heydamir/unslop",
+      "url": "https://github.com/heydamir/unslop",
+      "lote": "2026-11-23",
+      "categoria": "design",
+      "veredito": "piloto",
+      "faixa": [
+        "designer"
+      ],
+      "estrelas": 20708,
+      "licenca": "CC-BY-4.0",
+      "ultimo_push": "2026-11-15",
+      "o_que_e": "Skill de redesenho anti-slop: audita a tela contra sinais de interface com cara de IA (gradientes, brilhos, emoji, pulsos, copy exclamativa), propõe uma direção e espera o de acordo antes de editar.",
+      "uso_no_levelup": "Rodar só a auditoria e o modo polimento em Quiz, Result e SimuladoOficial, que têm os sinais que ela procura (Card glass, shadow-glow-accent, gradient-accent, animate-sparkle, animate-pulse no timer; 29 arquivos com bg-gradient). As regras de copy batem com rules/common/writing.md.",
+      "gatilho": "Promover para agora se o piloto no Quiz render ao menos 5 achados acionáveis que o Impeccable (item 19) não apontou, sem propostas que baixem o alvo de toque de 44 px ou troquem fonte e paleta; senão, descartar.",
+      "como_ativar": "Com o de acordo do dono: copiar de heydamir/unslop@620163eedb3529d9cd23a3994ed8d287d06f760d só skills/unslop/SKILL.md e skills/unslop/references/*.md para .claude/skills/unslop/, com LICENSE e ORIGEM.md (crédito a Damir Sokolovsky). Antes, corrigir as linhas 105 ('!' seguido de crase) e 122 ('$48,210') da SKILL.md, que o validador recusa; sem scripts/ e sem a etapa de geração de imagens.",
+      "riscos": "CC-BY-4.0 exige atribuição em cópias e adaptações. Pensada para desktop (alvos de 32 a 36 px), não trata movimento reduzido e tende a propor fonte e paleta novas ou cortar celebrações da gamificação. Os scripts usam Playwright, ffmpeg e rede; a etapa de visuais envia a descrição do produto a geradores de imagem pagos. Revisão de segurança: aprovado com essas condições.",
+      "relacao_backlog": "Alternativa ao Impeccable do item 19: pilotar os dois no Quiz e ficar com o que der achados mais acionáveis."
+    },
+    {
+      "repo": "ItsNotRexed/Leonida",
+      "url": "https://github.com/ItsNotRexed/Leonida",
+      "lote": "2026-11-23",
+      "categoria": "fora-do-escopo",
+      "veredito": "descartar",
+      "faixa": [
+        "security-reviewer"
+      ],
+      "estrelas": 25433,
+      "licenca": "GPL-3.0",
+      "ultimo_push": "2026-11-23",
+      "o_que_e": "Recompilação estática do GTA VI de Xbox para PC a partir de uma cópia do jogo.",
+      "uso_no_levelup": "Nenhum. Fora do escopo.",
+      "riscos": "Envolve propriedade intelectual de terceiro, com risco de DMCA."
+    },
+    {
+      "repo": "JuneYaooo/rea-video",
+      "url": "https://github.com/JuneYaooo/rea-video",
+      "lote": "2026-11-23",
+      "categoria": "marketing",
+      "veredito": "monitorar",
+      "faixa": [
+        "cmo"
+      ],
+      "estrelas": 12583,
+      "licenca": "Apache-2.0",
+      "ultimo_push": "2026-11-23",
+      "o_que_e": "Skill e CLI que desmontam um vídeo plano a plano (filmado, IA ou código), com legendas, cortes e áudio, e sugerem como refazê-lo.",
+      "uso_no_levelup": "Estudar vídeos curtos de referência para as peças da campanha do simulado; complementa o HyperFrames já testado no laboratório.",
+      "gatilho": "Projeto com pelo menos 3 meses e campanha de vídeo do simulado (D12) aprovada com produção semanal.",
+      "riscos": "Apache-2.0, criado em 2026-10-29; direitos autorais do vídeo analisado e do 'remake'. A chave opcional de modelo de vídeo (Gemini ou Doubao) envia o vídeo a terceiros: só material público, nunca de aluno.",
+      "relacao_backlog": "D12; HyperFrames (docs/ANALISE_DAS_REFERENCIAS.md)"
+    },
+    {
+      "repo": "karpathy/llm-wiki",
+      "url": "https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f",
+      "lote": "2026-11-23",
+      "categoria": "ia-produto",
+      "veredito": "agora",
+      "faixa": [
+        "gerente-contexto",
+        "engenheiro-ia"
+      ],
+      "licenca": "não declarada (adotada só a ideia)",
+      "o_que_e": "Padrão (gist, sem código) de base de conhecimento mantida por LLM: fontes imutáveis, wiki compilado e atualizado a cada fonte nova e esquema; operações ingest, query e lint, com index.md e log.md só de acréscimo.",
+      "uso_no_levelup": "Já é o desenho do AGENTS-COLLAB e do Radar (fonte oficial imutável, fato com evidência, conflito vai para revisão). Falta o 'lint': o gerente-contexto procurar contradições entre AGENTS-COLLAB, CLAUDE.md e docs, afirmações obsoletas e docs órfãos; o 'compilado uma vez' reforça o cache de explicações por questão (P2.11).",
+      "como_ativar": "Feito: checklist de manutenção (lint) da documentação na definição do gerente-contexto (.claude/agents/gerente-contexto.md), citando o gist na revisão ac46de1.",
+      "riscos": "Gist sem licença declarada: adotar a ideia sem copiar o texto; custo zero. Wiki compilado por modelo para o aluno (ex.: resumo de lei seca) só com revisão do curador, como as questões.",
+      "relacao_backlog": "D1; P2.11 (cache amortizado)",
+      "ativacao": {
+        "tipo": "regra",
+        "alvo": ".claude/agents/gerente-contexto.md",
+        "commit": "ac46de1ad27f92b28ac95459c782c07f6b8c964a",
+        "aprovado_por": "dono",
+        "aprovado_em": "2026-11-23"
+      }
+    },
+    {
+      "repo": "kunkundi/crossdesk",
+      "url": "https://github.com/kunkundi/crossdesk",
+      "lote": "2026-11-23",
+      "categoria": "fora-do-escopo",
+      "veredito": "descartar",
+      "faixa": [
+        "security-reviewer"
+      ],
+      "estrelas": 6610,
+      "licenca": "NOASSERTION",
+      "ultimo_push": "2026-11-23",
+      "o_que_e": "Área de trabalho remota multiplataforma com cliente web e um MCP para um agente observar e operar computadores remotos.",
+      "uso_no_levelup": "Nenhum. Suporte remoto a alunos menores não é desejável. A superfície de ataque é alta e não há ganho para o estudo.",
+      "riscos": "Agente com controle remoto, sinalização em servidor de terceiro e licença sem declaração (NOASSERTION)."
+    },
+    {
+      "repo": "libracoder/kiri",
+      "url": "https://github.com/libracoder/kiri",
+      "lote": "2026-11-23",
+      "categoria": "processo-agentes",
+      "veredito": "descartar",
+      "faixa": [
+        "security-reviewer"
+      ],
+      "estrelas": 12595,
+      "licenca": "Apache-2.0",
+      "ultimo_push": "2026-11-23",
+      "o_que_e": "Runtime de contêineres em Rust compatível com Docker, com Kubernetes, CA própria para HTTPS local e um `kiri share` que publica uma porta local na internet.",
+      "uso_no_levelup": "No máximo rodaria o Supabase local, que o Docker já atende. Não traz ganho para o aluno e cria risco alto na máquina de desenvolvimento.",
+      "riscos": "Projeto de 3 semanas que se autoatualiza e instala uma autoridade certificadora. Também pode expor à internet o Supabase local, com service_role."
+    },
+    {
+      "repo": "mattpocock/ai-hero-cli",
+      "url": "https://github.com/mattpocock/ai-hero-cli",
+      "lote": "2026-11-23",
+      "categoria": "processo-agentes",
+      "veredito": "descartar",
+      "faixa": [
+        "engenheiro-ia"
+      ],
+      "estrelas": 155,
+      "licenca": "MIT",
+      "ultimo_push": "2026-11-12",
+      "o_que_e": "CLI que navega e roda os exercícios do curso AI Hero.",
+      "uso_no_levelup": "Nenhum; o próprio README diz que não serve fora do contexto do curso.",
+      "riscos": "MIT e sem risco relevante; só não tem uso."
+    },
+    {
+      "repo": "mattpocock/chat",
+      "url": "https://github.com/mattpocock/chat",
+      "lote": "2026-11-23",
+      "categoria": "ia-produto",
+      "veredito": "futuro",
+      "faixa": [
+        "edge-functions",
+        "engenheiro-ia",
+        "cmo"
+      ],
+      "licenca": "não declarada",
+      "o_que_e": "SDK TypeScript para bots em Telegram, WhatsApp, Slack, Discord, Teams e outros, com streaming de IA e estado em Postgres ou Redis.",
+      "uso_no_levelup": "Veículo da 'Questão do dia' (P3) mais simples que o OpenClaw: biblioteca numa Edge Function, resposta conferida por validate_answer e cota por aluno. Para o alerta do P1.8 não precisa: um fetch para o Telegram ou um e-mail basta.",
+      "gatilho": "D6 decidido (idade e supervisão parental) e o dono aprovar a 'Questão do dia' com consentimento explícito.",
+      "como_ativar": "Usar o repositório de origem (o README aponta vercel/chat) com licença e versão conferidas e testar no Deno via npm:. Começar pelo Telegram (API gratuita), com opt-in e sem menores sem supervisão.",
+      "riscos": "Dossiê sem metadados (o README diz MIT; confirmar a procedência); WhatsApp Business cobra por conversa e exige conta Meta. Tokens dos canais viram secrets e a mensagem do aluno é dado não confiável.",
+      "relacao_backlog": "P3 'Questão do dia' (decisão do OpenClaw); D6; P1.8"
+    },
+    {
+      "repo": "mattpocock/cookout",
+      "url": "https://github.com/mattpocock/cookout",
+      "lote": "2026-11-23",
+      "categoria": "processo-agentes",
+      "veredito": "monitorar",
+      "faixa": [
+        "gerente-contexto"
+      ],
+      "estrelas": 5,
+      "licenca": "não declarada",
+      "ultimo_push": "2026-11-23",
+      "o_que_e": "Quadro no estilo Slack, hospedado pelo próprio usuário, onde pessoas e agentes conversam em canais (servidor Node, SQLite e token de admin).",
+      "uso_no_levelup": "Seria uma alternativa ao handoff por arquivo do AGENTS-COLLAB, que hoje fica versionado e passa por revisão em PR. Nenhum problema atual justifica a troca.",
+      "gatilho": "Se sessões paralelas passarem a gerar conflitos frequentes em AGENTS-COLLAB.md e o projeto tiver licença e versão estável.",
+      "como_ativar": "Nada agora.",
+      "riscos": "Criado em 22/11/2026, com 5 estrelas e sem licença; exige servidor e token de admin (mais um segredo) e tiraria o estado vivo do Git.",
+      "relacao_backlog": "D1 (metodologia AGENTS-COLLAB)."
+    },
+    {
+      "repo": "mattpocock/course-video-manager",
+      "url": "https://github.com/mattpocock/course-video-manager",
+      "lote": "2026-11-23",
+      "categoria": "marketing",
+      "veredito": "descartar",
+      "faixa": [
+        "engenheiro-ia"
+      ],
+      "estrelas": 937,
+      "licenca": "não declarada",
+      "ultimo_push": "2026-11-22",
+      "o_que_e": "Ferramenta pessoal do autor para publicar vídeos de curso (metadados, descrições, miniaturas e postagem), com Drizzle e Remotion.",
+      "uso_no_levelup": "Nenhum. A disciplina de migrations só aditivas com portão de versão já está nas convenções (idempotentes e tolerantes à ordem de publicação).",
+      "riscos": "Sem licença no repositório (todos os direitos reservados): não copiar código."
+    },
+    {
+      "repo": "mattpocock/dictionary-of-ai-coding",
+      "url": "https://github.com/mattpocock/dictionary-of-ai-coding",
+      "lote": "2026-11-23",
+      "categoria": "processo-agentes",
+      "veredito": "futuro",
+      "faixa": [
+        "documentation-writer"
+      ],
+      "estrelas": 5640,
+      "licenca": "não declarada",
+      "ultimo_push": "2026-11-12",
+      "o_que_e": "Glossário em inglês simples dos termos de programação com IA (contexto, compactação, handoff, subagente, skill).",
+      "uso_no_levelup": "Leitura para quem chega à equipe entender o vocabulário do AGENTS-COLLAB. Não instala nada e não muda os agentes.",
+      "gatilho": "Quando entrar a primeira pessoa técnica na equipe ou for escrito o guia de integração dos perfis da D12.",
+      "como_ativar": "Citar como link externo no guia, sem copiar trechos.",
+      "riscos": "O repositório não declara licença, então o texto não pode ser copiado; está em inglês.",
+      "relacao_backlog": "D12 (equipe operacional e perfis)."
+    },
+    {
+      "repo": "mattpocock/sandcastle",
+      "url": "https://github.com/mattpocock/sandcastle",
+      "lote": "2026-11-23",
+      "categoria": "processo-agentes",
+      "veredito": "futuro",
+      "faixa": [
+        "coordenador",
+        "tester"
+      ],
+      "estrelas": 9245,
+      "licenca": "MIT",
+      "ultimo_push": "2026-11-18",
+      "o_que_e": "Biblioteca TypeScript que roda agentes de código em sandboxes isoladas (Bubblewrap, Docker ou nuvem), cada um num branch, e traz os commits de volta.",
+      "uso_no_levelup": "Paralelizar trabalho de implementação do coordenador em tarefas independentes, com isolamento de arquivos e ambiente. Hoje as sessões remotas e os worktrees do Claude Code bastam.",
+      "gatilho": "O coordenador rodar 3 ou mais agentes de implementação em paralelo por semana e surgirem conflitos ou vazamento de ambiente entre eles.",
+      "como_ativar": "No laboratório, provedor local (Bubblewrap) e estratégia de branch que termina em PR, nunca merge na main. Confirmar que .claude/hooks/guardrails.mjs roda dentro do sandbox e passar pelo security-reviewer.",
+      "riscos": "MIT; o merge automático de commits pode furar a convenção de PR, e os provedores de nuvem (E2B, Modal, Vercel) pedem chave e levam o código para fora. Os guardrails podem não valer dentro do sandbox.",
+      "relacao_backlog": "Convenção de PR para main; ARQUITETURA §9 (governança)"
+    },
+    {
+      "repo": "mattpocock/skills",
+      "url": "https://github.com/mattpocock/skills",
+      "lote": "2026-11-23",
+      "categoria": "processo-agentes",
+      "veredito": "piloto",
+      "faixa": [
+        "coordenador",
+        "documentation-writer"
+      ],
+      "estrelas": 331217,
+      "licenca": "MIT",
+      "ultimo_push": "2026-11-19",
+      "o_que_e": "Pacote de skills curtas de engenharia e produtividade (grill-me, grill-with-docs, triage, teach, diagnosing-bugs, git-guardrails), hoje disponível como plugin oficial que se atualiza sozinho.",
+      "uso_no_levelup": "Desde a avaliação anterior só mudou o canal de instalação: teach/grilling já viraram o modo socrático do Mentor, git-guardrails virou o hook e diagnosing-bugs está no tester.md. O ganho novo é o /grill-with-docs, para o dono fechar D5/D6 e montar um glossário do domínio (tier × billing_tier, plano efetivo, Passe, trilha, Radar), termos que já geraram armadilhas reais.",
+      "gatilho": "Passa para o settings.json do projeto se, em 2 semanas, os agentes usarem o glossário e nenhuma skill do pacote disparar sozinha fora de hora.",
+      "como_ativar": "Só na máquina do dono, em .claude/settings.local.json fora do Git: \"enabledPlugins\": {\"mattpocock-skills@claude-plugins-official\": true}. No /setup-matt-pocock-skills, escolher GitHub para issues e docs/ para documentos, manter as decisões em AGENTS-COLLAB.md (não numa pasta de ADR) e conferir o diff antes de commitar.",
+      "riscos": "Repete diagnosing-bugs e git-guardrails, que já foram absorvidos, e soma dezenas de descrições de skill às 79 dos cargos no contexto. A atualização automática traz texto novo sem revisão.",
+      "relacao_backlog": "Apoia as decisões pendentes D5 (lojas) e D6 (ECA Digital); nenhum item de P0 a P2 depende dele."
+    },
+    {
+      "repo": "mattpocock/ts-reset",
+      "url": "https://github.com/mattpocock/ts-reset",
+      "lote": "2026-11-23",
+      "categoria": "processo-agentes",
+      "veredito": "piloto",
+      "faixa": [
+        "frontend",
+        "code-reviewer"
+      ],
+      "estrelas": 8652,
+      "licenca": "MIT",
+      "ultimo_push": "2026-04-01",
+      "o_que_e": "Declarações de tipo que corrigem APIs do JavaScript: JSON.parse e .json() passam a devolver unknown, e .filter(Boolean) restringe o tipo do resultado.",
+      "uso_no_levelup": "Faz o compilador cobrar a 'validação na fronteira' de rules/common/coding-style.md nos pontos onde o JSON chega hoje como any: src/pages/Mentor.tsx:117 e :171 (streaming), src/pages/Discursiva.tsx:26 e src/lib/authService.ts:14. Vale só para o front; as Edge Functions não mudam.",
+      "gatilho": "Levar para a main se as correções couberem num PR pequeno com typecheck verde; desistir se exigir mexer no types.ts gerado.",
+      "como_ativar": "Num branch: `bun add -d @total-typescript/ts-reset`, criar src/reset.d.ts com `import \"@total-typescript/ts-reset\";` e rodar `bun run typecheck`, corrigindo com zod ou checagem explícita, nunca com `as`. Depois, ressincronizar o package-lock.json (`npm install --package-lock-only`).",
+      "riscos": "Não pega cast explícito: `JSON.parse(raw) as Tipo` em src/hooks/useAffiliates.ts:340, src/lib/quizSession.ts:48 e src/pages/SimuladoOficial.tsx:257 já viola a regra hoje e precisa de correção à parte. Acrescenta uma dependência de desenvolvimento ao bun.lockb do Lovable.",
+      "relacao_backlog": "Anda junto com o P1.5 (harness de testes do front)."
+    },
+    {
+      "repo": "meta/astryx",
+      "url": "https://github.com/meta/astryx",
+      "lote": "2026-11-23",
+      "categoria": "design",
+      "veredito": "descartar",
+      "faixa": [
+        "designer",
+        "frontend"
+      ],
+      "estrelas": 32489,
+      "licenca": "MIT",
+      "ultimo_push": "2026-11-23",
+      "o_que_e": "Design system da Meta em beta: mais de 150 componentes React com StyleX, temas e uma CLI com documentação para agentes.",
+      "uso_no_levelup": "Adotá-lo seria trocar shadcn/Radix + Tailwind (fora de escopo) e exige React 19 (o app usa 18.3.1). A ideia de documentação legível por agentes já está coberta por rules/ e pelo agente designer.",
+      "gatilho": "Só reabrir se o dono decidir trocar o design system, com React 19 e o Astryx fora do beta.",
+      "como_ativar": "Não ativar.",
+      "riscos": "A CLI init grava o guia do Astryx em AGENTS.md e CLAUDE.md (fonte da verdade do projeto) e pede StyleX e React 19."
+    },
+    {
+      "repo": "milind-soni/OpenMausBot",
+      "url": "https://github.com/milind-soni/OpenMausBot",
+      "lote": "2026-11-23",
+      "categoria": "processo-agentes",
+      "veredito": "descartar",
+      "faixa": [
+        "security-reviewer"
+      ],
+      "estrelas": 27123,
+      "licenca": "Apache-2.0",
+      "ultimo_push": "2026-11-23",
+      "o_que_e": "App de chat com vários bots (Claude, Codex e Grok locais) que usam VM na nuvem, VM local ou o próprio computador, mais de 500 apps via Composio.",
+      "uso_no_levelup": "Nenhum. Não ajuda o candidato e aumenta a superfície de ataque da máquina do dono.",
+      "riscos": "Dá a agentes o controle do computador onde ficam os segredos do projeto, com OAuth amplo em apps de terceiros."
+    },
+    {
+      "repo": "mjmirza/app-store-compliance",
+      "url": "https://github.com/mjmirza/app-store-compliance",
+      "lote": "2026-11-23",
+      "categoria": "mobile",
+      "veredito": "futuro",
+      "faixa": [
+        "mobile",
+        "pagamentos",
+        "security-reviewer"
+      ],
+      "estrelas": 4716,
+      "licenca": "NOASSERTION",
+      "ultimo_push": "2026-11-23",
+      "o_que_e": "Playbook com 124 padrões de recusa da App Store e do Google Play e 112 prazos regulatórios, mais um guard em bash (v2.5.1) que bloqueia comandos de build e envio quando acha risco crítico.",
+      "uso_no_levelup": "Hoje só como leitura de apoio para D5 e D6 (conferir na fonte oficial); o guard não tem o que checar sem ios/ e android/. Com o Capacitor, varredura manual antes de cada envio para 3.1.1/Play Billing, 4.2, consentimento de IA (5.1.2(i)) e exclusão de conta (5.1.1(v)).",
+      "gatilho": "Branch do P2.12 com capacitor.config e as pastas ios/ ou android/ criadas, depois de D5 decidido, e licença ORA 2.3 aprovada pelo jurídico.",
+      "como_ativar": "Clonar fora do repositório num commit revisado (ad76746 ou posterior) e rodar só o modo manual (bash agent-os/hooks/app-store-compliance-guard.sh <projeto>), sem scripts/install.sh (que edita ~/.claude). Triar achados com security-reviewer e pagamentos; hook próprio só versionado em .claude/hooks com teste.",
+      "riscos": "Reprovado para instalação agora pelo security-reviewer: o scripts/install.sh grava um hook PreToolUse global em ~/.claude/settings.json para todo comando Bash, e a skill manda rodar monitores com rede e pull-metadata.sh com credenciais das lojas. Licença OpenRoots Agent License 2.3 (não OSI; royalty acima de US$ 20 mi de receita; restrição para treino de IA) exige leitura jurídica. Como hook, bloquearia todo cap sync até D5 (Stripe citado no código).",
+      "relacao_backlog": "D5, P2.12, D6/P0.3 e P1.8d; revelou a falta de exclusão de conta dentro do app."
+    },
+    {
+      "repo": "morluto/rea",
+      "url": "https://github.com/morluto/rea",
+      "lote": "2026-11-23",
+      "categoria": "seguranca",
+      "veredito": "descartar",
+      "faixa": [
+        "security-reviewer"
+      ],
+      "estrelas": 475283,
+      "licenca": "MIT",
+      "ultimo_push": "2026-11-23",
+      "o_que_e": "MCP e CLI de engenharia reversa de binários, apps Electron, .NET, Android e sites, com um setup que altera a configuração do agente.",
+      "uso_no_levelup": "Nenhum. Já foi descartado em 2026-11-17. Mantém a decisão anterior.",
+      "riscos": "Analisar apps de concorrentes traz risco jurídico. O `npx rea-agents@latest setup` muda a config do agente e pode instalar ferramentas nativas, e as 475 mil estrelas não são plausíveis."
+    },
+    {
+      "repo": "msitarzewski/agency-agents",
+      "url": "https://github.com/msitarzewski/agency-agents",
+      "lote": "2026-11-23",
+      "categoria": "processo-agentes",
+      "veredito": "descartar",
+      "faixa": [
+        "coordenador"
+      ],
+      "estrelas": 169914,
+      "licenca": "MIT",
+      "ultimo_push": "2026-11-09",
+      "o_que_e": "Catálogo grande de agentes com persona (engenharia, marketing, comunidade), instalado por script ou app desktop em ~/.claude/agents.",
+      "uso_no_levelup": "Nenhum: o LevelUp já tem 17 faixas exclusivas e 79 cargos gerados de catálogo próprio. Personas 'com personalidade' contrariam o desenho de faixas sem sobreposição.",
+      "gatilho": "Nenhum; quando surgir uma faixa nova, a ficha equivalente pode ser lida como referência, sem copiar.",
+      "como_ativar": "Não instalar.",
+      "riscos": "Mais de cem descrições de agente disputariam o roteamento automático, que escolhe pelo campo description.",
+      "relacao_backlog": "Nenhuma."
+    },
+    {
+      "repo": "multica-ai/andrej-karpathy-skills",
+      "url": "https://github.com/multica-ai/andrej-karpathy-skills",
+      "lote": "2026-11-23",
+      "categoria": "processo-agentes",
+      "veredito": "agora",
+      "faixa": [
+        "code-reviewer",
+        "documentation-writer"
+      ],
+      "estrelas": 235278,
+      "licenca": "não declarada",
+      "ultimo_push": "2026-04-20",
+      "o_que_e": "Um CLAUDE.md com quatro princípios contra erros comuns de LLM: pensar antes de codar, simplicidade, mudança cirúrgica e execução guiada por critério verificável.",
+      "uso_no_levelup": "Incorporar só o que falta: mudança cirúrgica (toda linha alterada responde ao pedido, nada de refatorar ou reformatar o código vizinho, código morto alheio é apontado e não apagado) e 'declarar as suposições e as leituras possíveis do pedido antes de codar'. Isso reduz o diff fora de escopo nos PRs que o code-reviewer revisa.",
+      "gatilho": "Não se aplica (entra agora, só o texto).",
+      "como_ativar": "Feito: princípios reescritos em PT-BR, com palavras próprias, no bloco 'Mudança mínima e cirúrgica' de rules/common/coding-style.md, no contrato de delegação (.claude/agents/README.md) e no code-reviewer. Não instalar o plugin nem usar o curl do README.",
+      "riscos": "Sem arquivo LICENSE (MIT só no plugin.json), por isso adotada a ideia e não o texto; o marketplace do README aponta para outro dono (forrestchang). 'Sem tratamento de erro para cenário impossível' não foi importado: conflita com 'falhe fechado'.",
+      "relacao_backlog": "Nenhum item; reforça os princípios 6 e 7 do CLAUDE.md e o portão de revisão.",
+      "ativacao": {
+        "tipo": "regra",
+        "alvo": "rules/common/coding-style.md",
+        "commit": "2c606141936f1eeef17fa3043a72095b4765b9c2",
+        "aprovado_por": "dono",
+        "aprovado_em": "2026-11-23"
+      }
+    },
+    {
+      "repo": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "url": "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill",
+      "lote": "2026-11-23",
+      "categoria": "design",
+      "veredito": "futuro",
+      "faixa": [
+        "designer",
+        "mobile"
+      ],
+      "estrelas": 153194,
+      "licenca": "MIT",
+      "ultimo_push": "2026-11-23",
+      "o_que_e": "Plugin com sete skills; a principal é uma busca local em Python sobre CSVs (diretrizes de UX, paletas, pares de fontes, regras por stack, inclusive shadcn) com gerador de design system.",
+      "uso_no_levelup": "Na auditoria atual agrega pouco (o gerador propõe paleta e fontes novas, fora de escopo). O valor real são as regras de UI nativa de references/pro-rules.md (área segura, 44 pt/48 dp, retorno de toque, contraste nos dois temas) para o app nas lojas.",
+      "gatilho": "Início do P2.12 (Capacitor nas lojas) ou uma tela nova do zero, como a página pública do Radar por concurso.",
+      "como_ativar": "Preferir incorporar as linhas aplicáveis de .claude/skills/ui-ux-pro-max/references/pro-rules.md (commit f823ab5fb970de820e5a0626a0786aba9aee0543, MIT) em rules/stack, com atribuição. Se a busca for necessária: copiar só a pasta ui-ux-pro-max (SKILL.md, references/, data/, scripts/core.py, search.py, design_system.py, reasoning_contract.py), trocar a variável de raiz do plugin pelo caminho local e nunca instalar como plugin nem copiar stack/ ou as skills design, brand, banner-design, slides e ui-styling.",
+      "riscos": "O plugin inteiro traz geradores de logo e ícone que leem ~/.claude/.env e chamam APIs pagas, um script que roda npx shadcn add (pode sobrescrever src/components/ui/), gravação de design-system/ na raiz e uma pasta stack/ com settings que liberam todos os MCP do projeto e leitura de /home. Revisão de segurança: aprovado só o subconjunto acima.",
+      "relacao_backlog": "Checklist de UI nativa para o P2.12."
+    },
+    {
+      "repo": "NousResearch/hermes-agent",
+      "url": "https://github.com/NousResearch/hermes-agent",
+      "lote": "2026-11-23",
+      "categoria": "processo-agentes",
+      "veredito": "descartar",
+      "faixa": [
+        "engenheiro-ia"
+      ],
+      "estrelas": 265615,
+      "licenca": "MIT",
+      "ultimo_push": "2026-11-23",
+      "o_que_e": "Agente pessoal que cria e reescreve as próprias skills com a experiência, roda em VPS ou nuvem e conversa por Telegram, com qualquer provedor de modelo.",
+      "uso_no_levelup": "Nenhum: o Mentor é agente único com poucas ferramentas nas Edge Functions (P2.11) e prompt só muda com nova versão e golden set; um agente que se reescreve sozinho contraria isso. A versão governada da ideia já existe em ai_lessons (curta, contada, desativável).",
+      "riscos": "MIT, mas instalação `curl | bash`, ferramentas no host, gateway de mensagens e assinatura Nous Portal. Aprendizado sem revisão humana traz deriva e envenenamento.",
+      "relacao_backlog": "D2; P2.11"
+    },
+    {
+      "repo": "NVIDIA/auto-ontology",
+      "url": "https://github.com/NVIDIA/auto-ontology",
+      "lote": "2026-11-23",
+      "categoria": "ia-produto",
+      "veredito": "descartar",
+      "faixa": [
+        "engenheiro-ia",
+        "arquiteto-dados"
+      ],
+      "estrelas": 14599,
+      "licenca": "Apache-2.0",
+      "ultimo_push": "2026-11-23",
+      "o_que_e": "Biblioteca que gera uma ontologia a partir dos metadados do banco e a expõe por MCP, CLI e API para agentes responderem perguntas de negócio com SQL rastreável.",
+      "uso_no_levelup": "Perguntas do admin em linguagem natural sobre o banco. O LevelUp tem uma fonte (Postgres) e métricas fixas (simulados/semana, custo por agente em ai_runs no P1.6), caso em que o próprio README admite que SQL direto basta.",
+      "riscos": "Apache-2.0, mas exige Docker, chave NVIDIA e conexão ao banco, mandando schema e valores com dados de alunos (há menores) a modelos externos. Operar mais um serviço não se paga para meia dúzia de consultas.",
+      "relacao_backlog": "P1.6 (painel de custo e latência)"
+    },
+    {
+      "repo": "obra/superpowers",
+      "url": "https://github.com/obra/superpowers",
+      "lote": "2026-11-23",
+      "categoria": "processo-agentes",
+      "veredito": "descartar",
+      "faixa": [
+        "coordenador"
+      ],
+      "estrelas": 324842,
+      "licenca": "MIT",
+      "ultimo_push": "2026-11-03",
+      "o_que_e": "Metodologia completa em skills que disparam sozinhas (brainstorm, spec, plano e desenvolvimento por subagentes), hoje no marketplace oficial.",
+      "uso_no_levelup": "Nada novo a ativar: o TDD e o verification-before-completion já estão em rules/common/testing.md e no 'verifique o verificador' do tester.md. Só ficou mais fácil instalar, e o pacote inteiro disputa o processo com o AGENTS-COLLAB e o coordenador.",
+      "gatilho": "Só se o dono abandonar a metodologia AGENTS-COLLAB (D1).",
+      "como_ativar": "Não ativar; manter superpowers@claude-plugins-official fora de enabledPlugins.",
+      "riscos": "Segundo o README, o agente segue o plano sozinho por horas, o que pula a regra 'mudança estrutural → aprovação do dono'. Continua disponível na conta do dono para uso pessoal; não ativar no projeto.",
+      "relacao_backlog": "Nenhuma; P1.5 (harness de testes do front) continua com o tester."
+    },
+    {
+      "repo": "openclaw/openclaw",
+      "url": "https://github.com/openclaw/openclaw",
+      "lote": "2026-11-23",
+      "categoria": "ia-produto",
+      "veredito": "descartar",
+      "faixa": [
+        "engenheiro-ia",
+        "edge-functions"
+      ],
+      "estrelas": 395093,
+      "licenca": "MIT",
+      "ultimo_push": "2026-11-23",
+      "o_que_e": "Assistente pessoal de código aberto que roda no próprio computador e atende por WhatsApp, Telegram, Slack e outros canais, com modelos e ferramentas como plugins.",
+      "uso_no_levelup": "A decisão de 2026-11-17 ligava a ele a 'Questão do dia' por mensageiro (🗂️ P3). Muda: é gateway de assistente pessoal com ferramentas no host, e para um bot de muitos alunos uma biblioteca de chat numa Edge Function é o mais simples (ver mattpocock/chat); o retry testado no laboratório já existe no llm.ts.",
+      "riscos": "MIT, sem plano pago; ferramentas rodam no host sem sandbox por padrão (segundo o README). Qualquer canal com alunos exige consentimento e a decisão D6.",
+      "relacao_backlog": "Decisão anterior em docs/REFERENCIAS_REPOSITORIOS.md §1 (muda o veículo do P3); D6"
+    },
+    {
+      "repo": "os6/nospeaker",
+      "url": "https://github.com/os6/nospeaker",
+      "lote": "2026-11-23",
+      "categoria": "fora-do-escopo",
+      "veredito": "descartar",
+      "faixa": [
+        "security-reviewer"
+      ],
+      "estrelas": 1172,
+      "licenca": "MIT",
+      "ultimo_push": "2026-11-22",
+      "o_que_e": "Programa de macOS que faz o motor háptico do trackpad falar.",
+      "uso_no_levelup": "Nenhum. Fora do escopo.",
+      "riscos": "Instala por `curl ... | sh`, usa framework privado da Apple e o repositório tem 1 dia."
+    },
+    {
+      "repo": "pierridotite/mobile-agent-testers",
+      "url": "https://github.com/pierridotite/mobile-agent-testers",
+      "lote": "2026-11-23",
+      "categoria": "mobile",
+      "veredito": "futuro",
+      "faixa": [
+        "tester",
+        "mobile",
+        "security-reviewer"
+      ],
+      "estrelas": 1341,
+      "licenca": "MIT",
+      "ultimo_push": "2026-11-23",
+      "o_que_e": "Template de GitHub Actions que sobe até 20 agentes Claude Code em simuladores iOS e emuladores Android, cada um com uma persona (aparelho, idioma, fonte grande), e entrega relatórios criptografados com capturas; aceita Capacitor.",
+      "uso_no_levelup": "Com o build Capacitor pronto, rodar personas pt-BR (iPhone SE com fonte máxima, Android de entrada com fonte 200%, leitor de tela) nos fluxos da estrela-guia: cadastro, simulado completo, revisão offline e checkout. Complementa os testes determinísticos do tester.",
+      "gatilho": "Build instalável (APK de debug e build de simulador iOS) gerado na CI pelo P2.12 e homologação com contas sintéticas de adultos; reavaliar a maturidade (o projeto tem uma semana).",
+      "como_ativar": "Clonar, ler workflow, setup.sh, scripts/collect.sh e LICENSE e fixar commit; criar repositório separado a partir do template, configurar só token do Claude e conta de homologação, e começar com 2 personas Android.",
+      "riscos": "Agentes leem telas com conteúdo de terceiros num runner com segredos (injeção de prompt e vazamento): só homologação, token mínimo, nunca produção (D4) nem dado de menor. Runner grátis só em repositório público; custo de cerca de US$ 0,15 a 0,55 por aparelho e resultados não reproduzíveis.",
+      "relacao_backlog": "P2.12, P1.5 (harness do tester) e item 19 (auditoria de UI e acessibilidade)."
+    },
+    {
+      "repo": "pingdotgg/t3code",
+      "url": "https://github.com/pingdotgg/t3code",
+      "lote": "2026-11-23",
+      "categoria": "processo-agentes",
+      "veredito": "descartar",
+      "faixa": [
+        "coordenador"
+      ],
+      "estrelas": 74262,
+      "licenca": "MIT",
+      "ultimo_push": "2026-11-23",
+      "o_que_e": "Painel aberto para controlar Claude Code, Codex e outros agentes pelo desktop, pela web ou pelo celular.",
+      "uso_no_levelup": "Nenhum no projeto; é decisão pessoal do dono sobre como operar as sessões.",
+      "como_ativar": "Não instalar no projeto.",
+      "riscos": "Acesso remoto e aprovação pelo celular numa máquina com MCP de produção (Supabase, Lovable) aumentam a superfície de ataque.",
+      "relacao_backlog": "Nenhuma."
+    },
+    {
+      "repo": "ScrapeCreators/social-media-research-skills",
+      "url": "https://github.com/ScrapeCreators/social-media-research-skills",
+      "lote": "2026-11-23",
+      "categoria": "marketing",
+      "veredito": "monitorar",
+      "faixa": [
+        "cmo"
+      ],
+      "estrelas": 7386,
+      "licenca": "MIT",
+      "ultimo_push": "2026-08-26",
+      "o_que_e": "Skills de agente para pesquisa em redes sociais (posts fora da curva, mineração de comentários, concorrentes, anúncios), apoiadas na API paga ScrapeCreators.",
+      "uso_no_levelup": "Pesquisa de voz do concurseiro (dúvidas, objeções) em conteúdo de cursinhos para a campanha do simulado (D12); não toca o produto.",
+      "gatilho": "Jurídico aprovar a base legal para tratar comentários públicos (LGPD, possíveis menores) e o cmo precisar dessa pesquisa em escala; até lá, pesquisa manual.",
+      "riscos": "Skills MIT, mas os dados vêm de API paga (chave do dono) que raspa redes cujos termos podem proibir. Comentários são dado pessoal: só agregados, sem guardar perfis.",
+      "relacao_backlog": "D12"
+    },
+    {
+      "repo": "sherlock-project/sherlock",
+      "url": "https://github.com/sherlock-project/sherlock",
+      "lote": "2026-11-23",
+      "categoria": "seguranca",
+      "veredito": "descartar",
+      "faixa": [
+        "security-reviewer"
+      ],
+      "estrelas": 116209,
+      "licenca": "MIT",
+      "ultimo_push": "2026-11-23",
+      "o_que_e": "Ferramenta de OSINT que procura um nome de usuário em mais de 400 redes sociais.",
+      "uso_no_levelup": "Nenhum uso legítimo. Rodar sobre alunos ou candidatos seria perfilamento. Não protege quem estuda nem ajuda a passar. É coleta sem base legal.",
+      "riscos": "Viola finalidade e minimização da LGPD e o ECA Digital (há menores), com exposição jurídica."
+    },
+    {
+      "repo": "stablyai/orca",
+      "url": "https://github.com/stablyai/orca",
+      "lote": "2026-11-23",
+      "categoria": "processo-agentes",
+      "veredito": "descartar",
+      "faixa": [
+        "coordenador"
+      ],
+      "estrelas": 134219,
+      "licenca": "MIT",
+      "ultimo_push": "2026-11-23",
+      "o_que_e": "IDE de agentes com bots agendados ou disparados por PR, CI e webhook, memória em Markdown e app para celular.",
+      "uso_no_levelup": "Nenhum no projeto; o que seria agendado (acompanhar ai_runs, alertas) já tem pg_cron e Edge Functions.",
+      "como_ativar": "Não instalar no projeto.",
+      "riscos": "Os bots agem sozinhos em PR e webhook, com memória própria (SOUL.md, MEMORY.md) fora do AGENTS-COLLAB. O README informa telemetria anônima, que pode ser desligada.",
+      "relacao_backlog": "P0.2 e P1.8 (alertas) seguem em pg_cron e Edge Functions."
+    },
+    {
+      "repo": "storytold/craft-anything",
+      "url": "https://github.com/storytold/craft-anything",
+      "lote": "2026-11-23",
+      "categoria": "processo-agentes",
+      "veredito": "descartar",
+      "faixa": [
+        "coordenador"
+      ],
+      "estrelas": 41961,
+      "licenca": "Apache-2.0",
+      "ultimo_push": "2026-11-23",
+      "o_que_e": "Motor de engenharia reversa que estuda um site, app ou jogo e faz um agente construir uma versão própria.",
+      "uso_no_levelup": "Nenhum: clonar plataformas concorrentes não ajuda o candidato e repete o risco jurídico que já levou ao descarte do morluto/rea.",
+      "como_ativar": "Não instalar.",
+      "riscos": "No modo Deep lê código e arquivos do alvo; o README avisa que o modo clean room não é sandbox e que o agente age com as permissões do usuário.",
+      "relacao_backlog": "Nenhuma (mesma decisão de docs/REFERENCIAS_REPOSITORIOS.md §3 para o morluto/rea)."
+    },
+    {
+      "repo": "thedotmack/claude-mem",
+      "url": "https://github.com/thedotmack/claude-mem",
+      "lote": "2026-11-23",
+      "categoria": "processo-agentes",
+      "veredito": "descartar",
+      "faixa": [
+        "gerente-contexto",
+        "security-reviewer"
+      ],
+      "estrelas": 119273,
+      "licenca": "Apache-2.0",
+      "ultimo_push": "2026-11-23",
+      "o_que_e": "Plugin que grava o que o agente de código faz em cada sessão, resume com IA e injeta esse contexto nas sessões seguintes.",
+      "uso_no_levelup": "Nenhum: a memória entre agentes do LevelUp é explícita, curta, versionada e revisável (AGENTS-COLLAB e handoffs, D1). Memória capturada e reinjetada sem revisão repete o risco que as regras já apontam para ai_lessons.",
+      "riscos": "Captura tudo da sessão (inclusive resultados de consultas à produção e possíveis segredos) e manda resumir por observador pago, OpenRouter ou Gemini; analytics anônimo vem ligado (segundo o README). Memória injetada é superfície de envenenamento, e o instalador pede conta e cartão para o teste grátis.",
+      "relacao_backlog": "D1; rules/common/ai-agents.md (memória); rules/common/privacy.md"
+    },
+    {
+      "repo": "thtbee/nectarlink",
+      "url": "https://github.com/thtbee/nectarlink",
+      "lote": "2026-11-23",
+      "categoria": "fora-do-escopo",
+      "veredito": "descartar",
+      "faixa": [
+        "security-reviewer"
+      ],
+      "estrelas": 6082,
+      "licenca": "NOASSERTION",
+      "ultimo_push": "2026-11-23",
+      "o_que_e": "Integração entre Android e PC (notificações, SMS, chamadas, área de transferência, arquivos, espelhamento), instalada por curl|sh e por APK fora da Play Store.",
+      "uso_no_levelup": "Nenhum. Risco de vazar credenciais da máquina de desenvolvimento.",
+      "riscos": "Sincroniza com o celular a área de transferência e as notificações, onde passam segredos e códigos de uso único. Pede para pausar o Play Protect, o instalador não tem assinatura e a licença é NOASSERTION."
+    },
+    {
+      "repo": "ultraworkers/claw-code",
+      "url": "https://github.com/ultraworkers/claw-code",
+      "lote": "2026-11-23",
+      "categoria": "processo-agentes",
+      "veredito": "descartar",
+      "faixa": [
+        "coordenador"
+      ],
+      "estrelas": 194730,
+      "licenca": "MIT",
+      "ultimo_push": "2026-11-23",
+      "o_que_e": "Harness em Rust que o próprio README chama de peça de museu mantida por agentes, sem uso em produção.",
+      "uso_no_levelup": "Nenhum.",
+      "como_ativar": "Não instalar.",
+      "riscos": "Só compila a partir do código-fonte e pede chave de API da Anthropic; segundo o README, o crate de mesmo nome no crates.io instala outra coisa.",
+      "relacao_backlog": "Nenhuma."
+    },
+    {
+      "repo": "vercel-labs/agent-desktop",
+      "url": "https://github.com/vercel-labs/agent-desktop",
+      "lote": "2026-11-23",
+      "categoria": "processo-agentes",
+      "veredito": "descartar",
+      "faixa": [
+        "coordenador"
+      ],
+      "estrelas": 26317,
+      "licenca": "Apache-2.0",
+      "ultimo_push": "2026-11-23",
+      "o_que_e": "CLI e servidor MCP para agentes operarem aplicativos de desktop pela árvore de acessibilidade do sistema.",
+      "uso_no_levelup": "O LevelUp é web/PWA, e para o navegador o tester já tem o agent-browser (mesma equipe) e o Playwright registrados. Foi feito para apps de desktop e não acrescenta nada ao app web nem às lojas.",
+      "como_ativar": "Não instalar.",
+      "riscos": "Snapshots e área de transferência podem conter dados pessoais da tela, segundo o README. Ações feitas por MCP não passam pelo hook de guardrails, cujo matcher só cobre Bash, Edit e Write.",
+      "relacao_backlog": "O E2E de login, simulado e checkout segue pelo agent-browser."
+    },
+    {
+      "repo": "xerj-org/xerj",
+      "url": "https://github.com/xerj-org/xerj",
+      "lote": "2026-11-23",
+      "categoria": "dados-coleta",
+      "veredito": "monitorar",
+      "faixa": [
+        "engenheiro-ia"
+      ],
+      "estrelas": 20211,
+      "licenca": "Apache-2.0",
+      "ultimo_push": "2026-11-23",
+      "o_que_e": "Motor de busca em um binário Rust (BM25, vetor e híbrido) com servidor MCP e API compatível com Elasticsearch; o modelo Query-1 responde sobre fatos gravados e devolve UNKNOWN ou CONFLICT quando não há base.",
+      "uso_no_levelup": "Nenhum hoje: busca no produto cabe no Postgres e busca de código no grep dos agentes. O 'recusar quando falta fato' lembra o portão de evidência do Radar (evidence.ts), que já existe em código.",
+      "gatilho": "Versão estável (fora de rc) e Query-1 com código ou dados de avaliação públicos e benchmark independente.",
+      "riscos": "O motor é Apache-2.0, mas o Query-1 é binário proprietário fora do código público (segundo o README), o formato de dados não volta de versão e a instalação é `curl | sh`. Projeto de 2026-06 com benchmarks do próprio autor."
+    },
+    {
+      "repo": "XiaoYouChR/Ghost-Downloader-3",
+      "url": "https://github.com/XiaoYouChR/Ghost-Downloader-3",
+      "lote": "2026-11-23",
+      "categoria": "fora-do-escopo",
+      "veredito": "descartar",
+      "faixa": [
+        "security-reviewer"
+      ],
+      "estrelas": 16115,
+      "licenca": "GPL-3.0",
+      "ultimo_push": "2026-11-23",
+      "o_que_e": "Gerenciador de downloads (HTTP, BT, magnet, M3U8, YouTube) que promete impressão TLS de navegador real 'invisível a anti-bot', patrocinado por um proxy residencial.",
+      "uso_no_levelup": "Nenhum. O Radar busca editais em fontes oficiais pelas Edge Functions. Na prática serve para raspagem e pirataria.",
+      "riscos": "Contornar anti-bot e baixar conteúdo protegido (aulas de concorrentes) traz risco jurídico. Licença GPL-3.0."
+    },
+    {
+      "repo": "XinaTian/MROffice",
+      "url": "https://github.com/XinaTian/MROffice",
+      "lote": "2026-11-23",
+      "categoria": "fora-do-escopo",
+      "veredito": "descartar",
+      "faixa": [
+        "security-reviewer"
+      ],
+      "estrelas": 2729,
+      "licenca": "AGPL-3.0",
+      "ultimo_push": "2026-11-23",
+      "o_que_e": "Suíte de escritório com IA, MCP (hospedado em mcp.mroffice.ai ou via `npx -y mroffice-mcp`) e SDK de embed.",
+      "uso_no_levelup": "Nenhum necessário. Exportar PDF cabe no stack atual. Cria dependência e um fluxo de dados desnecessários.",
+      "riscos": "Os documentos passam pelo serviço deles, o MCP não tem versão fixa e o `npx mroffice-embed init` grava chaves no .env, que é gerenciado pelo Lovable. Licença AGPL-3.0."
+    }
+  ]
 }
