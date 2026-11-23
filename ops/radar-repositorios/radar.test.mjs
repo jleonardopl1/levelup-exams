@@ -88,6 +88,16 @@ test('skill escrita fora do gerador não pode executar comando nem trocar variá
   assert.ok(conferir(comPropria, ler('total de $48,210 e $ARGUMENTS')).some(p => p.includes('variável')));
 });
 
+test('aprovação do dono sem ativação aparece em seção própria e exige por e em', () => {
+  const aprovado = base({ repo: 'a/b', url: 'https://github.com/a/b', veredito: 'piloto', gatilho: 'g', como_ativar: 'x', aprovacao: { por: 'dono (de acordo: 1)', em: '2026-11-23' } });
+  assert.deepEqual(conferir(catalogo(aprovado), ambiente()), []);
+  const md = renderizar(catalogo(aprovado));
+  assert.match(md, /### Aprovados pelo dono[^\n]*\n\n#### [^\n]+\n\n- \*\*\[a\/b\]/);
+  assert.match(md, /\*\*Aprovação:\*\* dono \(de acordo: 1\), 2026-11-23\./);
+  assert.ok(conferir(catalogo({ ...aprovado, aprovacao: { por: 'dono' } }), ambiente()).some(p => p.includes('aprovacao exige')));
+  assert.ok(conferir(catalogo({ ...aprovado, veredito: 'futuro' }), ambiente()).some(p => p.includes('recebem aprovação')));
+});
+
 test('o relatório traz marcadores, contagem por veredito e a tabela de ativos', () => {
   const md = renderizar(catalogo(plugin, base({ repo: 'b/c', url: 'https://github.com/b/c', veredito: 'futuro', gatilho: 'Quando D5 for decidida', como_ativar: 'x' })));
   assert.ok(md.startsWith('<!-- radar:inicio') && md.endsWith('<!-- radar:fim -->'));

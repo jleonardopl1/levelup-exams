@@ -92,6 +92,9 @@ export function conferir(catalogo, ambiente) {
     for (const campo of TEXTOS) if (!texto(item[campo])) erro(nome, `falta ${campo}`);
     if (PRECISA_GATILHO.has(item.veredito) && !texto(item.gatilho)) erro(nome, 'falta gatilho (quando reavaliar ou ativar)');
     if (item.veredito !== 'descartar' && item.veredito !== 'monitorar' && !texto(item.como_ativar)) erro(nome, 'falta como_ativar');
+    const apr = item.aprovacao;
+    if (apr !== undefined && (!texto(apr?.por) || !DATA.test(apr?.em ?? ''))) erro(nome, 'aprovacao exige por e em (AAAA-MM-DD)');
+    if (apr !== undefined && !['agora', 'piloto'].includes(item.veredito)) erro(nome, 'só "agora" ou "piloto" recebem aprovação');
     const ativ = item.ativacao;
     if (!ativ) continue;
     if (!['agora', 'piloto'].includes(item.veredito)) erro(nome, 'só "agora" ou "piloto" podem ficar ativos');
@@ -162,12 +165,18 @@ export function renderizar(catalogo) {
         out.push(`#### ${CATEGORIAS.get(categoria)}`, '');
       }
       out.push(`- **${link(i)}** — ${frase(i.o_que_e)} _${meta(i)}; faixa: ${i.faixa.join(', ')}._`);
-      for (const [campo, rotulo] of campos) if (texto(i[campo])) out.push(`  - **${rotulo}:** ${frase(i[campo])}`);
+      for (const [campo, rotulo] of campos) {
+        const valor = campo === 'aprovacao' && i.aprovacao ? `${i.aprovacao.por}, ${i.aprovacao.em}` : i[campo];
+        if (texto(valor)) out.push(`  - **${rotulo}:** ${frase(valor)}`);
+      }
     }
     out.push('');
   };
   const completo = [['uso_no_levelup', 'Uso no LevelUp'], ['gatilho', 'Gatilho'], ['como_ativar', 'Como ativar'], ['riscos', 'Riscos'], ['relacao_backlog', 'Backlog']];
-  secao('Aguardando o de acordo do dono', itens.filter(i => !i.ativacao && (i.veredito === 'agora' || i.veredito === 'piloto')), completo);
+  const aprovavel = i => !i.ativacao && (i.veredito === 'agora' || i.veredito === 'piloto');
+  secao('Aguardando o de acordo do dono', itens.filter(i => aprovavel(i) && !i.aprovacao), completo);
+  secao('Aprovados pelo dono — em implantação ou usados fora do ambiente de agentes',
+    itens.filter(i => aprovavel(i) && i.aprovacao), [['aprovacao', 'Aprovação'], ...completo]);
   secao('Futuro — ativar quando o gatilho acontecer', itens.filter(i => i.veredito === 'futuro'), completo);
   secao('Monitorar', itens.filter(i => i.veredito === 'monitorar'), [['uso_no_levelup', 'Por que acompanhar'], ['gatilho', 'Reavaliar quando'], ['riscos', 'Riscos']]);
   secao('Descartados', itens.filter(i => i.veredito === 'descartar'), [['uso_no_levelup', 'Motivo'], ['riscos', 'Riscos']]);

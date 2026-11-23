@@ -330,7 +330,11 @@
       "gatilho": "Produção só depois do P0.4 (Radar publicado e rodando) e se a URL estática, o endpoint JSON que a página consome ou o diário oficial (P17) não resolverem a fonte.",
       "como_ativar": "Aprovado pelo dono em 2026-11-23 (de acordo: 1). Código pronto e desligado: radar_sources.render_mode ('direto' | 'firecrawl', migration 20261123120000) e fetchRendered (API v2 por fetch, endpoint fixo, sem cache, proxy basic, robots.txt para o nosso robô e o da Firecrawl, URL final conferida, 2 MB, recusa proxyUsed diferente de basic e provider). Durante o piloto tudo dessas fontes vai para revisão humana (requireReviewForRendered) e no máximo RADAR_MAX_RENDERED (2) por execução. Para ligar: curador confere alternativas sem custo; dono cria a conta, grava FIRECRAWL_API_KEY, aplica a migration, faz uma chamada de teste para confirmar proxyUsed e metadata.url, e marca a fonte. Roteiro em docs/RADAR_CONCURSOS.md.",
       "riscos": "AGPL-3.0 só pesa se hospedarmos versão modificada; consumir a API não gera obrigação. Custo baixo (2 fontes a cada 12 h dá cerca de 120 créditos/mês, contra 1.000 grátis segundo o README), mas é dependência externa em produção, pode não respeitar robots.txt (o fetcher confere antes) e a resposta é dado não confiável (fenceUntrusted).",
-      "relacao_backlog": "Armadilha do Radar (páginas por JavaScript); P0.4; P17; D8"
+      "relacao_backlog": "Armadilha do Radar (páginas por JavaScript); P0.4; P17; D8",
+      "aprovacao": {
+        "por": "dono (de acordo: 1)",
+        "em": "2026-11-23"
+      }
     },
     {
       "repo": "garrytan/gstack",
@@ -386,10 +390,14 @@
       "ultimo_push": "2026-11-23",
       "o_que_e": "Plugin de Claude Code e Codex em que um agente com contexto redige a especificação e revisores 'goldfish', em subagentes sem a conversa anterior, a revisam; também compara documentos com o código (drift).",
       "uso_no_levelup": "Revisão independente das specs de IA antes de codar: Mentor com ferramentas (P2.11), discursiva dupla (D7) e cache de explicações. O drift-report confere docs/RADAR_CONCURSOS.md, docs/MERCADO_PAGO.md e a ARQUITETURA contra o código.",
-      "gatilho": "De acordo do dono para um piloto na sessão dele; promover ao projeto só se a revisão da spec do P2.11 ou o drift-report de docs/ trouxerem achados que o code-reviewer e o documentation-writer não trouxeram.",
-      "como_ativar": "Piloto fora do projeto: carregar só na sessão do dono com claude --plugin-dir apontando para uma cópia do commit 94d948d7d2a1d48e981997c20963e39d9e9ee67c (ou instalação no escopo do usuário). Usar /egm:egm-review e egm-lite só em documentos de docs/, com 'EGM artifact directory:' apontando para pasta ignorada pelo git, e avisar no prompt que a saída é em PT-BR e que CLAUDE.md e rules/ prevalecem. Não rodar /egm:egm-bootstrap (Bash, Write e Edit em todas as pastas).",
+      "gatilho": "Para ligar no projeto (enabledPlugins), só se o uso sob demanda virar rotina e o Claude Code permitir carregar o plugin sem que os 10 agentes dele entrem no roteamento automático; reavaliar com o security-reviewer.",
+      "como_ativar": "Piloto executado em 2026-11-23 com ops/radar-repositorios/egm-drift.sh (plugin no commit 94d948d, carregado só na execução, numa cópia descartável do repositório): drift-report de docs/RADAR_CONCURSOS.md e docs/MERCADO_PAGO.md contra o código. Resultado em docs/radar-repositorios/pilotos/2026-11-23-elephant-goldfish-drift.md: cerca de 30 divergências; 3 das mais graves conferidas no código e confirmadas, nenhuma trazida antes pelo code-reviewer ou pelo security-reviewer. Passou no critério. Uso: rodar o script sob demanda (antes de fechar uma fase de plano em docs/ ou numa revisão trimestral), conferindo cada achado no código antes de agir. Não entra em enabledPlugins.",
       "riscos": "Apache-2.0, marketplace próprio fora do diretório oficial, projeto de 2026-09. Revisão de segurança: aprovado com condições (sem hooks, MCP nem rede; todas as skills só por /). Traz 10 agentes com descrições genéricas que disputariam o roteamento com reviewer, code-reviewer, documentation-writer e coordenador, e os revisores rodam sem o CLAUDE.md do projeto (omitClaudeMd).",
-      "relacao_backlog": "P2.11; D7; D9"
+      "relacao_backlog": "P2.11; D7; D9",
+      "aprovacao": {
+        "por": "dono (de acordo: 2)",
+        "em": "2026-11-23"
+      }
     },
     {
       "repo": "GoogleChrome/modern-web-guidance",
@@ -724,10 +732,14 @@
       "ultimo_push": "2026-04-01",
       "o_que_e": "Declarações de tipo que corrigem APIs do JavaScript: JSON.parse e .json() passam a devolver unknown, e .filter(Boolean) restringe o tipo do resultado.",
       "uso_no_levelup": "Faz o compilador cobrar a 'validação na fronteira' de rules/common/coding-style.md nos pontos onde o JSON chega hoje como any: src/pages/Mentor.tsx:117 e :171 (streaming), src/pages/Discursiva.tsx:26 e src/lib/authService.ts:14. Vale só para o front; as Edge Functions não mudam.",
-      "gatilho": "Levar para a main se as correções couberem num PR pequeno com typecheck verde; desistir se exigir mexer no types.ts gerado.",
-      "como_ativar": "Num branch: `bun add -d @total-typescript/ts-reset`, criar src/reset.d.ts com `import \"@total-typescript/ts-reset\";` e rodar `bun run typecheck`, corrigindo com zod ou checagem explícita, nunca com `as`. Depois, ressincronizar o package-lock.json (`npm install --package-lock-only`).",
+      "gatilho": "Remover se atrapalhar a integração com o Lovable (dependência nova no bun.lockb) ou se uma versão nova do TypeScript já cobrir os mesmos tipos.",
+      "como_ativar": "Feito em 2026-11-23 (PR #34): @total-typescript/ts-reset ^0.6.1 como dependência de desenvolvimento e src/reset.d.ts. Os 13 erros de tipo foram corrigidos com checagem explícita (sem as nem any), incluindo os casts antigos de useAffiliates e SimuladoOficial; parseErrorBody centraliza o corpo de erro das Edge Functions. Pendente: src/lib/quizSession.ts:48 (validação aninhada maior) e o any de supabase.functions.invoke, que o ts-reset não cobre.",
       "riscos": "Não pega cast explícito: `JSON.parse(raw) as Tipo` em src/hooks/useAffiliates.ts:340, src/lib/quizSession.ts:48 e src/pages/SimuladoOficial.tsx:257 já viola a regra hoje e precisa de correção à parte. Acrescenta uma dependência de desenvolvimento ao bun.lockb do Lovable.",
-      "relacao_backlog": "Anda junto com o P1.5 (harness de testes do front)."
+      "relacao_backlog": "Anda junto com o P1.5 (harness de testes do front).",
+      "aprovacao": {
+        "por": "dono (de acordo: 4)",
+        "em": "2026-11-23"
+      }
     },
     {
       "repo": "meta/astryx",
