@@ -267,24 +267,32 @@ async function safeFetch(start: URL, fetchFn: typeof fetch, accept: string, time
   throw new FetchError("redirecionamentos demais");
 }
 
-async function robotsFor(url: URL, opts: FetchOptions): Promise<string[]> {
+/** Agente do serviço de renderização no robots.txt (casa com grupos "Firecrawl", "FirecrawlAgent"...). */
+const FIRECRAWL_ROBOTS_AGENT = "firecrawlagent";
+
+/**
+ * Regras do robots.txt do host para um agente (o nosso por padrão). O arquivo é baixado uma vez
+ * por host e execução; as regras do nosso agente e as do serviço de renderização ficam no cache.
+ */
+async function robotsFor(url: URL, opts: FetchOptions, agent = "levelupradar"): Promise<string[]> {
   const cache = opts.robotsCache ?? new Map<string, string[]>();
-  const cached = cache.get(url.host);
+  const key = (a: string) => (a === "levelupradar" ? url.host : `${url.host}#${a}`);
+  const cached = cache.get(key(agent));
   if (cached) return cached;
-  let rules: string[] = [];
+  let body = "";
   try {
     const robotsUrl = safeUrl(`https://${url.host}/robots.txt`);
     if (robotsUrl) {
       const { res } = await safeFetch(robotsUrl, opts.fetchFn ?? fetch, "text/plain,*/*;q=0.5", 8_000);
-      if (res.ok) rules = parseRobots(new TextDecoder().decode((await readCapped(res)).slice(0, 200_000)));
+      if (res.ok) body = new TextDecoder().decode((await readCapped(res)).slice(0, 200_000));
       else await res.body?.cancel().catch(() => {});
     }
   } catch {
     // robots.txt inacessível (ou redirecionado para destino proibido) = sem regras declaradas;
     // a página em si continua sujeita a safeUrl e aos redirecionamentos conferidos.
   }
-  cache.set(url.host, rules);
-  return rules;
+  for (const a of ["levelupradar", FIRECRAWL_ROBOTS_AGENT]) cache.set(key(a), parseRobots(body, a));
+  return cache.get(key(agent)) ?? [];
 }
 
 /** Baixa e normaliza uma página oficial. Lança FetchError com mensagem curta. */
@@ -325,7 +333,8 @@ export async function fetchPage(rawUrl: string, opts: FetchOptions = {}): Promis
 
 /** Endpoint fixo: a chave só vai para este host (nada configurável por onde o segredo vaze). */
 export const FIRECRAWL_SCRAPE_URL = "https://api.firecrawl.dev/v2/scrape";
-const RENDER_TIMEOUT_MS = 45_000;
+/** Teto por renderização; a função passa um prazo menor quando o orçamento da execução aperta. */
+export const RENDER_TIMEOUT_MS = 45_000;
 
 export interface RenderOptions extends FetchOptions {
   /** Secret FIRECRAWL_API_KEY. Sem ele a fonte falha com mensagem curta (piloto desligado). */
@@ -334,7 +343,7 @@ export interface RenderOptions extends FetchOptions {
 
 interface FirecrawlPayload {
   success?: unknown;
-  data?: { html?: unknown; metadata?: { statusCode?: unknown; url?: unknown } };
+  data?: { html?: unknown; metadata?: { statusCode?: unknown; url?: unknown; proxyUsed?: unknown; provider?: unknown } };
 }
 
 /**
@@ -342,7 +351,9 @@ interface FirecrawlPayload {
  * pede à Firecrawl o HTML já renderizado e segue o mesmo caminho do coletor (texto, links, hash).
  * Mantém as regras do coletor: URL segura, robots.txt da fonte conferido ANTES, resposta limitada
  * a 2 MB, URL final conferida com safeUrl. Sem cache (`maxAge: 0`, `storeInCache: false`) e com
- * proxy `basic`: não contorna anti-robô. Só a URL pública da fonte vai ao serviço.
+ * proxy `basic`: não contorna anti-robô (resposta com outro proxy ou de provedor terceiro é recusada).
+ * Só a URL pública da fonte vai ao serviço. A página volta com `rendered: true`: durante o piloto,
+ * nada dela publica nem avisa alunos sem revisão humana (requireReviewForRendered).
  */
 export async function fetchRendered(rawUrl: string, opts: RenderOptions = {}): Promise<FetchedPage> {
   if (!opts.apiKey) throw new FetchError("renderização não configurada");
@@ -350,8 +361,13 @@ export async function fetchRendered(rawUrl: string, opts: RenderOptions = {}): P
   const initial = safeUrl(rawUrl);
   if (!initial) throw new FetchError("URL não permitida");
 
-  const rules = await robotsFor(initial, opts);
-  if (!isAllowed(rules, initial.pathname + initial.search)) throw new FetchError("bloqueado pelo robots.txt");
+  // Quem acessa a página é o serviço: o robots.txt precisa liberar o nosso agente E o dele.
+  // Cache local garante um único download do robots.txt mesmo sem o cache da execução.
+  const robotsOpts = { ...opts, robotsCache: opts.robotsCache ?? new Map<string, string[]>() };
+  const path = initial.pathname + initial.search;
+  for (const agent of ["levelupradar", FIRECRAWL_ROBOTS_AGENT]) {
+    if (!isAllowed(await robotsFor(initial, robotsOpts, agent), path)) throw new FetchError("bloqueado pelo robots.txt");
+  }
 
   let res: Response;
   try {
@@ -394,6 +410,9 @@ export async function fetchRendered(rawUrl: string, opts: RenderOptions = {}): P
   if (payload?.success !== true || typeof html !== "string" || typeof meta?.statusCode !== "number") {
     throw new FetchError("renderização: resposta inválida");
   }
+  // Falha fechada: proxy que contorna anti-robô ou dado servido por provedor terceiro não é a fonte oficial.
+  if (typeof meta.proxyUsed === "string" && meta.proxyUsed !== "basic") throw new FetchError("renderização com proxy não permitido");
+  if (meta.provider !== undefined && meta.provider !== null) throw new FetchError("renderização por provedor terceiro não permitida");
   const status = meta.statusCode;
   if (!((status >= 200 && status < 300) || status === 304)) throw new FetchError(`HTTP ${status}`);
   const finalUrl = safeUrl(typeof meta.url === "string" && meta.url ? meta.url : initial.toString());
@@ -401,5 +420,5 @@ export async function fetchRendered(rawUrl: string, opts: RenderOptions = {}): P
 
   const text = htmlToText(html).slice(0, 400_000);
   const links = extractLinks(html, finalUrl.toString());
-  return { url: finalUrl.toString(), status, contentType: "text/html", text, links, hash: await sha256(text), binary: false };
+  return { url: finalUrl.toString(), status, contentType: "text/html", text, links, hash: await sha256(text), binary: false, rendered: true };
 }

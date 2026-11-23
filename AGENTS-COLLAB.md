@@ -225,9 +225,13 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
   imagem, só por `/`); coluna `radar_sources.render_mode` (migration `20261123120000`) e
   `fetchRendered` (API v2 da Firecrawl por fetch, endpoint fixo, sem cache, proxy `basic`,
   robots.txt e URL final conferidos, 2 MB); a função lê as fontes com `select("*")` para tolerar a
-  ordem de publicação. Roteiro do dono em `docs/RADAR_CONCURSOS.md`.
-- **Testado:** Deno 2.9.6 (npm) com import map local → 88 testes das funções ok, 3 novos do
-  `fetchRendered`; `deno check` de `radar-concursos/index.ts` ok; migration no PGlite (aplica sobre
+  ordem de publicação. Correções da revisão do `security-reviewer`: tudo de fonte renderizada vira
+  atualização pendente (`requireReviewForRendered`, nada publica nem avisa alunos sozinho), no
+  máximo `RADAR_MAX_RENDERED` (2) por execução com prazo tirado do orçamento, robots.txt conferido
+  também para o robô da Firecrawl, recusa de `proxyUsed` ≠ `basic` e de `provider`. Roteiro do dono
+  em `docs/RADAR_CONCURSOS.md`, com chamada de teste antes de ligar.
+- **Testado:** Deno 2.9.6 (npm) com import map local → 91 testes das funções ok, 6 novos
+  (`fetchRendered` e revisão obrigatória); `deno check` de `radar-concursos/index.ts` ok; migration no PGlite (aplica sobre
   todas, idempotente, padrão `direto`, recusa valor fora da lista); `npm run test:unit` ok.
 - **Não testado:** API real da Firecrawl (rede bloqueada nesta sessão) — em especial se o
   parâmetro `proxy: "basic"`, marcado como obsoleto, ainda é respeitado; páginas reais do Cebraspe e da Selecon.

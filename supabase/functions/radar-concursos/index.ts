@@ -27,8 +27,8 @@ import { jsonResponse, readJson, requireAdmin, UUID_RE } from "../_shared/utils.
 import { createGatewayClient, modelFromEnv } from "../_shared/ai/llm.ts";
 import { createTelemetry } from "../_shared/ai/telemetry.ts";
 import { slugify } from "./evidence.ts";
-import { diffNewLines, fetchPage, FetchError, fetchRendered } from "./fetcher.ts";
-import { type ChangedPage, type ConcursoOutcome, isSourceDue, pool, runMonitor } from "./pipeline.ts";
+import { diffNewLines, fetchPage, FetchError, fetchRendered, RENDER_TIMEOUT_MS } from "./fetcher.ts";
+import { type ChangedPage, type ConcursoOutcome, isSourceDue, pool, requireReviewForRendered, runMonitor } from "./pipeline.ts";
 import { relevanceScore, shouldSuggestTrack } from "./scoring.ts";
 import { runTrackDraft } from "./tracks.ts";
 import type { Area, ConcursoRecord, FetchedPage } from "./types.ts";
@@ -58,6 +58,9 @@ interface SourceRow {
   /** 'firecrawl' = página montada por JavaScript, renderizada pelo serviço (piloto D15). Sem a coluna = 'direto'. */
   render_mode?: string | null;
 }
+
+/** Tempo reservado a agentes e persistência antes de iniciar uma renderização (piloto Firecrawl). */
+const RENDER_RESERVE_MS = 60_000;
 
 const intEnv = (name: string, fallback: number, min: number, max: number) =>
   Math.min(max, Math.max(min, Number(Deno.env.get(name) ?? fallback) || fallback));
@@ -202,25 +205,35 @@ async function monitor(supabase: Supa, apiKey: string, trigger: "cron" | "admin"
     .filter((s) => (sourceId ? s.id === sourceId : isSourceDue(s, now)))
     // Fontes especializadas de áreas com mais peso primeiro.
     .sort((a, b) => (areaById.get(b.area_id ?? "")?.priority ?? 1) - (areaById.get(a.area_id ?? "")?.priority ?? 1))
-    .slice(0, intEnv("RADAR_MAX_SOURCES", 8, 1, 20));
+    .slice(0, intEnv("RADAR_MAX_SOURCES", 8, 1, 20))
+    // Piloto Firecrawl: poucas fontes renderizadas por execução (cada uma pode levar até 45 s).
+    .filter(((slots) => (s: SourceRow) => s.render_mode !== "firecrawl" || slots-- > 0)(intEnv("RADAR_MAX_RENDERED", 2, 0, 5)));
 
   // 1. Coleta (sem IA): baixa, normaliza e calcula o trecho novo.
   const fetched = await pool(due, 3, async (s) => {
     try {
-      const page = s.render_mode === "firecrawl"
-        ? await fetchRendered(s.url, { robotsCache, apiKey: Deno.env.get("FIRECRAWL_API_KEY") ?? undefined })
-        : await fetchPage(s.url, { robotsCache });
-      return { source: s, page: page as FetchedPage, error: null as string | null };
+      if (s.render_mode === "firecrawl") {
+        // Reserva tempo para agentes e persistência; sem folga, a fonte fica para a próxima execução.
+        const budget = deadline - Date.now() - RENDER_RESERVE_MS;
+        if (budget < 10_000) return { source: s, page: null, error: null, skipped: true };
+        const page = await fetchRendered(s.url, {
+          robotsCache, apiKey: Deno.env.get("FIRECRAWL_API_KEY") ?? undefined, timeoutMs: Math.min(RENDER_TIMEOUT_MS, budget),
+        });
+        return { source: s, page: page as FetchedPage, error: null as string | null, skipped: false };
+      }
+      return { source: s, page: await fetchPage(s.url, { robotsCache }) as FetchedPage, error: null as string | null, skipped: false };
     } catch (e) {
-      return { source: s, page: null, error: e instanceof FetchError ? e.message : "erro na coleta" };
+      return { source: s, page: null, error: e instanceof FetchError ? e.message : "erro na coleta", skipped: false };
     }
   });
+  const renderedSources = new Set(fetched.filter((f) => f.page?.rendered).map((f) => f.source.id));
 
   const changed: ChangedPage[] = [];
   const documentChanges: { source: SourceRow; page: FetchedPage }[] = [];
   const emptyPages = new Set<string>();
   let errors = 0;
   for (const f of fetched) {
+    if (f.skipped) continue;
     if (!f.page) {
       errors++;
       await supabase.from("radar_sources").update({
@@ -282,7 +295,7 @@ async function monitor(supabase: Supa, apiKey: string, trigger: "cron" | "admin"
   let published = 0, pending = 0;
   const touched = new Set<string>();
   const persistFailed = new Set<string>();
-  for (const o of outcomes) {
+  for (const o of requireReviewForRendered(outcomes, renderedSources)) {
     try {
       const r = await persistOutcome(supabase, o, areaIdBySlug);
       if (r.result === "publicada") published++;

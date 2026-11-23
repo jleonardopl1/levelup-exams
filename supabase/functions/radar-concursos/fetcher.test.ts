@@ -146,6 +146,7 @@ Deno.test("fetchRendered: HTML renderizado vira texto, links e hash; só a URL p
   assertEquals(page.links[0].href, "https://banca.org.br/editais/tj.pdf");
   assertEquals(page.url, "https://banca.org.br/concursos/tj");
   assertEquals(page.hash.length, 64);
+  assertEquals(page.rendered, true);
   // robots.txt da fonte antes; depois uma única chamada ao endpoint fixo, com a chave só nele.
   assertEquals(calls.map((c) => c.url), ["https://banca.org.br/robots.txt", FIRECRAWL_SCRAPE_URL]);
   const api = calls[1].init!;
@@ -177,4 +178,24 @@ Deno.test("fetchRendered: recusa resposta inválida, página com erro, destino i
   );
   await assertRejects(() => caso(() => new Response("{}", { status: 402 })), Error, "sem crédito");
   await assertRejects(() => caso(() => new Response("{}", { status: 500 })), Error, "HTTP 500");
+});
+
+Deno.test("fetchRendered: robots.txt que proíbe o robô do serviço também bloqueia (sem chamar a API)", async () => {
+  const { fetchFn, calls } = fakeFirecrawl({ robots: "User-agent: FirecrawlAgent\nDisallow: /\n\nUser-agent: *\nAllow: /" });
+  await assertRejects(() => fetchRendered("https://banca.org.br/concursos", { fetchFn, apiKey: "fc" }), Error, "robots");
+  assertEquals(calls.filter((c) => c.url === FIRECRAWL_SCRAPE_URL).length, 0);
+  // O coletor direto segue liberado pelo grupo "*": falha só porque a página falsa não existe (404).
+  await assertRejects(() => fetchPage("https://banca.org.br/concursos", { fetchFn }), Error, "HTTP 404");
+});
+
+Deno.test("fetchRendered: recusa proxy que contorna anti-robô e dado servido por provedor terceiro", async () => {
+  const caso = (metadata: Record<string, unknown>) =>
+    fetchRendered("https://banca.org.br/c", {
+      fetchFn: fakeFirecrawl({ reply: () => Response.json({ success: true, data: { html: "<p>x</p>", metadata: { statusCode: 200, ...metadata } } }) }).fetchFn,
+      apiKey: "fc",
+    });
+  await assertRejects(() => caso({ proxyUsed: "enhanced" }), Error, "proxy não permitido");
+  await assertRejects(() => caso({ provider: { id: "outro" } }), Error, "provedor terceiro");
+  const ok = await caso({ proxyUsed: "basic" });
+  assertEquals(ok.rendered, true);
 });

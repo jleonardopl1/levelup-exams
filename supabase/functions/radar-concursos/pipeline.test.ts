@@ -1,6 +1,8 @@
 import { assert, assertEquals } from "https://deno.land/std@0.190.0/testing/asserts.ts";
 import { type LlmClient, LlmError, type ToolCallOptions } from "../_shared/ai/llm.ts";
-import { type ChangedPage, type MonitorConfig, type MonitorModels, runMonitor } from "./pipeline.ts";
+import {
+  type ChangedPage, type ConcursoOutcome, type MonitorConfig, type MonitorModels, RENDERED_REVIEW_REASON, requireReviewForRendered, runMonitor,
+} from "./pipeline.ts";
 import type { Area, ConcursoRecord, FetchedPage } from "./types.ts";
 
 const AREAS: Area[] = [
@@ -232,4 +234,27 @@ Deno.test("extração com falha também deixa a fonte pendente", async () => {
   const { stats } = await runMonitor(llm, { pages: [CHANGED], areas: AREAS, existingByArea: new Map() }, MODELS, config());
   assertEquals(stats.extractionsFailed, 2);
   assertEquals(stats.unfinishedSources, ["s1"]);
+});
+
+Deno.test("fonte renderizada (piloto Firecrawl) nunca publica sozinha: vira revisão humana", () => {
+  const consolidation = {
+    patch: { nome: "Concurso TJ 2026" }, changes: [], kind: "novo", severity: "critica", title: "t", summary: "s",
+    needsReview: false, reasons: [],
+  } as unknown as NonNullable<ConcursoOutcome["consolidation"]>;
+  const base: ConcursoOutcome = {
+    sourceId: "fonte-js", areaSlug: "juridica", evidenceUrl: "https://banca.org.br/c", orgao: "TJ", nome: "Concurso TJ 2026", existing: null,
+    consolidation, claims: [], rejected: [], verified: true, coordinator: { prioridade: 1, motivo: "" },
+  };
+  const [renderizada, direta, semConsolidacao] = requireReviewForRendered(
+    [{ ...base, sourceId: "fonte-js" }, { ...base, sourceId: "fonte-html" }, { ...base, sourceId: "fonte-js", consolidation: null }],
+    new Set(["fonte-js"]),
+  );
+  assertEquals(renderizada.consolidation?.needsReview, true);
+  assert(renderizada.consolidation?.reasons.includes(RENDERED_REVIEW_REASON));
+  assertEquals(direta.consolidation?.needsReview, false);
+  assertEquals(semConsolidacao.consolidation, null);
+  // O original não é alterado e reaplicar não duplica o motivo.
+  assertEquals(consolidation.needsReview, false);
+  const denovo = requireReviewForRendered([renderizada], new Set(["fonte-js"]))[0];
+  assertEquals(denovo.consolidation?.reasons.filter((r) => r === RENDERED_REVIEW_REASON).length, 1);
 });

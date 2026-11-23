@@ -105,7 +105,8 @@ Plataforma gamificada de estudos para concursos públicos, vestibulares e ENEM (
   Analista de banca e Arquiteto de trilha. Fato só com evidência literal da fonte oficial, conferida
   em código (`evidence.ts`); retificação, regressão de fase e verificador indisponível → revisão humana.
   Fonte montada por JavaScript: `radar_sources.render_mode = 'firecrawl'` (piloto D15, secret
-  `FIRECRAWL_API_KEY`, desligado sem ele; `fetchRendered` em `fetcher.ts`).
+  `FIRECRAWL_API_KEY`, desligado sem ele; `fetchRendered` em `fetcher.ts`); tudo dessas fontes vai
+  para revisão humana (`requireReviewForRendered`), no máximo `RADAR_MAX_RENDERED` por execução.
   Rascunho de trilha só vira trilha com aprovação do admin. Modelos: `RADAR_MODEL`,
   `RADAR_VERIFIER_MODEL`, `RADAR_TRACK_MODEL`.
 - **Fábrica de questões** (`generate-track-questions`): Elaborador → portão determinístico →
