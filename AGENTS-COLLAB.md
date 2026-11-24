@@ -250,6 +250,42 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
 ## Handoff mais recente
 <!-- Sempre o topo = o mais recente. Template: docs/colaboracao/handoff-template.md -->
 
+### 2026-11-24 · Guia do dono: Mercado Pago como prioridade (`documentation-writer` + `pagamentos`)
+
+- **Objetivo da sessão:** o dono pediu o detalhamento do passo 7 e do "Para depois" e definiu o
+  **Mercado Pago como prioridade**. Sessão só para o guia do dono: nenhum código mudou.
+- **O que mudou:** `docs/PASSO_A_PASSO_DONO.md` reescrito em três partes. A: Mercado Pago em
+  MP1–MP10 (conta PJ e Pix, decisões a–h com mensagem pronta, aplicação e credenciais de teste,
+  republicar funções e webhook de teste, secrets com `MP_ENABLED=staff`, compras de teste com conta
+  de moderador, liberar 8j/8d, jurídico, produção controlada com estorno, abertura). B: passos
+  1–7 com a situação real e o passo 7 detalhado item a item. C: D6, webhook da Stripe, saldo de IA,
+  D5, D10, D7, `plus_internal_grants` e Codex.
+- **Achados sobre produção (24/11):**
+  - Migrations do Mercado Pago **aplicadas**: `payment_orders`, `payment_provider_events` e a coluna
+    `live_mode` estão no `types.ts` regerado pelo Lovable em 20/11 (`0909a1d`).
+  - `mp-create-checkout`, `mp-sync-order` e `mp-webhook` **publicadas** (OPTIONS ao endereço de
+    produção: 200, 200 e o 405 da própria função). A versão publicada não foi conferida; o guia
+    manda republicar (MP4).
+  - `ai_runs`, `ai_lessons` e as 7 tabelas do Radar estão no `types.ts`: P0.1 e P0.4 sem ação do dono.
+  - Passo 2 (migration `render_mode` e `radar-concursos`) e migration `20261124120000` feitos pelo
+    Lovable (`bc32c6b`, `2442cf4`).
+- **Documentação do Mercado Pago conferida** (developers, pt-BR): o Access Token de teste do
+  Checkout Pro começa com `APP_USR-`; o vendedor de teste é criado sozinho; Pix **não é aprovado no
+  modo de teste** (fica pendente), então o Pix aprovado só é testado na produção controlada (MP9);
+  o webhook tem "URL modo teste" e "URL modo produção" separadas.
+- **Armadilhas novas:** a conta master não consegue testar a compra (Plus permanente → recusa
+  `already_covered`); a homologação usa uma conta com nível **Moderador** (`MP_ENABLED=staff` aceita
+  master, admin e moderador).
+- **Desatualizado (para o `gerente-contexto`):** as armadilhas "Tabelas do Radar ainda não estão em
+  `types.ts`" e "Tabelas do Mercado Pago ainda não estão em `types.ts`" já não valem; falta trocar
+  `radarDb` e o cliente sem tipos de `useMyPaymentOrders` pelo `supabase` tipado.
+- **Testado:** `npm run test:unit` → 106 aprovados, 0 falhas, 2 pulados (checagens de fichas,
+  skills, referências e radar ok).
+- **Não testado:** se as funções `mp-*` publicadas são a versão de 20/11; secrets do Mercado Pago
+  (não dá para ler).
+- **Próximo passo sugerido:** dono faz MP1–MP2 e libera MP7 (8j, 8d e a decisão A/B dos pedidos ao
+  excluir a conta); `pagamentos` + `tester` acompanham o MP6 quando o dono avisar.
+
 ### 2026-11-24 · Radar: Cebraspe e Selecon sem Firecrawl (`curador-conteudo`)
 
 - **Objetivo da sessão:** backlog 17 e 21 e §5.1 do guia do dono: achar alternativa gratuita e sem
