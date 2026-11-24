@@ -1323,6 +1323,7 @@ export type Database = {
           last_text: string | null
           name: string
           pending_retries: number
+          render_mode: string
           url: string
         }
         Insert: {
@@ -1340,6 +1341,7 @@ export type Database = {
           last_text?: string | null
           name: string
           pending_retries?: number
+          render_mode?: string
           url: string
         }
         Update: {
@@ -1357,6 +1359,7 @@ export type Database = {
           last_text?: string | null
           name?: string
           pending_retries?: number
+          render_mode?: string
           url?: string
         }
         Relationships: [
