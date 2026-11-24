@@ -15,6 +15,13 @@
       "when": 1795519710407,
       "tag": "0001_radar_render_mode",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1795522496212,
+      "tag": "0002_radar_sources_urls_estaticas",
+      "breakpoints": true
     }
   ]
 }
