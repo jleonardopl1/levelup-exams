@@ -56,10 +56,10 @@ A Edge Function `generate-track-questions` publica **3 questões novas por maté
 
 1. monta o contexto: conteúdo do edital por nível, tópicos menos explorados, últimos enunciados (para não repetir), uma base de fatos já verificados e as **lições** da matéria (erros já reprovados antes);
 2. o **Elaborador** gera as questões no padrão da banca;
-3. um **portão determinístico** barra falhas clássicas (pista de tamanho, "todas/nenhuma", gabarito copiado no enunciado);
+3. um **portão determinístico** barra falhas clássicas (pista de tamanho — a correta não pode se destacar por ser a mais longa, nem ser a mais longa em mais de 35% das questões da matéria —, "todas/nenhuma", gabarito copiado no enunciado; régua em `rules/stack/content-questions.md`);
 4. em paralelo, o **Solucionador cego** resolve sem ver o gabarito e o **Revisor técnico** reprova gabarito duvidoso, mais de uma resposta defensável ou dado inventado;
 5. se eles divergirem, o **Árbitro** decide (só mantém se confirmar o mesmo gabarito);
-6. valida, embaralha (sem embaralhar quando a explicação cita letras), deduplica e grava com `origem = 'ia_diaria'`; as reprovações viram lições (`ai_lessons`) e cada chamada é medida em `ai_runs`.
+6. valida, embaralha (sem embaralhar quando a explicação cita letras; numéricas em ordem crescente, como a Selecon), deduplica e grava com `origem = 'ia_diaria'`; as reprovações viram lições (`ai_lessons`) e cada chamada é medida em `ai_runs`.
 
 Na **Legislação municipal** (`ai_grounded_only = true`), a geração só pode usar os fatos já verificados das explicações autorais, o que impede artigos ou prazos inventados.
 

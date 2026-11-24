@@ -2,7 +2,10 @@
  * Orquestração da fábrica de questões (uma matéria por vez).
  *
  *  1. Elaborador gera N+2 candidatas (com as lições da matéria no prompt).
- *  2. Portão determinístico: esquema + falhas clássicas de elaboração (quality.ts).
+ *  2. Portão determinístico: esquema + falhas clássicas de elaboração (quality.ts) + pista
+ *     de tamanho (length-cue.ts), inclusive o teto por matéria: se no banco recente a correta
+ *     já é a mais longa em muitas questões, candidata com a correta mais longa é recusada
+ *     antes do revisor (não gasta modelo à toa).
  *  3. Em PARALELO e de forma independente:
  *       - solucionador(es) cego(s): resolvem sem gabarito;
  *       - revisor técnico: confere gabarito, unicidade, fundamento e ementa.
@@ -29,6 +32,7 @@ import {
   SOLVER_TOOL,
   solverPrompts,
 } from "./agents.ts";
+import { type BankLengthStats, LENGTH_CUE, lengthProfile, longestBudget } from "./length-cue.ts";
 import { arbiterKeeps, decide, itemFlaws } from "./quality.ts";
 import type { GeneratedQuestion, LessonSource, ReviewVerdict, SolverVote, SubjectContext } from "./types.ts";
 
@@ -58,12 +62,19 @@ export interface PipelineInput {
   topics: string[];
   facts: string[];
   lessons: string[];
+  /**
+   * Tamanhos das questões recentes da matéria (bankLengthStats). Com ele, o portão limita
+   * quantas novas podem ter a correta como a mais longa (teto LENGTH_CUE.maxShareLongest).
+   */
+  recentLength?: BankLengthStats;
 }
 
 export interface PipelineStats {
   mode: PipelineMode;
   generated: number;
   rejectedByValidator: number;
+  /** Recusadas só porque a correta seria a mais longa e a matéria já está no teto. */
+  rejectedByLengthBudget: number;
   rejectedByReviewer: number;
   disputed: number;
   arbitrated: number;
@@ -97,6 +108,7 @@ export async function runQualityPipeline(
     mode: config.mode,
     generated: 0,
     rejectedByValidator: 0,
+    rejectedByLengthBudget: 0,
     rejectedByReviewer: 0,
     disputed: 0,
     arbitrated: 0,
@@ -109,7 +121,7 @@ export async function runQualityPipeline(
   const lessons: PipelineOutcome["lessons"] = [];
 
   // 1. Elaborador
-  const gen = generationPrompts(ctx, input.missing + 2, input.recent, input.topics, facts, input.lessons);
+  const gen = generationPrompts(ctx, input.missing + 2, input.recent, input.topics, facts, input.lessons, input.recentLength);
   const generated = await llm.callTool({
     agent: "elaborador",
     promptVersion: PROMPT_VERSIONS.elaborador,
@@ -126,12 +138,20 @@ export async function runQualityPipeline(
 
   // 2. Portão determinístico
   const candidates: GeneratedQuestion[] = [];
+  let longestLeft = input.recentLength ? longestBudget(input.recentLength, input.missing) : Infinity;
   for (const q of generated.data) {
     const flaws = itemFlaws(q);
     if (flaws.length) {
       stats.rejectedByValidator += 1;
       for (const f of flaws) lessons.push({ source: "validador", lesson: f });
+    } else if (lengthProfile(q.alternativas, q.correta).correctIsLongest && longestLeft <= 0) {
+      stats.rejectedByLengthBudget += 1;
+      lessons.push({
+        source: "validador",
+        lesson: `A correta não pode ser a alternativa mais longa: na matéria ela já é a mais longa em mais de ${Math.round(100 * LENGTH_CUE.maxShareLongest)}% das questões recentes (o acaso é 25%). Deixe a correta com tamanho intermediário.`,
+      });
     } else {
+      if (lengthProfile(q.alternativas, q.correta).correctIsLongest) longestLeft -= 1;
       candidates.push(q);
     }
   }

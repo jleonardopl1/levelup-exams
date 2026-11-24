@@ -170,3 +170,26 @@ Deno.test("pipeline: lições da matéria chegam ao prompt do elaborador, cercad
   assert(user.includes("<<<INICIO_LICOES_DA_MATERIA>>>"));
   assert(user.includes("Lei 9.784/99"));
 });
+
+Deno.test("pipeline: matéria no teto de 'correta mais longa' recusa candidata assim antes do revisor", async () => {
+  // Correta só 10% mais longa: passa na régua da questão, mas não cabe no teto da matéria.
+  const longest = {
+    ...q(9),
+    alternativas: ["publicidade dos atos oficiais", "impessoalidade do agente", "moralidade dos agentes", "eficiência do serviço"],
+    correta: 0,
+  };
+  const { llm, calls } = fakeLlm({
+    elaborador: () => ({ questoes: [q(1), longest, q(2)] }),
+    revisor: approveAll(2),
+    solucionador: solveAll([0, 0]),
+  });
+  const recentLength = { n: 40, longest: 20, shortest: 5, flagged: 0, shareLongest: 0.5, shareShortest: 0.125 };
+  const out = await runQualityPipeline(llm, input({ missing: 2, recentLength }), MODELS, config());
+  assertEquals(out.stats.rejectedByLengthBudget, 1);
+  assertEquals(out.accepted.length, 2);
+  assert(out.lessons.some((l) => l.lesson.includes("não pode ser a alternativa mais longa")));
+  // O elaborador recebeu o aviso de que a matéria está acima do teto.
+  assert(calls.find((c) => c.agent === "elaborador")!.user.includes("a correta é a alternativa mais longa em 50%"));
+  // O revisor só viu as duas que passaram no portão.
+  assert(!calls.find((c) => c.agent === "revisor")!.user.includes("publicidade dos atos oficiais"));
+});

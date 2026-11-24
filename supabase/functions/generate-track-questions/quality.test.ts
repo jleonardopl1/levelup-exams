@@ -1,5 +1,15 @@
 import { assert, assertEquals } from "https://deno.land/std@0.190.0/testing/asserts.ts";
-import { arbiterKeeps, citesOptionLetters, decide, emphasizeNegativeCommand, itemFlaws, shuffleAlternatives, validateQuestion } from "./quality.ts";
+import {
+  arbiterKeeps,
+  citesOptionLetters,
+  decide,
+  emphasizeNegativeCommand,
+  itemFlaws,
+  numericKey,
+  orderNumericAlternatives,
+  shuffleAlternatives,
+  validateQuestion,
+} from "./quality.ts";
 import { groupLessons, normalizeLesson } from "./lessons.ts";
 import type { GeneratedQuestion, ReviewVerdict, SolverVote } from "./types.ts";
 
@@ -139,4 +149,35 @@ Deno.test("itemFlaws: termos absolutos só nos distratores", () => {
   // Um distrator absoluto só não é pista; e a correta também absoluta desfaz o padrão.
   assertEquals(itemFlaws({ ...cue, alternativas: [cue.alternativas[0], "é proibido", cue.alternativas[2], "exige lei"] }).filter((f) => f.includes("absolutos")), []);
   assertEquals(itemFlaws({ ...cue, alternativas: ["é sempre permitido", ...cue.alternativas.slice(1)] }).filter((f) => f.includes("absolutos")), []);
+});
+
+Deno.test("itemFlaws: pista de tamanho moderada (correta 30% acima da maior errada) agora reprova", () => {
+  const moderate = {
+    ...Q,
+    alternativas: ["publicidade dos atos oficiais na imprensa", "impessoalidade do agente", "moralidade administrativa", "eficiência do serviço"],
+  };
+  assert(itemFlaws(moderate).some((f) => f.includes("Pista de tamanho")));
+});
+
+Deno.test("numericKey: números, moeda, fração e percentual com a mesma unidade", () => {
+  assertEquals(numericKey("12 anos de idade"), { value: 12, unit: "|ano de idade" });
+  assertEquals(numericKey("1 ano de idade")?.unit, numericKey("8 anos de idade")?.unit);
+  assertEquals(numericKey("R$ 1.250,50")?.value, 1250.5);
+  assertEquals(numericKey("15/64")?.value, 15 / 64);
+  assertEquals(numericKey("30%")?.unit, "|%");
+  assertEquals(numericKey("dois dígrafos"), null);
+});
+
+Deno.test("orderNumericAlternatives: ordem crescente como a Selecon, gabarito preservado", () => {
+  const ages = { ...Q, alternativas: ["14 anos de idade", "8 anos de idade", "12 anos de idade", "10 anos de idade"], correta: 2 };
+  const o = orderNumericAlternatives(ages)!;
+  assertEquals(o.alternativas, ["8 anos de idade", "10 anos de idade", "12 anos de idade", "14 anos de idade"]);
+  assertEquals(o.alternativas[o.correta], "12 anos de idade");
+  // Unidades diferentes ou valores repetidos: não ordena.
+  assertEquals(orderNumericAlternatives({ ...Q, alternativas: ["8 anos", "10 meses", "12 anos", "14 anos"] }), null);
+  assertEquals(orderNumericAlternatives({ ...Q, alternativas: ["8", "8,0", "12", "14"] }), null);
+  // shuffleAlternatives usa a ordem crescente em vez de sortear.
+  const s = shuffleAlternatives({ ...Q, alternativas: ["R$ 900,00", "R$ 1.200,00", "R$ 300,00", "R$ 600,00"], correta: 1 });
+  assertEquals(s.alternativas, ["R$ 300,00", "R$ 600,00", "R$ 900,00", "R$ 1.200,00"]);
+  assertEquals(s.alternativas[s.correta], "R$ 1.200,00");
 });

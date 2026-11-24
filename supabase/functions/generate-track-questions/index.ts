@@ -9,10 +9,12 @@
  *   1. monta o contexto (ementa do edital por nível, tópicos já cobertos, últimos
  *      enunciados, fatos verificados e as LIÇÕES da matéria — reprovações anteriores);
  *   2. Elaborador gera as candidatas no padrão da banca;
- *   3. portão determinístico (esquema + falhas clássicas de elaboração);
+ *   3. portão determinístico (esquema + falhas clássicas de elaboração + pista de tamanho,
+ *      com teto de "correta mais longa" por matéria — length-cue.ts);
  *   4. em paralelo: Solucionador(es) CEGO(s) resolvem sem gabarito e o Revisor técnico
  *      confere gabarito/fundamento; divergência vai para o Árbitro (modelo mais forte);
- *   5. valida, embaralha, deduplica (content_hash) e grava com origem = 'ia_diaria';
+ *   5. valida, embaralha (numéricas em ordem crescente, como a Selecon), deduplica
+ *      (content_hash) e grava com origem = 'ia_diaria';
  *   6. grava telemetria (ai_runs) e as lições novas (ai_lessons).
  *
  * Disparo:
@@ -36,6 +38,7 @@ import { jsonResponse, readJson, requireAdmin } from "../_shared/utils.ts";
 import { createGatewayClient, LlmError, modelFromEnv, modelListFromEnv } from "../_shared/ai/llm.ts";
 import { createTelemetry } from "../_shared/ai/telemetry.ts";
 import { todayInCuiaba } from "./agents.ts";
+import { bankLengthStats } from "./length-cue.ts";
 import { loadLessons, saveLessons } from "./lessons.ts";
 import { type PipelineConfig, type PipelineMode, type PipelineModels, runQualityPipeline } from "./pipeline.ts";
 import { norm, shuffleAlternatives } from "./quality.ts";
@@ -99,14 +102,22 @@ async function processSubject(
   models: PipelineModels,
   config: PipelineConfig,
 ) {
-  const [{ data: recentRows }, { data: topicRows }, { data: factRows }, lessons] = await Promise.all([
+  const [{ data: recentRows }, { data: topicRows }, { data: factRows }, lessons, { data: recentAiRows }] = await Promise.all([
     supabase.from("questions").select("enunciado").eq("subject_id", ctx.subjectId)
       .order("created_at", { ascending: false }).limit(40),
     supabase.from("questions").select("topico").eq("subject_id", ctx.subjectId).not("topico", "is", null).limit(1000),
     supabase.from("questions").select("explicacao").eq("subject_id", ctx.subjectId).eq("origem", "autoral")
       .not("explicacao", "is", null).limit(400),
     loadLessons(supabase, ctx.subjectId),
+    // Banco recente da própria fábrica: base do teto de "correta mais longa" (length-cue.ts).
+    supabase.from("questions").select("alternativas, correta").eq("subject_id", ctx.subjectId)
+      .eq("origem", "ia_diaria").eq("is_active", true).order("created_at", { ascending: false }).limit(40),
   ]);
+  const recentLength = bankLengthStats(
+    ((recentAiRows ?? []) as { alternativas: string[] | null; correta: number | null }[])
+      .filter((r) => Array.isArray(r.alternativas) && r.alternativas.length === 4 && Number.isInteger(r.correta))
+      .map((r) => ({ alternativas: r.alternativas as string[], correta: r.correta as number })),
+  );
 
   const recent = (recentRows ?? []).map((r: { enunciado: string }) => r.enunciado.slice(0, 160));
   const topicCount = new Map<string, number>();
@@ -121,7 +132,7 @@ async function processSubject(
   // Amostra aleatória de fatos para variar o foco a cada dia.
   const facts = allFacts.sort(() => Math.random() - 0.5).slice(0, ctx.grounded ? 60 : 15);
 
-  const outcome = await runQualityPipeline(llm, { ctx, missing, recent, topics, facts, lessons }, models, config);
+  const outcome = await runQualityPipeline(llm, { ctx, missing, recent, topics, facts, lessons, recentLength }, models, config);
   // A memória é gravada mesmo quando nada foi aprovado — é aí que ela mais ensina.
   await saveLessons(supabase, ctx.subjectId, outcome.lessons);
 
@@ -275,7 +286,7 @@ serve(withCors(async (req) => {
         });
         // Linha de fluxo de trabalho (invoke_workflow, nas convenções OTel GenAI): o resumo da matéria.
         telemetry.record(
-          { agent: "orquestrador", model: "", promptVersion: "pipeline@2026-11-16", status: "ok", attempts: 1, latencyMs: Date.now() - startedAt, inputTokens: null, outputTokens: null },
+          { agent: "orquestrador", model: "", promptVersion: "pipeline@2026-11-24", status: "ok", attempts: 1, latencyMs: Date.now() - startedAt, inputTokens: null, outputTokens: null },
           { subjectId: ctx.subjectId, metadata: { operation: "invoke_workflow", requested: missing, inserted: r.inserted, lessons: r.lessons, ...r.stats } },
         );
         return { subject: ctx.slug, requested: missing, inserted: r.inserted, status, stats: r.stats };

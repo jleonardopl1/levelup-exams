@@ -12,38 +12,32 @@
  * - Calcula content_hash (dedup): a migration e idempotente (ON CONFLICT) e, ao ser
  *   reaplicada, atualiza gabarito/explicacao/nivel corrigidos das questoes autorais.
  *
+ * - Recusa questao com pista de forma (correta mais longa, mais curta, todas/nenhuma...) e
+ *   materia em que a correta e a mais longa acima do teto: mesma auditoria do test:unit
+ *   (scripts/audit-questions.mjs, regua em supabase/functions/generate-track-questions/length-cue.ts).
+ *
  * Formato compacto de cada questao:
  *   { "t": "topico", "d": "Fácil|Médio|Difícil", "n": "medio|superior" (opcional),
- *     "q": "enunciado", "a": ["A","B","C","D"], "c": 0, "e": "explicação", "fixa": false }
+ *     "q": "enunciado", "a": ["A","B","C","D"], "c": 0, "e": "explicação", "fixa": false,
+ *     "k": "16 hex" (opcional) }
+ *
+ * "k" (chave de ordem): os 16 primeiros caracteres do content_hash com que a questao foi
+ * publicada pela primeira vez. Questao reescrita depois de publicada continua embaralhada
+ * por essa chave, entao a ordem das alternativas no banco nao muda e o indice que o aluno
+ * marcou (selected_index) continua apontando para a mesma alternativa. Preenchido por
+ * scripts/build-question-revision.mjs; nao edite a mao.
  */
-import { createHash } from "node:crypto";
 import { existsSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { auditTrack } from "./audit-questions.mjs";
+import { contentHash, isFixed, norm, seededShuffle, sql, sqlArr } from "./lib/track-content.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const slug = process.argv[2] || "camara-cuiaba-2026";
 const dir = join(root, "content", "trilhas", slug);
 const track = JSON.parse(readFileSync(join(dir, "track.json"), "utf8"));
 const out = join(root, "supabase", "migrations", track.migration_file);
-
-const sql = (v) => (v === null || v === undefined ? "NULL" : `'${String(v).replace(/'/g, "''")}'`);
-const sqlArr = (arr) => `ARRAY[${arr.map(sql).join(", ")}]::text[]`;
-const norm = (s) => s.normalize("NFKC").replace(/\s+/g, " ").trim().toLowerCase();
-export const contentHash = (enunciado, alternativas) =>
-  createHash("sha256").update(norm(enunciado) + "||" + alternativas.map(norm).sort().join("|")).digest("hex");
-
-const NO_SHUFFLE = /anteriores|nenhuma das|todas as alternativas|^\s*(apenas\s+)?[IVX]+\b|\b[IVX]+\s*(,|e)\s*[IVX]+\b|^\s*[VF]\s*[-–,]\s*[VF]/i;
-
-function seededShuffle(n, seedHex) {
-  // Fisher-Yates usando bytes do proprio hash (deterministico e sem vies de PRNG).
-  const idx = [...Array(n).keys()];
-  for (let i = n - 1, k = 0; i > 0; i--, k++) {
-    const j = parseInt(seedHex.slice(k * 4, k * 4 + 4), 16) % (i + 1);
-    [idx[i], idx[j]] = [idx[j], idx[i]];
-  }
-  return idx;
-}
 
 const errors = [];
 const subjects = [];
@@ -57,6 +51,7 @@ function prepareQuestion(q, where) {
   if (!Number.isInteger(q.c) || q.c < 0 || q.c > 3) errors.push(`${where}: gabarito invalido`);
   if (!q.e || q.e.length < 20) errors.push(`${where}: explicacao ausente/curta`);
   if (q.n && !["medio", "superior"].includes(q.n)) errors.push(`${where}: nivel invalido`);
+  if (q.k !== undefined && !/^[0-9a-f]{16}$/.test(q.k)) errors.push(`${where}: chave de ordem (k) invalida`);
   if (!["Fácil", "Médio", "Difícil"].includes(q.d)) errors.push(`${where}: dificuldade invalida`);
   if (!q.a || q.a.length !== 4) return null;
   const hash = contentHash(q.q, q.a);
@@ -64,9 +59,9 @@ function prepareQuestion(q, where) {
   seenHashes.set(hash, where);
   let alternativas = q.a;
   let correta = q.c;
-  const fixed = q.fixa || q.a.some((alt) => NO_SHUFFLE.test(alt));
+  const fixed = isFixed(q);
   if (!fixed) {
-    const order = seededShuffle(4, hash);
+    const order = seededShuffle(4, q.k || hash);
     alternativas = order.map((k) => q.a[k]);
     correta = order.indexOf(q.c);
   }
@@ -119,6 +114,10 @@ if (existsSync(dailyDir)) {
     dailyBatches.push({ file, date: data.date, items, migration });
   }
 }
+
+// Pistas de forma (correta mais longa etc.): o build nao gera seed com conteudo que entrega a resposta.
+const audit = auditTrack(slug);
+errors.push(...audit.problems);
 
 if (errors.length) {
   console.error("Conteudo invalido:\n - " + errors.join("\n - "));
