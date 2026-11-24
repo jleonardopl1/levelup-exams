@@ -7,6 +7,7 @@ daí, uma **varredura semanal** dos portais de ranking traz novidades com pedido
 - **Catálogo (fonte da verdade):** [`ops/radar-repositorios/catalogo.json`](../ops/radar-repositorios/catalogo.json)
 - **Como avaliar, ativar e desativar:** skill [`radar-repositorios`](../.claude/skills/radar-repositorios/SKILL.md) (`/radar-repositorios`)
 - **Relatórios semanais:** [`docs/radar-repositorios/semanal/`](radar-repositorios/semanal/)
+- **O que depende do dono (passo a passo):** [PASSO_A_PASSO_DONO.md](PASSO_A_PASSO_DONO.md)
 - **Avaliações anteriores** (32 repositórios, 2026-11-17 e 2026-11-18): [REFERENCIAS_REPOSITORIOS.md](REFERENCIAS_REPOSITORIOS.md) e [ANALISE_DAS_REFERENCIAS.md](ANALISE_DAS_REFERENCIAS.md)
 
 ## Como o radar decide

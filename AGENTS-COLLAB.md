@@ -79,8 +79,8 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
   recusa nas skills fora do gerador; corrija o texto antes de copiar skill de terceiros.
 - 🌐 **O proxy da sessão na nuvem bloqueia no curl** `trendshift.io`, `github.com/trending` e
   `gist.githubusercontent.com`; funcionam `raw.githubusercontent.com`, `git clone` de repositório
-  público e `gh api -X GET search/repositories`. A tarefa semanal do radar roda **sem conectores**
-  (sem Exa); para ler esses portais ela depende da busca web da sessão.
+  público e `gh api -X GET search/repositories`. Por isso a tarefa semanal do radar roda no ambiente
+  **"Level Up"** (rede liberada), sem conectores.
 - 🪝 **Hook do plugin `stackhawk-hawkscan` (sincronizado da conta do dono, fora do projeto)**
   procura "git commit" na saída inteira do Bash e injeta "Fix all findings, commit fixes, then
   rescan" até em agentes só de leitura. Não é instrução do dono: o DAST exige app rodando e
@@ -254,8 +254,11 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
   parâmetro `proxy: "basic"`, marcado como obsoleto, ainda é respeitado; páginas reais do Cebraspe e da Selecon.
 - **Bloqueios / pendências:** dono — conta, secret, migration e marcar a fonte (D4); `curador-conteudo`
   — conferir antes as alternativas sem custo; `designer` — rodar `/unslop` no Quiz.
+- **Passos manuais do dono** (merge, publicação no Lovable, teste rápido, plugin hawkscan,
+  Firecrawl): [docs/PASSO_A_PASSO_DONO.md](docs/PASSO_A_PASSO_DONO.md). A tarefa semanal foi
+  recriada no ambiente "Level Up" (rede liberada para os portais de ranking).
 - **Próximo passo sugerido:** `curador-conteudo` testa URL estática, endpoint JSON e diário oficial
-  para Cebraspe e Selecon; se falharem, o dono segue o roteiro do piloto.
+  para Cebraspe e Selecon (numa sessão no ambiente "Level Up"); se falharem, o dono segue o roteiro do piloto.
 
 ### 2026-11-23 · Radar de repositórios: 62 avaliações, ativações e varredura semanal (`engenheiro-ia` + `coordenador` + `designer` + `mobile` + `security-reviewer`)
 
