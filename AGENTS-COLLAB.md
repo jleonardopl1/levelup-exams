@@ -112,11 +112,20 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
   Questões `ia_diaria` antigas podem ter esse defeito — auditar (backlog P1).
 - 🧾 **Telemetria e lições são "best effort"**: sem a migration aplicada, as funções seguem
   funcionando e só registram aviso no log. Não conclua que "a IA não roda" por falta de linhas em `ai_runs`.
-- 🕸️ **Radar: páginas montadas por JavaScript chegam vazias ao coletor** (Cebraspe, portal da
-  Selecon) e a Fundatec tem anti-robô — semeadas desligadas. Fonte com "página sem texto" no
-  painel precisa de outra URL (página do órgão, diário oficial). O coletor não executa JS.
-  Último recurso: `render_mode = 'firecrawl'` na fonte (piloto D15, secret `FIRECRAWL_API_KEY`,
-  roteiro em `docs/RADAR_CONCURSOS.md`).
+- 🕸️ **Radar: página montada por JavaScript chega vazia ao coletor** (a lista `/concursos/` do
+  Cebraspe) e anti-robô dá 403 (Fundatec; páginas de concurso da Selecon em `*.selecao.net.br`,
+  Turnstile da Cloudflare). O coletor não executa JS. Antes de renderizar, procure a lista estática
+  da banca: Cebraspe → `/noticias/`, Selecon → `selecon.org.br` (a raiz `selecao.net.br` nem é
+  página dinâmica: só responde "Cliente não encontrado."). Último recurso para JS:
+  `render_mode = 'firecrawl'` (piloto D15, roteiro em `docs/RADAR_CONCURSOS.md`).
+- 🧾 **O coletor do Radar descarta JSON, RSS e Atom como binário** (`fetcher.ts`, filtro de
+  content-type: só HTML, XHTML, `text/plain`, `text/xml` e `application/xml`). A API do Cebraspe
+  (`application/json`) e o feed da Selecon (`application/rss+xml`) viram só hash. Sitemap passa como
+  texto, mas sem `<a href>` não há links e o `link_oficial` não passa no portão de evidência.
+- 🏛️ **Diários oficiais a partir da nuvem:** `www.in.gov.br` (DOU) responde 403 da Azion ou corta a
+  conexão, também no navegador e sem aviso do proxy (é o site); o INLABS estava em manutenção. A
+  API do Querido Diário agora é `api.queridodiario.org.br` (o host `api.queridodiario.ok.org.br`
+  falha no TLS) e às vezes falha na primeira tentativa.
 - 🗝️ **A ferramenta de migration do agente do Lovable recusa SQL que lê o Vault**
   ("Agent access to secrets is not allowed"), como o bloco de agendamento do pg_cron. A migration
   do Radar foi aplicada em partes pela consulta SQL do Lovable (`query_database`), com o mesmo
@@ -208,15 +217,27 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
   14. Edital verticalizado sincronizado entre aparelhos (tabela com RLS) e links de lei seca por item.
   15. Questões com texto-base comum (freeCodeCamp `questionSets.context`) para Português.
   16. Exportar caderno de erros para o Anki (RPC só com questões já respondidas).
-  17. Fonte "Querido Diário" no Radar para órgãos com site em JavaScript; IBGE para municípios por UF.
+  17. ✔ verificado (2026-11-24, `curador-conteudo`): o Querido Diário **não substitui** a página da
+      banca (Selecon: 9 diários desde agosto, nenhum dos municípios com concurso aberto; Cuiabá parada
+      desde 02/06/2026; trechos com nº de inscrição de candidato; resposta JSON) e o DOU não abriu
+      daqui. Cebraspe e Selecon resolvidas com HTML estático (migration `20261124120000`). Falta: IBGE
+      para municípios por UF; reavaliar o Querido Diário só com filtro de dados pessoais e o item 17a.
+  17a. Coletor do Radar com JSON de fonte conhecida e RSS/Atom (`edge-functions` + `engenheiro-ia`):
+      a API que a página do Cebraspe chama (`apis.cebraspe.org.br/cebraspe/eventos/tipo/concursos/fase/<fase>`,
+      sem token nem cabeçalho) dá fase, vagas, salário e sigla de cada concurso; o detalhe
+      (`/cebraspe/eventos/<SIGLA>`) dá cargos, inscrições, editais e retificações. Converter em texto
+      determinístico com links (`www.cebraspe.org.br/concursos/<SIGLA>`) para o portão de evidência.
+      API não documentada: pode mudar sem aviso. Ganho: fase e retificação dos ~70 concursos em andamento.
   18. Eventos tipados (AG-UI) no streaming do Mentor quando ele ganhar ferramentas (P2.11).
   19. Auditoria de UI das telas de estudo com Impeccable (`critique`/`audit`) pelo `designer`.
   20. RPC que agregue o domínio por tópico no banco (hoje o front lê as 1.000 respostas mais
       recentes de cada matéria — teto `max_rows` do PostgREST; tópico sem resposta nesse recorte some).
 - **Do radar de repositórios (`docs/RADAR_REPOSITORIOS.md`) — pilotos:**
   21. ✅ aprovado (2026-11-23) · Firecrawl para as fontes do Radar montadas por JavaScript: código
-      pronto e desligado. Falta: `curador-conteudo` conferir as alternativas sem custo (item 17), o
-      dono criar a conta, gravar `FIRECRAWL_API_KEY`, aplicar `20261123120000` e marcar a fonte (D4).
+      pronto e desligado. **Sem fonte-alvo desde 2026-11-24:** Cebraspe e Selecon resolvidas sem
+      renderização (item 17); a Selecon nem é JS (raiz vazia, concursos com anti-robô). O dono **não**
+      precisa criar conta nem secret. Falta: dono aplicar `20261123120000` e `20261124120000` e decidir
+      ligar a fonte `cebraspe.org.br/noticias/` (D4, guia do dono §5).
   22. ✅ aprovado (2026-11-23) · elephant-goldfish: piloto rodado com `ops/radar-repositorios/egm-drift.sh`
       (plugin fixado, só na execução); passou no critério e gerou os itens P1.8h–k. Uso sob demanda.
   23. ✅ aprovado (2026-11-23) · unslop instalado (`/unslop`, só auditoria). Falta: `designer` rodar
@@ -228,6 +249,56 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
 
 ## Handoff mais recente
 <!-- Sempre o topo = o mais recente. Template: docs/colaboracao/handoff-template.md -->
+
+### 2026-11-24 · Radar: Cebraspe e Selecon sem Firecrawl (`curador-conteudo`)
+
+- **Objetivo da sessão:** backlog 17 e 21 e §5.1 do guia do dono: achar alternativa gratuita e sem
+  renderização para as duas fontes "página dinâmica" e preparar a troca.
+- **O que mudou:** migration `20261124120000_radar_sources_urls_estaticas.sql`: troca URL e nome das
+  duas fontes desligadas, zera o retrato e deixa `render_mode = 'direto'`, sem ligar nenhuma. Só
+  troca fonte desligada e sem colisão de URL; `pending_retries` e `render_mode` só entram se a coluna
+  existir. Também mudaram `docs/RADAR_CONCURSOS.md` (limites, tabela "Fontes conferidas", situação
+  do piloto) e `docs/PASSO_A_PASSO_DONO.md` §5 (Firecrawl dispensado, aplicar a migration e ligar o
+  Cebraspe, roteiro antigo recolhido).
+- **Evidências** (curl pelo proxy, `fetchPage` real do coletor, robots.txt conferido):
+  - **Cebraspe `/concursos/`:** 200 `text/html`, aplicação React (`<div id="root"></div>`), 0 caracteres
+    e 0 links.
+  - **Cebraspe `/noticias/`:** 200 `text/html`, 4.471 caracteres e 73 links. A notícia da SEAP/PE
+    traz 700 vagas, inscrições de 12/11/2026 a 04/01/2027, R$ 5.667,92, prova em 21/03/2027 e o link
+    `concursos/SEAP_PE_26`. No robots.txt, `Disallow:` está vazio.
+  - **Cebraspe JSON** (achado no bundle e confirmado no Playwright):
+    `apis.cebraspe.org.br/cebraspe/eventos/tipo/concursos/fase/inscricoes-abertas` responde 200
+    `application/json` (PC PE 26 com 1.315 vagas e SEAP PE 26 com 700). A lista completa tem 246 KB:
+    1 novo, 2 com inscrições abertas, 70 em andamento e 428 encerrados. Não pede token, e o coletor
+    trata como binário.
+  - **Selecon `selecao.net.br/`:** 200, 30 bytes, "Cliente não encontrado.".
+  - **Selecon `*.selecao.net.br/informacoes/<id>/`:** 403 com Turnstile da Cloudflare, também no Playwright.
+  - **Selecon `selecon.org.br/concursos/`:** 200 `text/html`, 6.145 caracteres, 22 links e 12
+    concursos, incluindo os 9 da aba "Inscrições Abertas" da home (fonte ativa).
+  - **Selecon RSS:** `application/rss+xml`, tratado como binário.
+  - **DOU:** `www.in.gov.br` respondeu 403 da Azion ou cortou a conexão. Não foi o proxy (nenhuma
+    linha `[agent-proxy]`); o INLABS estava em manutenção.
+  - **Querido Diário** (`api.queridodiario.org.br`): a busca "Selecon" desde 01/08 trouxe 9 diários,
+    só de Niterói e Araçás/BA. Cuiabá tem nível 3, mas o último diário é de 02/06/2026; Várzea Grande
+    tem nível 1; Barra do Garças e Campo Novo do Parecis, nível 0.
+  - **Dados pessoais:** as fontes novas não trazem nomes de candidatos; a notícia de "primeira chamada"
+    só cita a relação. Os trechos do Querido Diário trazem número de inscrição.
+- **Testado:** PGlite com todas as migrations → `node supabase/tests/mercadopago.validate.mjs` e
+  `node docs/proposta-plus/validate.mjs`: "Todos os testes passaram". Uma validação própria da
+  migration (fora do repositório) passou nas 18 verificações: troca, idempotência, ausência de
+  `render_mode`/`pending_retries`, fonte já ligada intocada, URL nova já existente e tabela ausente.
+  `bun run test:unit` → 106 aprovados, 0 falhas, 2 pulados.
+- **Não testado:** a primeira coleta real com Batedor e Verificador (sem modelo nesta sessão). O DOU
+  e o INLABS ficaram bloqueados a partir desta sessão.
+- **Decisões tomadas:** nenhuma D nova; ligar fontes continua com o dono (D4).
+- **Armadilhas novas:** o coletor descarta JSON e RSS; `selecao.net.br` não é página dinâmica; DOU e
+  Querido Diário a partir da nuvem.
+- **Bloqueios / pendências:**
+  - Dono: aplicar a `20261124120000` no Lovable e decidir ligar `cebraspe.org.br/noticias/` (guia §5.2–5.3).
+  - `edge-functions` + `engenheiro-ia`: item 17a (JSON do Cebraspe, RSS/Atom).
+  - Não re-rode a `20261117120000`: ela recria as duas URLs antigas, desligadas. É inofensivo.
+- **Próximo passo sugerido:** o dono aplica a migration e liga a fonte do Cebraspe. Depois, o
+  `curador-conteudo` confere em Admin → Radar a primeira coleta (PC/PE e SEAP/PE) e as atualizações pendentes.
 
 ### 2026-11-23 · Pilotos aprovados do radar: unslop, Firecrawl, elephant-goldfish e ts-reset (`designer` + `edge-functions` + `supabase-db` + `frontend` + `security-reviewer`)
 

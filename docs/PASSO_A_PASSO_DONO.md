@@ -5,8 +5,8 @@ que pedem a sua conta, uma chave secreta, publicação em produção no Lovable 
 Todo o resto da avaliação dos repositórios e dos 4 pilotos já está feito e testado no
 [PR #34](https://github.com/jleonardopl1/levelup-exams/pull/34).
 
-**Tempo:** cerca de 15 minutos para o obrigatório (passos 1 a 3). Ligar o Firecrawl (passo 5) é
-opcional e leva cerca de 30 minutos.
+**Tempo:** cerca de 15 minutos para o obrigatório (passos 1 a 3). O passo 5 (fontes do Cebraspe e
+da Selecon) é opcional e leva cerca de 5 minutos, sem Firecrawl.
 
 > **Pode fazer o merge sem medo.** Tudo o que é novo neste PR está desligado até você agir: o
 > Firecrawl só funciona com a sua chave, as skills novas só servem aos agentes e o ts-reset só
@@ -21,7 +21,7 @@ opcional e leva cerca de 30 minutos.
 | 2 | Publicar no Lovable (site, função do Radar e migration) | Depois do merge | 5 min | Sim |
 | 3 | Teste rápido no app | Depois do passo 2 | 5 min | Sim |
 | 4 | Desligar o plugin "StackHawk HawkScan" da sua conta do Claude | Quando quiser | 2 min | Recomendado |
-| 5 | Ligar o Firecrawl no Radar (Cebraspe e Selecon) | Quando quiser | 30 min | Opcional |
+| 5 | Trocar as fontes do Cebraspe e da Selecon no Radar (sem Firecrawl) | Depois do merge do PR da troca | 5 min | Opcional |
 | 6 | Responder à varredura semanal de repositórios | Segunda, 30/11 | 2 min | Quando chegar |
 | 7 | Escolher as próximas correções | Quando quiser | 2 min | Recomendado |
 
@@ -92,42 +92,84 @@ No Claude Code do computador, o comando `/plugin` também lista os plugins e per
 
 - [ ] Feito
 
-## Passo 5 — Ligar o Firecrawl no Radar (opcional)
+## Passo 5 — Fontes do Cebraspe e da Selecon no Radar (opcional)
 
-**Para que serve:** os sites do Cebraspe e da Selecon montam a lista de concursos com JavaScript,
-e o Radar hoje recebe a página vazia. O Firecrawl abre a página como um navegador e devolve o
-conteúdo. Por segurança, **tudo que vier dessas fontes vai para a sua revisão** em
-Admin → Radar antes de chegar aos alunos.
+**Resultado da verificação de 24/11/2026: o Firecrawl não é necessário para nenhuma das duas.**
+Não crie a conta.
+
+- **Cebraspe:** a lista de concursos (`/concursos/`) é montada por JavaScript e chega vazia ao
+  Radar. A página de notícias [cebraspe.org.br/noticias](https://www.cebraspe.org.br/noticias/) é
+  simples, anuncia cada concurso novo e cada notícia traz vagas, inscrições, salário, data da prova
+  e o link oficial do concurso.
+- **Selecon:** o endereço cadastrado (`selecao.net.br`) não tem lista nenhuma: responde só "Cliente
+  não encontrado.". A lista de concursos da Selecon **já chega ao Radar** pela fonte ligada
+  "Instituto Selecon" ([selecon.org.br](https://www.selecon.org.br/)). As páginas de cada concurso
+  ficam atrás de uma proteção anti-robô que o Radar não contorna (nem com o Firecrawl).
+
+### 5.1 Ver se dá para evitar o Firecrawl (grátis)
+
+Feito pelo `curador-conteudo` em 24/11/2026: dá para evitar nas duas fontes. O resultado e as
+evidências estão no `AGENTS-COLLAB.md` (handoff de 24/11).
+
+- [x] Alternativa gratuita verificada
+
+### 5.2 Aplicar a troca das URLs
+
+Depois do merge do PR com a migration `20261124120000`, cole no chat do Lovable:
+
+```text
+Aplique a migration supabase/migrations/20261124120000_radar_sources_urls_estaticas.sql
+(só troca a URL e o nome de duas fontes desligadas do Radar; não liga nenhuma; pode rodar de novo
+sem problema). Não altere nenhum outro arquivo.
+```
+
+A migration troca as duas fontes desligadas:
+
+| Antes (desligada) | Depois (continua desligada) |
+| --- | --- |
+| Cebraspe — concursos (página dinâmica), `https://www.cebraspe.org.br/concursos/` | Cebraspe — notícias (concursos e seleções), `https://www.cebraspe.org.br/noticias/` |
+| Selecon — portal de seleções (página dinâmica), `https://selecao.net.br/` | Selecon — concursos (lista estática), `https://selecon.org.br/concursos/` |
+
+- [ ] Migration aplicada
+
+### 5.3 Ligar a fonte do Cebraspe (decisão sua)
+
+No chat do Lovable, peça para rodar:
+
+```sql
+UPDATE public.radar_sources SET is_active = true
+WHERE url = 'https://www.cebraspe.org.br/noticias/';
+```
+
+Depois, em Admin → Radar, clique em **Verificar agora**. A fonte deve aparecer sem "página sem
+texto". Na primeira visita, o Radar lê a página inteira; os concursos novos passam pelo mesmo
+verificador das outras fontes.
+
+**Selecon:** não precisa ligar nada. A fonte "Instituto Selecon" já está ligada e traz a mesma lista.
+A "Selecon — concursos (lista estática)" fica desligada como alternativa com menos repetição. Se um
+dia quiser trocar, ligue esta e desligue a "Instituto Selecon". **Não deixe as duas ligadas.**
+
+- [ ] Fonte do Cebraspe ligada
+
+### 5.4 Firecrawl: guardado para uma fonte futura
+
+O código do piloto continua pronto e desligado. Só vale a pena se aparecer uma fonte que exista
+**apenas** montada por JavaScript (sem notícia, lista simples ou diário oficial). O roteiro antigo
+fica abaixo, recolhido.
+
+<details>
+<summary>Roteiro do Firecrawl (não usar para Cebraspe nem Selecon)</summary>
 
 **Custo:** o plano gratuito do Firecrawl deve bastar (2 fontes a cada 12 horas gastam cerca de
 120 créditos por mês). Confira os limites atuais no site deles.
 
-### 5.1 Primeiro, ver se dá para evitar (grátis)
-
-Às vezes o mesmo conteúdo existe numa página simples. Abra uma **nova sessão do Claude Code no
-ambiente "Level Up"** (ele tem acesso livre à internet) e cole:
-
-```text
-Use o agente curador-conteudo. Para as fontes do Radar "Cebraspe — concursos"
-(https://www.cebraspe.org.br/concursos/) e "Selecon — portal de seleções" (https://selecao.net.br/),
-verifique se existe uma URL estática, um endpoint JSON usado pela própria página ou um diário oficial
-com a mesma informação (item 17 do backlog). Se existir, proponha trocar a URL da fonte por PR.
-Registre o resultado no AGENTS-COLLAB.md.
-```
-
-Se encontrar uma alternativa, **pare aqui**: o Firecrawl não é necessário.
-
-- [ ] Alternativa gratuita verificada
-
-### 5.2 Criar a conta e a chave
+#### Criar a conta e a chave
 
 1. Acesse [firecrawl.dev](https://www.firecrawl.dev/) e crie a conta.
 2. No painel, abra **API Keys** e copie a chave (começa com `fc-`).
 3. Guarde a chave num gerenciador de senhas. **Nunca cole a chave num chat.**
 
-- [ ] Conta e chave criadas
-
-### 5.3 Guardar a chave no Lovable
+#### Guardar a chave no Lovable
 
 No chat do Lovable, escreva:
 
@@ -137,9 +179,7 @@ Adicione o secret FIRECRAWL_API_KEY para as Edge Functions.
 
 O Lovable abre um formulário seguro. Cole a chave **no formulário**, não no chat.
 
-- [ ] Secret salvo
-
-### 5.4 Fazer uma chamada de teste (antes de ligar)
+#### Fazer uma chamada de teste (antes de ligar)
 
 O parâmetro que impede o Firecrawl de usar "proxies anti-robô" está marcado como obsoleto na
 documentação deles. Antes de ligar, confirme como ele responde. Abra uma **nova sessão do Claude
@@ -148,34 +188,29 @@ Code no ambiente "Level Up"** e cole:
 ```text
 Faça UMA chamada de teste à API v2 da Firecrawl (POST https://api.firecrawl.dev/v2/scrape) com o mesmo
 corpo usado por fetchRendered em supabase/functions/radar-concursos/fetcher.ts, para
-https://www.cebraspe.org.br/concursos/. Peça a chave pelo formulário seguro (nunca no chat).
+<url da fonte>. Peça a chave pelo formulário seguro (nunca no chat).
 Me diga: se metadata.proxyUsed veio e vale "basic", se metadata.url é a URL final, quantos créditos a
 chamada gastou e se o HTML traz a lista de concursos. Registre o resultado em docs/RADAR_CONCURSOS.md e abra PR.
 ```
 
 A sessão vai mostrar um cartão para você salvar a chave com segurança.
 
-- **Se `proxyUsed` vier como "basic" e o HTML trouxer os concursos:** siga para o 5.5.
+- **Se `proxyUsed` vier como "basic" e o HTML trouxer os concursos:** siga para "Marcar a fonte".
 - **Se `proxyUsed` não vier, ou vier diferente de "basic":** pare e me avise. A avaliação é reaberta.
 
-- [ ] Teste feito e aprovado
-
-### 5.5 Marcar as fontes
+#### Marcar a fonte
 
 No chat do Lovable, peça para rodar este SQL (uma fonte por vez é mais seguro):
 
 ```sql
 UPDATE public.radar_sources
 SET render_mode = 'firecrawl', is_active = true
-WHERE url = 'https://www.cebraspe.org.br/concursos/';
+WHERE url = '<url da fonte>';
 ```
 
-Para a Selecon, use a URL `https://selecao.net.br/`. Não use o Firecrawl em páginas de
-resultado com nomes de candidatos.
+Não use o Firecrawl em páginas de resultado com nomes de candidatos nem em sites com anti-robô.
 
-- [ ] Fonte(s) marcada(s)
-
-### 5.6 Conferir
+#### Conferir
 
 1. Em Admin → Radar, clique em **Verificar agora**.
 2. A fonte deixa de aparecer como "página sem texto".
@@ -189,7 +224,7 @@ resultado com nomes de candidatos.
 
 **Para desligar:** rode o mesmo SQL com `render_mode = 'direto'`, ou apague o secret no Lovable.
 
-- [ ] Funcionando
+</details>
 
 ## Passo 6 — Varredura semanal de repositórios
 

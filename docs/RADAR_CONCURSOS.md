@@ -106,16 +106,46 @@ segue o fluxo de `docs/TRILHAS.md`.
 
 ## Limites conhecidos
 
-- **Páginas montadas por JavaScript** (Cebraspe, portal da Selecon) e com anti-robô (Fundatec)
-  chegam sem texto ao coletor: ficam cadastradas e desligadas. Use a página do órgão, o diário
-  oficial ou outra URL estática da banca. Se nada disso resolver, use o piloto de renderização
-  abaixo (só para JavaScript; anti-robô continua desligado de propósito).
+- **Páginas montadas por JavaScript** (a lista `/concursos/` do Cebraspe) e com anti-robô
+  (Fundatec, páginas de concurso da Selecon em `*.selecao.net.br`) chegam sem texto ao coletor.
+  Antes de pensar em renderizar, procure a lista de notícias ou de concursos da própria banca, a
+  página do órgão ou o diário oficial (ver "Fontes conferidas" abaixo). Se nada disso resolver, use o
+  piloto de renderização (só para JavaScript; anti-robô continua desligado de propósito).
+- **JSON, RSS e Atom** (`application/json`, `application/rss+xml`, `application/atom+xml`) são
+  tratados como binários pelo coletor: só o hash é guardado, sem texto nem links. "XML funciona"
+  vale só para `text/xml` e `application/xml` (ex.: sitemap), e sitemap não tem `<a href>`: sem
+  links, o `link_oficial` não passa no portão de evidência.
 - **PDF**: o coletor só detecta que o arquivo mudou (vira revisão humana); a leitura do edital em
   PDF para o rascunho de trilha é por texto colado.
 - O Radar não inventa concursos que não estejam nas fontes cadastradas: a cobertura depende da
   lista de fontes (Admin → Radar → Fontes).
 - Todos os textos de páginas são tratados como **dados não confiáveis** (cercados e com
   `UNTRUSTED_RULE`); nenhuma instrução vinda de uma página muda o papel de um agente.
+
+## Fontes conferidas (Cebraspe e Selecon, 2026-11-24)
+
+Conferidas pelo `curador-conteudo` com o `fetchPage` do próprio coletor. A migration
+`20261124120000_radar_sources_urls_estaticas.sql` troca as duas fontes desligadas; ligar continua
+sendo decisão do dono.
+
+| Banca | URL | O que o coletor recebe | Uso |
+| --- | --- | --- | --- |
+| Cebraspe | `https://www.cebraspe.org.br/concursos/` | 200, HTML de aplicação React: 0 caracteres, 0 links | substituída |
+| Cebraspe | `https://www.cebraspe.org.br/noticias/` | 200, HTML estático (WordPress): ~4,5 mil caracteres, 73 links; cada notícia de concurso traz vagas, inscrições, remuneração, data da prova e o link `www.cebraspe.org.br/concursos/<SIGLA>` | **fonte nova (desligada)** |
+| Cebraspe | `https://apis.cebraspe.org.br/cebraspe/eventos/tipo/concursos/fase/{novos,inscricoes-abertas,em-andamento}` | 200, `application/json` (binário para o coletor). É o que a própria página chama; sem token nem cabeçalho. Detalhe em `/cebraspe/eventos/<SIGLA>` (cargos, período de inscrição, editais e retificações) | melhor fonte de fase; exige mudança no `fetcher.ts` |
+| Selecon | `https://selecao.net.br/` | 200, só "Cliente não encontrado." (raiz da plataforma de inscrições, não é página dinâmica) | substituída |
+| Selecon | `https://www.selecon.org.br/` | 200, HTML estático: abas "Em andamento" e "Inscrições Abertas" renderizadas no servidor, com edital, órgão, vagas, remuneração, cidade, UF e link do concurso | **fonte ativa** ("Instituto Selecon") |
+| Selecon | `https://selecon.org.br/concursos/` | 200, HTML estático: os 12 concursos mais recentes (cobre todos os de inscrição aberta), sem contadores nem abas repetidas | **alternativa (desligada)**; ligar só no lugar da fonte ativa |
+| Selecon | `https://<cliente>.selecao.net.br/informacoes/<id>/` | 403, desafio Turnstile da Cloudflare (também num navegador real) | anti-robô: não usar; a página de detalhe falha e o Radar segue com o texto da lista |
+| Selecon | `https://selecon.org.br/concursos/feed/` | 200, `application/rss+xml` (binário para o coletor); só número do edital e link | não usar |
+
+**Diários oficiais.** O DOU (`www.in.gov.br`) respondeu 403 da Azion ou derrubou a conexão a partir
+da sessão na nuvem, até num navegador; o INLABS estava "em manutenção". Não deu para conferir. A API
+do Querido Diário mudou para `api.queridodiario.org.br` (o host antigo falha no TLS). Ela só
+complementa: a busca por "Selecon" desde agosto trouxe 9 diários (Niterói e Araçás), nenhum dos
+municípios com concurso aberto (Cuiabá, Várzea Grande, Barra do Garças, São Gonçalo); Cuiabá está
+parada desde 02/06/2026. Os trechos trazem número de inscrição de candidatos (dado pessoal) e a
+resposta é JSON. Por isso não vira fonte.
 
 ## Piloto: fontes montadas por JavaScript (Firecrawl, D15)
 
@@ -138,9 +168,12 @@ atualização **pendente** (motivo "fonte renderizada por serviço externo") e s
 depois da aprovação do admin. Cada execução renderiza no máximo `RADAR_MAX_RENDERED` fontes
 (padrão 2), com prazo tirado do orçamento da execução; sem folga, a fonte fica para a próxima.
 
+**Situação em 2026-11-24:** sem fonte-alvo. Cebraspe e Selecon foram resolvidas sem renderização
+(ver "Fontes conferidas"); o código fica pronto e desligado para uma fonte futura.
+
 **Para ligar (dono):**
 1. `curador-conteudo` confirma que a URL estática da banca, o endpoint JSON que a página consome
-   ou o diário oficial (backlog 17) não resolvem a fonte.
+   ou o diário oficial (backlog 17) não resolvem a fonte, e que ela não tem anti-robô.
 2. Criar a conta na Firecrawl e gravar o secret `FIRECRAWL_API_KEY` nas Edge Functions (Lovable
    Cloud). O plano gratuito cobre o piloto: 2 fontes a cada 12 h dão cerca de 120 créditos por mês.
 3. Aplicar a migration `20261123120000_radar_render_mode.sql` e publicar `radar-concursos`, em
