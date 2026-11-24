@@ -12,10 +12,11 @@ export async function readAuthProviders(url: string, publishableKey: string): Pr
     });
     if (!response.ok) throw new Error(AUTH_UNAVAILABLE_MESSAGE);
     const settings = await response.json();
-    if (!settings?.external || typeof settings.external !== 'object' || Array.isArray(settings.external)) {
+    const external = settings && typeof settings === 'object' && 'external' in settings ? settings.external : null;
+    if (!external || typeof external !== 'object' || Array.isArray(external)) {
       throw new Error(AUTH_UNAVAILABLE_MESSAGE);
     }
-    return new Set(Object.entries(settings.external).filter(([, on]) => on === true).map(([name]) => name));
+    return new Set(Object.entries(external).filter(([, on]) => on === true).map(([name]) => name));
   } finally {
     clearTimeout(timeout);
   }

@@ -1,5 +1,7 @@
 import { assert, assertEquals, assertRejects } from "https://deno.land/std@0.190.0/testing/asserts.ts";
-import { diffNewLines, extractLinks, fetchPage, htmlToText, isAllowed, parseRobots, safeUrl, windowAround } from "./fetcher.ts";
+import {
+  diffNewLines, extractLinks, fetchPage, fetchRendered, FIRECRAWL_SCRAPE_URL, htmlToText, isAllowed, parseRobots, safeUrl, windowAround,
+} from "./fetcher.ts";
 
 Deno.test("safeUrl: só https público, sem IP, porta estranha ou host interno", () => {
   assert(safeUrl("https://www.cebraspe.org.br/concursos/"));
@@ -112,4 +114,88 @@ Deno.test("robots.txt redirecionado para destino interno não é seguido", async
   assert(page.text.includes("Concursos abertos"));
   assertEquals(calls, ["https://banca.org.br/robots.txt", "https://banca.org.br/concursos"]);
   assertEquals(modes, ["manual", "manual"]);
+});
+
+// --- Piloto Firecrawl (render_mode = 'firecrawl') ---------------------------------------------
+
+function fakeFirecrawl(opts: { robots?: string; reply?: () => Response } = {}) {
+  const calls: { url: string; init?: RequestInit }[] = [];
+  const fetchFn = ((input: string | URL | Request, init?: RequestInit) => {
+    const url = typeof input === "string" ? input : input instanceof URL ? input.toString() : input.url;
+    calls.push({ url, init });
+    if (url === "https://banca.org.br/robots.txt") return Promise.resolve(new Response(opts.robots ?? "User-agent: *\nDisallow: /privado"));
+    if (url === FIRECRAWL_SCRAPE_URL) {
+      return Promise.resolve(opts.reply ? opts.reply() : Response.json({
+        success: true,
+        data: {
+          html: `<h2>Concurso TJ 2026</h2><p>Inscri&ccedil;&otilde;es abertas</p><a href="/editais/tj.pdf">Edital</a>`,
+          metadata: { statusCode: 200, url: "https://banca.org.br/concursos/tj" },
+        },
+      }));
+    }
+    return Promise.resolve(new Response("x", { status: 404 }));
+  }) as typeof fetch;
+  return { fetchFn, calls };
+}
+
+Deno.test("fetchRendered: HTML renderizado vira texto, links e hash; só a URL pública vai ao serviço", async () => {
+  const { fetchFn, calls } = fakeFirecrawl();
+  const page = await fetchRendered("https://banca.org.br/concursos/tj", { fetchFn, apiKey: "fc-teste" });
+  assert(page.text.includes("Concurso TJ 2026"));
+  assert(page.text.includes("Inscrições abertas"));
+  assertEquals(page.links[0].href, "https://banca.org.br/editais/tj.pdf");
+  assertEquals(page.url, "https://banca.org.br/concursos/tj");
+  assertEquals(page.hash.length, 64);
+  assertEquals(page.rendered, true);
+  // robots.txt da fonte antes; depois uma única chamada ao endpoint fixo, com a chave só nele.
+  assertEquals(calls.map((c) => c.url), ["https://banca.org.br/robots.txt", FIRECRAWL_SCRAPE_URL]);
+  const api = calls[1].init!;
+  assertEquals(api.method, "POST");
+  assertEquals((api.headers as Record<string, string>).Authorization, "Bearer fc-teste");
+  assertEquals((calls[0].init?.headers as Record<string, string>).Authorization, undefined);
+  const body = JSON.parse(String(api.body));
+  assertEquals(body.url, "https://banca.org.br/concursos/tj");
+  assertEquals([body.maxAge, body.storeInCache, body.proxy], [0, false, "basic"]);
+  assertEquals(Object.keys(body).sort(), ["blockAds", "formats", "maxAge", "onlyMainContent", "proxy", "storeInCache", "timeout", "url"]);
+});
+
+Deno.test("fetchRendered: sem chave, URL insegura ou robots.txt proibindo, o serviço não é chamado", async () => {
+  const { fetchFn, calls } = fakeFirecrawl();
+  await assertRejects(() => fetchRendered("https://banca.org.br/concursos", { fetchFn }), Error, "não configurada");
+  await assertRejects(() => fetchRendered("https://127.0.0.1/x", { fetchFn, apiKey: "fc" }), Error, "URL não permitida");
+  await assertRejects(() => fetchRendered("https://banca.org.br/privado/x", { fetchFn, apiKey: "fc" }), Error, "robots");
+  assertEquals(calls.filter((c) => c.url === FIRECRAWL_SCRAPE_URL).length, 0);
+});
+
+Deno.test("fetchRendered: recusa resposta inválida, página com erro, destino interno e falta de crédito", async () => {
+  const caso = (reply: () => Response) => fetchRendered("https://banca.org.br/c", { fetchFn: fakeFirecrawl({ reply }).fetchFn, apiKey: "fc" });
+  await assertRejects(() => caso(() => Response.json({ success: false, error: "x" })), Error, "resposta inválida");
+  await assertRejects(() => caso(() => new Response("não é json")), Error, "resposta inválida");
+  await assertRejects(() => caso(() => Response.json({ success: true, data: { html: "<p>x</p>", metadata: { statusCode: 404 } } })), Error, "HTTP 404");
+  await assertRejects(
+    () => caso(() => Response.json({ success: true, data: { html: "<p>x</p>", metadata: { statusCode: 200, url: "https://127.0.0.1/admin" } } })),
+    Error, "redirecionamento",
+  );
+  await assertRejects(() => caso(() => new Response("{}", { status: 402 })), Error, "sem crédito");
+  await assertRejects(() => caso(() => new Response("{}", { status: 500 })), Error, "HTTP 500");
+});
+
+Deno.test("fetchRendered: robots.txt que proíbe o robô do serviço também bloqueia (sem chamar a API)", async () => {
+  const { fetchFn, calls } = fakeFirecrawl({ robots: "User-agent: FirecrawlAgent\nDisallow: /\n\nUser-agent: *\nAllow: /" });
+  await assertRejects(() => fetchRendered("https://banca.org.br/concursos", { fetchFn, apiKey: "fc" }), Error, "robots");
+  assertEquals(calls.filter((c) => c.url === FIRECRAWL_SCRAPE_URL).length, 0);
+  // O coletor direto segue liberado pelo grupo "*": falha só porque a página falsa não existe (404).
+  await assertRejects(() => fetchPage("https://banca.org.br/concursos", { fetchFn }), Error, "HTTP 404");
+});
+
+Deno.test("fetchRendered: recusa proxy que contorna anti-robô e dado servido por provedor terceiro", async () => {
+  const caso = (metadata: Record<string, unknown>) =>
+    fetchRendered("https://banca.org.br/c", {
+      fetchFn: fakeFirecrawl({ reply: () => Response.json({ success: true, data: { html: "<p>x</p>", metadata: { statusCode: 200, ...metadata } } }) }).fetchFn,
+      apiKey: "fc",
+    });
+  await assertRejects(() => caso({ proxyUsed: "enhanced" }), Error, "proxy não permitido");
+  await assertRejects(() => caso({ provider: { id: "outro" } }), Error, "provedor terceiro");
+  const ok = await caso({ proxyUsed: "basic" });
+  assertEquals(ok.rendered, true);
 });

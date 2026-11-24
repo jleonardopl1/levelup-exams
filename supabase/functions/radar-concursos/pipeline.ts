@@ -100,6 +100,21 @@ export interface MonitorStats {
 const MIN_STAGE_MS = 20_000;
 
 /** Executa tarefas com concorrência limitada, preservando a ordem dos resultados. */
+/** Motivo gravado na atualização que veio de fonte renderizada por serviço externo. */
+export const RENDERED_REVIEW_REASON = "fonte renderizada por serviço externo (piloto): revisão humana obrigatória";
+
+/**
+ * Piloto Firecrawl (D15): a evidência literal de uma página renderizada é conferida contra o que o
+ * serviço devolveu, não contra o site oficial. Até o piloto provar o serviço, nada vindo dessas
+ * fontes publica nem avisa alunos sozinho: vira atualização pendente para o admin.
+ */
+export function requireReviewForRendered(outcomes: ConcursoOutcome[], renderedSourceIds: Set<string>): ConcursoOutcome[] {
+  return outcomes.map((o) => {
+    if (!o.consolidation || !renderedSourceIds.has(o.sourceId) || o.consolidation.needsReview && o.consolidation.reasons.includes(RENDERED_REVIEW_REASON)) return o;
+    return { ...o, consolidation: { ...o.consolidation, needsReview: true, reasons: [...o.consolidation.reasons, RENDERED_REVIEW_REASON] } };
+  });
+}
+
 export async function pool<T, R>(items: T[], limit: number, fn: (item: T, i: number) => Promise<R>): Promise<R[]> {
   const out: R[] = new Array(items.length);
   let next = 0;

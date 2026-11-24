@@ -7,6 +7,7 @@ daí, uma **varredura semanal** dos portais de ranking traz novidades com pedido
 - **Catálogo (fonte da verdade):** [`ops/radar-repositorios/catalogo.json`](../ops/radar-repositorios/catalogo.json)
 - **Como avaliar, ativar e desativar:** skill [`radar-repositorios`](../.claude/skills/radar-repositorios/SKILL.md) (`/radar-repositorios`)
 - **Relatórios semanais:** [`docs/radar-repositorios/semanal/`](radar-repositorios/semanal/)
+- **O que depende do dono (passo a passo):** [PASSO_A_PASSO_DONO.md](PASSO_A_PASSO_DONO.md)
 - **Avaliações anteriores** (32 repositórios, 2026-11-17 e 2026-11-18): [REFERENCIAS_REPOSITORIOS.md](REFERENCIAS_REPOSITORIOS.md) e [ANALISE_DAS_REFERENCIAS.md](ANALISE_DAS_REFERENCIAS.md)
 
 ## Como o radar decide
@@ -62,42 +63,41 @@ candidatos a instalação, dos arquivos reais numa revisão fixada.
 | [multica-ai/andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills) | regra | `rules/common/coding-style.md` @ `2c606141936f` | code-reviewer, documentation-writer | dono, 2026-11-23 |
 | [karpathy/llm-wiki](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f) | regra | `.claude/agents/gerente-contexto.md` @ `ac46de1ad27f` | gerente-contexto, engenheiro-ia | dono, 2026-11-23 |
 | [GoogleChrome/modern-web-guidance](https://github.com/GoogleChrome/modern-web-guidance) | skill | `.claude/skills/guias-web-modernos` @ `2b4aa13a72dd` | designer, frontend, mobile | dono, 2026-11-23 |
+| [heydamir/unslop](https://github.com/heydamir/unslop) | skill | `.claude/skills/unslop` @ `620163eedb35` | designer | dono (de acordo: 3), 2026-11-23 |
 | [cloudflare/security-audit-skill](https://github.com/cloudflare/security-audit-skill) | skill | `.claude/skills/security-audit` @ `c1c8a8c14710` | security-reviewer | dono, 2026-11-23 |
 
 ### Aguardando o de acordo do dono
 
+Nenhum.
+
+### Aprovados pelo dono — em implantação ou usados fora do ambiente de agentes
+
 #### Processo e ambiente dos agentes
 
 - **[google/elephant-goldfish-model](https://github.com/google/elephant-goldfish-model)** — Plugin de Claude Code e Codex em que um agente com contexto redige a especificação e revisores 'goldfish', em subagentes sem a conversa anterior, a revisam; também compara documentos com o código (drift). _★ 22.365 · Apache-2.0 · avaliado em 2026-11-23; faixa: coordenador, engenheiro-ia, documentation-writer._
+  - **Aprovação:** dono (de acordo: 2), 2026-11-23.
   - **Uso no LevelUp:** Revisão independente das specs de IA antes de codar: Mentor com ferramentas (P2.11), discursiva dupla (D7) e cache de explicações. O drift-report confere docs/RADAR_CONCURSOS.md, docs/MERCADO_PAGO.md e a ARQUITETURA contra o código.
-  - **Gatilho:** De acordo do dono para um piloto na sessão dele; promover ao projeto só se a revisão da spec do P2.11 ou o drift-report de docs/ trouxerem achados que o code-reviewer e o documentation-writer não trouxeram.
-  - **Como ativar:** Piloto fora do projeto: carregar só na sessão do dono com claude --plugin-dir apontando para uma cópia do commit 94d948d7d2a1d48e981997c20963e39d9e9ee67c (ou instalação no escopo do usuário). Usar /egm:egm-review e egm-lite só em documentos de docs/, com 'EGM artifact directory:' apontando para pasta ignorada pelo git, e avisar no prompt que a saída é em PT-BR e que CLAUDE.md e rules/ prevalecem. Não rodar /egm:egm-bootstrap (Bash, Write e Edit em todas as pastas).
+  - **Gatilho:** Para ligar no projeto (enabledPlugins), só se o uso sob demanda virar rotina e o Claude Code permitir carregar o plugin sem que os 10 agentes dele entrem no roteamento automático; reavaliar com o security-reviewer.
+  - **Como ativar:** Piloto executado em 2026-11-23 com ops/radar-repositorios/egm-drift.sh (plugin no commit 94d948d, carregado só na execução, numa cópia descartável do repositório): drift-report de docs/RADAR_CONCURSOS.md e docs/MERCADO_PAGO.md contra o código. Resultado em docs/radar-repositorios/pilotos/2026-11-23-elephant-goldfish-drift.md: cerca de 30 divergências; 3 das mais graves conferidas no código e confirmadas, nenhuma trazida antes pelo code-reviewer ou pelo security-reviewer. Passou no critério. Uso: rodar o script sob demanda (antes de fechar uma fase de plano em docs/ ou numa revisão trimestral), conferindo cada achado no código antes de agir. Não entra em enabledPlugins.
   - **Riscos:** Apache-2.0, marketplace próprio fora do diretório oficial, projeto de 2026-09. Revisão de segurança: aprovado com condições (sem hooks, MCP nem rede; todas as skills só por /). Traz 10 agentes com descrições genéricas que disputariam o roteamento com reviewer, code-reviewer, documentation-writer e coordenador, e os revisores rodam sem o CLAUDE.md do projeto (omitClaudeMd).
   - **Backlog:** P2.11; D7; D9.
 - **[mattpocock/ts-reset](https://github.com/mattpocock/ts-reset)** — Declarações de tipo que corrigem APIs do JavaScript: JSON.parse e .json() passam a devolver unknown, e .filter(Boolean) restringe o tipo do resultado. _★ 8.652 · MIT · avaliado em 2026-11-23; faixa: frontend, code-reviewer._
+  - **Aprovação:** dono (de acordo: 4), 2026-11-23.
   - **Uso no LevelUp:** Faz o compilador cobrar a 'validação na fronteira' de rules/common/coding-style.md nos pontos onde o JSON chega hoje como any: src/pages/Mentor.tsx:117 e :171 (streaming), src/pages/Discursiva.tsx:26 e src/lib/authService.ts:14. Vale só para o front; as Edge Functions não mudam.
-  - **Gatilho:** Levar para a main se as correções couberem num PR pequeno com typecheck verde; desistir se exigir mexer no types.ts gerado.
-  - **Como ativar:** Num branch: `bun add -d @total-typescript/ts-reset`, criar src/reset.d.ts com `import "@total-typescript/ts-reset";` e rodar `bun run typecheck`, corrigindo com zod ou checagem explícita, nunca com `as`. Depois, ressincronizar o package-lock.json (`npm install --package-lock-only`).
+  - **Gatilho:** Remover se atrapalhar a integração com o Lovable (dependência nova no bun.lockb) ou se uma versão nova do TypeScript já cobrir os mesmos tipos.
+  - **Como ativar:** Feito em 2026-11-23 (PR #34): @total-typescript/ts-reset ^0.6.1 como dependência de desenvolvimento e src/reset.d.ts. Os 13 erros de tipo foram corrigidos com checagem explícita (sem as nem any), incluindo os casts antigos de useAffiliates e SimuladoOficial; parseErrorBody centraliza o corpo de erro das Edge Functions. Pendente: src/lib/quizSession.ts:48 (validação aninhada maior) e o any de supabase.functions.invoke, que o ts-reset não cobre.
   - **Riscos:** Não pega cast explícito: `JSON.parse(raw) as Tipo` em src/hooks/useAffiliates.ts:340, src/lib/quizSession.ts:48 e src/pages/SimuladoOficial.tsx:257 já viola a regra hoje e precisa de correção à parte. Acrescenta uma dependência de desenvolvimento ao bun.lockb do Lovable.
   - **Backlog:** Anda junto com o P1.5 (harness de testes do front).
 
 #### Coleta de dados e busca
 
 - **[firecrawl/firecrawl](https://github.com/firecrawl/firecrawl)** — API, CLI e servidor MCP que transformam páginas (inclusive as montadas por JavaScript) e PDFs em markdown, com versão local em Rust, nuvem paga e auto-hospedagem. _★ 207.661 · AGPL-3.0 · avaliado em 2026-11-23; faixa: edge-functions, curador-conteudo, engenheiro-ia._
+  - **Aprovação:** dono (de acordo: 1), 2026-11-23.
   - **Uso no LevelUp:** Radar: as fontes que chegam vazias ao fetcher.ts (Cebraspe e portal da Selecon, semeadas desligadas) passariam a ser renderizadas pela API da Firecrawl Cloud, só nas fontes marcadas, mantendo diff, portão de evidência e verificador. A Fundatec (anti-robô) continua desligada.
   - **Gatilho:** Produção só depois do P0.4 (Radar publicado e rodando) e se a URL estática, o endpoint JSON que a página consome ou o diário oficial (P17) não resolverem a fonte.
-  - **Como ativar:** O curador tenta antes as alternativas sem custo; se falharem, o dono cria conta (nunca o modo sem chave) e o laboratório testa as duas páginas com o robots.txt conferido. Depois, edge-functions adiciona um modo de renderização por fonte (campo novo via supabase-db) que chama a API v2 por fetch, sem SDK, confere o host da URL final, mantém 2 MB/15 s e usa o secret FIRECRAWL_API_KEY.
+  - **Como ativar:** Aprovado pelo dono em 2026-11-23 (de acordo: 1). Código pronto e desligado: radar_sources.render_mode ('direto' | 'firecrawl', migration 20261123120000) e fetchRendered (API v2 por fetch, endpoint fixo, sem cache, proxy basic, robots.txt para o nosso robô e o da Firecrawl, URL final conferida, 2 MB, recusa proxyUsed diferente de basic e provider). Durante o piloto tudo dessas fontes vai para revisão humana (requireReviewForRendered) e no máximo RADAR_MAX_RENDERED (2) por execução. Para ligar: curador confere alternativas sem custo; dono cria a conta, grava FIRECRAWL_API_KEY, aplica a migration, faz uma chamada de teste para confirmar proxyUsed e metadata.url, e marca a fonte. Roteiro em docs/RADAR_CONCURSOS.md.
   - **Riscos:** AGPL-3.0 só pesa se hospedarmos versão modificada; consumir a API não gera obrigação. Custo baixo (2 fontes a cada 12 h dá cerca de 120 créditos/mês, contra 1.000 grátis segundo o README), mas é dependência externa em produção, pode não respeitar robots.txt (o fetcher confere antes) e a resposta é dado não confiável (fenceUntrusted).
   - **Backlog:** Armadilha do Radar (páginas por JavaScript); P0.4; P17; D8.
-
-#### Design e front-end
-
-- **[heydamir/unslop](https://github.com/heydamir/unslop)** — Skill de redesenho anti-slop: audita a tela contra sinais de interface com cara de IA (gradientes, brilhos, emoji, pulsos, copy exclamativa), propõe uma direção e espera o de acordo antes de editar. _★ 20.708 · CC-BY-4.0 · avaliado em 2026-11-23; faixa: designer._
-  - **Uso no LevelUp:** Rodar só a auditoria e o modo polimento em Quiz, Result e SimuladoOficial, que têm os sinais que ela procura (Card glass, shadow-glow-accent, gradient-accent, animate-sparkle, animate-pulse no timer; 29 arquivos com bg-gradient). As regras de copy batem com rules/common/writing.md.
-  - **Gatilho:** Promover para agora se o piloto no Quiz render ao menos 5 achados acionáveis que o Impeccable (item 19) não apontou, sem propostas que baixem o alvo de toque de 44 px ou troquem fonte e paleta; senão, descartar.
-  - **Como ativar:** Com o de acordo do dono: copiar de heydamir/unslop@620163eedb3529d9cd23a3994ed8d287d06f760d só skills/unslop/SKILL.md e skills/unslop/references/*.md para .claude/skills/unslop/, com LICENSE e ORIGEM.md (crédito a Damir Sokolovsky). Antes, corrigir as linhas 105 ('!' seguido de crase) e 122 ('$48,210') da SKILL.md, que o validador recusa; sem scripts/ e sem a etapa de geração de imagens.
-  - **Riscos:** CC-BY-4.0 exige atribuição em cópias e adaptações. Pensada para desktop (alvos de 32 a 36 px), não trata movimento reduzido e tende a propor fonte e paleta novas ou cortar celebrações da gamificação. Os scripts usam Playwright, ffmpeg e rede; a etapa de visuais envia a descrição do produto a geradores de imagem pagos. Revisão de segurança: aprovado com essas condições.
-  - **Backlog:** Alternativa ao Impeccable do item 19: pilotar os dois no Quiz e ficar com o que der achados mais acionáveis.
 
 ### Futuro — ativar quando o gatilho acontecer
 
@@ -373,6 +373,12 @@ candidatos a instalação, dos arquivos reais numa revisão fixada.
   - **Como ativar:** Feito: copiados só os guias (14 categorias, 202 arquivos) do commit 2b4aa13 para .claude/skills/guias-web-modernos/guides/, com LICENSE, ORIGEM.md e SKILL.md própria que consulta os guias com Grep e Read. Não instalar o plugin nem liberar npx.
   - **Riscos:** Revisão de segurança: o plugin foi reprovado como está (a SKILL.md original roda npx -y modern-web-guidance@latest a cada consulta, sem versão fixa, se declara obrigatória em toda tarefa, pede pré-autorização de rede e sugere editar CLAUDE.md); a cópia dos guias foi aprovada. Guias em inglês e para HTML puro (adaptar a React/shadcn).
   - **Backlog:** Complementa o item 19 (auditoria de UI) e prepara o P2.12 pela instalação do PWA.
+- **[heydamir/unslop](https://github.com/heydamir/unslop)** — Skill de redesenho anti-slop: audita a tela contra sinais de interface com cara de IA (gradientes, brilhos, emoji, pulsos, copy exclamativa), propõe uma direção e espera o de acordo antes de editar. _★ 20.708 · CC-BY-4.0 · avaliado em 2026-11-23; faixa: designer._
+  - **Uso no LevelUp:** Rodar só a auditoria e o modo polimento em Quiz, Result e SimuladoOficial, que têm os sinais que ela procura (Card glass, shadow-glow-accent, gradient-accent, animate-sparkle, animate-pulse no timer; 29 arquivos com bg-gradient). As regras de copy batem com rules/common/writing.md.
+  - **Gatilho:** Promover para agora se o piloto no Quiz render ao menos 5 achados acionáveis que o Impeccable (item 19) não apontou, sem propostas que baixem o alvo de toque de 44 px ou troquem fonte e paleta; senão, descartar.
+  - **Como ativar:** Feito (piloto aprovado pelo dono em 2026-11-23): SKILL.md e references/*.md do commit 620163e copiados para .claude/skills/unslop/, com LICENSE e ORIGEM.md (crédito a Damir Sokolovsky). Adaptações: só por /unslop, só auditoria e polimento, sem scripts e sem geração de imagem, linhas 105 e 122 corrigidas. Próximo passo: designer roda /unslop no Quiz e registra os achados contra o critério do gatilho.
+  - **Riscos:** CC-BY-4.0 exige atribuição em cópias e adaptações. Pensada para desktop (alvos de 32 a 36 px), não trata movimento reduzido e tende a propor fonte e paleta novas ou cortar celebrações da gamificação. Os scripts usam Playwright, ffmpeg e rede; a etapa de visuais envia a descrição do produto a geradores de imagem pagos. Revisão de segurança: aprovado com essas condições.
+  - **Backlog:** Alternativa ao Impeccable do item 19: pilotar os dois no Quiz e ficar com o que der achados mais acionáveis.
 
 #### Segurança
 

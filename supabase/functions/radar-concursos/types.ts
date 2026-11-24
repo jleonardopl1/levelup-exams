@@ -148,6 +148,8 @@ export interface FetchedPage {
   links: { href: string; label: string }[];
   /** Hash do texto normalizado (detecção de mudança). */
   hash: string;
+  /** Renderizada por serviço externo (piloto Firecrawl): nada dela publica sem revisão humana. */
+  rendered?: boolean;
   /** Documento binário (PDF etc.): só o hash é útil. */
   binary: boolean;
 }

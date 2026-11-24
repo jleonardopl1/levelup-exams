@@ -108,10 +108,56 @@ segue o fluxo de `docs/TRILHAS.md`.
 
 - **Páginas montadas por JavaScript** (Cebraspe, portal da Selecon) e com anti-robô (Fundatec)
   chegam sem texto ao coletor: ficam cadastradas e desligadas. Use a página do órgão, o diário
-  oficial ou outra URL estática da banca.
+  oficial ou outra URL estática da banca. Se nada disso resolver, use o piloto de renderização
+  abaixo (só para JavaScript; anti-robô continua desligado de propósito).
 - **PDF**: o coletor só detecta que o arquivo mudou (vira revisão humana); a leitura do edital em
   PDF para o rascunho de trilha é por texto colado.
 - O Radar não inventa concursos que não estejam nas fontes cadastradas: a cobertura depende da
   lista de fontes (Admin → Radar → Fontes).
 - Todos os textos de páginas são tratados como **dados não confiáveis** (cercados e com
   `UNTRUSTED_RULE`); nenhuma instrução vinda de uma página muda o papel de um agente.
+
+## Piloto: fontes montadas por JavaScript (Firecrawl, D15)
+
+Aprovado pelo dono em 2026-11-23. O código está pronto e **desligado**: só vale para a fonte
+marcada com `render_mode = 'firecrawl'` e com o secret `FIRECRAWL_API_KEY` configurado.
+
+**Como funciona.** Para a fonte marcada, a função `radar-concursos` confere a URL (`safeUrl`) e o
+`robots.txt` da fonte, e só então pede à API da Firecrawl (`POST https://api.firecrawl.dev/v2/scrape`,
+endpoint fixo) o HTML já renderizado. O pedido vai sem cache (`maxAge: 0`, `storeInCache: false`)
+e com proxy `basic`, para não contornar anti-robô: resposta que indique outro proxy
+(`metadata.proxyUsed`) ou dado servido por provedor terceiro (`metadata.provider`) é recusada. O
+`robots.txt` precisa liberar o nosso agente e o da Firecrawl. A resposta é limitada a 2 MB, a URL
+final passa de novo por `safeUrl` e o HTML segue o caminho normal: texto, links, hash, diff, portão
+de evidência e verificador. Só a URL pública da fonte vai ao serviço; nenhum dado de aluno. As
+páginas de detalhe e o `link_oficial` continuam no coletor direto.
+
+**Nada publica sozinho durante o piloto.** A evidência literal de uma página renderizada é conferida
+contra o que o serviço devolveu, não contra o site oficial. Por isso todo resultado dessas fontes vira
+atualização **pendente** (motivo "fonte renderizada por serviço externo") e só chega aos alunos
+depois da aprovação do admin. Cada execução renderiza no máximo `RADAR_MAX_RENDERED` fontes
+(padrão 2), com prazo tirado do orçamento da execução; sem folga, a fonte fica para a próxima.
+
+**Para ligar (dono):**
+1. `curador-conteudo` confirma que a URL estática da banca, o endpoint JSON que a página consome
+   ou o diário oficial (backlog 17) não resolvem a fonte.
+2. Criar a conta na Firecrawl e gravar o secret `FIRECRAWL_API_KEY` nas Edge Functions (Lovable
+   Cloud). O plano gratuito cobre o piloto: 2 fontes a cada 12 h dão cerca de 120 créditos por mês.
+3. Aplicar a migration `20261123120000_radar_render_mode.sql` e publicar `radar-concursos`, em
+   qualquer ordem: a função trata a coluna ausente como `direto`.
+4. **Antes de marcar a primeira fonte**, uma chamada de teste com a chave (fora do Radar) para
+   confirmar o que a v2 devolve: se `metadata.proxyUsed` vem e vale `basic`, se `metadata.url` é a
+   URL final e quantos créditos a chamada gastou. O parâmetro `proxy` está marcado como obsoleto na
+   documentação da Firecrawl (padrão `auto`, que tenta proxies "enhanced"); se a resposta não
+   permitir conferir o proxy, não ligar e reabrir a avaliação. Use uma chave só para o Radar, com
+   teto de créditos, e confirme a política de retenção de dados da Firecrawl (LGPD).
+5. Marcar e ligar a fonte (SQL do Lovable). Só páginas de edital e listagem de concursos; páginas
+   de resultado com nomes de candidatos ficam fora do piloto:
+   `UPDATE public.radar_sources SET render_mode = 'firecrawl', is_active = true WHERE url = '<url da fonte>';`
+6. Admin → Radar → **Verificar agora** e conferir no painel que a fonte deixou de ter "página sem
+   texto". Acompanhar os créditos no painel da Firecrawl.
+
+**Erros que aparecem na fonte:** "renderização não configurada" (falta o secret), "renderização sem
+crédito" (402), "renderização limitada (429)", "bloqueado pelo robots.txt", "renderização com proxy
+não permitido", "renderização por provedor terceiro não permitida", "HTTP <código>" (a página
+respondeu com erro). **Desligar:** `render_mode = 'direto'` na fonte ou remover o secret.

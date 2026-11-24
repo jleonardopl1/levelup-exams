@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { useEffect } from 'react';
 import { checkoutRedirectUrl } from '@/lib/checkout';
+import { parseErrorBody } from '@/lib/errorBody';
 
 /**
  * Planos de assinatura. O app envia só o NOME do plano; o servidor (create-checkout)
@@ -15,9 +16,9 @@ export type SubscriptionPlan = 'monthly' | 'annual' | 'exam_pass';
 /** Extrai a mensagem real de erro de uma Edge Function (o corpo traz o motivo). */
 async function functionError(error: unknown): Promise<Error & { code?: string }> {
   const context = (error as { context?: Response }).context;
-  const body = await context?.json?.().catch(() => null);
-  const err = new Error(body?.error || (error as Error)?.message || 'Erro inesperado') as Error & { code?: string };
-  err.code = body?.code;
+  const body = parseErrorBody(await context?.json?.().catch(() => null));
+  const err = new Error(body.error || (error as Error)?.message || 'Erro inesperado') as Error & { code?: string };
+  err.code = body.code;
   return err;
 }
 

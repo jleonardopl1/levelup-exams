@@ -254,7 +254,10 @@ function MockIntro({ slug, data }: { slug: string; data: NonNullable<ReturnType<
 function useFlags(examId: string) {
   const key = `levelup:mock-flags:${examId}`;
   const [flags, setFlags] = useState<Set<string>>(() => {
-    try { return new Set(JSON.parse(sessionStorage.getItem(key) ?? '[]') as string[]); } catch { return new Set(); }
+    try {
+      const parsed = JSON.parse(sessionStorage.getItem(key) ?? '[]');
+      return new Set(Array.isArray(parsed) ? parsed.filter((id): id is string => typeof id === 'string') : []);
+    } catch { return new Set(); }
   });
   const toggle = (id: string) => setFlags((prev) => {
     const next = new Set(prev);

@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { parseErrorBody } from '@/lib/errorBody';
 
 /** Correção da discursiva (Edge Function essay-review + migration 20261115130000). */
 
@@ -44,8 +45,8 @@ async function invokeEssay<T>(body: Record<string, unknown>): Promise<T> {
   const { data, error } = await supabase.functions.invoke('essay-review', { body });
   if (error) {
     const ctx = (error as { context?: Response }).context;
-    const payload = await ctx?.json?.().catch(() => null);
-    throw new Error(payload?.error || 'Não foi possível falar com o corretor. Tente de novo.');
+    const payload = parseErrorBody(await ctx?.json?.().catch(() => null));
+    throw new Error(payload.error || 'Não foi possível falar com o corretor. Tente de novo.');
   }
   if (data?.error) throw new Error(data.error);
   return data as T;

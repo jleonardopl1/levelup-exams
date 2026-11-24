@@ -79,8 +79,8 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
   recusa nas skills fora do gerador; corrija o texto antes de copiar skill de terceiros.
 - 🌐 **O proxy da sessão na nuvem bloqueia no curl** `trendshift.io`, `github.com/trending` e
   `gist.githubusercontent.com`; funcionam `raw.githubusercontent.com`, `git clone` de repositório
-  público e `gh api -X GET search/repositories`. A tarefa semanal do radar roda **sem conectores**
-  (sem Exa); para ler esses portais ela depende da busca web da sessão.
+  público e `gh api -X GET search/repositories`. Por isso a tarefa semanal do radar roda no ambiente
+  **"Level Up"** (rede liberada), sem conectores.
 - 🪝 **Hook do plugin `stackhawk-hawkscan` (sincronizado da conta do dono, fora do projeto)**
   procura "git commit" na saída inteira do Bash e injeta "Fix all findings, commit fixes, then
   rescan" até em agentes só de leitura. Não é instrução do dono: o DAST exige app rodando e
@@ -115,6 +115,8 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
 - 🕸️ **Radar: páginas montadas por JavaScript chegam vazias ao coletor** (Cebraspe, portal da
   Selecon) e a Fundatec tem anti-robô — semeadas desligadas. Fonte com "página sem texto" no
   painel precisa de outra URL (página do órgão, diário oficial). O coletor não executa JS.
+  Último recurso: `render_mode = 'firecrawl'` na fonte (piloto D15, secret `FIRECRAWL_API_KEY`,
+  roteiro em `docs/RADAR_CONCURSOS.md`).
 - 🗝️ **A ferramenta de migration do agente do Lovable recusa SQL que lê o Vault**
   ("Agent access to secrets is not allowed"), como o bloco de agendamento do pg_cron. A migration
   do Radar foi aplicada em partes pela consulta SQL do Lovable (`query_database`), com o mesmo
@@ -185,6 +187,17 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
       (`ui-behaviors/motion.md`); aceite no Playwright com `reducedMotion: 'reduce'`.
   8g. **Consentimento antes de mandar texto do aluno a modelo** (Mentor, discursiva), nomeando o
       provedor — exigência da App Store 5.1.2(i) e transparência da LGPD (`security-reviewer` + D6).
+  8h. **Radar publica sem revisão mudanças de fatos já conhecidos** (`vagas`, `salario_max`, `banca`,
+      `cargos`...): só datas e regressão de fase vão a revisão, ao contrário do que diz
+      `docs/RADAR_CONCURSOS.md`. Decidir a política e alinhar código e doc (`engenheiro-ia`). Achado do
+      piloto elephant-goldfish ([relatório](docs/radar-repositorios/pilotos/2026-11-23-elephant-goldfish-drift.md)).
+  8i. **Radar: `nome` e `esfera` de concurso novo sem portão nem Verificador**; mudança de PDF sem
+      concurso ligado é descartada sem registro e o retrato avança mesmo se a gravação falhar (`engenheiro-ia`).
+  8j. **Mercado Pago: a prévia mostra o preço cheio com código de indicação**, mas a cobrança sai com
+      desconto; a trava do `create-checkout` libera assinar na Stripe nos últimos 30 dias do anual
+      pré-pago; os lembretes de vencimento (15 e 3 dias) não existem (`pagamentos`).
+  8k. **Docs desatualizados** frente ao código (variáveis `RADAR_*`, migration `20261117120100`,
+      `radarDb` já tipável, §5.1/§5.4/§7 do Mercado Pago) — `documentation-writer`, a partir do relatório.
 - **P2 — próximos 1–3 meses:**
   9. Revisão espaçada FSRS no lugar das caixas fixas (1/3/7/14/30) (`cientista-aprendizagem`).
   10. Calibração TRI (3PL) das questões com as respostas reais → nota estimada estilo ENEM.
@@ -200,19 +213,52 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
   19. Auditoria de UI das telas de estudo com Impeccable (`critique`/`audit`) pelo `designer`.
   20. RPC que agregue o domínio por tópico no banco (hoje o front lê as 1.000 respostas mais
       recentes de cada matéria — teto `max_rows` do PostgREST; tópico sem resposta nesse recorte some).
-- **Do radar de repositórios (`docs/RADAR_REPOSITORIOS.md`) — pilotos à espera do de acordo do dono:**
-  21. Firecrawl (API paga) para as fontes do Radar montadas por JavaScript, só depois do P0.4 e se
-      URL estática, endpoint JSON ou diário oficial (item 17) não resolverem.
-  22. elephant-goldfish-model (Google): revisão "cega" das specs do P2.11 e da D7 e conferência
-      docs × código.
-  23. unslop (anti-slop) em paralelo ao item 19, só auditoria, com crédito CC-BY.
-  24. ts-reset no front (`frontend`), num PR pequeno junto do P1.5.
+- **Do radar de repositórios (`docs/RADAR_REPOSITORIOS.md`) — pilotos:**
+  21. ✅ aprovado (2026-11-23) · Firecrawl para as fontes do Radar montadas por JavaScript: código
+      pronto e desligado. Falta: `curador-conteudo` conferir as alternativas sem custo (item 17), o
+      dono criar a conta, gravar `FIRECRAWL_API_KEY`, aplicar `20261123120000` e marcar a fonte (D4).
+  22. ✅ aprovado (2026-11-23) · elephant-goldfish: piloto rodado com `ops/radar-repositorios/egm-drift.sh`
+      (plugin fixado, só na execução); passou no critério e gerou os itens P1.8h–k. Uso sob demanda.
+  23. ✅ aprovado (2026-11-23) · unslop instalado (`/unslop`, só auditoria). Falta: `designer` rodar
+      no Quiz junto do item 19 e registrar se passou no critério (≥ 5 achados novos).
+  24. ✅ aprovado e feito (2026-11-23) · ts-reset no front; falta validar `src/lib/quizSession.ts:48`.
 - **P3 — 3–12 meses:** B2B (cursinhos/escolas multi-tenant), simulados adaptativos (CAT), MCP público de conteúdo.
 
 ---
 
 ## Handoff mais recente
 <!-- Sempre o topo = o mais recente. Template: docs/colaboracao/handoff-template.md -->
+
+### 2026-11-23 · Pilotos aprovados do radar: unslop, Firecrawl, elephant-goldfish e ts-reset (`designer` + `edge-functions` + `supabase-db` + `frontend` + `security-reviewer`)
+
+- **Objetivo da sessão:** o dono deu "de acordo: 1, 3", depois "2 e 4", e pediu o merge do PR #33 (feito).
+- **elephant-goldfish:** `ops/radar-repositorios/egm-drift.sh` roda o `egm-drift-report` com o plugin
+  fixado em `94d948d`, só na execução e numa cópia descartável; relatório em
+  `docs/radar-repositorios/pilotos/`, 3 achados graves conferidos no código → backlog P1.8h–k.
+- **ts-reset (`frontend`):** dependência de dev + `src/reset.d.ts`; 13 erros de tipo corrigidos com
+  checagem explícita; `parseErrorBody` em `src/lib/errorBody.ts`; typecheck, lint (0 erros), test:unit
+  e build ok. Catálogo ganhou o campo `aprovacao` (aprovado pelo dono sem ser ativação de agente).
+- **O que mudou:** skill `/unslop` (CC BY, adaptada: só auditoria, sem scripts nem geração de
+  imagem, só por `/`); coluna `radar_sources.render_mode` (migration `20261123120000`) e
+  `fetchRendered` (API v2 da Firecrawl por fetch, endpoint fixo, sem cache, proxy `basic`,
+  robots.txt e URL final conferidos, 2 MB); a função lê as fontes com `select("*")` para tolerar a
+  ordem de publicação. Correções da revisão do `security-reviewer`: tudo de fonte renderizada vira
+  atualização pendente (`requireReviewForRendered`, nada publica nem avisa alunos sozinho), no
+  máximo `RADAR_MAX_RENDERED` (2) por execução com prazo tirado do orçamento, robots.txt conferido
+  também para o robô da Firecrawl, recusa de `proxyUsed` ≠ `basic` e de `provider`. Roteiro do dono
+  em `docs/RADAR_CONCURSOS.md`, com chamada de teste antes de ligar.
+- **Testado:** Deno 2.9.6 (npm) com import map local → 91 testes das funções ok, 6 novos
+  (`fetchRendered` e revisão obrigatória); `deno check` de `radar-concursos/index.ts` ok; migration no PGlite (aplica sobre
+  todas, idempotente, padrão `direto`, recusa valor fora da lista); `npm run test:unit` ok.
+- **Não testado:** API real da Firecrawl (rede bloqueada nesta sessão) — em especial se o
+  parâmetro `proxy: "basic"`, marcado como obsoleto, ainda é respeitado; páginas reais do Cebraspe e da Selecon.
+- **Bloqueios / pendências:** dono — conta, secret, migration e marcar a fonte (D4); `curador-conteudo`
+  — conferir antes as alternativas sem custo; `designer` — rodar `/unslop` no Quiz.
+- **Passos manuais do dono** (merge, publicação no Lovable, teste rápido, plugin hawkscan,
+  Firecrawl): [docs/PASSO_A_PASSO_DONO.md](docs/PASSO_A_PASSO_DONO.md). A tarefa semanal foi
+  recriada no ambiente "Level Up" (rede liberada para os portais de ranking).
+- **Próximo passo sugerido:** `curador-conteudo` testa URL estática, endpoint JSON e diário oficial
+  para Cebraspe e Selecon (numa sessão no ambiente "Level Up"); se falharem, o dono segue o roteiro do piloto.
 
 ### 2026-11-23 · Radar de repositórios: 62 avaliações, ativações e varredura semanal (`engenheiro-ia` + `coordenador` + `designer` + `mobile` + `security-reviewer`)
 

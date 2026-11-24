@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { readPref, writePref } from "@/lib/trackPrefs";
+import { parseErrorBody } from "@/lib/errorBody";
 
 /** "direto" explica; "socratico" guia com perguntas e dicas em degraus (servidor valida). */
 type MentorMode = "direto" | "socratico";
@@ -24,6 +25,15 @@ type Message = {
 };
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-mentor`;
+
+/** Texto novo de um pedaço do streaming (formato da API de chat da OpenAI); fora do formato, undefined. */
+function deltaContent(chunk: unknown): string | undefined {
+  const choices = chunk && typeof chunk === "object" && "choices" in chunk ? chunk.choices : undefined;
+  const choice: unknown = Array.isArray(choices) ? choices[0] : undefined;
+  const delta = choice && typeof choice === "object" && "delta" in choice ? choice.delta : undefined;
+  const content = delta && typeof delta === "object" && "content" in delta ? delta.content : undefined;
+  return typeof content === "string" ? content : undefined;
+}
 
 const Mentor = () => {
   const navigate = useNavigate();
@@ -114,7 +124,7 @@ const Mentor = () => {
 
       // Handle server-side errors
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
+        const errorData = parseErrorBody(await response.json().catch(() => null));
         const errorMessage = errorData.error || "Falha ao conectar com o Mentor IA";
         
         if (response.status === 401) {
@@ -168,8 +178,7 @@ const Mentor = () => {
           if (jsonStr === "[DONE]") break;
 
           try {
-            const parsed = JSON.parse(jsonStr);
-            const content = parsed.choices?.[0]?.delta?.content;
+            const content = deltaContent(JSON.parse(jsonStr));
             if (content) {
               assistantContent += content;
               setMessages((prev) => {

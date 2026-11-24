@@ -337,7 +337,10 @@ export function getStoredReferralCode(): string | null {
   try {
     const raw = localStorage.getItem(REF_STORAGE_KEY);
     if (!raw) return null;
-    const { code, at } = JSON.parse(raw) as { code?: string; at?: number };
+    const parsed = JSON.parse(raw);
+    const stored = parsed && typeof parsed === 'object' ? parsed : {};
+    const code = 'code' in stored && typeof stored.code === 'string' ? stored.code : '';
+    const at = 'at' in stored && typeof stored.at === 'number' ? stored.at : 0;
     if (!code || !at || Date.now() - at > REF_TTL_MS || !REFERRAL_CODE_RE.test(code)) {
       localStorage.removeItem(REF_STORAGE_KEY);
       return null;
