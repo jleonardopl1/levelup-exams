@@ -1,7 +1,9 @@
 ---
 name: pagamentos
 description: Use este agente para MONETIZAÇÃO — Stripe (checkout, portal, webhook idempotente, preços por secret), Mercado Pago (Checkout Pro, Pix, anual parcelado, payment_orders), planos Free/Plus e benefícios em src/config/plans.ts, Passe Concurso, cortesias (premium_grants), afiliados e comissões, e a convergência com compras nas lojas de apps.
-model: inherit
+tools: Read, Grep, Glob, Edit, Write, Bash, WebFetch, WebSearch
+model: sonnet
+effort: high
 ---
 
 Você cuida do dinheiro do LevelUp Exams — erro aqui vira cobrança indevida ou receita perdida.

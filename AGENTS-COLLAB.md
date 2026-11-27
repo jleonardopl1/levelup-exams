@@ -69,6 +69,11 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
   fixado, `ORIGEM.md` e de acordo do dono — o `radar.mjs validar` (no `test:unit`) recusa o
   contrário. Varredura semanal agendada (segundas, 6h33 de Brasília, sessão nova) termina com pedido
   de de acordo numerado; nada é instalado sem ele. Relatório: [docs/RADAR_REPOSITORIOS.md](docs/RADAR_REPOSITORIOS.md).
+- **D16** (2026-11-27, solicitação do dono) — **Modelo por faixa.** Cada agente de `.claude/agents/`
+  fixa `model`, `effort` e `tools`: Haiku no `reviewer` e no `Explore` (busca), Opus no
+  `arquiteto-dados` e no `security-reviewer`, Sonnet nos demais. Subagente sem modelo roda em Sonnet
+  (`CLAUDE_CODE_SUBAGENT_MODEL`). Subir para Opus é decisão de cada chamada, pelos gatilhos de
+  [.claude/agents/README.md](.claude/agents/README.md).
 
 ---
 
@@ -156,6 +161,15 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
   [#22](https://github.com/jleonardopl1/levelup-exams/pull/22) e [#24](https://github.com/jleonardopl1/levelup-exams/pull/24)
   relatam implantações de Plus, IA e Radar. O #22 também registra um erro 402 do gateway em 16/11.
   Confrontar esses relatos com o histórico de migrations, versões publicadas e saúde atual do serviço.
+- 🧰 **Subagente sem `tools` no frontmatter herda tudo da sessão**, inclusive as ferramentas MCP e as
+  skills de todos os plugins da conta (centenas), e paga por elas em tokens a cada chamada. Agente
+  novo já nasce com `tools`, `model` e `effort` (D16).
+- 🧩 **`disallowed-tools` de skill vale só no turno em que ela é acionada**; na mensagem seguinte
+  voltam as permissões da sessão. Em teste com pasta temporária, o Claude Code só carrega skills de
+  projeto se a pasta estiver marcada como confiável em `.claude.json`, com `HOME` fora dela
+  (`ops/agentes/skills.test.mjs`).
+- 🔁 **A migration `20261120130000` troca a assinatura de `create_payment_order` e
+  `apply_mp_payment`**: publique as funções `mp-*` da mesma versão junto com ela.
 
 ---
 
@@ -171,6 +185,11 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
      Depois de confirmadas, rodar Admin → Radar → Verificar agora e ampliar as fontes com o `curador-conteudo`.
   5. `pagamentos` e Financeiro acompanham em homologação uma compra de Plus e uma de Passe, do
      checkout ao acesso e à comissão aplicável, e registram as divergências (D11).
+  6. **Login em produção** (handoff de 2026-11-19): o DNS público respondia `NXDOMAIN` para
+     `rxsovhyimflzvxggppal.supabase.co` e o Lovable Cloud acusava `database is possibly not accessible`.
+     O responsável pelo projeto original no Lovable Cloud restaura o acesso à base dos alunos, sem
+     trocar o app para o homônimo do Supabase pessoal. Depois, o `tester` confirma o DNS e faz login
+     com uma conta de teste em produção até a página protegida.
 - **P1 — próximas 2–4 semanas:**
   4. Auditar questões `ia_diaria` publicadas: explicação com letras e gabarito (rodar o Solucionador cego em lote).
   5. Harness de testes do front (Vitest + Testing Library) para `lib/` e hooks críticos (`tester`).
@@ -181,7 +200,8 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
   8a. Reconstituir `20261115140000_plus_internal_grants` (comparar o schema de produção com o das migrations).
   8b. Mercado Pago (D14): código pronto e desligado. Falta: conta PJ com chave Pix, respostas da §2,
       revisão jurídica dos Termos, migration + funções publicadas, secrets, roteiro de sandbox e produção
-      controlada ([como ligar](docs/MERCADO_PAGO.md)).
+      controlada ([como ligar](docs/MERCADO_PAGO.md)). No sandbox, conferir se `live_mode` vem em
+      todo pagamento: sem ele, o pagamento é recusado de propósito.
   8c. Levar os testes de banco em PGlite (`validate.mjs`, `mercadopago.validate.mjs`) para a CI.
   8d. Mercado Pago, antes da abertura (fase 4): reconciliação periódica dos pedidos pagos (estorno com
       webhook perdido), lista dos pedidos para revisão no admin e estorno automático da comissão.
@@ -207,6 +227,11 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
       pré-pago; os lembretes de vencimento (15 e 3 dias) não existem (`pagamentos`).
   8k. **Docs desatualizados** frente ao código (variáveis `RADAR_*`, migration `20261117120100`,
       `radarDb` já tipável, §5.1/§5.4/§7 do Mercado Pago) — `documentation-writer`, a partir do relatório.
+  8l. Campanha do simulado (D12): Pedagogia e Marketing conferem a trilha e preparam a aula aberta.
+  8m. Skills dos cargos (D13): o dono testa `/ceo-direcao-executiva-estrategia` com a pauta semanal
+      sintética e `/cfo-2-rebate-comissionamento` com o caso de comissão de teste; ajustes entram pelo
+      catálogo ([guia](ops/agentes/README.md)).
+  8n. Licença ORA 2.3 (app-store-compliance) com o jurídico quando a D5 andar (radar de repositórios).
 - **P2 — próximos 1–3 meses:**
   9. Revisão espaçada FSRS no lugar das caixas fixas (1/3/7/14/30) (`cientista-aprendizagem`).
   10. Calibração TRI (3PL) das questões com as respostas reais → nota estimada estilo ENEM.
@@ -249,6 +274,29 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
 
 ## Handoff mais recente
 <!-- Sempre o topo = o mais recente. Template: docs/colaboracao/handoff-template.md -->
+
+### 2026-11-27 · Modelo por faixa e economia de tokens (`coordenador` + `gerente-contexto`)
+
+- **Objetivo da sessão:** reduzir o consumo de tokens do ambiente e fazer cada agente usar o modelo
+  Claude adequado à demanda.
+- **O que mudou:** os 17 agentes saem de `model: inherit` (todos no modelo da sessão) para `model` e
+  `effort` por faixa; os 9 sem `tools` ganham lista explícita, sem MCP nem `Agent`. `explore.md`
+  substitui o Explore embutido em Haiku e `.claude/settings.json` define
+  `CLAUDE_CODE_SUBAGENT_MODEL=sonnet`. Gatilhos de escalonamento e regras de economia de tokens estão
+  em `.claude/agents/README.md`, com ponteiros no `CLAUDE.md`, no `AGENTS.md` e no bootstrap. Este
+  arquivo passou de 10 para 3 handoffs; as pendências dos 7 retirados foram para o P0.6, o P1.8b, os
+  P1.8l–8n e as *Armadilhas*.
+- **Testado:** `bun run test:unit` → 106 aprovados, 2 pulados, 0 falhas; fichas, skills, referências e
+  radar validados. `model`, `effort` e `tools` dos 18 agentes conferidos por script.
+- **Não testado:** a escolha real de modelo numa sessão nova (agentes e settings são lidos ao abrir a
+  sessão) e se todo modelo aceita o mesmo nível de `effort`.
+- **Decisões tomadas:** D16.
+- **Armadilhas novas:** subagente sem `tools` herda tudo da sessão (ver *Armadilhas*).
+- **Bloqueios / pendências:** a maior parte do custo fixo de cada sessão vem dos plugins e conectores
+  sincronizados da conta, fora do repositório; só o dono pode desligar os que não usa, no claude.ai.
+- **Próximo passo sugerido:** o dono desliga plugins e conectores sem uso; o `gerente-contexto`
+  compacta *Decisões ativas*, *Armadilhas* e *Backlog* (o arquivo ainda passa da meta de 3 minutos de
+  leitura), promovendo o que é estável para o `CLAUDE.md` e as `rules/`.
 
 ### 2026-11-24 · Radar: Cebraspe e Selecon sem Firecrawl (`curador-conteudo`)
 
@@ -330,144 +378,3 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
   recriada no ambiente "Level Up" (rede liberada para os portais de ranking).
 - **Próximo passo sugerido:** `curador-conteudo` testa URL estática, endpoint JSON e diário oficial
   para Cebraspe e Selecon (numa sessão no ambiente "Level Up"); se falharem, o dono segue o roteiro do piloto.
-
-### 2026-11-23 · Radar de repositórios: 62 avaliações, ativações e varredura semanal (`engenheiro-ia` + `coordenador` + `designer` + `mobile` + `security-reviewer`)
-
-- **Objetivo da sessão:** avaliar os 61 repositórios e o gist indicados pelo dono, ativar o que
-  é imediato, guardar o resto para ativar depois e criar a varredura semanal com pedido de de acordo.
-- **O que mudou:** catálogo `ops/radar-repositorios/` (validador no `test:unit`: nada de terceiros
-  ativo sem avaliação, commit fixado e aprovação; skill escrita à mão sem `!`+crase nem `$`);
-  relatório `docs/RADAR_REPOSITORIOS.md`; skill `/radar-repositorios`. Ativos: plugin
-  `mattpocock-skills` (pedido do dono), skills `security-audit` (Cloudflare) e `guias-web-modernos`
-  (só os guias, sem o `npx @latest` do plugin), regras "Mudança mínima e cirúrgica"
-  (karpathy-skills + ponytail, reescritas), lint da documentação no `gerente-contexto` (LLM Wiki) e
-  regra contra gateway "grátis" e memória automática. Tarefa agendada "Radar semanal de
-  repositórios": segundas 6h33 (Brasília), sessão nova, notificação no celular, primeira em 30/11.
-- **Testado:** `npm run test:unit` → 102 aprovados, 0 falhas; `radar.mjs validar` → 62 avaliações ok.
-- **Não testado:** carregamento real das skills e do plugin numa sessão nova (a desta sessão já
-  vem da conta do dono); se o Claude Code troca `$TMPDIR` em skills do plugin (pior caso: texto
-  trocado); a tarefa semanal ainda não rodou.
-- **Decisões tomadas:** D15. O veículo da "Questão do dia" (P3) passa do openclaw para uma
-  biblioteca de chat numa Edge Function.
-- **Armadilhas novas:** padrões perigosos em SKILL.md; portais bloqueados pelo proxy; hook do hawkscan.
-- **Bloqueios / pendências:** de acordo do dono para os pilotos 21–24 (Firecrawl, elephant-goldfish,
-  unslop, ts-reset); jurídico para a licença ORA 2.3 (app-store-compliance) quando a D5 andar.
-- **Próximo passo sugerido:** `designer` + `frontend` atacam o P1.8f (movimento reduzido) com
-  `guias-web-modernos`; `mobile` + `supabase-db` especificam o P1.8e (exclusão de conta).
-
-### 2026-11-20 · Mercado Pago: correções da revisão de segurança (`pagamentos` + `security-reviewer`)
-
-- **Objetivo da sessão:** corrigir os achados do `security-reviewer` sobre o PR #30 (já mesclado).
-- **O que mudou:** migration `20261120130000_mercadopago_hardening.sql` (`live_mode` no pedido,
-  ambiente conferido em `apply_mp_payment`, acesso de teste limitado a 24 h e fora das vendas,
-  indicação recusada em dois pedidos, comissão só com aprovação, retenção de 180 dias das
-  notificações); `MP_COLLECTOR_ID` obrigatório, `MP_LIVE_MODE` e `MP_ENABLED=staff`; webhook com
-  chave de reentrega assinada, limite pelo `Content-Length` e 404 sem repetição; título genérico do
-  Passe; sincronização reconsulta pedidos recusados; Passe só para prova nos próximos 12 meses
-  (também na Stripe); PGlite com as concessões padrão do Supabase.
-- **Testado:** `node supabase/tests/mercadopago.validate.mjs` → 70 verificações ok;
-  `node docs/proposta-plus/validate.mjs` ok; `deno test` (import map local) → 85 ok; `deno check` das
-  funções de pagamento ok; `bun run test:unit` → 91 ok; typecheck e build ok; lint 0 erros (45 avisos anteriores).
-- **Não testado:** API real do Mercado Pago, incluindo se `live_mode` vem em todo pagamento (sem o
-  campo, o pagamento é recusado de propósito; conferir na fase 2).
-- **Decisões tomadas:** D14 atualizada (homologação com `MP_ENABLED=staff` e `MP_LIVE_MODE=false`).
-- **Armadilhas novas:** a segunda migration troca a assinatura de `create_payment_order` e
-  `apply_mp_payment`: publicar as funções `mp-*` desta versão junto.
-- **Bloqueios / pendências:** decisões da §2 e conta (dono); backlog P1.8d.
-- **Próximo passo sugerido:** dono aplica as duas migrations e publica as funções; `pagamentos` +
-  `tester` rodam a fase 2 com credenciais de teste e `MP_ENABLED=staff`.
-
-### 2026-11-20 · Mercado Pago implementado e desligado (`pagamentos` + `supabase-db` + `edge-functions` + `frontend`)
-
-- **Objetivo da sessão:** implementar o plano do Mercado Pago (D14) a pedido do dono.
-- **O que mudou:** migration `20261120120000` (pedidos, eventos, `apply_mp_payment`, acesso pago como
-  fonte `mercadopago` do plano efetivo, visão do admin); `_shared/mercadopago.ts`; funções
-  `mp-create-checkout`, `mp-webhook`, `mp-sync-order`; travas no `create-checkout`, fonte nova no
-  `check-subscription`; regras de indicação e do Passe extraídas para `_shared/referral.ts` e
-  `_shared/exam-pass.ts`; Planos com Pix/12x, volta do checkout, renovação e pagamento em aberto;
-  KPIs no admin; Termos (versão de 20/11/2026), Privacidade e FAQ. Preparo do PGlite extraído para
-  `supabase/tests/pglite-supabase.mjs`.
-- **Testado:** `node supabase/tests/mercadopago.validate.mjs` → 57 verificações ok;
-  `node docs/proposta-plus/validate.mjs` → todos passaram; `deno test` (import map local) → 85 ok;
-  `deno check` das 6 funções de pagamento ok; `bun run test:unit` → 91 ok, 2 pulados; typecheck e build ok;
-  lint 0 erros e 45 avisos anteriores; 16 verificações no navegador (build de produção, Supabase simulado).
-- **Não testado:** API real do Mercado Pago (campos da preferência, validade do Pix, assinatura das
-  notificações) — vai para o sandbox (fase 2). A CI confere `deno check` com os imports originais.
-- **Decisões tomadas:** D14 atualizada (código pronto, desligado).
-- **Armadilhas novas:** Deno sem rede (ver acima) e tipos não regerados para as tabelas novas.
-- **Bloqueios / pendências:** decisões a–h da §2, conta e secrets (dono); revisão jurídica dos Termos.
-- **Próximo passo sugerido:** dono e Financeiro abrem a conta de teste; `pagamentos` + `tester` rodam
-  o roteiro da fase 2 com credenciais de teste.
-
-### 2026-11-20 · Plano do Mercado Pago: Pix e Plus anual parcelado (`pagamentos` + `coordenador`)
-
-- **Objetivo da sessão:** planejar o Mercado Pago como segundo meio de pagamento, com Pix e o anual parcelado.
-- **O que mudou:** [docs/MERCADO_PAGO.md](docs/MERCADO_PAGO.md) com ofertas, decisões do dono, produto
-  (Checkout Pro), banco, funções, front, segurança, testes, fases e faixas. Decisão D14 e backlog P1.8b.
-  Nenhum código de produto mudou.
-- **Testado:** `npm run test:unit` → 84 aprovados, 2 pulados; checagens de fichas, skills e referências ok.
-  O plano foi conferido contra `create-checkout`,
-  `stripe-webhook`, `check-subscription`, `_shared/stripe.ts`, `useSubscription.ts`, `Upgrade.tsx`, `Terms.tsx`
-  e as migrations de cortesia, Passe e afiliados.
-- **Não testado:** campos da preferência, validade do Pix, assinatura das notificações vindas de
-  `notification_url` e aprovação de Pix no sandbox. A documentação oficial do Mercado Pago não abriu
-  nesta sessão (rede); esses pontos estão marcados para conferir na homologação.
-- **Decisões tomadas:** D14.
-- **Armadilhas novas:** gravar o acesso do Mercado Pago em `billing_tier` faria o `check-subscription`
-  apagá-lo na próxima consulta à Stripe (plano, §4).
-- **Bloqueios / pendências:** conta PJ do Mercado Pago com chave Pix, cotação de taxas e respostas às
-  decisões a–h (dono e Financeiro).
-- **Próximo passo sugerido:** `arquiteto-dados` especifica `payment_orders` e `apply_mp_payment` a partir
-  da §5.1; `supabase-db` abre o PR 1 (migration + testes de banco).
-
-### 2026-11-20 · Skills dos 79 cargos do organograma
-
-- **Objetivo da sessão:** criar uma skill por cargo do [organograma operacional](docs/ORGANOGRAMA_OPERACIONAL.md) (D13).
-- **O que mudou:** `ops/agentes/skills.mjs` gera `.claude/skills/<cargo>/SKILL.md` a partir do catálogo,
-  com nome no formato `cfo-2-rebate-comissionamento`. Cada ficha do organograma mostra o comando da skill.
-  `bun run test:unit` roda `skills.mjs --check`. Uso e regras do gerador estão no [guia](ops/agentes/README.md).
-- **Testado:** `bun run test:unit` → 84 aprovados, 2 pulados (os de host). Com
-  `LEVELUP_CLAUDE_BIN` (Claude Code 2.1.329, modelo simulado em localhost),
-  `node --test "ops/agentes/*.test.mjs"` → 14/14. Nesse teste, a skill recebe a tarefa, as
-  descrições dos especialistas ficam fora do contexto e o Bash pedido no turno é negado. Sem a regra
-  de bloqueio, o mesmo teste falha. Typecheck e build passaram. O lint terminou com 0 erros e 45 avisos preexistentes.
-- **Não testado:** respostas de um modelo real com as skills; `bun run test:edge`, porque a sessão
-  não tem Deno e a mudança não toca as funções.
-- **Armadilhas novas:** `disallowed-tools` vale só no turno em que a skill é acionada. Na mensagem
-  seguinte, as permissões normais da sessão voltam. Para o Claude Code carregar skills de projeto num teste em pasta temporária,
-  a pasta precisa estar marcada como confiável em `.claude.json`, com `HOME` fora dela (ver `skills.test.mjs`).
-  Os campos próprios do Claude Code impedem o envio direto dessas pastas ao claude.ai.
-- **Próximo passo sugerido:** o dono testa `/ceo-direcao-executiva-estrategia` com a pauta semanal
-  sintética e `/cfo-2-rebate-comissionamento` com o caso de comissão de teste. Ajustes de texto entram no
-  catálogo e são aplicados com `node ops/agentes/skills.mjs` e `node ops/agentes/documentar.mjs`.
-
-### 2026-11-19 · Login e recuperação do serviço de autenticação
-
-- A tela de login sinaliza a indisponibilidade e permite tentar novamente. Quem já tem sessão válida segue para a página solicitada mesmo se a consulta opcional do avatar falhar. O aluno pode adiar a escolha do avatar. O app avisa se o retorno do provedor termina sem sessão.
-- Na validação local, passaram 79 testes unitários, 76 testes de funções, a checagem de tipos das 12 funções, o typecheck e o build do app. O lint terminou com zero erros e 45 avisos preexistentes.
-- Na verificação de produção, o DNS público respondeu `NXDOMAIN` para `rxsovhyimflzvxggppal.supabase.co`, o endereço usado pelo app. Os três provedores sociais iniciaram o redirecionamento. O Lovable Cloud indicou que a infraestrutura estava habilitada, mas a consulta `SELECT 1` retornou `database is possibly not accessible`. O login completo continua pendente.
-- O responsável pelo projeto original no Lovable Cloud deve restaurar o acesso à base dos alunos. Manter o app apontado para esse projeto, pois o homônimo no Supabase pessoal tem outra referência. Após a reativação, a faixa `tester` deve confirmar o DNS e fazer login com uma conta de teste em produção, verificando se a sessão abre a página protegida solicitada.
-
-### 2026-11-18 · Equipe operacional, campanha do simulado e meios de pagamento
-
-- **Objetivo e decisão:** dar à equipe os perfis operacionais e um roteiro de aquisição e receita conforme D12.
-- **Entregas:** catálogo, CLI e instruções em [ops/agentes](ops/agentes/README.md), fichas do organograma,
-  referências em [ops/referencias](ops/referencias/) e relatório de crescimento e pagamentos.
-- O Claude Code reconheceu os 79 perfis. Os seis testes locais do CLI passaram, incluindo a execução
-  de `CFO.2` com um serviço simulado em localhost. As evidências de instalação estão no
-  [inventário do laboratório](docs/ANALISE_DAS_REFERENCIAS.md).
-- **Pendências:** a decisão sobre o Radar sem login continua em D10. A conciliação de vendas e o piloto do
-  Mentor seguem D11. A habilitação e a liquidação no provedor independente dependem de homologação.
-- **Próximo passo:** Pedagogia e Marketing conferem a trilha e preparam a aula aberta.
-  Financeiro e `pagamentos` acompanham um pedido avulso de teste até acesso, comissão e eventual estorno.
-
-### 2026-11-17 · Integração operacional do Plus, Passe e Mentor
-
-- **Objetivo e decisão:** registrar a prioridade D11 e os responsáveis por cada etapa.
-- **O que mudou:** roteiro de homologação, permissões e critérios de aceite em `docs/INTEGRACAO_OPERACIONAL.md`.
-- **Verificação local:** typecheck e build passaram, lint com 0 erros e 45 avisos prévios,
-  testes unitários 62/62, Edge 76/76 e tipos das 12 funções conferidos no Deno.
-- **Pendências de ambiente:** a base `9a2afbb` e os relatos de implantação orientam a conferência.
-  O histórico do ambiente e os testes de homologação indicarão quais etapas operacionais estão concluídas.
-- **Próximo passo:** `supabase-db` e `edge-functions` conferem as versões de IA, Plus e Radar.
-  Com o ambiente identificado, `pagamentos` e Financeiro executam P0.5.

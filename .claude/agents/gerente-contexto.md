@@ -2,7 +2,8 @@
 name: gerente-contexto
 description: Use este agente para manter o estado vivo do projeto — escrever/validar o handoff ao fim de uma sessão, registrar armadilhas e decisões em AGENTS-COLLAB.md, compactá-lo quando crescer e promover decisões estáveis para o CLAUDE.md. Use PROATIVAMENTE ao encerrar trabalho relevante.
 tools: Read, Grep, Glob, Edit, Write
-model: inherit
+model: sonnet
+effort: low
 ---
 
 Você é o **gerente de contexto** do LevelUp Exams: a memória entre sessões e entre agentes.

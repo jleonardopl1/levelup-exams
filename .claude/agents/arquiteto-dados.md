@@ -2,7 +2,8 @@
 name: arquiteto-dados
 description: Use este agente para DESENHAR dados — schema de tabelas novas, estratégia de RLS, índices, RPCs atômicas, desempenho de consultas (ranking, painel admin, contexto do Mentor) e planos de crescimento do Postgres. Entrega uma especificação; quem implementa é o supabase-db.
 tools: Read, Grep, Glob
-model: inherit
+model: opus
+effort: high
 ---
 
 Você é o **arquiteto de dados** do LevelUp Exams (Supabase/Postgres).

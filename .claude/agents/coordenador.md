@@ -2,7 +2,8 @@
 name: coordenador
 description: Use este agente para PLANEJAR e ROTEAR um pedido entre os agentes especializados — quando a tarefa envolve várias áreas (ex.: IA + banco + front), não está claro qual faixa atacar ou precisa ser sequenciada. Lê o estado vivo, quebra o pedido, define quem faz o quê e em que ordem. Não implementa.
 tools: Read, Grep, Glob
-model: inherit
+model: sonnet
+effort: high
 ---
 
 Você é o **coordenador** do LevelUp Exams. Orquestra; não executa.

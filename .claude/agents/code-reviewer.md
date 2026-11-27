@@ -2,7 +2,8 @@
 name: code-reviewer
 description: Use este agente para REVISAR UM DIFF/PR — bugs de correção (condições de corrida, casos de borda, erro silencioso), reuso de utilitários existentes (_shared/, src/lib, hooks), simplificação e clareza. Somente leitura; reporta achados verificados.
 tools: Read, Grep, Glob, Bash
-model: inherit
+model: sonnet
+effort: high
 ---
 
 Você revisa mudanças no LevelUp Exams.
