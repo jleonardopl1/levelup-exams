@@ -117,7 +117,7 @@ for (const file of readdirSync(join(dir, "questions")).filter((f) => f.endsWith(
       dificuldade: nq.d,
     });
   });
-  if (stamped) rewrittenFiles.push({ path: join(root, rel), data: cur });
+  if (stamped) rewrittenFiles.push({ path: join(root, rel), data: cur, raw: readFileSync(join(root, rel), "utf8") });
   if (rows.length) autoral.push({ file, rows });
 }
 
@@ -294,6 +294,6 @@ END $$;
 `);
 
 writeFileSync(join(root, "supabase", "migrations", outName), out.join("\n"));
-for (const { path, data } of rewrittenFiles) writeFileSync(path, formatContentJson(data));
+for (const { path, data, raw } of rewrittenFiles) writeFileSync(path, formatContentJson(data, raw));
 console.log(`OK: ${nAutoral} autorais, ${nIa} ia_diaria reescritas, ${nOff} ia_diaria inativadas -> supabase/migrations/${outName}`);
 console.log(`Chave de ordem gravada em ${rewrittenFiles.length} arquivo(s) de conteúdo.`);

@@ -37,5 +37,17 @@ export function seededShuffle(n, seedHex) {
  */
 export const publishedOrder = (q, hash = contentHash(q.q, q.a)) => (isFixed(q) ? [0, 1, 2, 3] : seededShuffle(4, q.k || hash));
 
-/** Formato dos arquivos content/trilhas/<slug>/questions/*.json: uma chave por linha, sem recuo. */
-export const formatContentJson = (data) => JSON.stringify(data, null, "\t").split("\n").map((l) => l.replace(/^\t+/, "")).join("\n");
+/**
+ * Formato dos arquivos content/trilhas/<slug>/questions/*.json. Há dois estilos no repositório
+ * e cada arquivo mantém o seu (`raw` = conteúdo atual): uma chave por linha, sem recuo; ou uma
+ * questão por linha, com recuo de 2/4 espaços. Sem `raw`, usa o primeiro.
+ */
+export function formatContentJson(data, raw = "") {
+  const trailing = raw.endsWith("\n") ? "\n" : "";
+  if (/^\{\n {2}"/.test(raw)) {
+    const head = Object.entries(data).filter(([k]) => k !== "questions").map(([k, v]) => `  ${JSON.stringify(k)}: ${JSON.stringify(v)},`);
+    const lines = data.questions.map((q) => "    " + JSON.stringify(q));
+    return `{\n${head.join("\n")}\n  "questions": [\n${lines.join(",\n")}\n  ]\n}${trailing}`;
+  }
+  return JSON.stringify(data, null, "\t").split("\n").map((l) => l.replace(/^\t+/, "")).join("\n") + trailing;
+}
