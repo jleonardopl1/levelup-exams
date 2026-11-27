@@ -6,13 +6,13 @@
 "d": "Médio",
 "q": "Leia o trecho: \"A transparência legislativa não se esgota na publicação de atos no diário oficial. Ela exige linguagem acessível, dados abertos e canais que permitam ao cidadão não apenas saber o que foi decidido, mas compreender por que foi decidido.\" A ideia central do trecho é que a transparência:",
 "a": [
-"exige mais do que a simples publicação formal dos atos, alcançando a compreensão das decisões pelo cidadão",
-"se restringe à publicação dos atos no diário oficial, como determina a lei",
-"deve priorizar os dados abertos em detrimento da linguagem acessível",
-"é responsabilidade exclusiva do cidadão, que deve buscar as informações"
+"vai além da divulgação oficial e deve possibilitar que se entendam os motivos das decisões",
+"se cumpre com a divulgação dos atos no diário oficial, dispensando outros meios de acesso",
+"deve dar prioridade à oferta de dados abertos, ainda que em prejuízo da linguagem acessível",
+"cabe sobretudo ao cidadão, a quem compete buscar e interpretar por conta própria os atos"
 ],
 "c": 0,
-"e": "O trecho afirma que a transparência 'não se esgota' na publicação e exige compreensão do 'porquê' das decisões. As demais alternativas contrariam ou extrapolam o texto."
+"e": "O trecho afirma que a transparência 'não se esgota' na publicação e exige compreensão do 'porquê' das decisões. Por isso não basta a divulgação no diário oficial; o texto soma dados abertos e linguagem acessível, sem priorizar um em prejuízo do outro; e as exigências (linguagem, dados, canais) recaem sobre quem divulga, não sobre o cidadão. As demais alternativas contrariam ou extrapolam o texto."
 },
 {
 "t": "Interpretação de texto",
@@ -32,13 +32,13 @@
 "d": "Fácil",
 "q": "Em \"A transparência legislativa não se esgota na publicação de atos no diário oficial. Ela exige linguagem acessível\", o pronome \"Ela\" retoma:",
 "a": [
-"a transparência legislativa",
-"a publicação de atos",
-"a linguagem acessível",
-"o diário oficial"
+"a transparência do Legislativo",
+"a publicação dos atos oficiais",
+"a linguagem acessível ao público",
+"a edição do diário oficial"
 ],
 "c": 0,
-"e": "'Ela' é elemento coesivo anafórico que retoma o sujeito da oração anterior, 'a transparência legislativa'."
+"e": "'Ela' é elemento coesivo anafórico que retoma o sujeito da oração anterior, 'a transparência legislativa' (a transparência do Legislativo): é a transparência que exige linguagem acessível. A publicação de atos é aquilo em que a transparência 'não se esgota'; 'linguagem acessível' vem depois do pronome, como complemento de 'exige', e não é retomada por ele; e o diário oficial é só o veículo da publicação, não o sujeito da oração anterior."
 },
 {
 "t": "Crase",
@@ -175,13 +175,13 @@
 "d": "Médio",
 "q": "Assinale a frase pontuada corretamente.",
 "a": [
-"Os vereadores, aprovaram o projeto por unanimidade.",
-"O presidente da Câmara, que presidia a sessão, encerrou os trabalhos.",
-"Cuiabá capital de Mato Grosso, completou 300 anos em 2019.",
-"Na sessão de ontem foram votados, três projetos."
+"Os vereadores presentes à sessão, aprovaram o projeto por unanimidade.",
+"O presidente da Câmara, que conduzia a sessão, encerrou os trabalhos.",
+"Cuiabá capital de Mato Grosso, completou 300 anos de fundação em 2019.",
+"Na sessão ordinária de ontem foram votados, três projetos de lei."
 ],
 "c": 1,
-"e": "A oração adjetiva explicativa vem entre vírgulas. Não se separa sujeito do verbo nem verbo do complemento; o aposto 'capital de Mato Grosso' deveria estar entre vírgulas."
+"e": "A oração adjetiva explicativa 'que conduzia a sessão' vem entre vírgulas. Não se separa sujeito do verbo nem verbo do complemento ou do sujeito posposto: erram 'Os vereadores presentes à sessão, aprovaram' e 'foram votados, três projetos de lei'. O aposto 'capital de Mato Grosso' deveria estar entre vírgulas (falta a vírgula depois de 'Cuiabá')."
 },
 {
 "t": "Pontuação",
@@ -279,13 +279,13 @@
 "d": "Médio",
 "q": "Assinale a palavra formada por derivação parassintética.",
 "a": [
-"desleal",
+"reorganizar",
 "entardecer",
-"pontapé",
-"combate"
+"passatempo",
+"sustento"
 ],
 "c": 1,
-"e": "'Entardecer' recebe prefixo e sufixo simultaneamente (não existem 'entarde' nem 'tardecer'). 'Desleal' é prefixal, 'pontapé' é composição e 'combate' é derivação regressiva."
+"e": "'Entardecer' recebe prefixo e sufixo simultaneamente (não existem 'entarde' nem 'tardecer'). 'Reorganizar' é derivação prefixal (existe 'organizar'), 'passatempo' é composição por justaposição (passa + tempo) e 'sustento' é derivação regressiva (de 'sustentar')."
 },
 {
 "t": "Flexão verbal",
@@ -306,12 +306,12 @@
 "q": "Em \"Se a Mesa aprovasse o requerimento, a audiência seria realizada\", os verbos estão, respectivamente, no:",
 "a": [
 "pretérito imperfeito do subjuntivo e futuro do pretérito do indicativo",
-"presente do subjuntivo e futuro do presente",
-"pretérito perfeito do indicativo e futuro do pretérito",
-"futuro do subjuntivo e presente do indicativo"
+"pretérito imperfeito do subjuntivo e futuro do presente do indicativo",
+"pretérito mais-que-perfeito do subjuntivo e futuro do pretérito do indicativo",
+"futuro do subjuntivo e pretérito imperfeito do indicativo"
 ],
 "c": 0,
-"e": "'Aprovasse' é pretérito imperfeito do subjuntivo; 'seria' é futuro do pretérito do indicativo, correlação típica da hipótese."
+"e": "'Aprovasse' é pretérito imperfeito do subjuntivo; 'seria' é futuro do pretérito do indicativo, correlação típica da hipótese. O futuro do presente seria 'será'; o pretérito mais-que-perfeito do subjuntivo é forma composta ('tivesse aprovado'); o futuro do subjuntivo seria 'aprovar' ('se a Mesa aprovar'); e o pretérito imperfeito do indicativo seria 'era'."
 },
 {
 "t": "Vozes verbais",
@@ -358,9 +358,9 @@
 "q": "A palavra \"casa\" está empregada em sentido polissêmico, referindo-se a uma instituição, em:",
 "a": [
 "A Casa aprovou o projeto por maioria absoluta.",
-"Comprei uma casa perto da Prainha.",
-"O botão saiu da casa da camisa.",
-"Ele acertou a casa decimal."
+"Compramos uma casa com quintal perto da Prainha.",
+"O botão saiu da casa e a camisa ficou aberta.",
+"Ele acertou a casa decimal ao refazer o cálculo."
 ],
 "c": 0,
 "e": "'Casa', com maiúscula, designa o órgão legislativo (a Câmara). Nas demais, os sentidos são moradia, abertura do botão e posição decimal — exemplos de polissemia."
@@ -423,12 +423,12 @@
 "q": "As palavras \"órgão\", \"túnel\" e \"inconstitucionalíssimo\" são acentuadas, respectivamente, por serem:",
 "a": [
 "paroxítona terminada em ditongo; paroxítona terminada em -l; proparoxítona",
-"oxítona; paroxítona; proparoxítona",
-"paroxítona terminada em -ão; oxítona terminada em -l; paroxítona",
-"proparoxítona; paroxítona terminada em -l; proparoxítona"
+"oxítona terminada em -ão; paroxítona terminada em -l; proparoxítona",
+"paroxítona terminada em -ão; oxítona terminada em -l; paroxítona terminada em -o",
+"proparoxítona terminada em -ão; paroxítona terminada em -l; proparoxítona"
 ],
 "c": 0,
-"e": "Órgão: paroxítona terminada em ditongo nasal; túnel: paroxítona terminada em -l; o superlativo em -íssimo é proparoxítona (todas acentuadas)."
+"e": "Órgão: paroxítona terminada em ditongo nasal (a tônica é 'ór'); túnel: paroxítona terminada em -l (a tônica é 'tú'); o superlativo em -íssimo é proparoxítona (todas as proparoxítonas são acentuadas). Por isso 'órgão' não é oxítona nem proparoxítona (tem só duas sílabas), 'túnel' não é oxítona e 'inconstitucionalíssimo' não é paroxítona."
 },
 {
 "t": "Uso do hífen",
@@ -475,12 +475,12 @@
 "q": "Considerando a adequação ao registro formal exigido em um requerimento à Mesa Diretora, a melhor redação é:",
 "a": [
 "Venho, respeitosamente, requerer a Vossa Excelência a inclusão da matéria na pauta.",
-"Tô pedindo pra botar o projeto na pauta, valeu.",
-"Gostaria que vocês colocassem a matéria na pauta aí.",
-"Exijo a imediata colocação do projeto em pauta!"
+"Venho pedir a Vossa Excelência que dê um jeito de botar a matéria na pauta da sessão.",
+"Gostaria que Vossa Excelência incluísse a matéria em vossa pauta da próxima sessão.",
+"Exijo de Vossa Excelência a imediata inclusão da matéria na pauta, sem mais demora."
 ],
 "c": 0,
-"e": "Formalidade, impessoalidade, polidez e pronome de tratamento adequado caracterizam a redação oficial; as demais são coloquiais ou descorteses."
+"e": "Formalidade, impessoalidade, polidez e pronome de tratamento adequado caracterizam a redação oficial. 'Dar um jeito de botar' é coloquial; com 'Vossa Excelência', verbos e possessivos vão para a 3ª pessoa ('sua pauta', não 'vossa pauta'); e 'exijo... sem mais demora' é descortês e impositivo."
 },
 {
 "t": "Discurso direto e indireto",
@@ -552,13 +552,13 @@
 "d": "Médio",
 "q": "Assinale a frase que apresenta problema de coerência.",
 "a": [
-"Como choveu muito, a sessão itinerante foi adiada.",
-"Embora estivesse doente, o servidor compareceu ao trabalho.",
+"Como choveu muito na manhã de ontem, a sessão itinerante foi adiada.",
+"Embora estivesse gripado, o servidor compareceu normalmente ao expediente.",
 "O projeto foi rejeitado por unanimidade, já que todos votaram a favor.",
-"Quem chegou cedo conseguiu lugar no plenário."
+"Quem chegou cedo à Câmara conseguiu lugar nas galerias do plenário."
 ],
 "c": 2,
-"e": "Há contradição lógica: se todos votaram a favor, o projeto não poderia ter sido rejeitado por unanimidade."
+"e": "Há contradição lógica: se todos votaram a favor, o projeto não poderia ter sido rejeitado por unanimidade. As demais são coerentes: a chuva é causa do adiamento; a concessiva 'embora estivesse gripado' admite o comparecimento apesar da doença; e chegar cedo explica conseguir lugar."
 },
 {
 "t": "Argumentação",
@@ -566,25 +566,25 @@
 "q": "Em um artigo de opinião, o autor afirma: \"Segundo o IBGE, Cuiabá tem mais de 650 mil habitantes; portanto, os serviços públicos precisam ser planejados em escala metropolitana\". O argumento utilizado é predominantemente de:",
 "a": [
 "autoridade e dados estatísticos",
-"exemplificação ficcional",
-"apelo emocional",
-"comparação histórica"
+"exemplificação e relato ficcional",
+"apelo emocional e senso comum",
+"comparação histórica e analogia"
 ],
 "c": 0,
-"e": "O autor apoia-se em dado estatístico atribuído a instituição reconhecida (IBGE), estratégia de argumento por autoridade e comprovação numérica."
+"e": "O autor apoia-se em dado estatístico atribuído a instituição reconhecida (IBGE), estratégia de argumento por autoridade e comprovação numérica. Não há exemplo, relato ficcional, apelo às emoções, recurso ao senso comum, comparação com o passado nem analogia."
 },
 {
 "t": "Emprego de pronomes",
 "d": "Médio",
 "q": "Assinale a alternativa em que o pronome está empregado de acordo com a norma-padrão.",
 "a": [
-"Isto que você disse ontem foi importante.",
-"Entre eu e você não há problemas.",
+"Isto que você disse ontem na reunião foi importante.",
+"Entre eu e você não há problema algum a resolver.",
 "Este documento que está em minhas mãos é o original.",
-"Trouxe o relatório para mim revisar."
+"Trouxe o relatório da comissão para mim revisar."
 ],
 "c": 2,
-"e": "'Este' refere-se ao que está próximo de quem fala. O correto seria 'isso que você disse' (próximo ao interlocutor/passado recente), 'entre mim e você' e 'para eu revisar' (sujeito de infinitivo)."
+"e": "'Este' refere-se ao que está próximo de quem fala. O correto seria 'isso que você disse' (próximo ao interlocutor/passado recente), 'entre mim e você' (pronome oblíquo tônico após preposição) e 'para eu revisar' (sujeito de infinitivo)."
 },
 {
 "t": "Pronomes de tratamento",
@@ -630,13 +630,13 @@
 "d": "Médio",
 "q": "Na oração \"Foram nomeados os candidatos aprovados\", o sujeito é:",
 "a": [
-"oculto",
-"indeterminado",
-"\"os candidatos aprovados\"",
-"inexistente"
+"oculto: \"eles\", depreendido da forma verbal",
+"indeterminado: não se sabe quem nomeou",
+"simples: \"os candidatos aprovados\"",
+"inexistente: a oração não tem sujeito"
 ],
 "c": 2,
-"e": "Voz passiva analítica com sujeito posposto: 'os candidatos aprovados' (concorda com 'foram nomeados')."
+"e": "Voz passiva analítica com sujeito posposto: 'os candidatos aprovados' (concorda com 'foram nomeados'), sujeito simples de núcleo 'candidatos'. Não é oculto, pois está expresso na oração; não é indeterminado, pois o que se omite é o agente da passiva, não o sujeito; e não é inexistente, pois a oração tem sujeito."
 },
 {
 "t": "Sintaxe - período composto",
@@ -669,26 +669,26 @@
 "d": "Médio",
 "q": "Leia: \"Desde que o painel eletrônico foi instalado, nenhuma votação precisou ser repetida por erro de contagem.\" Pode-se inferir corretamente que:",
 "a": [
-"antes do painel, houve votações repetidas por erro de contagem",
-"o painel eliminou todas as votações da Câmara",
-"as votações passaram a ser secretas",
-"os vereadores deixaram de votar nominalmente"
+"antes do painel, falhas na apuração chegaram a exigir nova votação",
+"o painel eliminou todo tipo de erro nas votações da Câmara",
+"a instalação do painel tornou secretas as votações em plenário",
+"depois do painel, os vereadores deixaram de votar nominalmente"
 ],
 "c": 0,
-"e": "O trecho pressupõe que, antes da instalação, ocorriam repetições por erro de contagem. As demais não decorrem do texto."
+"e": "O trecho pressupõe que, antes da instalação, ocorriam repetições por erro de contagem. As demais não decorrem do texto: ele trata só de erros de contagem que obrigavam a repetir votações, não de qualquer erro, e nada diz sobre voto secreto ou fim da votação nominal."
 },
 {
 "t": "Semântica - sinonímia",
 "d": "Fácil",
 "q": "Em \"A medida foi considerada inócua pelos técnicos\", a palavra \"inócua\" significa:",
 "a": [
-"perigosa",
+"perigosa, de alto risco",
 "inofensiva, sem efeito",
-"urgente",
-"ilegal"
+"urgente, inadiável",
+"ilegal, contrária à lei"
 ],
 "c": 1,
-"e": "'Inócuo' é o que não causa dano ou não produz efeito."
+"e": "'Inócuo' é o que não causa dano ou não produz efeito. Por isso não significa perigosa (sentido oposto), urgente nem ilegal."
 },
 {
 "t": "Plural de compostos",
