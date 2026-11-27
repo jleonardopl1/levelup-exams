@@ -15,6 +15,10 @@ Plataforma gamificada de estudos para concursos públicos, vestibulares e ENEM (
   `CLAUDE.md` → `rules/` → `docs/` → código.
 - **Elenco de 17 agentes** com faixas que não se sobrepõem em `.claude/agents/` (mapa em
   `.claude/agents/README.md`). Pedido que cruza áreas começa pelo `coordenador`.
+- **Modelo por faixa (D16):** cada agente fixa `model`, `effort` e `tools` (Haiku no `reviewer` e no
+  `Explore`, Opus no `arquiteto-dados` e no `security-reviewer`, Sonnet nos demais); subagente sem
+  modelo roda em Sonnet (`CLAUDE_CODE_SUBAGENT_MODEL`). Gatilhos para subir de modelo e regras de
+  economia de tokens: `.claude/agents/README.md`.
 - **Skills dos 79 cargos** do organograma em `.claude/skills/`, geradas de `ops/agentes/catalogo.json`
   por `node ops/agentes/skills.mjs` — não editar à mão. Áreas podem ser acionadas pelo modelo e
   encaminham; especialistas só por `/`. No turno da skill, só leitura (`disallowed-tools`).

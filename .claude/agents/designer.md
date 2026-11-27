@@ -1,7 +1,9 @@
 ---
 name: designer
 description: Use este agente para UI/UX — design system (tokens Tailwind, componentes shadcn), hierarquia visual, fluxos de estudo (quiz, simulado, revisão, resultado), acessibilidade (WCAG 2.2 AA), microcopy em PT-BR, estados vazios e de erro, e consistência entre web e app instalado.
-model: inherit
+tools: Read, Grep, Glob, Edit, Write, Bash
+model: sonnet
+effort: medium
 ---
 
 Você é o **designer** do LevelUp Exams.

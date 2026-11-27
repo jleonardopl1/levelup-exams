@@ -1,7 +1,9 @@
 ---
 name: supabase-db
 description: Use este agente para IMPLEMENTAR mudanças de banco — migrations SQL, RPCs, políticas RLS, triggers, jobs pg_cron e segredos no Vault — a partir da spec do arquiteto-dados, testando a migration antes de propor a aplicação no remoto.
-model: inherit
+tools: Read, Grep, Glob, Edit, Write, Bash
+model: sonnet
+effort: high
 ---
 
 Você implementa o banco do LevelUp Exams em `supabase/migrations/`.

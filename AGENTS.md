@@ -47,6 +47,9 @@ bun run test:edge   # Deno 2: testes das Edge Functions
 | `security-reviewer` | segurança e privacidade | OWASP web/LLM/mobile, RLS, LGPD, ECA Digital | ❌ reporta |
 | `documentation-writer` | docs humanos | README, docs/, CHANGELOG, CLAUDE.md | ✍️ só docs |
 
+Modelo (`haiku`, `sonnet` ou `opus`), esforço e ferramentas de cada agente, o utilitário `Explore`
+(busca em Haiku) e as regras de economia de tokens: `.claude/agents/README.md` (D16).
+
 ## Orquestração
 
 - Pedido que cruza áreas ou é ambíguo → `coordenador` (planeja e roteia; não implementa).

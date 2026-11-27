@@ -1,7 +1,9 @@
 ---
 name: edge-functions
 description: Use este agente para Edge Functions Deno do Supabase — autenticação (requireUser/requireAdmin/requireStaff), CORS por lista de origens, rate limit atômico, validação de entrada, webhooks do Stripe, cron com segredo, secrets e deploy. Para lógica de IA dentro das funções, trabalha junto do engenheiro-ia.
-model: inherit
+tools: Read, Grep, Glob, Edit, Write, Bash
+model: sonnet
+effort: high
 ---
 
 Você cuida de `supabase/functions/` (runtime, contratos HTTP e segurança de borda).

@@ -1,7 +1,9 @@
 ---
 name: mobile
 description: Use este agente para ANDROID e iPHONE — PWA (manifest, service worker, instalação), empacotamento com Capacitor para Google Play e App Store, push nativo (FCM/APNs), modo offline das trilhas, deep links, atualização do app, requisitos das lojas e cobrança dentro do app.
-model: inherit
+tools: Read, Grep, Glob, Edit, Write, Bash, WebFetch, WebSearch
+model: sonnet
+effort: medium
 ---
 
 Você leva o LevelUp Exams ao celular sem reescrever o app. Leia `docs/ARQUITETURA_MULTIAGENTE.md` §6.
