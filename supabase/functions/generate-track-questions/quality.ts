@@ -4,6 +4,7 @@
  * contornar (validação de esquema, falhas clássicas de elaboração de itens e a regra
  * de consenso entre os agentes).
  */
+import { lengthCueFlaws } from "./length-cue.ts";
 import type { Decision, GeneratedQuestion, ReviewVerdict, SolverVote } from "./types.ts";
 
 export const norm = (s: string) => s.normalize("NFKC").replace(/\s+/g, " ").trim().toLowerCase();
@@ -57,7 +58,8 @@ export function emphasizeNegativeCommand(stem: string): string {
  */
 const ABSOLUTE = /\b(sempre|nunca|jamais|exclusivamente|unicamente|absolutamente|em (?:qualquer|nenhuma) hip[óo]tese|sob nenhuma circunst[âa]ncia|todo e qualquer)\b/iu;
 
-const ALL_OR_NONE = /\b(todas as (alternativas|anteriores|opções)|nenhuma das (alternativas|anteriores|opções))\b/i;
+// "Todas/nenhuma das anteriores" e a variante "Nenhum: os três...", "Todas: ..." (alternativa que julga as outras).
+const ALL_OR_NONE = /\b(todas as (alternativas|anteriores|opções)|nenhuma das (alternativas|anteriores|opções))\b|^\s*(nenhum|nenhuma|todos|todas|ambos|ambas)\s*[:—–]/i;
 
 /**
  * Falhas clássicas de elaboração de itens (item-writing flaws) que entregam a resposta
@@ -68,14 +70,8 @@ export function itemFlaws(q: GeneratedQuestion): string[] {
   if (q.alternativas.some((a) => ALL_OR_NONE.test(a))) {
     flaws.push('Alternativa do tipo "todas/nenhuma das anteriores" (a banca não usa e o prompt proíbe).');
   }
-  // Pista de tamanho: a correta é a mais longa e bem maior que a média das erradas.
-  const lens = q.alternativas.map((a) => a.length);
-  const right = lens[q.correta];
-  const others = lens.filter((_, i) => i !== q.correta);
-  const avgOthers = others.reduce((s, n) => s + n, 0) / others.length;
-  if (right > Math.max(...others) && avgOthers > 0 && right >= 1.75 * avgOthers && right - avgOthers >= 40) {
-    flaws.push("Alternativa correta muito mais longa que as demais (pista de tamanho para o candidato).");
-  }
+  // Pista de tamanho (correta mais longa, bem acima da média ou mais curta): length-cue.ts.
+  flaws.push(...lengthCueFlaws(q.alternativas, q.correta));
   // Termos absolutos só nos distratores: pista para eliminar sem saber.
   const absoluteDistractors = q.alternativas.filter((a, i) => i !== q.correta && ABSOLUTE.test(a)).length;
   if (absoluteDistractors >= 2 && !ABSOLUTE.test(q.alternativas[q.correta])) {
@@ -99,10 +95,44 @@ export function citesOptionLetters(text: string): boolean {
 
 const REFERS_TO_OTHERS = /anteriores|nenhuma das|todas as alternativas|^\s*(apenas\s+)?[IVX]+\b|\b[IVX]+\s*(,|e)\s*[IVX]+\b|^\s*[VF]\s*[-–,]\s*[VF]/i;
 
+const NUMERIC = /^(r\$\s*)?(-?\d+\/\d+|-?\d{1,3}(?:\.\d{3})+(?:,\d+)?|-?\d+(?:,\d+)?)(.*)$/i;
+
+/**
+ * Valor de uma alternativa puramente numérica ("12 anos de idade", "R$ 1.250,00", "15/64",
+ * "30%") e o "resto" (unidade), para comparar entre alternativas. `null` = não é numérica.
+ */
+export function numericKey(alt: string): { value: number; unit: string } | null {
+  const m = NUMERIC.exec(alt.replace(/\s+/g, " ").trim());
+  if (!m) return null;
+  const raw = m[2];
+  const value = raw.includes("/")
+    ? Number(raw.split("/")[0]) / Number(raw.split("/")[1])
+    : Number(raw.replace(/\./g, "").replace(",", "."));
+  if (!Number.isFinite(value)) return null;
+  // "1 ano" e "2 anos" têm a mesma unidade; comparação sem plural e sem caixa.
+  const unit = `${(m[1] ?? "").replace(/\s+/g, "")}|${m[3].trim().toLowerCase().replace(/s\b/g, "")}`;
+  return { value, unit };
+}
+
+/**
+ * A Selecon apresenta alternativas numéricas em ordem crescente (idades, prazos, valores,
+ * frações). Devolve a questão nessa ordem, ou `null` se as alternativas não forem todas
+ * números da mesma unidade com valores distintos.
+ */
+export function orderNumericAlternatives(q: GeneratedQuestion): GeneratedQuestion | null {
+  const keys = q.alternativas.map(numericKey);
+  if (keys.some((k) => k === null)) return null;
+  const ks = keys as { value: number; unit: string }[];
+  if (new Set(ks.map((k) => k.unit)).size !== 1 || new Set(ks.map((k) => k.value)).size !== ks.length) return null;
+  const order = ks.map((k, i) => ({ v: k.value, i })).sort((a, b) => a.v - b.v).map((x) => x.i);
+  return { ...q, alternativas: order.map((k) => q.alternativas[k]), correta: order.indexOf(q.correta) };
+}
+
 /**
  * Embaralha as alternativas para o gabarito não ficar concentrado numa letra.
- * Não embaralha quando a ordem tem significado (I/II/III, V/F) ou quando a explicação
- * cita letras (ela ficaria errada depois de embaralhar).
+ * Numéricas vão em ordem crescente (padrão Selecon). Não embaralha quando a ordem tem
+ * significado (I/II/III, V/F) ou quando a explicação cita letras (ela ficaria errada
+ * depois de embaralhar).
  */
 export function shuffleAlternatives(
   q: GeneratedQuestion,
@@ -110,6 +140,8 @@ export function shuffleAlternatives(
 ): GeneratedQuestion {
   if (q.alternativas.some((a) => REFERS_TO_OTHERS.test(a))) return q;
   if (citesOptionLetters(q.explicacao)) return q;
+  const numeric = orderNumericAlternatives(q);
+  if (numeric) return numeric;
   const order = [0, 1, 2, 3];
   const rnd = randomInts(4);
   for (let i = 3; i > 0; i--) {

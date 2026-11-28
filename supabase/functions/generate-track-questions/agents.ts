@@ -13,13 +13,14 @@
  */
 import { fenceUntrusted, UNTRUSTED_RULE } from "../_shared/ai/guardrails.ts";
 import type { ToolSpec } from "../_shared/ai/llm.ts";
+import { type BankLengthStats, LENGTH_CUE } from "./length-cue.ts";
 import { letter, validateQuestion } from "./quality.ts";
 import type { ArbiterVerdict, GeneratedQuestion, ReviewVerdict, SolverVote, SubjectContext } from "./types.ts";
 
 export const PROMPT_VERSIONS = {
-  elaborador: "elaborador@2026-11-17",
+  elaborador: "elaborador@2026-11-24",
   solucionador: "solucionador@2026-11-16",
-  revisor: "revisor@2026-11-16",
+  revisor: "revisor@2026-11-24",
   arbitro: "arbitro@2026-11-16",
 } as const;
 
@@ -94,18 +95,29 @@ export function generationPrompts(
   topics: string[],
   facts: string[],
   lessons: string[],
+  recentLength?: BankLengthStats,
 ) {
   const today = todayInCuiaba();
   const system = `Você é um elaborador sênior de questões de concursos públicos brasileiros, especialista na banca ${ctx.banca}.
 Regras obrigatórias:
-- Questões INÉDITAS, de múltipla escolha, com exatamente 4 alternativas e UMA única correta, no estilo da banca (enunciados contextualizados, distratores plausíveis, sem "todas/nenhuma das anteriores").
+- Questões INÉDITAS, de múltipla escolha, com exatamente 4 alternativas e UMA única correta, sem "todas/nenhuma das anteriores".
 - Conteúdo estritamente dentro da ementa do edital informada e de acordo com a legislação, a jurisprudência e o entendimento técnico VIGENTES em ${today}.
 - Nunca invente números de artigos, prazos, percentuais ou nomes. Se não tiver certeza absoluta de um dado, não o use.
-- A explicação deve citar o fundamento (artigo, norma, conceito ou cálculo) e dizer por que as demais alternativas estão erradas, referindo-se a elas pelo CONTEÚDO — nunca pela letra (as alternativas serão embaralhadas).
-- Sem pistas: a alternativa correta não pode ser sistematicamente a mais longa nem repetir palavras do enunciado; os distratores devem ter tamanho e estrutura semelhantes; termos absolutos (sempre, nunca, exclusivamente, em qualquer hipótese) não podem aparecer só nas alternativas erradas.
+- A explicação deve citar o fundamento (artigo, norma, conceito ou cálculo) e dizer por que cada uma das demais alternativas está errada, referindo-se a elas pelo CONTEÚDO — nunca pela letra (as alternativas serão embaralhadas).
 - Comando negativo em caixa alta: "assinale a alternativa INCORRETA", "EXCETO", "que NÃO".
 - Português formal, norma-padrão, sem marcas de formatação.
 - Não repita nem parafraseie questões já existentes listadas pelo usuário.
+
+Padrão da banca (provas reais da Selecon):
+- Enunciado contextualizado que termina em dois-pontos; as alternativas completam a frase, começam com letra minúscula e não têm ponto final. Pergunta direta só quando a resposta é um nome ou um número.
+- As quatro alternativas são paralelas: mesma estrutura gramatical, mesmo nível de detalhe e tamanho parecido (a maior não passa a menor em mais de 30%). Listas (princípios, etapas, requisitos) têm o mesmo número de itens nas quatro.
+- Alternativas numéricas (idades, prazos, valores, frações) usam a mesma unidade em todas.
+
+Alternativas sem pista — o candidato não pode acertar pela forma, só pelo conhecimento:
+- A correta NÃO é a mais longa nem a mais detalhada. Escreva-a de forma enxuta: justificativa, aposto e ressalva explicativa vão para a explicação, não para a alternativa. No lote, a correta pode ser a mais longa em no máximo uma de cada quatro questões, e só por pouco.
+- Cada alternativa errada nasce de um erro típico de quem estudou pela metade — prazo, quórum, percentual ou competência trocados; órgão ou conceito vizinho; autor ou lei diferente; exceção tratada como regra; causa e efeito invertidos; requisito a mais ou a menos — e traz o mesmo tipo de detalhe da correta, só que errado.
+- Nenhuma errada pode ser eliminada por bom senso: nada caricato, antiético óbvio, fora do assunto ou oposto à própria frase do enunciado.
+- Se a correta tem ressalva ("salvo", "desde que", "observado"), ao menos uma errada também tem. Termos absolutos (sempre, nunca, exclusivamente, em qualquer hipótese) não aparecem só nas erradas. A correta não repete palavras do enunciado que as erradas não repetem.
 ${UNTRUSTED_RULE}`;
 
   const modules = ctx.modules
@@ -119,6 +131,10 @@ ${UNTRUSTED_RULE}`;
     : facts.length
       ? `\n\nBase de referência já validada (use para manter a precisão; não copie):\n${fenceUntrusted("BASE_DE_REFERENCIA", `- ${facts.slice(0, 15).join("\n- ")}`)}`
       : "";
+  const pct = (x: number) => `${Math.round(100 * x)}%`;
+  const lengthWarning = recentLength && recentLength.n >= 10 && recentLength.shareLongest > 0.3
+    ? `\n\nATENÇÃO: nas questões recentes desta matéria a correta é a alternativa mais longa em ${pct(recentLength.shareLongest)} dos casos (acaso = 25%; teto ${pct(LENGTH_CUE.maxShareLongest)}). Neste lote, a correta NÃO pode ser a mais longa: deixe-a com tamanho intermediário.`
+    : "";
   const memory = lessons.length
     ? `\n\nLições desta matéria — erros que o revisor e o árbitro já reprovaram em rodadas anteriores. NÃO os repita:\n${fenceUntrusted("LICOES_DA_MATERIA", `- ${lessons.join("\n- ")}`)}`
     : "";
@@ -134,7 +150,7 @@ ${nivelRule}
 Tópicos já cobertos (priorize os pouco explorados da ementa): ${topics.slice(0, 60).join("; ") || "nenhum"}
 
 Enunciados recentes que NÃO podem ser repetidos:
-${recent.map((r) => `- ${r}`).join("\n") || "- (nenhum)"}${grounded}${memory}
+${recent.map((r) => `- ${r}`).join("\n") || "- (nenhum)"}${grounded}${memory}${lengthWarning}
 
 Gere ${count} questões inéditas, variando tópicos e dificuldade (pelo menos uma "Difícil"), e registre-as com a ferramenta salvar_questoes.`;
   return { system, user };
@@ -241,7 +257,9 @@ export function parseReview(count: number) {
 }
 
 export function reviewPrompts(ctx: SubjectContext, questions: GeneratedQuestion[], facts: string[]) {
-  const system = `Você é um revisor técnico rigoroso de questões de concurso (${ctx.banca}). Reprove qualquer questão com: gabarito errado; mais de uma alternativa defensável; nenhuma correta; dado factual duvidoso, desatualizado ou inventado (artigos, prazos, percentuais); conteúdo fora da ementa; explicação que não sustenta o gabarito ou que cita alternativas pela letra; pista que entregue a resposta. Na dúvida, reprove. No motivo, escreva o erro concreto em uma frase. ${UNTRUSTED_RULE}`;
+  const system = `Você é um revisor técnico rigoroso de questões de concurso (${ctx.banca}). Reprove qualquer questão com: gabarito errado; mais de uma alternativa defensável; nenhuma correta; dado factual duvidoso, desatualizado ou inventado (artigos, prazos, percentuais); conteúdo fora da ementa; explicação que não sustenta o gabarito ou que cita alternativas pela letra.
+Reprove também qualquer PISTA DE FORMA, que deixa o candidato acertar sem saber o conteúdo: a correta é mais longa, mais detalhada ou mais "equilibrada" que as erradas; é a única com ressalva, tecnicismo ou palavras do enunciado; alguma errada é caricata, antiética óbvia, fora do assunto ou eliminável por bom senso; as alternativas não são paralelas (estruturas ou níveis de detalhe diferentes). Faça o teste: um candidato que NÃO estudou o assunto, olhando só a forma das quatro alternativas, chegaria à correta? Se sim, reprove.
+Na dúvida, reprove. No motivo, escreva o erro concreto em uma frase. ${UNTRUSTED_RULE}`;
   const grounded = ctx.grounded
     ? `\nFatos verificados permitidos (qualquer dado fora desta lista implica reprovação):\n${factsBlock(facts)}`
     : "";

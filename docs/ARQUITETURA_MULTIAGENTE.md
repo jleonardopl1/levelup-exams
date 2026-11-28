@@ -295,8 +295,13 @@ ambiguidade ou omissão vai ao árbitro, que só mantém se confirmar **o mesmo*
 correta. Sem solucionador disponível, cai no critério anterior (só revisor) e marca *degradado*
 na telemetria. Revisor fora do ar → nada é publicado.
 
-**Portão determinístico:** esquema, "todas/nenhuma das anteriores", **pista de tamanho** (correta
-≥ 1,75× a média das erradas) e gabarito copiado no enunciado. Não embaralha quando a explicação cita letras.
+**Portão determinístico:** esquema, "todas/nenhuma das anteriores", gabarito copiado no enunciado e
+**pista de tamanho** (`length-cue.ts`, régua única com o seed e a auditoria): correta mais longa que
+passa a maior errada em > 20%, correta > 1,5× a média das erradas ou correta muito mais curta, e
+**teto por matéria** — se nas 40 questões recentes a correta já é a mais longa em mais de 35%, nova
+candidata com a correta mais longa é recusada antes do revisor. O revisor também reprova pista de
+forma qualitativa (correta única com ressalva ou tecnicismo, errada caricata, falta de paralelismo).
+Não embaralha quando a explicação cita letras; alternativas numéricas vão em ordem crescente (Selecon).
 
 **Prazo:** o pg_cron espera 150 s; orçamento de 140 s (`QUESTION_RUN_BUDGET_MS`). Solucionador e
 revisor em paralelo; árbitro só com ≥ 20 s restantes; disputa sem árbitro é reprovada.
