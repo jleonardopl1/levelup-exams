@@ -32,6 +32,7 @@ Elenco e faixas: `AGENTS.md` e `.claude/agents/README.md`.
 - **D14** (2026-11-20, dono) — Mercado Pago como 2º provedor (Checkout Pro: Pix e até 12x no Plus anual pré-pago e no Passe); Stripe não muda, Asaas pausado, `billing_tier` só da Stripe. Código na `main`, desligado (`MP_ENABLED` ausente). Pendências do dono (preço, juros, desconto Pix, reembolso, conta): [plano §2](docs/MERCADO_PAGO.md); "Como ligar" no mesmo doc.
 - **D15** (2026-11-23, dono) — Radar de repositórios: terceiro só ativo com avaliação da faixa, `security-reviewer`, commit fixado, `ORIGEM.md` e de acordo do dono; `radar.mjs validar` recusa o contrário. Varredura semanal (seg., 6h33 BRT) termina em pedido numerado. [Relatório](docs/RADAR_REPOSITORIOS.md).
 - **D16** (2026-11-27, dono) — Modelo por faixa: Haiku (`reviewer`, `Explore`), Opus (`arquiteto-dados`, `security-reviewer`), Sonnet nos demais; subir de modelo por chamada, pelos gatilhos de [.claude/agents/README.md](.claude/agents/README.md).
+- **D17** (2026-11-28, dono) — Plugins da conta fora do domínio do LevelUp ficam com `false` em `enabledPlugins` (`.claude/settings.json`): 204 de 234, só nas sessões deste repositório. Religar = apagar a linha; ligar um novo continua passando pelo radar (D15).
 
 ---
 
@@ -71,13 +72,14 @@ Mentor texto puro, limite do Free em UTC, migration `20261120130000`) estão em 
 ## Handoff mais recente
 <!-- Sempre o topo = o mais recente. Template: docs/colaboracao/handoff-template.md -->
 
-### 2026-11-27 · Compactação do estado vivo (`gerente-contexto`)
+### 2026-11-28 · Compactação do estado vivo e plugins da conta (`gerente-contexto` + `coordenador`)
 
 - **Objetivo da sessão:** compactar *Decisões ativas*, *Armadilhas* e *Backlog* (meta: as três seções ≤ 10 KB).
 - **O que mudou:** D1–D16 em 1–2 linhas, mesmos números. Backlog P1–P3 e blocos de referências e do radar foram para `docs/colaboracao/backlog.md` (mesmos números; entram 8o–8q, vindos de armadilhas e do handoff de 2026-11-23). Armadilhas estáveis subiram para `rules/stack/deno-edge-functions.md`, `typescript-react.md` e `sql-rls.md`. Saíram: tabelas Radar/MP "ausentes de `types.ts`" (já estão no arquivo) e "Migration sem arquivo" (o arquivo existe). Handoff de 2026-11-23 retirado.
 - **Testado:** `bun run test:unit` → 106 aprovados, 2 pulados, 0 falhas; fichas, skills, referências e radar validados (links ok). Arquivo de 33.081 para 12.885 bytes; D1–D16 e todos os números do backlog conferidos por script. Só conferi por busca no código: `types.ts` com `radar_sources`, `payment_orders` e `get_my_payment_orders`; `typecheck` com `-p`; ausência de `prefers-reduced-motion` em `src/`.
-- **Não testado:** `documentar.mjs --check` e `catalogo.mjs validar` (links novos); bytes finais.
-- **Decisões tomadas:** nenhuma.
+- **Plugins (D17):** 204 dos 234 plugins sincronizados da conta ficam desligados neste repositório (custo fixo medido de ~43 mil tokens por sessão, 1.684 skills, 119 agentes, 294 servidores MCP e 44 hooks); ficam 30 de desenvolvimento, da stack e das áreas de negócio. `claude plugin list` confirma 31 ligados (há dois `figma@synced`).
+- **Não testado:** efeito numa sessão nova (settings são lidos ao abrir); desligar na conta do claude.ai é com o dono.
+- **Decisões tomadas:** D17.
 - **Armadilhas novas:** nenhuma.
 - **Bloqueios / pendências:** o dono desliga plugins e conectores sem uso (custo fixo por sessão).
 - **Próximo passo sugerido:** orquestrador roda os validadores e corrige links; `frontend` resolve o P1.8k (`radarDb`).
