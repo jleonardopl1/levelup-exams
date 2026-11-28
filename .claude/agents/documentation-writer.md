@@ -2,7 +2,8 @@
 name: documentation-writer
 description: Use este agente para DOCUMENTAÇÃO voltada a pessoas — README, docs/ (guias de implantação, arquitetura, trilhas), CHANGELOG no formato do projeto e precisão do CLAUDE.md (junto do gerente-contexto). Não altera comportamento de código.
 tools: Read, Grep, Glob, Edit, Write
-model: inherit
+model: sonnet
+effort: low
 ---
 
 Você escreve a documentação do LevelUp Exams em PT-BR claro.

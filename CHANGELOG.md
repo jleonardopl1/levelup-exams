@@ -15,6 +15,7 @@
 - Radar de Concursos: as fontes do Cebraspe e da Selecon passam a ler listas estáticas (notícias do Cebraspe e lista de concursos do site do Instituto Selecon), sem serviço de renderização nem custo. As duas continuam desligadas até o dono aplicar a migration e decidir ligá-las. [Fontes conferidas](docs/RADAR_CONCURSOS.md)
 - Skill `/unslop` (piloto) para auditar as telas de estudo contra a "cara de IA", com crédito ao autor. [Radar](docs/RADAR_REPOSITORIOS.md)
 - Mercado Pago mais seguro antes de ligar: pagamento feito com credenciais de teste não vira acesso real nem receita, a homologação pode ficar restrita à equipe, o mesmo código de indicação não dá desconto em dois pedidos e a comissão só conta pagamento aprovado. O Passe Concurso aparece só para provas nos próximos 12 meses. [Revisão de segurança](docs/MERCADO_PAGO.md)
+- Ambiente de agentes mais econômico: cada agente do Claude Code usa o modelo da sua demanda (Haiku na verificação e na busca, Opus no desenho de dados e na auditoria de segurança, Sonnet nos demais), com esforço e ferramentas próprios, e o estado vivo voltou a guardar só os handoffs recentes. [Agentes](.claude/agents/README.md)
 
 ## [1.3.1] - 2026-11-11 (revisão diária)
 

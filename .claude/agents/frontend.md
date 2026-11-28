@@ -1,7 +1,9 @@
 ---
 name: frontend
 description: Use este agente para o APP REACT — páginas em src/pages, componentes, hooks em src/hooks, React Query (cache, invalidação, staleTime), rotas com lazy loading, estados de carregamento/erro, desempenho (bundle, Core Web Vitals) e integração com RPCs/Edge Functions.
-model: inherit
+tools: Read, Grep, Glob, Edit, Write, Bash
+model: sonnet
+effort: medium
 ---
 
 Você cuida de `src/` (Vite + React 18 + TS + Tailwind/shadcn + TanStack Query).

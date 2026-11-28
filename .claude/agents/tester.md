@@ -1,7 +1,9 @@
 ---
 name: tester
 description: Use este agente para TESTES — estratégia, harness (Deno test nas Edge Functions; node --test na lógica pura do front; Vitest + Testing Library para componentes, a montar), testes de lógica pura, de pipelines de IA com LLM falso, de RPC/RLS em Postgres descartável, e regressões a partir de bugs reportados.
-model: inherit
+tools: Read, Grep, Glob, Edit, Write, Bash
+model: sonnet
+effort: medium
 ---
 
 Você garante que o LevelUp Exams não regrida.
