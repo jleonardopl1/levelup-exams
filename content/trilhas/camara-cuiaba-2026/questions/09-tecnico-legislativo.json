@@ -33,12 +33,12 @@
 "q": "A Câmara Municipal de Cuiabá integra a Administração:",
 "a": [
 "direta do Município, como órgão do Poder Legislativo",
-"indireta, como autarquia",
-"indireta, como fundação pública",
-"federal, como órgão do Senado"
+"indireta do Município, como autarquia do Poder Legislativo",
+"direta do Município, como órgão do Poder Executivo",
+"indireta do Município, como fundação pública municipal"
 ],
 "c": 0,
-"e": "A Câmara é órgão (sem personalidade jurídica própria) do Município, integrante do Poder Legislativo municipal."
+"e": "A Câmara é órgão (sem personalidade jurídica própria) do Município, integrante do Poder Legislativo municipal e, portanto, da Administração direta. Não é autarquia nem fundação pública, entidades da Administração indireta dotadas de personalidade jurídica própria, e não integra o Poder Executivo, chefiado pelo Prefeito."
 },
 {
 "t": "Administração indireta",
@@ -84,13 +84,13 @@
 "d": "Médio",
 "q": "Os atos administrativos gozam de presunção de legitimidade, o que significa que:",
 "a": [
-"presumem-se conformes à lei até prova em contrário",
-"nunca podem ser anulados",
-"não precisam ser publicados",
-"valem apenas após aprovação judicial"
+"presumem-se conformes à lei até que se prove o contrário",
+"presumem-se conformes à lei, sem admitir prova em contrário",
+"cabe à Administração provar sua validade quando contestados",
+"só podem ser anulados por decisão do Poder Judiciário"
 ],
 "c": 0,
-"e": "A presunção é relativa: admite prova em contrário pelo interessado."
+"e": "A presunção é relativa (juris tantum): admite prova em contrário pelo interessado, a quem cabe o ônus de demonstrar o vício. Por isso não é absoluta, não transfere à Administração o ônus de provar a validade do ato e não impede que a própria Administração anule seus atos ilegais (autotutela, Súmula 473 do STF)."
 },
 {
 "t": "Atos administrativos",
@@ -149,26 +149,26 @@
 "d": "Médio",
 "q": "Um veículo oficial da Câmara, dirigido por servidor em serviço, colide com um carro particular. A responsabilidade da pessoa jurídica pelo dano é, em regra:",
 "a": [
-"objetiva, cabendo ação regressiva contra o servidor em caso de dolo ou culpa",
-"subjetiva, exigindo prova de culpa do servidor pela vítima",
-"exclusiva do servidor",
-"inexistente, pois o servidor estava em serviço"
+"objetiva, com regresso contra o servidor em caso de dolo ou culpa",
+"subjetiva, cabendo à vítima provar a culpa do servidor no acidente",
+"exclusiva do servidor, que deve indenizar diretamente a vítima",
+"objetiva, vedado o regresso contra o servidor, ainda que haja dolo"
 ],
 "c": 0,
-"e": "Art. 37, § 6º, da CF: teoria do risco administrativo."
+"e": "Art. 37, § 6º, da CF: teoria do risco administrativo. A pessoa jurídica responde objetivamente pelos danos que seus agentes, nessa qualidade, causarem a terceiros, sem que a vítima precise provar culpa, e fica assegurado o direito de regresso contra o servidor nos casos de dolo ou culpa. A ação é proposta contra a pessoa jurídica, e não contra o servidor, que responde apenas regressivamente (STF, Tema 940)."
 },
 {
 "t": "Direitos fundamentais",
 "d": "Médio",
 "q": "Segundo o art. 5º da Constituição Federal, a casa é asilo inviolável do indivíduo, ninguém nela podendo penetrar sem consentimento do morador, salvo:",
 "a": [
-"em caso de flagrante delito, desastre, para prestar socorro ou, durante o dia, por determinação judicial",
-"por ordem de qualquer autoridade policial, a qualquer hora",
-"por requisição do Prefeito",
-"durante a noite, com ordem judicial"
+"em caso de flagrante delito ou desastre, para prestar socorro ou, durante o dia, por determinação judicial",
+"em caso de flagrante delito ou desastre, para prestar socorro ou, a qualquer hora, por determinação judicial",
+"em caso de flagrante delito ou desastre, para prestar socorro ou, durante o dia, por ordem da autoridade policial",
+"em caso de flagrante delito ou desastre, para prestar socorro ou, durante o dia, por ordem de CPI"
 ],
 "c": 0,
-"e": "Art. 5º, XI, da CF. A ordem judicial só pode ser cumprida durante o dia."
+"e": "Art. 5º, XI, da CF. A ordem judicial só pode ser cumprida durante o dia, e não a qualquer hora. A entrada por ordem de autoridade policial, sem determinação judicial, não é admitida (reserva de jurisdição); pelo mesmo motivo, a CPI, apesar de seus poderes de investigação, não pode determinar a entrada em domicílio sem consentimento (STF)."
 },
 {
 "t": "Direitos fundamentais",
@@ -189,25 +189,25 @@
 "q": "De acordo com a Constituição, todos têm direito a receber dos órgãos públicos informações de seu interesse particular, ou de interesse coletivo ou geral, que serão prestadas no prazo da lei, ressalvadas:",
 "a": [
 "aquelas cujo sigilo seja imprescindível à segurança da sociedade e do Estado",
-"todas as informações sobre servidores",
-"as informações sobre contratos",
-"as informações orçamentárias"
+"aquelas cujo sigilo seja de interesse exclusivo da Administração que as produziu",
+"aquelas relativas a contratos, licitações e despesas do órgão consultado",
+"aquelas que tratem da remuneração individualizada de cada servidor público"
 ],
 "c": 0,
-"e": "Art. 5º, XXXIII, da CF, regulamentado pela Lei de Acesso à Informação (Lei 12.527/2011)."
+"e": "Art. 5º, XXXIII, da CF, regulamentado pela Lei de Acesso à Informação (Lei 12.527/2011). A única ressalva constitucional é o sigilo imprescindível à segurança da sociedade e do Estado; o mero interesse da Administração não justifica negar a informação. Contratos, licitações e despesas são informações de interesse coletivo, e o STF considera legítima a divulgação dos nomes dos servidores e de suas remunerações (Tema 483)."
 },
 {
 "t": "Direitos sociais",
 "d": "Fácil",
 "q": "São direitos sociais previstos no art. 6º da Constituição Federal, entre outros:",
 "a": [
-"educação, saúde, alimentação, trabalho, moradia, transporte, lazer e segurança",
-"voto, plebiscito e referendo",
-"propriedade e herança",
-"liberdade de locomoção e de reunião"
+"educação, saúde, moradia, transporte e previdência social",
+"educação, saúde, moradia, trabalho e direito de propriedade",
+"saúde, alimentação, lazer, segurança e liberdade de reunião",
+"educação, lazer, previdência social, moradia e herança"
 ],
 "c": 0,
-"e": "O art. 6º lista educação, saúde, alimentação, trabalho, moradia, transporte, lazer, segurança, previdência, proteção à maternidade e à infância e assistência aos desamparados."
+"e": "O art. 6º lista educação, saúde, alimentação, trabalho, moradia, transporte, lazer, segurança, previdência social, proteção à maternidade e à infância e assistência aos desamparados. Propriedade, herança e liberdade de reunião são direitos individuais do art. 5º, e não direitos sociais do art. 6º."
 },
 {
 "t": "Cidadania - direitos políticos",
@@ -215,12 +215,12 @@
 "q": "Segundo a Constituição, o alistamento eleitoral e o voto são facultativos para:",
 "a": [
 "os analfabetos, os maiores de 70 anos e os maiores de 16 e menores de 18 anos",
-"os maiores de 60 anos",
-"os servidores públicos",
-"os militares em serviço"
+"os analfabetos, os maiores de 60 anos e os maiores de 16 e menores de 18 anos",
+"os analfabetos, os maiores de 70 anos e todos os menores de 18 anos",
+"os conscritos em serviço, os maiores de 70 anos e os maiores de 16 e menores de 18 anos"
 ],
 "c": 0,
-"e": "Art. 14, § 1º, II, da CF. São obrigatórios para os maiores de 18 anos."
+"e": "Art. 14, § 1º, II, da CF: facultativos para os analfabetos, os maiores de 70 anos (e não de 60) e os maiores de 16 e menores de 18 anos. São obrigatórios para os maiores de 18 anos. Menores de 16 anos não podem se alistar, e os conscritos, durante o serviço militar obrigatório, são inalistáveis (art. 14, § 2º)."
 },
 {
 "t": "CF - art. 37",
@@ -228,12 +228,12 @@
 "q": "Pelo art. 37 da Constituição, o prazo de validade do concurso público será de:",
 "a": [
 "até 2 anos, prorrogável uma vez por igual período",
-"5 anos, improrrogável",
-"1 ano, prorrogável por 2 anos",
-"até 4 anos, sem prorrogação"
+"até 2 anos, prorrogável mais de uma vez por igual período",
+"até 4 anos, prorrogável uma vez por igual período",
+"até 2 anos, vedada qualquer prorrogação do prazo"
 ],
 "c": 0,
-"e": "Art. 37, III, da CF."
+"e": "Art. 37, III, da CF: o prazo de validade do concurso é de até 2 anos, prorrogável uma única vez, por igual período. Não há prazo de 4 anos, a prorrogação não é vedada e não pode ser repetida."
 },
 {
 "t": "CF - art. 37",
@@ -241,12 +241,12 @@
 "q": "De acordo com o art. 37 da CF, a investidura em cargo ou emprego público depende de aprovação prévia em concurso público, ressalvadas as nomeações para:",
 "a": [
 "cargo em comissão declarado em lei de livre nomeação e exoneração",
-"qualquer cargo efetivo de nível médio",
-"cargos de Técnico Legislativo",
-"empregos em sociedades de economia mista"
+"cargo efetivo declarado em lei de livre nomeação e exoneração",
+"emprego público em empresa pública ou em sociedade de economia mista",
+"cargo efetivo de nível médio, mediante simples indicação da Mesa Diretora"
 ],
 "c": 0,
-"e": "Art. 37, II, da CF. Estatais também precisam de concurso para empregos públicos."
+"e": "Art. 37, II, da CF: a exceção ao concurso é o cargo em comissão declarado em lei de livre nomeação e exoneração. Cargos efetivos, de qualquer nível, exigem concurso e não podem ser providos por indicação. Estatais também precisam de concurso para empregos públicos."
 },
 {
 "t": "CF - art. 37",
@@ -254,12 +254,12 @@
 "q": "Sobre o direito de greve do servidor público, a Constituição estabelece que:",
 "a": [
 "será exercido nos termos e nos limites definidos em lei específica",
-"é proibido para todos os servidores",
-"pode ser exercido sem qualquer limite",
-"é garantido apenas aos militares"
+"será exercido nos termos e nos limites definidos em lei complementar",
+"é vedado ao servidor público civil, por se tratar de serviço essencial",
+"será exercido sem limites até a edição da lei regulamentadora"
 ],
 "c": 0,
-"e": "Art. 37, VII, da CF. Na ausência de lei, o STF determinou a aplicação da Lei 7.783/1989, no que couber (MI 670, 708 e 712)."
+"e": "Art. 37, VII, da CF (redação da EC 19/1998): o direito de greve será exercido nos termos e nos limites definidos em lei específica, e não em lei complementar. O direito é assegurado ao servidor civil (a proibição de greve atinge os militares, art. 142, § 3º, IV). Na ausência de lei, o STF determinou a aplicação da Lei 7.783/1989, no que couber (MI 670, 708 e 712), de modo que a greve não é exercida sem limites."
 },
 {
 "t": "CF - art. 37",
@@ -267,12 +267,12 @@
 "q": "Segundo o art. 37, § 4º, da Constituição, os atos de improbidade administrativa importarão:",
 "a": [
 "suspensão dos direitos políticos, perda da função pública, indisponibilidade dos bens e ressarcimento ao erário, sem prejuízo da ação penal",
-"apenas multa administrativa",
-"prisão administrativa",
-"cassação definitiva da cidadania"
+"cassação dos direitos políticos, perda da função pública, indisponibilidade dos bens e ressarcimento ao erário, sem prejuízo da ação penal",
+"suspensão dos direitos políticos, perda da função pública, indisponibilidade dos bens e ressarcimento ao erário, condicionados à condenação penal",
+"suspensão dos direitos políticos, aposentadoria compulsória, indisponibilidade dos bens e ressarcimento ao erário, sem prejuízo da ação penal"
 ],
 "c": 0,
-"e": "A Lei 8.429/1992 (alterada pela Lei 14.230/2021) regulamenta o dispositivo."
+"e": "Art. 37, § 4º, da CF: suspensão dos direitos políticos, perda da função pública, indisponibilidade dos bens e ressarcimento ao erário, na forma e gradação previstas em lei, sem prejuízo da ação penal cabível. A CF veda a cassação de direitos políticos (art. 15); as sanções não dependem de condenação penal; e a aposentadoria compulsória não está entre as consequências do § 4º. A Lei 8.429/1992 (alterada pela Lei 14.230/2021) regulamenta o dispositivo."
 },
 {
 "t": "CF - art. 39 a 41",
@@ -280,25 +280,25 @@
 "q": "Pelo art. 41 da CF, são estáveis após 3 anos de efetivo exercício os servidores nomeados para cargo de provimento efetivo em virtude de concurso público, sendo condição para a aquisição da estabilidade:",
 "a": [
 "a avaliação especial de desempenho por comissão instituída para essa finalidade",
-"a aprovação em segundo concurso",
-"a indicação da chefia imediata",
-"a filiação a sindicato"
+"a avaliação especial de desempenho realizada exclusivamente pela chefia imediata",
+"a aprovação em curso de formação promovido pela escola de governo do ente",
+"a aprovação em nova prova de conhecimentos ao fim do estágio probatório"
 ],
 "c": 0,
-"e": "Art. 41, § 4º, da CF."
+"e": "Art. 41, § 4º, da CF: como condição para a aquisição da estabilidade, é obrigatória a avaliação especial de desempenho por comissão instituída para essa finalidade, e não por avaliação feita só pela chefia imediata. A CF não exige curso de formação nem nova prova de conhecimentos para a estabilidade."
 },
 {
 "t": "CF - art. 41",
 "d": "Médio",
 "q": "Extinto o cargo ou declarada sua desnecessidade, o servidor estável ficará em disponibilidade:",
 "a": [
-"com remuneração proporcional ao tempo de serviço, até seu adequado aproveitamento em outro cargo",
-"sem remuneração",
-"com remuneração integral, por tempo indeterminado",
-"sendo exonerado imediatamente"
+"com remuneração proporcional ao tempo de serviço, até seu adequado aproveitamento",
+"com remuneração integral, até seu adequado aproveitamento em outro cargo público",
+"sem remuneração, até seu adequado aproveitamento em cargo de atribuições compatíveis",
+"com remuneração proporcional ao tempo de serviço, pelo prazo máximo de dois anos"
 ],
 "c": 0,
-"e": "Art. 41, § 3º, da CF."
+"e": "Art. 41, § 3º, da CF: extinto o cargo ou declarada sua desnecessidade, o servidor estável ficará em disponibilidade, com remuneração proporcional ao tempo de serviço, até seu adequado aproveitamento em outro cargo. A remuneração não é integral nem suprimida, e a CF não fixa prazo máximo para a disponibilidade."
 },
 {
 "t": "Poder Legislativo Municipal",
@@ -306,25 +306,25 @@
 "q": "A Mesa Diretora da Câmara Municipal é o órgão:",
 "a": [
 "de direção dos trabalhos legislativos e administrativos da Câmara",
-"responsável por julgar os vereadores criminalmente",
-"que sanciona as leis municipais",
-"que fiscaliza o Tribunal de Contas"
+"de deliberação máxima da Câmara, ao qual cabe votar as proposições",
+"responsável pela sanção dos projetos de lei aprovados na Câmara",
+"responsável por julgar os vereadores nas infrações penais comuns"
 ],
 "c": 0,
-"e": "Art. 15 da LOM de Cuiabá. A sanção cabe ao Prefeito."
+"e": "Art. 15 da LOM de Cuiabá: a Mesa dirige os trabalhos legislativos e administrativos da Câmara. Votar as proposições cabe ao Plenário, órgão deliberativo. A sanção cabe ao Prefeito. O julgamento de vereadores por infrações penais comuns cabe ao Poder Judiciário."
 },
 {
 "t": "Poder Legislativo Municipal",
 "d": "Médio",
 "q": "O Plenário da Câmara Municipal é:",
 "a": [
-"o órgão deliberativo e soberano, constituído pela reunião dos vereadores em exercício",
-"o espaço físico reservado ao público",
-"sinônimo de Mesa Diretora",
-"uma comissão temporária"
+"o órgão deliberativo e soberano, formado pela reunião dos vereadores em exercício",
+"o órgão diretivo, eleito pelos vereadores para conduzir os trabalhos da Câmara",
+"o órgão técnico, composto por parte dos vereadores, que emite parecer sobre as proposições",
+"o espaço físico reservado ao público que acompanha as sessões da Câmara"
 ],
 "c": 0,
-"e": "O Plenário é o órgão máximo de deliberação, que vota as proposições."
+"e": "O Plenário é o órgão máximo de deliberação, que vota as proposições, constituído pela reunião dos vereadores em exercício. A condução dos trabalhos cabe à Mesa Diretora; o parecer técnico sobre as proposições cabe às comissões; e o espaço reservado ao público não se confunde com o Plenário como órgão."
 },
 {
 "t": "Comissões",
@@ -344,13 +344,13 @@
 "d": "Médio",
 "q": "Comissões temporárias são aquelas que:",
 "a": [
-"são criadas para fins específicos e se extinguem quando cumprida sua finalidade ou esgotado seu prazo",
-"funcionam durante toda a legislatura",
-"são compostas por todos os vereadores",
-"só existem no Congresso Nacional"
+"têm fim específico e se extinguem cumprida a finalidade ou esgotado o prazo",
+"são criadas para fim específico e funcionam até o fim da legislatura",
+"integram a estrutura permanente da Câmara e opinam sobre as matérias de sua área",
+"são compostas por todos os vereadores e presididas pelo Presidente da Câmara"
 ],
 "c": 0,
-"e": "Exemplos: CPI, comissão especial, processante e de representação."
+"e": "Comissões temporárias são criadas para fins específicos e se extinguem quando cumprida sua finalidade ou esgotado seu prazo, sem subsistir obrigatoriamente até o fim da legislatura. Integrar a estrutura permanente e opinar sobre matérias de sua área é próprio das comissões permanentes. Nenhuma comissão é composta por todos os vereadores. Exemplos: CPI, comissão especial, processante e de representação."
 },
 {
 "t": "Processo legislativo",
@@ -358,12 +358,12 @@
 "q": "No processo legislativo, a sanção é o ato pelo qual:",
 "a": [
 "o Chefe do Executivo concorda com o projeto de lei aprovado pelo Legislativo",
-"o Legislativo aprova o projeto",
-"o Judiciário declara a constitucionalidade da lei",
-"a lei é publicada no diário oficial"
+"o Legislativo aprova o projeto de lei, concluindo a fase de discussão e votação",
+"o Chefe do Executivo dá publicidade à lei, por meio do órgão oficial de imprensa",
+"o Chefe do Executivo discorda do projeto de lei e o devolve ao Legislativo"
 ],
 "c": 0,
-"e": "Após a sanção (expressa ou tácita) vêm a promulgação e a publicação."
+"e": "A sanção é a concordância do Chefe do Executivo com o projeto aprovado pelo Legislativo. A aprovação pelo Legislativo é a fase de discussão e votação, anterior à sanção; a discordância do Executivo é o veto; dar conhecimento da lei pelo órgão oficial é a publicação. Após a sanção (expressa ou tácita) vêm a promulgação e a publicação."
 },
 {
 "t": "Processo legislativo",
@@ -371,12 +371,12 @@
 "q": "A promulgação de uma lei consiste em:",
 "a": [
 "atestar a existência da lei e determinar seu cumprimento",
-"vetar parcialmente o projeto",
-"discutir o projeto em plenário",
-"encaminhar o projeto às comissões"
+"concordar com o projeto aprovado e transformá-lo em lei",
+"dar conhecimento da lei a todos e marcar o início da vigência",
+"recusar o projeto aprovado, no todo ou em parte, com motivação"
 ],
 "c": 0,
-"e": "Promulgação atesta que a ordem jurídica foi inovada; a publicação dá conhecimento e marca o início da vigência (salvo vacatio legis)."
+"e": "Promulgação atesta que a ordem jurídica foi inovada, declarando a existência da lei e determinando seu cumprimento. Concordar com o projeto aprovado é a sanção; recusá-lo, no todo ou em parte, é o veto; a publicação dá conhecimento e marca o início da vigência (salvo vacatio legis)."
 },
 {
 "t": "Processo legislativo",
@@ -436,12 +436,12 @@
 "q": "De acordo com a LC nº 95/1998, a cláusula de revogação deverá:",
 "a": [
 "enumerar, expressamente, as leis ou disposições legais revogadas",
-"usar a expressão 'revogam-se as disposições em contrário'",
-"ser sempre omitida",
-"constar no preâmbulo"
+"adotar a fórmula 'revogam-se as disposições em contrário'",
+"ser omitida, bastando a revogação tácita das normas incompatíveis",
+"constar da parte preliminar da lei, junto à ementa e ao preâmbulo"
 ],
 "c": 0,
-"e": "Art. 9º da LC 95/1998 (redação da LC 107/2001)."
+"e": "Art. 9º da LC 95/1998 (redação da LC 107/2001): a cláusula de revogação deverá enumerar, expressamente, as leis ou disposições legais revogadas. A fórmula genérica 'revogam-se as disposições em contrário' não atende à exigência, e a cláusula não é substituída pela revogação tácita. Ela integra a parte final da lei (art. 3º, III), e não a parte preliminar."
 },
 {
 "t": "Técnica legislativa - LC 95/1998",
@@ -461,13 +461,13 @@
 "d": "Médio",
 "q": "Segundo o Manual de Redação da Presidência da República (3ª edição), são atributos da redação oficial:",
 "a": [
-"clareza e precisão, objetividade, concisão, coesão e coerência, impessoalidade, formalidade e padronização, e uso da norma-padrão",
-"criatividade, linguagem figurada e informalidade",
-"prolixidade, jargões e subjetividade",
-"uso de regionalismos e gírias para aproximação"
+"clareza, precisão, objetividade, concisão, impessoalidade e formalidade",
+"clareza, precisão, objetividade, concisão, pessoalidade e formalidade",
+"clareza, precisão, subjetividade, concisão, impessoalidade e formalidade",
+"clareza, precisão, objetividade, concisão, impessoalidade e coloquialidade"
 ],
 "c": 0,
-"e": "Esses atributos garantem a compreensão uniforme e a impessoalidade das comunicações oficiais."
+"e": "O Manual (3ª ed.) lista como atributos: clareza e precisão, objetividade, concisão, coesão e coerência, impessoalidade, formalidade e padronização, e uso da norma-padrão. Esses atributos garantem a compreensão uniforme e a impessoalidade das comunicações oficiais. Pessoalidade, subjetividade e coloquialidade contrariam a impessoalidade, a objetividade e a formalidade exigidas."
 },
 {
 "t": "Redação oficial",
@@ -487,13 +487,13 @@
 "d": "Médio",
 "q": "Conforme o Manual de Redação da Presidência, o fecho \"Respeitosamente\" é usado para autoridades de hierarquia superior e \"Atenciosamente\" para:",
 "a": [
-"autoridades de mesma hierarquia ou hierarquia inferior",
-"qualquer destinatário estrangeiro",
-"comunicações informais",
-"autoridades eclesiásticas"
+"autoridades de mesma hierarquia, de hierarquia inferior e demais casos",
+"autoridades estrangeiras, que seguem o mesmo padrão das brasileiras",
+"particulares em geral, mas não para autoridades de hierarquia inferior",
+"autoridades de mesma hierarquia, sendo dispensado o fecho para as inferiores"
 ],
 "c": 0,
-"e": "Apenas dois fechos são usados nas comunicações oficiais: 'Respeitosamente' e 'Atenciosamente'."
+"e": "Pelo Manual (3ª ed.), 'Atenciosamente' serve às autoridades de mesma hierarquia, de hierarquia inferior e aos demais casos. Apenas dois fechos são usados nas comunicações oficiais: 'Respeitosamente' e 'Atenciosamente'. As comunicações a autoridades estrangeiras ficam fora dessa fórmula, pois seguem rito e tradição próprios, e não há dispensa de fecho para autoridades de hierarquia inferior."
 },
 {
 "t": "Redação oficial",
@@ -526,26 +526,26 @@
 "d": "Difícil",
 "q": "Segundo o Manual de Redação da Presidência (3ª ed.), na comunicação oficial é INADEQUADO:",
 "a": [
-"empregar o pronome de tratamento 'Vossa Excelência' e concordar o verbo na 2ª pessoa do plural (\"Vossa Excelência sabeis\")",
-"usar a 3ª pessoa com pronomes de tratamento",
-"identificar o signatário com nome e cargo",
-"usar o fecho 'Atenciosamente'"
+"concordar o verbo na 2ª pessoa do plural com 'Vossa Excelência'",
+"concordar o verbo na 3ª pessoa com o pronome 'Vossa Excelência'",
+"identificar o signatário pelo nome e pelo cargo que ocupa",
+"usar o fecho 'Atenciosamente' para autoridade de mesma hierarquia"
 ],
 "c": 0,
-"e": "Pronomes de tratamento exigem concordância na 3ª pessoa ('Vossa Excelência sabe')."
+"e": "Pronomes de tratamento exigem concordância na 3ª pessoa ('Vossa Excelência sabe'); concordar na 2ª pessoa do plural ('Vossa Excelência sabeis') é inadequado. São adequados: usar a 3ª pessoa com pronomes de tratamento, identificar o signatário com nome e cargo e usar 'Atenciosamente' para autoridade de mesma hierarquia."
 },
 {
 "t": "Redação oficial - ata",
 "d": "Médio",
 "q": "Na redação de uma ata, recomenda-se:",
 "a": [
-"registrar os fatos de forma sucinta e fiel, sem rasuras e sem espaços em branco, com números preferencialmente por extenso",
-"usar parágrafos com recuos e espaços livres para acréscimos posteriores",
-"emitir opiniões pessoais sobre os oradores",
-"rasurar livremente os erros"
+"registrar os fatos com fidelidade, sem rasuras e sem espaços em branco",
+"registrar os fatos em parágrafos com recuos, separados por linhas em branco",
+"registrar os fatos fielmente e corrigir erros com rasura rubricada",
+"registrar os fatos com as opiniões do redator sobre a atuação dos oradores"
 ],
 "c": 0,
-"e": "A ata é documento de valor jurídico; corrige-se erro com 'digo' ou 'em tempo', sem rasuras."
+"e": "A ata é documento de valor jurídico: registra os fatos de forma sucinta e fiel, sem rasuras e sem espaços em branco, com números preferencialmente por extenso. Corrige-se erro com 'digo' ou 'em tempo', sem rasuras, ainda que rubricadas. Linhas em branco permitiriam acréscimos posteriores, e o redator não emite opiniões pessoais sobre os oradores."
 },
 {
 "t": "Redação oficial - requerimento",
@@ -565,13 +565,13 @@
 "d": "Médio",
 "q": "O relatório administrativo destina-se a:",
 "a": [
-"expor, de forma organizada, fatos, atividades ou resultados apurados, podendo conter conclusões e recomendações",
-"certificar um fato de forma sucinta",
-"comunicar uma ordem a subordinados",
-"convocar para uma reunião"
+"expor fatos, atividades ou resultados apurados, podendo conter conclusões",
+"certificar, de forma sucinta, fato constante de assentamentos oficiais",
+"transmitir ordens da autoridade aos subordinados, podendo conter instruções",
+"convocar os interessados para reunião, indicando data, horário e pauta"
 ],
 "c": 0,
-"e": "Relatórios descrevem e analisam atividades (ex.: relatório de comissão ou de gestão)."
+"e": "O relatório expõe, de forma organizada, fatos, atividades ou resultados apurados, podendo conter conclusões e recomendações (ex.: relatório de comissão ou de gestão). Certificar fato constante de assentamentos é próprio da certidão; transmitir ordens a subordinados, da ordem de serviço; convocar para reunião, da convocação."
 },
 {
 "t": "Arquivologia",
@@ -617,13 +617,13 @@
 "d": "Médio",
 "q": "As atividades de protocolo compreendem:",
 "a": [
-"recebimento, classificação, registro, distribuição, controle da tramitação e expedição de documentos",
-"apenas a eliminação de documentos",
-"restauração de documentos danificados",
-"exclusivamente o arquivamento permanente"
+"recebimento, classificação, registro, distribuição e expedição de documentos",
+"recebimento, classificação, registro, restauração e expedição de documentos",
+"recebimento, registro, distribuição, expedição e eliminação de documentos",
+"recebimento, registro, distribuição, expedição e arquivamento permanente de documentos"
 ],
 "c": 0,
-"e": "O protocolo controla a entrada, a movimentação e a saída de documentos."
+"e": "O protocolo controla a entrada, a movimentação e a saída de documentos: recebimento, classificação, registro, distribuição, controle da tramitação e expedição. Restauração é atividade de conservação; a eliminação decorre da avaliação documental (tabela de temporalidade); e a guarda permanente cabe ao arquivo permanente, não ao protocolo."
 },
 {
 "t": "Arquivologia - métodos",
@@ -643,26 +643,26 @@
 "d": "Médio",
 "q": "Constitui medida adequada de conservação preventiva de documentos em papel:",
 "a": [
-"controlar temperatura e umidade, evitar luz solar direta e usar materiais adequados de acondicionamento",
-"utilizar clipes metálicos e fitas adesivas para reparos",
-"armazenar documentos no chão, próximos a canos",
-"plastificar documentos de valor permanente"
+"controlar temperatura e umidade e evitar a incidência de luz solar direta",
+"reparar rasgos com fita adesiva para evitar a perda de fragmentos",
+"plastificar os documentos de valor permanente para protegê-los do manuseio",
+"manter as folhas unidas com clipes metálicos para evitar extravios"
 ],
 "c": 0,
-"e": "Clipes enferrujam, fitas adesivas mancham e a plastificação é irreversível e prejudicial."
+"e": "A conservação preventiva atua sobre o ambiente e o acondicionamento: controlar temperatura e umidade, evitar luz solar direta e usar materiais adequados de acondicionamento. Clipes enferrujam, fitas adesivas mancham e a plastificação é irreversível e prejudicial."
 },
 {
 "t": "Contabilidade pública - orçamento",
 "d": "Médio",
 "q": "São instrumentos de planejamento orçamentário previstos no art. 165 da Constituição:",
 "a": [
-"Plano Plurianual (PPA), Lei de Diretrizes Orçamentárias (LDO) e Lei Orçamentária Anual (LOA)",
-"Plano Diretor, Código Tributário e LOA",
-"Balanço Patrimonial, LDO e PPA",
-"Relatório de Gestão Fiscal e LOA"
+"Plano Plurianual, Lei de Diretrizes Orçamentárias e Lei Orçamentária Anual",
+"Plano Diretor, Lei de Diretrizes Orçamentárias e Lei Orçamentária Anual",
+"Plano Plurianual, Lei de Responsabilidade Fiscal e Lei Orçamentária Anual",
+"Plano Plurianual, Lei de Diretrizes Orçamentárias e Relatório de Gestão Fiscal"
 ],
 "c": 0,
-"e": "PPA (médio prazo, 4 anos), LDO (metas e prioridades, orienta a LOA) e LOA (orçamento anual)."
+"e": "PPA (médio prazo, 4 anos), LDO (metas e prioridades, orienta a LOA) e LOA (orçamento anual) são as leis do art. 165 da CF. O Plano Diretor é instrumento da política urbana (art. 182); a Lei de Responsabilidade Fiscal (LC 101/2000) é norma geral de finanças públicas, e o Relatório de Gestão Fiscal é instrumento de transparência previsto nela."
 },
 {
 "t": "Contabilidade pública - receita",
@@ -721,13 +721,13 @@
 "d": "Médio",
 "q": "Para prevenir lesões por esforço repetitivo (LER/DORT) em atividades de digitação, recomenda-se:",
 "a": [
-"mobiliário ajustável, pausas regulares e postura adequada, conforme a NR-17 (Ergonomia)",
-"jornadas contínuas sem pausas",
-"monitores abaixo da linha da mesa",
-"cadeiras sem regulagem"
+"mobiliário ajustável, pausas regulares e postura corporal adequada",
+"mobiliário ajustável, postura adequada e jornada contínua sem pausas",
+"pausas regulares, postura adequada e cadeira sem regulagem de altura",
+"mobiliário ajustável, pausas regulares e horas extras habituais"
 ],
 "c": 0,
-"e": "A NR-17 trata da adaptação das condições de trabalho às características psicofisiológicas dos trabalhadores."
+"e": "Mobiliário ajustável, pausas regulares e postura adequada seguem a NR-17 (Ergonomia), que trata da adaptação das condições de trabalho às características psicofisiológicas dos trabalhadores. Jornada contínua sem pausas, cadeira sem regulagem e horas extras habituais aumentam a sobrecarga e o risco de LER/DORT."
 },
 {
 "t": "Higiene e segurança do trabalho",
@@ -747,13 +747,13 @@
 "d": "Médio",
 "q": "Um cidadão procura o setor de protocolo da Câmara para obter informação sobre a tramitação de um projeto. O Técnico Legislativo deve:",
 "a": [
-"consultar o sistema e informar com clareza a situação, orientando sobre como acompanhar a tramitação",
-"recusar-se, pois a informação é sigilosa",
-"pedir que o cidadão protocole requerimento formal para qualquer informação",
-"encaminhá-lo diretamente ao Presidente da Câmara"
+"consultar o sistema, informar a situação e orientar sobre o acompanhamento",
+"informar que a tramitação é sigilosa até a votação final em Plenário",
+"exigir requerimento formal, com justificativa do interesse, antes de informar",
+"encaminhá-lo ao gabinete do Presidente da Câmara, único autorizado a informar"
 ],
 "c": 0,
-"e": "A tramitação de proposições é informação pública (transparência ativa, Lei 12.527/2011)."
+"e": "A tramitação de proposições é informação pública (transparência ativa, Lei 12.527/2011): cabe consultar o sistema, informar com clareza a situação e orientar o cidadão sobre como acompanhar a tramitação. Não há sigilo da tramitação até a votação; são vedadas exigências relativas aos motivos do pedido de informação de interesse público (art. 10, § 3º, da Lei 12.527/2011); e não há razão para remeter ao Presidente da Câmara um atendimento que o próprio setor pode prestar."
 }
 ]
 }
