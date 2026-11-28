@@ -58,7 +58,8 @@ export function emphasizeNegativeCommand(stem: string): string {
  */
 const ABSOLUTE = /\b(sempre|nunca|jamais|exclusivamente|unicamente|absolutamente|em (?:qualquer|nenhuma) hip[óo]tese|sob nenhuma circunst[âa]ncia|todo e qualquer)\b/iu;
 
-const ALL_OR_NONE = /\b(todas as (alternativas|anteriores|opções)|nenhuma das (alternativas|anteriores|opções))\b/i;
+// "Todas/nenhuma das anteriores" e a variante "Nenhum: os três...", "Todas: ..." (alternativa que julga as outras).
+const ALL_OR_NONE = /\b(todas as (alternativas|anteriores|opções)|nenhuma das (alternativas|anteriores|opções))\b|^\s*(nenhum|nenhuma|todos|todas|ambos|ambas)\s*[:—–]/i;
 
 /**
  * Falhas clássicas de elaboração de itens (item-writing flaws) que entregam a resposta

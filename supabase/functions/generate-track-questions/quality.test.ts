@@ -181,3 +181,8 @@ Deno.test("orderNumericAlternatives: ordem crescente como a Selecon, gabarito pr
   assertEquals(s.alternativas, ["R$ 300,00", "R$ 600,00", "R$ 900,00", "R$ 1.200,00"]);
   assertEquals(s.alternativas[s.correta], "R$ 1.200,00");
 });
+
+Deno.test("itemFlaws: alternativa que julga as outras ('Nenhum: os três...') reprova; menção de conteúdo passa", () => {
+  assertEquals(itemFlaws({ ...Q, alternativas: ["Publicidade", "Impessoalidade", "Moralidade", "Nenhum: os três estão na CF"] }).length, 1);
+  assertEquals(itemFlaws({ ...Q, alternativas: ["Publicidade", "Impessoalidade", "Moralidade", "nenhuma das linhas de defesa"] }), []);
+});
