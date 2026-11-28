@@ -19,6 +19,8 @@ Plataforma gamificada de estudos para concursos públicos, vestibulares e ENEM (
   `Explore`, Opus no `arquiteto-dados` e no `security-reviewer`, Sonnet nos demais); subagente sem
   modelo roda em Sonnet (`CLAUDE_CODE_SUBAGENT_MODEL`). Gatilhos para subir de modelo e regras de
   economia de tokens: `.claude/agents/README.md`.
+- **Plugins da conta (D17):** os fora do domínio ficam com `false` em `enabledPlugins`; para religar um,
+  apague a linha (ligar plugin novo segue o radar, D15).
 - **Skills dos 79 cargos** do organograma em `.claude/skills/`, geradas de `ops/agentes/catalogo.json`
   por `node ops/agentes/skills.mjs` — não editar à mão. Áreas podem ser acionadas pelo modelo e
   encaminham; especialistas só por `/`. No turno da skill, só leitura (`disallowed-tools`).

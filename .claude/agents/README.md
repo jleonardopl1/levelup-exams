@@ -76,6 +76,8 @@ de um MCP, acrescente só o dela (ex.: `mcp__Figma__*` no `designer`).
 4. Para continuar um trabalho, mande `SendMessage` ao mesmo agente em vez de criar outro.
 5. Paralelize só o que é independente e evite cadeias de agente chamando agente.
 6. Em suítes de teste, traga só as falhas e o placar final (`| tail -n 40`).
+7. Plugins da conta fora do domínio do LevelUp ficam desligados em `.claude/settings.json` (D17).
+   Só religue um (apagando a linha `false`) se a tarefa precisar dele.
 
 ## Como acionar
 
